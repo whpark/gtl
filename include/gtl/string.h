@@ -1,9 +1,4 @@
-﻿#pragma once
-
-#ifndef GTL_HEADER__STRING
-#define GTL_HEADER__STRING
-
-//////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////
 //
 // string.h:
 //
@@ -14,26 +9,27 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#pragma once
+
+#ifndef GTL_HEADER__STRING
+#define GTL_HEADER__STRING
+
 
 #pragma warning(push)
-//#pragma warning(once: 4251)
 
-//import std.core;
 
 #include <string>
 #include <concepts>
 
+#include "_lib_gtl.h"
+#include "concepts.h"
 #include "string/basic_string.h"
 #include "string/convert_codepage.h"
-#include "string/old_format.h"
+//#include "string/convert_codepage_kssm.h"
+//#include "string/old_format.h"
 
 namespace gtl {
 #pragma pack(push, 8)
-
-	//-----------------------------------------------------------------------------
-	/// @brief pre-defines : basic_string_t
-	template < gtlc::string_elem tchar_t, class _Traits = std::char_traits<tchar_t>, class _Alloc = std::allocator<tchar_t> >
-	using basic_string_t = std::basic_string<tchar_t, _Traits, _Alloc>;
 
 	//-----------------------------------------------------------------------------
 	/// @brief pre-defines : class TString
@@ -54,41 +50,36 @@ namespace gtl {
 		/// @brief Constructor
 		/// @tparam tchar_t 
 		using base_t::base_t;
-		//TString() = default;			// 필요없는데...
-		//TString(const TString& B) = default;
-		//TString(TString&& B) = default;
-		//TString(const basic_string_t<tchar_t>& B) : basic_string_t<tchar_t>(B) {}
+		TString() = default;
+		TString(TString const& B) = default;
+		TString(TString&& B) = default;
+		TString(basic_string_t<tchar_t> const& B) : basic_string_t<tchar_t>(B) {}
 
 
 		/// @brief Constructor from other codepage (string)
 		/// @param strOther : string
-		template < gtlc::string_elem tchar_other_t >
-			requires (!std::is_same_v<tchar_other_t, tchar_t>)
-		explicit TString(const TString<tchar_other_t>& strOther) {
-			*this = (const basic_string_t<tchar_other_t>&)strOther;
+		template < gtlc::string_elem tchar_other_t > // requires (!std::is_same_v<tchar_other_t, tchar_t>)
+		explicit TString(TString<tchar_other_t> const& strOther) : base_t(ToString<tchar_other_t, tchar_t>(strOther)) {
 		}
 
-		// TString(const tchar_t* B) { if (B) (base_t&)*this = B; }
 
 		/// @brief Constructor from other codepage (psz)
 		/// @param pszOther 
-		template < gtlc::string_elem tchar_other_t >
-			requires (!std::is_same_v<tchar_other_t, tchar_t>)
-		explicit TString(const tchar_other_t* pszOther) {
+		template < gtlc::string_elem tchar_other_t > // requires (!std::is_same_v<tchar_other_t, tchar_t>)
+		explicit TString(tchar_other_t const* pszOther) {
 			*this = pszOther;
 		}
 
 
-		/// @brief Constructor from String View
+		/// @brief Constructor from string_view<tchar_other_t>
 		/// @tparam  
 		/// @param B 
-		template < template <typename> typename str_view, class = str_view<tchar_t>::gtl_tstring_t >
-		TString(str_view<tchar_t> B) : base_t(B.data(), B.data()+B.size()) { }
-
-		template < typename tchar_other_t, template <typename> typename str_view, typename t = str_view<tchar_other_t>::gtl_tstring_t >
-			requires (gtlc::string_elem<tchar_other_t>)
-		TString(str_view<tchar_other_t> B) {
-			*this = TString<tchar_other_t>(B);
+		//template < gtlc::string_elem tchar_other_t, template <typename> typename tstr_view >
+		//	requires (std::is_convertible_v<tstr_view<tchar_other_t>, std::basic_string_view<tchar_other_t> >)
+		//TString(tstr_view<tchar_other_t> B) : base_t(ToString<tchar_other_t, tchar_t>(B)) {
+		//}
+		template < gtlc::string_elem tchar_other_t >
+		TString(std::basic_string_view<tchar_other_t> sv) : base_t(ToString<tchar_other_t, tchar_t>(sv)) {
 		}
 
 		//tchar_t* Attach(tchar_t* psz, size_type nBufferSize);
@@ -98,67 +89,48 @@ namespace gtl {
 		}
 
 	public:
-		auto GetLength() const						{ return base_t::size(); }
-		auto IsEmpty() const						{ return base_t::empty(); }
-		void Clear()								{ base_t::clear(); }
-		[[deprecated]] void Empty()					{ base_t::clear(); }
+		//// helper functions. do I need these?..
+		//auto GetLength() const						{ return base_t::size(); }
+		//auto IsEmpty() const						{ return base_t::empty(); }
+		//void Clear()								{ base_t::clear(); }
+		//[[deprecated]] void Empty()					{ base_t::clear(); }
 
-		tchar_t& GetAt(int index)					{ return base_t::at(index); }
-		tchar_t& GetAt(int index) const				{ return base_t::at(index); }
-		void SetAt(int index, tchar_t ch)			{ base_t::at(index) = ch; }
-		operator const tchar_t*() const				{ return base_t::c_str(); }
+		//tchar_t&		GetAt(int index)			{ return base_t::at(index); }
+		//tchar_t const&	GetAt(int index) const		{ return base_t::at(index); }
+		//void SetAt(int index, tchar_t ch)			{ base_t::at(index) = ch; }
 
-		//using base_t::operator [];	(using을 사용) or 또는 (index 를 size_type(size_t) 로 변경할 경우) --> operator 찾지 못함. --
-			  tchar_t& operator [] (index_type index)		{ return base_t::operator[](index); }
-		const tchar_t& operator [] (index_type index) const { return base_t::operator[](index); }
+		// returns psz
+		operator tchar_t const*() const				{ return base_t::c_str(); }
+
+		// operator []
+		using base_t::operator[];
 
 		//---------------------------------------------------------------------
 		// oeprator =
-		TString& operator = (const TString&) = default;
+		using base_t::operator = ;
+		TString& operator = (TString const&) = default;
 		TString& operator = (TString&&) = default;
 
-		template < std::integral tchar_other_t >
-		TString& operator = (const basic_string_t<tchar_other_t>& B) {
-			if constexpr (std::is_same_v<tchar_t, tchar_other_t>)		base_t::operator = (B);
-			else if constexpr (std::is_same_v<tchar_t, char>)		operator = ( ((const TString<tchar_other_t>&)B).ConvToMBCS() );
-			else if constexpr (std::is_same_v<tchar_t, wchar_t>)	operator = ( ((const TString<tchar_other_t>&)B).ConvToUnicode() );
-			else if constexpr (std::is_same_v<tchar_t, char8_t>)	operator = ( ((const TString<tchar_other_t>&)B).ConvToUTF8() );
-			else static_assert(false, "TString<T> T : char, char8_t, wchar_t");
-			return *this;
-		}
-		TString& operator = (const tchar_t* psz) {
-			if (psz)
-				(base_t&)(*this) = psz;
-			else
-				base_t::clear();
+		template < gtlc::string_elem tchar_other_t >
+		TString& operator = (basic_string_t<tchar_other_t> const& str) {
+			*this = ToString<tchar_other_t, tchar_t>(str);
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other_t >
-		TString& operator = (const tchar_other_t* psz) {
-			*this = TString<tchar_other_t>(psz);
+		TString& operator = (tchar_other_t const* psz) {
+			*this = ToString<tchar_other_t, tchar_t>(psz);
 			return *this;
 		}
-
-		// From String View
-		template < template <typename> typename str_view, class = str_view<tchar_t>::gtl_tstring_t >
-		TString& operator = (str_view<tchar_t> B) {
-			base_t::assign(B.data(), B.data()+B.size());
+		// From string_view
+		template < gtlc::string_elem tchar_other_t >
+		TString& operator = (std::basic_string_view<tchar_other_t> sv) {
+			*this = ToString<tchar_other_t, tchar_t>(sv);
 			return *this;
-		}
-		template < typename tchar_other_t, template <typename> typename str_view, class t = str_view<tchar_other_t>::gtl_tstring_t >
-			requires (gtlc::string_elem<tchar_other_t> )
-		TString& operator = (str_view<tchar_other_t> B) {
-			*this = TString<tchar_other_t>(B);
-			return *this;
-		}
-
-		template < template <typename> typename str_view, class t = str_view<tchar_t>::gtl_tstring_t >
-		operator str_view<tchar_t> () const {
-			return str_view(*this);
 		}
 
 		//---------------------------------------------------------------------
 		// operator +=
+		using base_t::operator +=;
 		TString& operator += (const TString& B) {
 			base_t::operator += (B);
 			return *this;
@@ -170,7 +142,6 @@ namespace gtl {
 			} else {
 				operator += ( ((const TString<tchar_other_t>&)B).ToString<tchar_t>() );
 			}
-			else static_assert(false, "TString<T> T : char, char8_t, wchar_t");
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other_t >
@@ -376,19 +347,19 @@ namespace gtl {
 			return base_t::erase(index, nCount).size();
 		}
 
-		index_type Find(tchar_t ch, index_type nStart = 0) const {
+		[[nodiscard]] index_type Find(tchar_t ch, index_type nStart = 0) const {
 			return base_t::find(ch, nStart);
 		}
-		index_type Find(const tchar_t* psz, index_type nStart = 0) const {
+		[[nodiscard]] index_type Find(const tchar_t* psz, index_type nStart = 0) const {
 			return base_t::find(psz, nStart);
 		}
-		index_type ReverseFind(tchar_t ch, index_type nStart = base_t::npos) const {
+		[[nodiscard]] index_type ReverseFind(tchar_t ch, index_type nStart = base_t::npos) const {
 			return base_t::rfind(ch, nStart);
 		}
-		index_type ReverseFind(const tchar_t* psz, index_type nStart = base_t::npos) const {
+		[[nodiscard]] index_type ReverseFind(const tchar_t* psz, index_type nStart = base_t::npos) const {
 			return base_t::rfind(psz, nStart);
 		}
-		index_type FindOneOf(const tchar_t* pszCharSet, index_type nStart = 0) const {
+		[[nodiscard]] index_type FindOneOf(const tchar_t* pszCharSet, index_type nStart = 0) const {
 			const tchar_t* head = base_t::c_str();
 			const tchar_t* pos = tszsearch_oneof(head+nStart, pszCharSet);
 			if (pos)
@@ -396,11 +367,11 @@ namespace gtl {
 			return base_t::npos;
 		}
 
-		// simple formatting
-		template < typename ... Args >
-		TString& Format(tchar_t const* pszFormat, Args&& ... args) {
-			return *this = gtl::old_printf::Format(pszFormat, std::forward<Args>(args)...);
-		}
+		//// simple formatting
+		//template < typename ... Args >
+		//TString& Format(tchar_t const* pszFormat, Args&& ... args) {
+		//	return *this = gtl::old_printf::Format(pszFormat, std::forward<Args>(args)...);
+		//}
 
 		//// to do : to be tested
 		//void FormatV(const tchar_t* pszFormat, va_list argList) {
@@ -410,7 +381,7 @@ namespace gtl {
 
 	//	bool LoadString(UINT nID);
 
-		tchar_t* GetBuffer(size_type nNewLen) {
+		[[nodiscard]] tchar_t* GetBuffer(size_type nNewLen) {
 			if (nNewLen > base_t::size()) {
 				//if (bKeepOriginal && (nNewLen > base_t::capacity()))
 				//	base_t::reserve(nNewLen);

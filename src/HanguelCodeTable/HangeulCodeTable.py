@@ -85,8 +85,8 @@ fOutHeader.write(
                 '\t\n'
                 '\tusing T_HANGEUL_TABLE = std::array<S_HANGEUL_CODE, ' + '{}'.format(nItems) + '>;\n\n'
                 '\tT_HANGEUL_TABLE const& GetHangeulCodeTable();\n'
-                '\tstd::map<wchar_t, uint16_t> const& GetHangeulCodeMapWtoKSSM();\n'
-                '\tstd::map<uint16_t, wchar_t> const& GetHangeulCodeMapKSSMtoW();\n'
+                '\tstd::map<char16_t, uint16_t> const& GetHangeulCodeMapUTF16toKSSM();\n'
+                '\tstd::map<uint16_t, char16_t> const& GetHangeulCodeMapKSSMtoUTF16();\n'
                 '\n'
                 '#pragma pack(pop)\n'
                 '}\t// namespace gtl\n'
@@ -146,7 +146,7 @@ fOutImpl.write('\n\n')
 codes.sort(key=codepair.KeyUnicode)
 nCount = 0
 fOutImpl.write('\t' + strLineSeperator)
-fOutImpl.write('\tstatic /*constexpr*/ std::map<wchar_t, uint16_t> const g_mapW_KSSM { {\n')
+fOutImpl.write('\tstatic /*constexpr*/ std::map<char16_t, uint16_t> const g_mapW_KSSM { {\n')
 for code in codes :
     if (nCount == 0) :
         fOutImpl.write('\t\t');
@@ -169,7 +169,7 @@ fOutImpl.write('\n\n')
 codes.sort(key=codepair.KeyKSSM)
 nCount = 0
 fOutImpl.write('\t' + strLineSeperator)
-fOutImpl.write('\tstatic /*constexpr*/ std::map<uint16_t, wchar_t> const g_mapKSSM_W { {\n')
+fOutImpl.write('\tstatic /*constexpr*/ std::map<uint16_t, char16_t> const g_mapKSSM_W { {\n')
 for code in codes :
     if (nCount == 0) :
         fOutImpl.write('\t\t');
@@ -191,10 +191,10 @@ fOutImpl.write(
             '\tT_HANGEUL_TABLE const& GetHangeulCodeTable() {\n'
             '\t\treturn g_tblHangeulCode;\n'
             '\t}\n'
-            '\tstd::map<wchar_t, uint16_t> const& GetHangeulCodeMapWtoKSSM() {\n'
+            '\tstd::map<char16_t, uint16_t> const& GetHangeulCodeMapUTF16toKSSM() {\n'
             '\t\treturn g_mapW_KSSM;\n'
             '\t}\n\n'
-            '\tstd::map<uint16_t, wchar_t> const& GetHangeulCodeMapKSSMtoW() {\n'
+            '\tstd::map<uint16_t, char16_t> const& GetHangeulCodeMapKSSMtoUTF16() {\n'
             '\t\treturn g_mapKSSM_W;\n'
             '\t}\n'
             )

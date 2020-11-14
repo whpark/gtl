@@ -9,10 +9,16 @@
 
 #pragma once
 
+
+#if !defined(_HAS_CXX20)
+#	error ERROR! Supports C++v20 only.
+#endif
+
+
 //=================================================================================================================================
 // include files. (until modules......)
-#define _USE_MATH_DEFINES
-#include <math.h>
+//#define _USE_MATH_DEFINES
+//#include <math.h>	======> <numbers>
 #include <cmath>
 #include <cassert>
 #include <cstdio>
@@ -27,63 +33,109 @@
 #include <tchar.h>
 //#include <cstdbool>
 
+#include <version>	// version information
+#include <concepts>
+#include <exception>
 #include <limits>
 #include <numeric>
+#include <numbers>
+#include <complex>
 #include <initializer_list>
-#include <exception>
 #include <typeinfo>
 #include <type_traits>
 #include <bit>
-#include <algorithm>
+#include <bitset>
 #include <compare>
-#include <tuple>
-#include <any>
+#include <charconv>
+
 #include <iostream>
-#include <istream>
-#include <ostream>
 #include <fstream>
+#include <codecvt>
 #include <string>
 #include <string_view>
+#if defined(__cpp_lib_format)
+#	include <format.h>
+#else
+#	include <fmt/format.h>
+#endif
+
+#include <algorithm>
 #include <iterator>
-#include <bitset>
+#include <any>
+#include <tuple>
 #include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
 #include <list>
 #include <array>
 #include <vector>
 #include <deque>
 #include <queue>
 #include <memory>
-#include <atomic>
-#include <chrono>
-#include <functional>
-#include <system_error>
-#include <thread>
-#include <utility>
-#include <mutex>
-#include <shared_mutex>
-#include <utility>
-#include <future>
 #include <optional>
+#include <variant>
+#include <ranges>
+
+#include <chrono>
 #include <filesystem>
+#include <system_error>
+#include <functional>
+#include <utility>
 #include <random>
+
+#include <atomic>
+#include <barrier>
+#include <mutex>
+#include <semaphore>
+#include <shared_mutex>
 #include <condition_variable>
-#include <charconv>
+#include <thread>
 #include <future>
-//#include <tchar.h>
-#include <codecvt>
-
-
-#if !defined(__cpp_lib_concepts)
-#	error ERROR! Supports C++v20 only.
+#include <coroutine>
+#include <latch>
+#if !defined (__cpp_lib_jthread)
+#	include <jthread.hpp>
 #endif
 
 
+
+#define GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY false
+
 namespace gtl {
 
-	namespace concepts {
 
-
+	// byte swap
+#if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY)
+	template < std::integral tvar_t >
+	[[nodiscard]] auto GetByteSwap(tvar_t v) {
+		if constexpr (sizeof(v) == sizeof(std::uint16_t)) {
+			return _byteswap_ushort(v);
+		} else if constexpr (sizeof(v) == sizeof(std::uint32_t)) {
+			return _byteswap_ulong(v);
+		} else if constexpr (sizeof(v) == sizeof(std::uint64_t)) {
+			return _byteswap_uint64(v);
+		} else {
+			static_assert(false, "not supported data type.");
+		}
 	}
+	template < std::integral tvar_t >
+	void ByteSwap(tvar_t& v) {
+		v = GetByteSwap(v);
+	}
+#else
+	template < std::integral tvar_t >
+	[[nodiscard]] tvar_t GetByteSwap(tvar_t const v) {
+		tvar_t r{};
+		std::reverse_copy((uint8_t const*)v, (uint8_t const*)v+sizeof(v), (uint8_t*)&r);
+		return r;
+	}
+	template < std::integral tvar_t >
+	void ByteSwap(tvar_t& v) {
+		std::reverse((uint8_t const*)v, (uint8_t const*)v+sizeof(v));
+	}
+#endif
+
 
 }
 

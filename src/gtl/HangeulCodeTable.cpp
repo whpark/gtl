@@ -2830,7 +2830,7 @@ namespace gtl {
 
 
 	//------------------------------------------------------------------------------------------------
-	static /*constexpr*/ std::map<wchar_t, uint16_t> const g_mapW_KSSM { {
+	static /*constexpr*/ std::map<char16_t, uint16_t> const g_mapW_KSSM { {
 		{ 0x3131/*ㄱ*/, 0x8841 },	{ 0x3132/*ㄲ*/, 0x8c41 },	{ 0x3133/*ㄳ*/, 0x8444 },	{ 0x3134/*ㄴ*/, 0x9041 },	{ 0x3135/*ㄵ*/, 0x8446 },	{ 0x3136/*ㄶ*/, 0x8447 },	{ 0x3137/*ㄷ*/, 0x9441 },	{ 0x3138/*ㄸ*/, 0x9841 },
 		{ 0x3139/*ㄹ*/, 0x9c41 },	{ 0x313a/*ㄺ*/, 0x844a },	{ 0x313b/*ㄻ*/, 0x844b },	{ 0x313c/*ㄼ*/, 0x844c },	{ 0x313d/*ㄽ*/, 0x844d },	{ 0x313e/*ㄾ*/, 0x844e },	{ 0x313f/*ㄿ*/, 0x844f },	{ 0x3140/*ㅀ*/, 0x8450 },
 		{ 0x3141/*ㅁ*/, 0xa041 },	{ 0x3142/*ㅂ*/, 0xa441 },	{ 0x3143/*ㅃ*/, 0xa841 },	{ 0x3144/*ㅄ*/, 0x8454 },	{ 0x3145/*ㅅ*/, 0xac41 },	{ 0x3146/*ㅆ*/, 0xb041 },	{ 0x3147/*ㅇ*/, 0xb441 },	{ 0x3148/*ㅈ*/, 0xb841 },
@@ -4238,7 +4238,7 @@ namespace gtl {
 
 
 	//------------------------------------------------------------------------------------------------
-	static /*constexpr*/ std::map<uint16_t, wchar_t> const g_mapKSSM_W { {
+	static /*constexpr*/ std::map<uint16_t, char16_t> const g_mapKSSM_W { {
 		{ 0x8444, 0x3133/*ㄳ*/ },	{ 0x8446, 0x3135/*ㄵ*/ },	{ 0x8447, 0x3136/*ㄶ*/ },	{ 0x844a, 0x313a/*ㄺ*/ },	{ 0x844b, 0x313b/*ㄻ*/ },	{ 0x844c, 0x313c/*ㄼ*/ },	{ 0x844d, 0x313d/*ㄽ*/ },	{ 0x844e, 0x313e/*ㄾ*/ },
 		{ 0x844f, 0x313f/*ㄿ*/ },	{ 0x8450, 0x3140/*ㅀ*/ },	{ 0x8454, 0x3144/*ㅄ*/ },	{ 0x8461, 0x314f/*ㅏ*/ },	{ 0x8481, 0x3150/*ㅐ*/ },	{ 0x84a1, 0x3151/*ㅑ*/ },	{ 0x84c1, 0x3152/*ㅒ*/ },	{ 0x84e1, 0x3153/*ㅓ*/ },
 		{ 0x8541, 0x3154/*ㅔ*/ },	{ 0x8561, 0x3155/*ㅕ*/ },	{ 0x8581, 0x3156/*ㅖ*/ },	{ 0x85a1, 0x3157/*ㅗ*/ },	{ 0x85c1, 0x3158/*ㅘ*/ },	{ 0x85e1, 0x3159/*ㅙ*/ },	{ 0x8641, 0x315a/*ㅚ*/ },	{ 0x8661, 0x315b/*ㅛ*/ },
@@ -5648,12 +5648,12 @@ namespace gtl {
 	T_HANGEUL_TABLE const& GetHangeulCodeTable() {
 		return g_tblHangeulCode;
 	}
-	std::map<uint16_t, wchar_t> const& GetKoreanMapKSSMtoW() {
-		return g_mapKSSM_W;
-	}
-	std::map<wchar_t, uint16_t> const& GetKoreanMapWtoKSSM() {
+	std::map<char16_t, uint16_t> const& GetHangeulCodeMapUTF16toKSSM() {
 		return g_mapW_KSSM;
 	}
 
+	std::map<uint16_t, char16_t> const& GetHangeulCodeMapKSSMtoUTF16() {
+		return g_mapKSSM_W;
+	}
 }	// namespace gtl
 

@@ -8,7 +8,6 @@
 
 
 #include <cstdint>
-#include <array>
 #include <map>
 
 namespace gtl {
@@ -25,8 +24,8 @@ namespace gtl {
 	using T_HANGEUL_TABLE = std::array<S_HANGEUL_CODE, 11223>;
 
 	T_HANGEUL_TABLE const& GetHangeulCodeTable();
-	std::map<uint16_t, wchar_t> const& GetHangeulCodeMapKSSMtoW();
-	std::map<wchar_t, uint16_t> const& GetHangeulCodeMapWtoKSSM();
+	std::map<char16_t, uint16_t> const& GetHangeulCodeMapUTF16toKSSM();
+	std::map<uint16_t, char16_t> const& GetHangeulCodeMapKSSMtoUTF16();
 
 #pragma pack(pop)
 }	// namespace gtl

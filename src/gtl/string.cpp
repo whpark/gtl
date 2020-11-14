@@ -11,104 +11,491 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "gtl/string/basic_string.h"
+#include "gtl/string/convert_codepage.h"
+#include "gtl/string/convert_codepage_kssm.h"
+#include "gtl/string/old_format.h"
 #include "gtl/string.h"
 //#include "gtl/archive.h"
 #include "HangeulCodeTable.h"
 
-
-
 namespace gtl {
-	//template < typename tchar_t >
-	//typename TString<tchar_t>::size_type TString<tchar_t>::RecalcLength() {	// data() 함수를 사용해서 버퍼를 가져온 다음, 버퍼에 데이터를 보낸 다음, 크기 다시 설정. capacity()에 따라서 마지막 문자가 잘릴 수 있음.
-	//	const tchar_t* p = *this;
-	//	const auto nCapacity = this->capacity();
-	//	if (!p || !nCapacity)
-	//		return 0;
-	//	auto& _My_data = this->_Get_data();
-	//	size_type nNewLen = 0;
-	//	for (; *p && nNewLen < nCapacity; p++)
-	//		nNewLen++;
-	//#ifdef _DEBUG
-	//	if (nNewLen == nCapacity)
-	//		throw std::overflow_error(__FMSG "String Length Overflowed.");
-	//#endif
-	//	return _My_data._Mysize = nNewLen;
-	//}
 
-	std::string ConvUnicode_MBCS(const std::wstring_view& strSource, int eCodepage) {
-		size_t nLen = WideCharToMultiByte(eCodepage, 0, strSource.data()/*not c_str()*/, (int)strSource.size(), nullptr, 0, nullptr, nullptr);
+	constexpr static bool const IsUTF8SigChar(char c) { return (c & 0b1100'0000) == 0b1000'0000; }
+
+#if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
+	std::string ConvUTF16_MBCS(const std::u16string_view& strFrom, S_CODEPAGE_OPTION codepage) {
+		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+			throw std::invalid_argument{"string is too long."};
+		}
+
 		std::string str;
-		if (nLen > 0) {
-			str.resize(nLen);
-			WideCharToMultiByte(eCodepage, 0, strSource.data()/*not c_str()*/, (int)strSource.size(), str.data(), (int)nLen, nullptr, nullptr);
-		}
+		if (strFrom.empty())
+			return str;
+
+		auto* pszFrom = (wchar_t const*)strFrom.data();
+		auto n = WideCharToMultiByte(codepage.to, 0, pszFrom, strFrom.size(), nullptr, 0, nullptr, nullptr);
+		if (n <= 0)
+			return str;
+		str.resize(n);
+		auto n2 = WideCharToMultiByte(codepage.to, 0, pszFrom, strFrom.size(), (LPSTR)str.data(), (int)str.capacity(), nullptr, nullptr);
 		return str;
 	}
-	std::wstring ConvMBCS_Unicode(const std::string_view& strSource, int eCodepage) {
-		size_t nLen = MultiByteToWideChar(eCodepage, 0, strSource.data()/*not c_str()*/, (int)strSource.size(), nullptr, 0);
-		std::wstring str;
-		if (nLen > 0) {
-			str.resize(nLen);
-			MultiByteToWideChar(eCodepage, 0, strSource.data()/*not c_str()*/, (int)strSource.size(), str.data(), (int)nLen);
+	std::u16string ConvMBCS_UTF16(const std::string_view& strFrom, S_CODEPAGE_OPTION codepage) {
+		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+			throw std::invalid_argument{"string is too long."};
 		}
+
+		std::u16string str;
+		if (strFrom.empty())
+			return str;
+
+		auto* pszFrom = (char const*)strFrom.data();
+		// todo : test return value is size or length?
+		auto n = MultiByteToWideChar(codepage.from, 0, pszFrom, (int)strFrom.size(), nullptr, 0);
+		if (n <= 0)
+			return str;
+		str.resize(n);
+		MultiByteToWideChar(codepage.from, 0, pszFrom, strFrom.size(), (LPWSTR)str.data(), (int)str.size());
 		return str;
 	}
-	std::u8string ConvUnicode_UTF8(const std::wstring_view& strSource, int eCodepage /*dummy*/) {
-		size_t nLen = WideCharToMultiByte(CP_UTF8, 0, strSource.data()/*not c_str()*/, (int)strSource.size(), nullptr, 0, nullptr, nullptr);
+#else
+	std::string ConvUTF16_MBCS(const std::u16string_view& strFrom, S_CODEPAGE_OPTION codepage) {
+		std::string str;
+		if (strFrom.empty())
+			return str;
+
+		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+			throw std::invalid_argument{"string is too long."};
+		}
+
+		auto const* pszSourceBegin = strFrom.data();
+		auto const* pszSourceEnd = strFrom.data()+strFrom.size();
+
+		std::locale loc(fmt::format(".{}", codepage.from));
+		auto const& facet = std::use_facet<std::codecvt<char, char16_t, mbstate_t>>(loc);
+
+		std::mbstate_t state = {0}; // zero-initialization represents the initial conversion state for mbstate_t
+		auto len = facet.length(state, pszSourceBegin, pszSourceEnd, strFrom.size());
+		if (len <= 0)
+			return str;
+		str.resize(len);
+
+		state = {}; // init.
+		std::remove_cvref_t<decltype(strFrom)>::value_type const* pszSourceNext{};
+		std::remove_cvref_t<decltype(str)>::value_type* pszDestNext{};
+		auto result = facet.in(state, pszSourceBegin, pszSourceEnd, pszSourceNext,
+					   str.data(), str.data()+len, pszDestNext);
+
+		if (result != std::codecvt_base::error)
+			throw std::invalid_argument{"String Cannot be transformed!"};
+		return str;
+	}
+	std::u16string ConvMBCS_UTF16(const std::string_view& strFrom, S_CODEPAGE_OPTION codepage) {
+		std::u16string str;
+		if (strFrom.empty())
+			return str;
+
+		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+			throw std::invalid_argument{"string is too long."};
+		}
+
+		auto const* pszSourceBegin = strFrom.data();
+		auto const* pszSourceEnd = strFrom.data()+strFrom.size();
+
+		std::locale loc(fmt::format(".{}", codepage.from));
+	#ifdef _WINDOWS
+		using utf16_t = wchar_t;
+	#else
+		using utf16_t = char16_t;
+	#endif
+		auto const& facet = std::use_facet<std::codecvt<utf16_t, char, mbstate_t>>(loc);
+
+		std::mbstate_t state = {0}; // zero-initialization represents the initial conversion state for mbstate_t
+		auto len = facet.length(state, pszSourceBegin, pszSourceEnd, strFrom.size());
+		if (len <= 0)
+			return str;
+		str.resize(len);
+
+		state = {}; // init.
+		std::remove_cvref_t<decltype(strFrom)>::value_type const* pszSourceNext{};
+		utf16_t* pszDestNext{};
+		auto result = facet.in(state, pszSourceBegin, pszSourceEnd, pszSourceNext,
+							   (utf16_t*)str.data(), (utf16_t*)str.data()+len, pszDestNext);
+
+		if (result != std::codecvt_base::error)
+			throw std::invalid_argument{"String Cannot be transformed!"};
+		return str;
+	}
+#endif
+
+#if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
+	std::u8string ConvUTF16_UTF8(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+			throw std::invalid_argument{"string is too long."};
+		}
+
 		std::u8string str;
-		if (nLen > 0) {
-			str.resize(nLen);
-			WideCharToMultiByte(CP_UTF8, 0, strSource.data()/*not c_str()*/, (int)strSource.size(), (char*)str.data(), (int)nLen, nullptr, nullptr);
+		if (strFrom.empty())
+			return str;
+
+		wchar_t const* pszFrom = (wchar_t const*)strFrom.data();
+		auto n = WideCharToMultiByte(CP_UTF8, 0, pszFrom, (int)strFrom.size(), nullptr, 0, nullptr, nullptr);
+		if (n <= 0)
+			return str;
+		str.resize(n);
+		WideCharToMultiByte(CP_UTF8, 0, pszFrom, -1, (LPSTR)str.data(), (int)str.size(), nullptr, nullptr);
+		return str;
+	}
+	std::u16string ConvUTF8_UTF16(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+			throw std::invalid_argument{"string is too long."};
+		}
+
+		std::u16string str;
+		if (strFrom.empty())
+			return str;
+
+		char const* pszFrom = (char const*)strFrom.data();
+		auto n = MultiByteToWideChar(CP_UTF8, 0, pszFrom, (int)strFrom.size(), nullptr, 0);
+		if (n <= 0)
+			return str;
+		str.resize(n);
+		MultiByteToWideChar(CP_UTF8, 0, pszFrom, -1, (LPWSTR)str.data(), (int)str.size());
+		return str;
+	}
+
+#else
+
+	std::u8string ConvUTF16_UTF8(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		std::u8string str;
+		if (svFrom.empty())
+			return str;
+
+		size_t nOutputLen = 0;
+		for (auto c : svFrom) {
+			if (c < 0x80)
+				nOutputLen ++;
+			else if (c < 0x0800)
+				nOutputLen += 2;
+			else if ( (c < 0xd800) || ( (c >= 0xe000) && (c <= 0xffff) ) )
+				nOutputLen += 3;
+			else {
+				throw std::invalid_argument{"Cannot Convert from u16 to u8."};
+				nOutputLen ++;
+			}
+		}
+
+		if (nOutputLen <= 0)
+			return str;
+
+		str.reserve(nOutputLen);
+		for (auto c : svFrom) {
+			if (c < 0x80)
+				str.push_back(static_cast<char8_t>(c));
+			else if (c < 0x0800) {
+				str.push_back(static_cast<char8_t>(0xc0 | (((c)>>6)&0x03f)));
+				str.push_back(static_cast<char8_t>(0x80 | ((c)&0x3F)));
+			} else if ( (c < 0xd800) || ( (c >= 0xe000) && (c <= 0xffff) ) ) {
+				str.push_back(static_cast<char8_t>(0xe0 | (((c)>>12)&0x0f)));
+				str.push_back(static_cast<char8_t>(0x80 | (((c)>> 6)&0x3f)));
+				str.push_back(static_cast<char8_t>(0x80 | ((c)&0x3f)));
+			} else {
+				throw std::invalid_argument{"Cannot Convert from u16 to u8."};
+			}
+		}
+
+		return str;
+	}
+	std::u16string ConvUTF8_UTF16(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		std::u16string str;
+		if (svFrom.empty())
+			return str;
+
+		size_t nOutputLen = 0;
+		auto const* pszEnd = svFrom.data() + svFrom.size();
+		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
+			auto const c1 = psz[0];
+			auto const c2 = psz[0] && (psz+1 < pszEnd) ? psz[1] : 0;
+			auto const c3 = psz[1] && (psz+2 < pszEnd) ? psz[2] : 0;
+
+			if ( c1 && c2 && ((c1 & 0b1110'0000) == 0b1100'0000) && IsUTF8SigChar(c2) ) {		// 110xxxxx 10xxxxxx
+				char16_t b = ((c1 & 0b0001'1111) << 6) | (c2 & 0b0011'1111);
+				if ( (b >= 0x0080) && (b <= 0x07ff) ) {
+					psz += 1;
+				}
+			} else if (c1 && c2 && c3 && ((c1&0b1111'0000) == 0b1110'0000) && IsUTF8SigChar(c2) && IsUTF8SigChar(c3) ) {
+				char16_t b = ((c1 & 0b0000'1111) << 12) | ((c2 & 0b0011'1111) << 6) | (c3 & 0b0011'1111);
+				if ( (b >= 0x0800) && (b <= 0xFFFF) ) {
+					psz += 2;
+				}
+			}
+			nOutputLen++;
+		}
+
+		if (nOutputLen <= 0)
+			return str;
+		str.reserve(nOutputLen);
+		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
+			auto const c1 = psz[0];
+			auto const c2 = psz[0] && (psz+1 < pszEnd) ? psz[1] : 0;
+			auto const c3 = psz[1] && (psz+2 < pszEnd) ? psz[2] : 0;
+
+			if ( c1 && c2 && ((c1&0b1110'0000) == 0b1100'0000) && IsUTF8SigChar(c2) ) {		// 110xxxxx 10xxxxxx
+				char16_t b = ((c1 & 0b0001'1111) << 6) | (c2 & 0b0011'1111);
+				if ( (b >= 0x0080) && (b <= 0x07ff) ) {
+					str.push_back(b);
+					psz += 1;
+				} else {
+					str.push_back(*psz);
+				}
+			} else if (c1 && c2 && c3 && ((c1&0b1111'0000) == 0b1110'0000) && IsUTF8SigChar(c2) && IsUTF8SigChar(c3) ) {
+				char16_t b = ((c1 & 0b0000'1111) << 12) | ((c2 & 0b0011'1111) << 6) | (c3 & 0b0011'1111);
+				if ( (b >= 0x0800) && (b <= 0xFFFF) ) {
+					str.push_back(b);
+					psz += 2;
+				} else {
+					str.push_back(*psz);
+				}
+			} else {
+				str.push_back(c1);
+			}
+		}
+
+		return str;
+	}
+#endif
+
+
+	std::u32string ConvUTF16_UTF32(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		// _Convert_wide_to_utf32 from <filesystem> (MSVC)
+		std::u32string str;
+		str.reserve(strFrom.size());
+
+		char16_t const* first { strFrom.data() };
+		char16_t const* iter {first};
+		char16_t const* const last { first + strFrom.size()};
+
+		for (; iter != last; ++iter) {
+			if (*iter <= 0xd7ffu) {
+				str.push_back(*iter);
+			} else if (*iter <= 0xdbffu) { // found leading surrogate
+				const char32_t cLeading = *iter; // widen for later math
+
+				++iter;
+
+				if (iter == last) { // missing trailing surrogate
+					throw std::invalid_argument{"cannot convert string from utf16 to utf32. missing trailing surrogate"};
+				}
+
+				char32_t const cTrailing = *iter; // widen for later math
+
+				if (0xdc00u <= cTrailing && cTrailing <= 0xdfffu) { // valid trailing surrogate
+					str.push_back(0xfca02400u + (cLeading << 10) + cTrailing);
+				} else { // invalid trailing surrogate
+					throw std::invalid_argument{"cannot convert string from utf16 to utf32. invalid trailing surrogate"};
+				}
+			} else if (*iter <= 0xdfffu) { // found trailing surrogate by itself, invalid
+				throw std::invalid_argument{"cannot convert string from utf16 to utf32. found trailing surrogate by itself, invalid"};
+			} else {
+				str.push_back(*iter);
+			}
+		}
+
+		return str;
+	}
+
+	std::u16string ConvUTF32_UTF16(std::u32string_view const& strFrom, S_CODEPAGE_OPTION codepage) {
+		// function _Convert_utf32_to_wide from <filesystem> (MSVC)
+		std::u16string str;
+
+		str.reserve(strFrom.size());
+
+		for (auto const c : strFrom) {
+			if (c <= 0xd7ffu) {
+				str.push_back(static_cast<std::u16string::value_type>(c));
+			} else if (c <= 0xdfffu) {
+				throw std::invalid_argument{"cannot convert string from utf32 to utf16. 0xdffu < c < 0xdfffu"};
+			} else if (c <= 0xffffu) {
+				str.push_back(static_cast<std::u16string::value_type>(c));
+			} else if (c <= 0x10ffffu) {
+				str.push_back(static_cast<char16_t>(0xd7c0u + (c >> 10)));
+				str.push_back(static_cast<char16_t>(0xdc00u + (c & 0x3ffu)));
+			} else {
+				throw std::invalid_argument{"cannot convert string from utf32 to utf16. 0x10FFFFU < c"};
+			}
+		}
+
+		return str;
+	}
+
+
+	namespace internal {
+		/// @brief static type cast (wide string/string_view) -> char16_t/char32_t string/string_vew. (according to its size), NO code conversion.
+		/// @tparam tchar_t 
+		/// @param str : basic_string or basic_string_view. (or whatever )
+		/// @return same container with char??_t
+		template < typename tchar_t, template <typename tchar_t, typename ... tstr_args> typename tstr, typename ... tstr_args >
+		auto WideAsCharXX(tstr<tchar_t, tstr_args...>& str) {
+			if constexpr (sizeof(tchar_t) == sizeof(char8_t)) {
+				return (tstr<char8_t>)(tstr<char8_t>&)str;
+			} else if constexpr (sizeof(tchar_t) == sizeof(char16_t)) {
+				return (tstr<char16_t>)(tstr<char16_t>&)str;
+			} else if constexpr (sizeof(tchar_t) == sizeof(char32_t)) {
+				return (tstr<char32_t>)(tstr<char32_t>&)str;
+			}
+		}
+
+		/// @brief static type cast (char16_t/char32_t string/string_view) -> char16_t/char32_t string/string_view. (according to its size), NO code conversion.
+		template < typename tchar_t, template <typename tchar_t, typename ... tstr_args> typename tstr, typename ... tstr_args >
+		tstr<wchar_t>& CharAsWideXX(tstr<tchar_t, tstr_args...>& str) {
+			return (tstr<wchar_t>&)(str);
+		}
+	}
+
+
+
+//#pragma warning(push)
+//#pragma warning(disable: 4996)
+//	std::u32string ConvUTF8_UTF32(std::u8string_view sv) {
+//		std::wstring_convert<std::codecvt<char32_t, char8_t, std::mbstate_t>, char32_t> conversion;
+//		return conversion.from_bytes((char const*)sv.data());
+//	}
+//
+//	std::u8string ConvUTF32_UTF8(std::u32string_view sv) {
+//		std::wstring_convert<std::codecvt<char32_t, char8_t, std::mbstate_t>, char32_t> conversion;
+//		return (std::u8string&)conversion.to_bytes(sv.data());
+//	}
+//#pragma warning(pop)
+
+	/// @brief Converts Codepage To StringA (MBCS)
+	std::string ToStringA(std::string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		if (codepage.from == codepage.to) {
+			return std::string{strFrom};
+		} else {
+			auto strU = ConvMBCS_UTF16(strFrom, {.from = codepage.from});
+			return ConvUTF16_MBCS(strU, {.to = codepage.to});
+		}
+	}
+	std::string ToStringA(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ToStringA(internal::WideAsCharXX(strFrom), codepage);
+	}
+	std::string ToStringA(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvUTF8_UTF16(strFrom, {.from = codepage.from});
+		return ConvUTF16_MBCS(str, {.to = codepage.to});
+	}
+	std::string ToStringA(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF16_MBCS(strFrom, codepage);
+	}
+	std::string ToStringA(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvUTF32_UTF16(strFrom, {.from = codepage.from});
+		return ConvUTF16_MBCS(str, {.to = codepage.to});
+	}
+
+	template < typename tstr >
+	auto ToStringWide(tstr&& s, S_CODEPAGE_OPTION codepage) {
+		if constexpr (sizeof(wchar_t) == sizeof(char16_t)) {
+			auto str = ToStringU16(std::forward<tstr>(s), codepage);
+			return internal::CharAsWideXX(str);
+		} else if constexpr (sizeof(wchar_t) == sizeof(char32_t)) {
+			auto str = ToStringU32(std::forward<tstr>(s), codepage);
+			return internal::CharAsWideXX(str);
+		} else {
+			static_assert(false, "no way!");
+		}
+	};
+
+	/// @brief Converts Codepage To StringW (unicode ~ utf16)
+	// alias to U16 / U32
+	std::wstring ToStringW(std::string_view strFrom, S_CODEPAGE_OPTION codepage)    { return ToStringWide(strFrom, codepage); }
+	std::wstring ToStringW(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage)   { return ToStringWide(strFrom, codepage); }
+	std::wstring ToStringW(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(strFrom, codepage); }
+	std::wstring ToStringW(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(strFrom, codepage); }
+	std::wstring ToStringW(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(strFrom, codepage); }
+
+	/// @brief Converts Codepage To utf-8
+	std::u8string ToStringU8(std::string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvMBCS_UTF16(strFrom, {.from = codepage.from});
+		return ConvUTF16_UTF8(str, {.to = codepage.to});
+	}
+	std::u8string ToStringU8(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ToStringU8(internal::WideAsCharXX(strFrom), codepage);
+	}
+	std::u8string ToStringU8(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		//if (codepage.from == codepage.to) 
+
+		return std::u8string{strFrom};
+	}
+	std::u8string ToStringU8(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF16_UTF8(strFrom, codepage);
+	}
+	std::u8string ToStringU8(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvUTF32_UTF16(strFrom, {.from = codepage.from});
+		return ConvUTF16_UTF8(str, {.to = codepage.to});
+	}
+
+	/// @brief Converts Codepage To utf-16
+	std::u16string ToStringU16(std::string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvMBCS_UTF16(strFrom, codepage);
+	}
+	std::u16string ToStringU16(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ToStringU16(internal::WideAsCharXX(strFrom), codepage);
+	}
+	std::u16string ToStringU16(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF8_UTF16(strFrom, codepage);
+	}
+	std::u16string ToStringU16(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		std::u16string str{strFrom};
+		if (codepage.from != codepage.to) {
+			[[unlikely]]
+			if ( ( (codepage.from == eCODEPAGE::UTF16BE) && (codepage.to == eCODEPAGE::UTF16LE) )
+				|| ( (codepage.from == eCODEPAGE::UTF16LE) && (codepage.to == eCODEPAGE::UTF16BE) ) )
+				for (auto& c : str)
+					c = _byteswap_ushort(c);
+		}
+		return str;
+	}
+	std::u16string ToStringU16(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF32_UTF16(strFrom, codepage);
+	}
+
+	/// @brief Converts Codepage To utf-32
+	std::u32string ToStringU32(std::string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvMBCS_UTF16(strFrom, {.from = codepage.from});
+		return ConvUTF16_UTF32(str, {.to = codepage.to});
+	}
+	std::u32string ToStringU32(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ToStringU32(internal::WideAsCharXX(strFrom), codepage);
+	}
+	std::u32string ToStringU32(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvUTF8_UTF16(strFrom, {.from = codepage.from});
+		return ConvUTF16_UTF32(str, {.to = codepage.to});
+	}
+	std::u32string ToStringU32(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF16_UTF32(strFrom, codepage);
+	}
+	std::u32string ToStringU32(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage) {
+		std::u32string str{strFrom};
+		if (codepage.from != codepage.to) {
+			[[unlikely]]
+			if ( ( (codepage.from == eCODEPAGE::UTF32BE) && (codepage.to == eCODEPAGE::UTF32LE) )
+				|| ( (codepage.from == eCODEPAGE::UTF32LE) && (codepage.to == eCODEPAGE::UTF32BE) ) )
+				for (auto& c : str)
+					c = _byteswap_ulong(c);
 		}
 		return str;
 	}
 
-	//template < class GetCode >	// 잘못되었음!. Unicode 에서만 동작하고, KSSM은 Binary Search 안됨!
-	//S_HANGEUL_CODE const* SearchHangeulTable(unsigned short c, GetCode get) {
-	//	auto const& tbl = GetHangeulCodeTable();
 
-	//	int iLeft = 0;
-	//	int iRight = (int)tbl.size();
-	//	int i = 0;
-
-	//	// binary search
-	//	for (i = (iLeft + iRight)/2; get(tbl[i]) != c; i = (iLeft + iRight)/2) {
-	//		if (get(tbl[i]) < c) iLeft = i; else iRight = i;
-	//		if ( (iRight - iLeft) == 1 ) {
-	//			if (get(tbl[iLeft]) == c)
-	//				return &tbl[iLeft];
-	//			if (get(tbl[iRight]) == c)
-	//				return &tbl[iRight];
-	//			return nullptr;
-	//		}
-	//		if (iLeft == iRight) return nullptr;
-	//	}
-	//	return (get(tbl[i]) == c) ? tbl + i : nullptr;
-	//}
-
-
-	constexpr unsigned long BIT7_0 = 0b1111'1111;//BIT(0)|BIT(1)|BIT(2)|BIT(3)|BIT(4)|BIT(5)|BIT(6)|BIT(7);
-	constexpr unsigned long BIT7_1 = 0b1111'1110;//BIT(1)|BIT(2)|BIT(3)|BIT(4)|BIT(5)|BIT(6)|BIT(7);
-	constexpr unsigned long BIT7_2 = 0b1111'1100;//BIT(2)|BIT(3)|BIT(4)|BIT(5)|BIT(6)|BIT(7);
-	constexpr unsigned long BIT7_3 = 0b1111'1000;//BIT(3)|BIT(4)|BIT(5)|BIT(6)|BIT(7);
-	constexpr unsigned long BIT7_4 = 0b1111'0000;//BIT(4)|BIT(5)|BIT(6)|BIT(7);
-	constexpr unsigned long BIT7_5 = 0b1110'0000;//BIT(5)|BIT(6)|BIT(7);
-	constexpr unsigned long BIT7_6 = 0b1100'0000;//BIT(6)|BIT(7);
-	constexpr unsigned long BIT7_7 = 0b1000'0000;//BIT(7);
-
-	constexpr unsigned long BIT0_7 = 0b1111'1111;//BIT(7)|BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
-	constexpr unsigned long BIT0_6 = 0b0111'1111;//BIT(6)|BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
-	constexpr unsigned long BIT0_5 = 0b0011'1111;//BIT(5)|BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
-	constexpr unsigned long BIT0_4 = 0b0001'1111;//BIT(4)|BIT(3)|BIT(2)|BIT(1)|BIT(0);
-	constexpr unsigned long BIT0_3 = 0b0000'1111;//BIT(3)|BIT(2)|BIT(1)|BIT(0);
-	constexpr unsigned long BIT0_2 = 0b0000'0111;//BIT(2)|BIT(1)|BIT(0);
-	constexpr unsigned long BIT0_1 = 0b0000'0011;//BIT(1)|BIT(0);
-	constexpr unsigned long BIT0_0 = 0b0000'0001;//BIT(0);
-
-	#define IS_UTF_C(x) ( ((x) & BIT7_6) == BIT7_7 )
+	/*GTL_API */std::map<char16_t, uint16_t> const& GetHangeulCodeMap(char16_t, uint16_t) {
+		return GetHangeulCodeMapUTF16toKSSM();
+	}
+	/*GTL_API */std::map<uint16_t, char16_t> const& GetHangeulCodeMap(uint16_t, char16_t) {
+		return GetHangeulCodeMapKSSMtoUTF16();
+	}
 
 	//-----------------------------------------------------------------------------
-	bool IsUTF8String(std::string_view str, int* pOutputBufferCount, bool* pbIsMSBSet) {
+	/*GTL_API */bool IsUTF8String(std::string_view str, int* pOutputBufferCount, bool* pbIsMSBSet) {
 		if (pOutputBufferCount)
 			*pOutputBufferCount = 0;
 		if (pbIsMSBSet)
@@ -126,18 +513,18 @@ namespace gtl {
 			const char c2 = iPos+1 < str.size() ? str[iPos+1] : 0;
 			const char c3 = iPos+2 < str.size() ? str[iPos+2] : 0;
 
-			if (c1 && BIT7_7) {
+			if (c1 && 0b1000'0000) {
 				bMSB = true;
-				if ( ((c1&BIT7_5) == BIT7_6) && IS_UTF_C(c2) ) {
-					wchar_t b = ((c1 & BIT0_4) << 6) | (c2 & BIT0_5);
+				if ( ((c1 & 0b1110'0000) == 0b1100'0000) && IsUTF8SigChar(c2) ) {
+					wchar_t b = ((c1 & 0b0001'1111) << 6) | (c2 & 0b0011'1111);
 					if ( (b >= 0x0080) && (b <= 0x07ff) ) {
 						iPos++;
 					} else {
 						bUTF8 = false;
 						break;
 					}
-				} else if ( ((c1&BIT7_4) == BIT7_5) && IS_UTF_C(c2) && IS_UTF_C(c3) ) {
-					wchar_t b = ((c1 & BIT0_3) << 12) | ((c2 & BIT0_5) << 6) | (c3 & BIT0_5);
+				} else if ( ((c1 & 0b1111'0000) == 0b1110'0000) && IsUTF8SigChar(c2) && IsUTF8SigChar(c3) ) {
+					wchar_t b = ((c1 & 0b0000'1111) << 12) | ((c2 & 0b0011'1111) << 6) | (c3 & 0b0011'1111);
 					if ( (b >= 0x0800) && (b <= 0xFFFF) ) {
 						iPos += 2;
 					} else {
@@ -160,5 +547,9 @@ namespace gtl {
 
 		return bUTF8;
 	}
+
+
+
+
 
 }	// namespace gtl

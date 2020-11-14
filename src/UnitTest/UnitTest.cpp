@@ -71,9 +71,26 @@ namespace UnitTest {
 			//path.u16string();
 			//path.u32string();
 
-			std::string str1;
-			str1 = gtl::ToString<char, char>(str1);
+			std::string str1 { "message1" };
+			gtl::CStringA str2 = gtl::ToString<char, char>(str1);
+			gtl::CStringA str3 = "asdfasdjklfd";
+			gtl::CString str4{gtl::CStringA(str1)};
 
+			std::string_view sv {str1};
+			std::string_view sv2 {str2};
+			std::u16string_view sv3 {str4};
+
+			gtl::CStringA str5 {sv};
+			gtl::CString str6(sv);
+			str6 = sv;
+			str6 = str5;
+			str6 = str1;
+			str2 = str6;
+			str2 = str3;
+
+			str2 = "abcde";
+			Assert::AreEqual(str2[1], 'b');
+			str2 = L"abcde";
 		}
 	};
 }

@@ -167,6 +167,7 @@
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\string\basic_string.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage.h" />
+    <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h" />
     <ClInclude Include="..\..\include\gtl\string\old_format.h" />
     <ClInclude Include="..\..\include\gtl\_default.h" />
     <ClInclude Include="..\..\include\gtl\string.h" />

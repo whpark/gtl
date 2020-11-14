@@ -57,6 +57,9 @@
     <ClInclude Include="..\..\include\gtl\string\old_format.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h">
+      <Filter>gtl\string</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
