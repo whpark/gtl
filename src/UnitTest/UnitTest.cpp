@@ -89,7 +89,7 @@ namespace UnitTest {
 			str2 = str3;
 
 			str2 = "abcde";
-			Assert::AreEqual(str2[1], 'b');
+			Assert::AreEqual('b', str2[1]);
 			str2 = L"abcde";
 		}
 	};

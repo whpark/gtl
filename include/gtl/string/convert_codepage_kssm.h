@@ -23,10 +23,10 @@ namespace gtl {
 
 	/// @brief KSSM <=> Codepage 949 (Korean Text Conversion. 조합형 <=> 완성형949(UTF16))
 	/// @return Code Converting MAP
-	GTL_API std::map<char16_t, uint16_t> GetHangeulCodeMap(char16_t, uint16_t);
+	GTL_API std::map<char16_t, uint16_t> const& GetHangeulCodeMap(char16_t, uint16_t);
 	/// @brief KSSM <=> Codepage 949 (Korean Text Conversion. 조합형 <=> 완성형949(UTF16))
 	/// @return Code Converting MAP
-	GTL_API std::map<uint16_t, char16_t> GetHangeulCodeMap(uint16_t, char16_t);
+	GTL_API std::map<uint16_t, char16_t> const& GetHangeulCodeMap(uint16_t, char16_t);
 
 	/// @brief KSSM <=> Codepage 949 (Korean Text Conversion. 조합형 <=> 완성형949(UTF16))
 	/// @tparam tchar_t1 char16_t for UTF16, or uint16_t for KSSM
