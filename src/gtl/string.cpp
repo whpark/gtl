@@ -23,66 +23,92 @@ namespace gtl {
 
 	constexpr static bool const IsUTF8SigChar(char c) { return (c & 0b1100'0000) == 0b1000'0000; }
 
+	namespace internal {
+		template < typename tchar_t >
+		inline std::optional<std::basic_string<tchar_t>> TransformEndian(std::basic_string_view<tchar_t>& sv, int eCodepage, int eCodepageOtherEndian) {
+			if (eCodepage != eCodepageOtherEndian)
+				return nullptr;
+			std::basic_string<tchar_t> strOther;
+			strOther.reserve(sv.size());
+			for (auto c : sv) {
+				strOther->push_back(GetByteSwap(c));
+			}
+			sv = strOther.value();
+			return strOther;
+		}
+		template < typename tchar_t >
+		inline void TransformEndian(std::basic_string<tchar_t>& str, int eCodepage, int eCodepageOtherEndian) {
+			if (eCodepage == eCodepageOtherEndian) {
+				for (auto& c : str)
+					ByteSwap(c));
+			}
+		}
+	}
+
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
-	std::string ConvUTF16_MBCS(const std::u16string_view& strFrom, S_CODEPAGE_OPTION codepage) {
-		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+	std::string ConvUTF16_MBCS(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			throw std::invalid_argument{"string is too long."};
 		}
 
 		std::string str;
-		if (strFrom.empty())
+		if (svFrom.empty())
 			return str;
 
-		auto* pszFrom = (wchar_t const*)strFrom.data();
-		auto n = WideCharToMultiByte(codepage.to, 0, pszFrom, strFrom.size(), nullptr, 0, nullptr, nullptr);
+		// check endian 
+		auto strOther = internal::TransformEndian(svFrom, codepage.from, eCODEPAGE::_UTF16_other);
+
+		auto* pszFrom = (wchar_t const*)svFrom.data();
+		auto n = WideCharToMultiByte(codepage.to, 0, pszFrom, (int)svFrom.size(), nullptr, 0, nullptr, nullptr);
 		if (n <= 0)
 			return str;
 		str.resize(n);
-		auto n2 = WideCharToMultiByte(codepage.to, 0, pszFrom, strFrom.size(), (LPSTR)str.data(), (int)str.capacity(), nullptr, nullptr);
+		auto n2 = WideCharToMultiByte(codepage.to, 0, pszFrom, (int)svFrom.size(), (LPSTR)str.data(), (int)str.capacity(), nullptr, nullptr);
+		// check endian, transform
 		return str;
 	}
-	std::u16string ConvMBCS_UTF16(const std::string_view& strFrom, S_CODEPAGE_OPTION codepage) {
-		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+	std::u16string ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			throw std::invalid_argument{"string is too long."};
 		}
 
 		std::u16string str;
-		if (strFrom.empty())
+		if (svFrom.empty())
 			return str;
 
-		auto* pszFrom = (char const*)strFrom.data();
+		auto* pszFrom = (char const*)svFrom.data();
 		// todo : test return value is size or length?
-		auto n = MultiByteToWideChar(codepage.from, 0, pszFrom, (int)strFrom.size(), nullptr, 0);
+		auto n = MultiByteToWideChar(codepage.from, 0, pszFrom, (int)svFrom.size(), nullptr, 0);
 		if (n <= 0)
 			return str;
 		str.resize(n);
-		MultiByteToWideChar(codepage.from, 0, pszFrom, strFrom.size(), (LPWSTR)str.data(), (int)str.size());
+		MultiByteToWideChar(codepage.from, 0, pszFrom, svFrom.size(), (LPWSTR)str.data(), (int)str.size());
 		return str;
 	}
 #else
-	std::string ConvUTF16_MBCS(const std::u16string_view& strFrom, S_CODEPAGE_OPTION codepage) {
+	std::string ConvUTF16_MBCS(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		std::string str;
-		if (strFrom.empty())
+		if (svFrom.empty())
 			return str;
 
-		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			throw std::invalid_argument{"string is too long."};
 		}
 
-		auto const* pszSourceBegin = strFrom.data();
-		auto const* pszSourceEnd = strFrom.data()+strFrom.size();
+		auto const* pszSourceBegin = svFrom.data();
+		auto const* pszSourceEnd = svFrom.data()+svFrom.size();
 
 		std::locale loc(fmt::format(".{}", codepage.from));
 		auto const& facet = std::use_facet<std::codecvt<char, char16_t, mbstate_t>>(loc);
 
 		std::mbstate_t state = {0}; // zero-initialization represents the initial conversion state for mbstate_t
-		auto len = facet.length(state, pszSourceBegin, pszSourceEnd, strFrom.size());
+		auto len = facet.length(state, pszSourceBegin, pszSourceEnd, svFrom.size());
 		if (len <= 0)
 			return str;
 		str.resize(len);
 
 		state = {}; // init.
-		std::remove_cvref_t<decltype(strFrom)>::value_type const* pszSourceNext{};
+		std::remove_cvref_t<decltype(svFrom)>::value_type const* pszSourceNext{};
 		std::remove_cvref_t<decltype(str)>::value_type* pszDestNext{};
 		auto result = facet.in(state, pszSourceBegin, pszSourceEnd, pszSourceNext,
 					   str.data(), str.data()+len, pszDestNext);
@@ -91,17 +117,17 @@ namespace gtl {
 			throw std::invalid_argument{"String Cannot be transformed!"};
 		return str;
 	}
-	std::u16string ConvMBCS_UTF16(const std::string_view& strFrom, S_CODEPAGE_OPTION codepage) {
+	std::u16string ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		std::u16string str;
-		if (strFrom.empty())
+		if (svFrom.empty())
 			return str;
 
-		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			throw std::invalid_argument{"string is too long."};
 		}
 
-		auto const* pszSourceBegin = strFrom.data();
-		auto const* pszSourceEnd = strFrom.data()+strFrom.size();
+		auto const* pszSourceBegin = svFrom.data();
+		auto const* pszSourceEnd = svFrom.data()+svFrom.size();
 
 		std::locale loc(fmt::format(".{}", codepage.from));
 	#ifdef _WINDOWS
@@ -112,13 +138,13 @@ namespace gtl {
 		auto const& facet = std::use_facet<std::codecvt<utf16_t, char, mbstate_t>>(loc);
 
 		std::mbstate_t state = {0}; // zero-initialization represents the initial conversion state for mbstate_t
-		auto len = facet.length(state, pszSourceBegin, pszSourceEnd, strFrom.size());
+		auto len = facet.length(state, pszSourceBegin, pszSourceEnd, svFrom.size());
 		if (len <= 0)
 			return str;
 		str.resize(len);
 
 		state = {}; // init.
-		std::remove_cvref_t<decltype(strFrom)>::value_type const* pszSourceNext{};
+		std::remove_cvref_t<decltype(svFrom)>::value_type const* pszSourceNext{};
 		utf16_t* pszDestNext{};
 		auto result = facet.in(state, pszSourceBegin, pszSourceEnd, pszSourceNext,
 							   (utf16_t*)str.data(), (utf16_t*)str.data()+len, pszDestNext);
@@ -130,34 +156,34 @@ namespace gtl {
 #endif
 
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
-	std::u8string ConvUTF16_UTF8(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+	std::u8string ConvUTF16_UTF8(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			throw std::invalid_argument{"string is too long."};
 		}
 
 		std::u8string str;
-		if (strFrom.empty())
+		if (svFrom.empty())
 			return str;
 
-		wchar_t const* pszFrom = (wchar_t const*)strFrom.data();
-		auto n = WideCharToMultiByte(CP_UTF8, 0, pszFrom, (int)strFrom.size(), nullptr, 0, nullptr, nullptr);
+		wchar_t const* pszFrom = (wchar_t const*)svFrom.data();
+		auto n = WideCharToMultiByte(CP_UTF8, 0, pszFrom, (int)svFrom.size(), nullptr, 0, nullptr, nullptr);
 		if (n <= 0)
 			return str;
 		str.resize(n);
 		WideCharToMultiByte(CP_UTF8, 0, pszFrom, -1, (LPSTR)str.data(), (int)str.size(), nullptr, nullptr);
 		return str;
 	}
-	std::u16string ConvUTF8_UTF16(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		if (strFrom.size() > static_cast<size_t>(INT_MAX)) {
+	std::u16string ConvUTF8_UTF16(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			throw std::invalid_argument{"string is too long."};
 		}
 
 		std::u16string str;
-		if (strFrom.empty())
+		if (svFrom.empty())
 			return str;
 
-		char const* pszFrom = (char const*)strFrom.data();
-		auto n = MultiByteToWideChar(CP_UTF8, 0, pszFrom, (int)strFrom.size(), nullptr, 0);
+		char const* pszFrom = (char const*)svFrom.data();
+		auto n = MultiByteToWideChar(CP_UTF8, 0, pszFrom, (int)svFrom.size(), nullptr, 0);
 		if (n <= 0)
 			return str;
 		str.resize(n);
@@ -267,14 +293,14 @@ namespace gtl {
 #endif
 
 
-	std::u32string ConvUTF16_UTF32(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
+	std::u32string ConvUTF16_UTF32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		// _Convert_wide_to_utf32 from <filesystem> (MSVC)
 		std::u32string str;
-		str.reserve(strFrom.size());
+		str.reserve(svFrom.size());
 
-		char16_t const* first { strFrom.data() };
+		char16_t const* first { svFrom.data() };
 		char16_t const* iter {first};
-		char16_t const* const last { first + strFrom.size()};
+		char16_t const* const last { first + svFrom.size()};
 
 		for (; iter != last; ++iter) {
 			if (*iter <= 0xd7ffu) {
@@ -305,13 +331,13 @@ namespace gtl {
 		return str;
 	}
 
-	std::u16string ConvUTF32_UTF16(std::u32string_view const& strFrom, S_CODEPAGE_OPTION codepage) {
+	std::u16string ConvUTF32_UTF16(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		// function _Convert_utf32_to_wide from <filesystem> (MSVC)
 		std::u16string str;
 
-		str.reserve(strFrom.size());
+		str.reserve(svFrom.size());
 
-		for (auto const c : strFrom) {
+		for (auto const c : svFrom) {
 			if (c <= 0xd7ffu) {
 				str.push_back(static_cast<std::u16string::value_type>(c));
 			} else if (c <= 0xdfffu) {
@@ -369,26 +395,26 @@ namespace gtl {
 //#pragma warning(pop)
 
 	/// @brief Converts Codepage To StringA (MBCS)
-	std::string ToStringA(std::string_view strFrom, S_CODEPAGE_OPTION codepage) {
+	std::string ToStringA(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		if (codepage.from == codepage.to) {
-			return std::string{strFrom};
+			return std::string{svFrom};
 		} else {
-			auto strU = ConvMBCS_UTF16(strFrom, {.from = codepage.from});
+			auto strU = ConvMBCS_UTF16(svFrom, {.from = codepage.from});
 			return ConvUTF16_MBCS(strU, {.to = codepage.to});
 		}
 	}
-	std::string ToStringA(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ToStringA(internal::WideAsCharXX(strFrom), codepage);
+	std::string ToStringA(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ToStringA(internal::WideAsCharXX(svFrom), codepage);
 	}
-	std::string ToStringA(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		auto str = ConvUTF8_UTF16(strFrom, {.from = codepage.from});
+	std::string ToStringA(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvUTF8_UTF16(svFrom, {.from = codepage.from});
 		return ConvUTF16_MBCS(str, {.to = codepage.to});
 	}
-	std::string ToStringA(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ConvUTF16_MBCS(strFrom, codepage);
+	std::string ToStringA(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF16_MBCS(svFrom, codepage);
 	}
-	std::string ToStringA(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		auto str = ConvUTF32_UTF16(strFrom, {.from = codepage.from});
+	std::string ToStringA(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvUTF32_UTF16(svFrom, {.from = codepage.from});
 		return ConvUTF16_MBCS(str, {.to = codepage.to});
 	}
 
@@ -407,45 +433,45 @@ namespace gtl {
 
 	/// @brief Converts Codepage To StringW (unicode ~ utf16)
 	// alias to U16 / U32
-	std::wstring ToStringW(std::string_view strFrom, S_CODEPAGE_OPTION codepage)    { return ToStringWide(strFrom, codepage); }
-	std::wstring ToStringW(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage)   { return ToStringWide(strFrom, codepage); }
-	std::wstring ToStringW(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(strFrom, codepage); }
-	std::wstring ToStringW(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(strFrom, codepage); }
-	std::wstring ToStringW(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(strFrom, codepage); }
+	std::wstring ToStringW(std::string_view svFrom, S_CODEPAGE_OPTION codepage)    { return ToStringWide(svFrom, codepage); }
+	std::wstring ToStringW(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage)   { return ToStringWide(svFrom, codepage); }
+	std::wstring ToStringW(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(svFrom, codepage); }
+	std::wstring ToStringW(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(svFrom, codepage); }
+	std::wstring ToStringW(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage)	{ return ToStringWide(svFrom, codepage); }
 
 	/// @brief Converts Codepage To utf-8
-	std::u8string ToStringU8(std::string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		auto str = ConvMBCS_UTF16(strFrom, {.from = codepage.from});
+	std::u8string ToStringU8(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvMBCS_UTF16(svFrom, {.from = codepage.from});
 		return ConvUTF16_UTF8(str, {.to = codepage.to});
 	}
-	std::u8string ToStringU8(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ToStringU8(internal::WideAsCharXX(strFrom), codepage);
+	std::u8string ToStringU8(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ToStringU8(internal::WideAsCharXX(svFrom), codepage);
 	}
-	std::u8string ToStringU8(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
+	std::u8string ToStringU8(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		//if (codepage.from == codepage.to) 
 
-		return std::u8string{strFrom};
+		return std::u8string{svFrom};
 	}
-	std::u8string ToStringU8(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ConvUTF16_UTF8(strFrom, codepage);
+	std::u8string ToStringU8(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF16_UTF8(svFrom, codepage);
 	}
-	std::u8string ToStringU8(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		auto str = ConvUTF32_UTF16(strFrom, {.from = codepage.from});
+	std::u8string ToStringU8(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvUTF32_UTF16(svFrom, {.from = codepage.from});
 		return ConvUTF16_UTF8(str, {.to = codepage.to});
 	}
 
 	/// @brief Converts Codepage To utf-16
-	std::u16string ToStringU16(std::string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ConvMBCS_UTF16(strFrom, codepage);
+	std::u16string ToStringU16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvMBCS_UTF16(svFrom, codepage);
 	}
-	std::u16string ToStringU16(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ToStringU16(internal::WideAsCharXX(strFrom), codepage);
+	std::u16string ToStringU16(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ToStringU16(internal::WideAsCharXX(svFrom), codepage);
 	}
-	std::u16string ToStringU16(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ConvUTF8_UTF16(strFrom, codepage);
+	std::u16string ToStringU16(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF8_UTF16(svFrom, codepage);
 	}
-	std::u16string ToStringU16(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		std::u16string str{strFrom};
+	std::u16string ToStringU16(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		std::u16string str{svFrom};
 		if (codepage.from != codepage.to) {
 			[[unlikely]]
 			if ( ( (codepage.from == eCODEPAGE::UTF16BE) && (codepage.to == eCODEPAGE::UTF16LE) )
@@ -455,27 +481,27 @@ namespace gtl {
 		}
 		return str;
 	}
-	std::u16string ToStringU16(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ConvUTF32_UTF16(strFrom, codepage);
+	std::u16string ToStringU16(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF32_UTF16(svFrom, codepage);
 	}
 
 	/// @brief Converts Codepage To utf-32
-	std::u32string ToStringU32(std::string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		auto str = ConvMBCS_UTF16(strFrom, {.from = codepage.from});
+	std::u32string ToStringU32(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvMBCS_UTF16(svFrom, {.from = codepage.from});
 		return ConvUTF16_UTF32(str, {.to = codepage.to});
 	}
-	std::u32string ToStringU32(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ToStringU32(internal::WideAsCharXX(strFrom), codepage);
+	std::u32string ToStringU32(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ToStringU32(internal::WideAsCharXX(svFrom), codepage);
 	}
-	std::u32string ToStringU32(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		auto str = ConvUTF8_UTF16(strFrom, {.from = codepage.from});
+	std::u32string ToStringU32(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		auto str = ConvUTF8_UTF16(svFrom, {.from = codepage.from});
 		return ConvUTF16_UTF32(str, {.to = codepage.to});
 	}
-	std::u32string ToStringU32(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		return ConvUTF16_UTF32(strFrom, codepage);
+	std::u32string ToStringU32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		return ConvUTF16_UTF32(svFrom, codepage);
 	}
-	std::u32string ToStringU32(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage) {
-		std::u32string str{strFrom};
+	std::u32string ToStringU32(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		std::u32string str{svFrom};
 		if (codepage.from != codepage.to) {
 			[[unlikely]]
 			if ( ( (codepage.from == eCODEPAGE::UTF32BE) && (codepage.to == eCODEPAGE::UTF32LE) )

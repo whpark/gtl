@@ -32,10 +32,12 @@ namespace gtl {
 		UTF16LE = UnicodeLE,
 		UTF16BE = UnicodeBE,
 		UTF16 = (std::endian::native == std::endian::little) ? UTF16LE : UTF16BE,
+		_UTF16_other = (UTF16 == UTF16BE) ? UTF16LE : UTF16BE,
 
 		UTF32LE = 12000,
 		UTF32BE = 12001,
 		UTF32 = (std::endian::native == std::endian::little) ? UTF32LE : UTF32BE,
+		_UTF32_other = (UTF32 == UTF32BE) ? UTF32LE : UTF32BE,
 
 		KO_KR_949 = 949,
 		KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
@@ -104,12 +106,12 @@ namespace gtl {
 		strTo = ToString<tchar_t1, tchar_t2>(strFrom);
 	}
 
-	GTL_API std::string ConvUTF16_MBCS(const std::u16string_view& strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u16string ConvMBCS_UTF16(const std::string_view& strFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::string ConvUTF16_MBCS(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u16string ConvMBCS_UTF16(std::string_view strFrom, S_CODEPAGE_OPTION codepage);
 	GTL_API std::u8string ConvUTF16_UTF8(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage);
 	GTL_API std::u16string ConvUTF8_UTF16(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage);
 	GTL_API std::u32string ConvUTF16_UTF32(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u16string ConvUTF32_UTF16(std::u32string_view const& strFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u16string ConvUTF32_UTF16(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage);
 
 	GTL_API bool IsUTF8String(std::string_view str, int* pOutputBufferCount = nullptr, bool* pbIsMSBSet = nullptr);
 

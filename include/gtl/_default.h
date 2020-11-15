@@ -10,10 +10,11 @@
 #pragma once
 
 
-#if !defined(_HAS_CXX20)
-#	error ERROR! Supports C++v20 only.
-#endif
+#include <version>	// version information
 
+#if !defined(_HAS_CXX20)
+#	error ERROR! C++v20
+#endif
 
 //=================================================================================================================================
 // include files. (until modules......)
@@ -33,7 +34,6 @@
 #include <tchar.h>
 //#include <cstdbool>
 
-#include <version>	// version information
 #include <concepts>
 #include <exception>
 #include <limits>
@@ -100,7 +100,7 @@
 
 
 
-#define GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY false
+#define GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY true
 
 namespace gtl {
 
@@ -108,7 +108,7 @@ namespace gtl {
 	// byte swap
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY)
 	template < std::integral tvar_t >
-	[[nodiscard]] auto GetByteSwap(tvar_t v) {
+	[[nodiscard]] inline auto GetByteSwap(tvar_t v) {
 		if constexpr (sizeof(v) == sizeof(std::uint16_t)) {
 			return _byteswap_ushort(v);
 		} else if constexpr (sizeof(v) == sizeof(std::uint32_t)) {
@@ -120,18 +120,18 @@ namespace gtl {
 		}
 	}
 	template < std::integral tvar_t >
-	void ByteSwap(tvar_t& v) {
+	inline void ByteSwap(tvar_t& v) {
 		v = GetByteSwap(v);
 	}
 #else
 	template < std::integral tvar_t >
-	[[nodiscard]] tvar_t GetByteSwap(tvar_t const v) {
+	[[nodiscard]] inline tvar_t GetByteSwap(tvar_t const v) {
 		tvar_t r{};
 		std::reverse_copy((uint8_t const*)v, (uint8_t const*)v+sizeof(v), (uint8_t*)&r);
 		return r;
 	}
 	template < std::integral tvar_t >
-	void ByteSwap(tvar_t& v) {
+	inline void ByteSwap(tvar_t& v) {
 		std::reverse((uint8_t const*)v, (uint8_t const*)v+sizeof(v));
 	}
 #endif
