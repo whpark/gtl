@@ -1,0 +1,4 @@
+#pragma once
+
+#define GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY false
+#define GTL_STRING_SUPPORT_CODEPAGE_KSSM true

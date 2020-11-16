@@ -45,9 +45,6 @@
     <ClInclude Include="..\..\include\gtl\__lib.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="HangeulCodeTable.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\string\basic_string.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
@@ -58,6 +55,12 @@
       <Filter>gtl\string</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h">
+      <Filter>gtl\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\config_gtl.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\string\HangeulCodeTable.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
   </ItemGroup>
@@ -72,7 +75,7 @@
       <Filter>gtl</Filter>
     </ClCompile>
     <ClCompile Include="HangeulCodeTable.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>gtl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

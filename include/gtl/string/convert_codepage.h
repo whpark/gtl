@@ -22,15 +22,16 @@ namespace gtl {
 	struct eCODEPAGE { enum : uint32_t {
 		Default = 0xFFFF'FFFF,	// CP_OEMCP
 
-		UnicodeLE = 1200,
-		UnicodeBE = 1201,
-		Unicode = (std::endian::native == std::endian::little) ? UnicodeLE : UnicodeBE,
+		UCS2LE = 1200,
+		UCS2BE = 1201,
+		UCS2 = (std::endian::native == std::endian::little) ? UCS2LE : UCS2BE,
+		_UCS2_other = (UCS2 == UCS2BE) ? UCS2LE : UCS2BE,
 
 		UTF7 = 65000,
 		UTF8 = 65001,
 
-		UTF16LE = UnicodeLE,
-		UTF16BE = UnicodeBE,
+		UTF16LE = UCS2LE,
+		UTF16BE = UCS2BE,
 		UTF16 = (std::endian::native == std::endian::little) ? UTF16LE : UTF16BE,
 		_UTF16_other = (UTF16 == UTF16BE) ? UTF16LE : UTF16BE,
 
@@ -57,11 +58,11 @@ namespace gtl {
 	inline std::string		ToStringA(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage = {});
 
 	/// @brief Converts Codepage To StringW (unicode ~ utf16)
-	inline std::wstring	ToStringW(std::string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::wstring	ToStringW(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::wstring	ToStringW(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::wstring	ToStringW(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::wstring	ToStringW(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage = {});
 
 	/// @brief Converts Codepage To utf-8
 	inline std::u8string	ToStringU8(std::string_view strFrom, S_CODEPAGE_OPTION codepage = {});
@@ -91,8 +92,154 @@ namespace gtl {
 	GTL_API std::u16string ConvUTF8_UTF16(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage);
 	GTL_API std::u32string ConvUTF16_UTF32(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage);
 	GTL_API std::u16string ConvUTF32_UTF16(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u8string ConvUTF32_UTF8(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u32string ConvUTF8_UTF32(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage);
 
 	GTL_API bool IsUTF8String(std::string_view str, int* pOutputBufferCount = nullptr, bool* pbIsMSBSet = nullptr);
+
+
+	// char32_t character from utf8/16 string.
+	template < gtlc::string_elem tchar_t >
+	class utf_string_view {
+	private:
+		std::basic_string_view<tchar_t> sv_;
+
+	public:
+		utf_string_view(std::basic_string_view<tchar_t> sv) : sv_(sv) { }
+		utf_string_view(std::basic_string<tchar_t> const& str) : sv_(str.data(), str.data()+str.size()) { }
+		utf_string_view() = default;
+		utf_string_view(utf_string_view const&) = default;
+		utf_string_view(utf_string_view&&) = default;
+
+		utf_string_view& operator = (utf_string_view const&) = default;
+
+	public:
+		class iterator {
+		private:
+			tchar_t const* position_;
+			tchar_t const* const end_;
+			int char_len_{};
+			char32_t code_{};
+		public:
+			iterator(tchar_t const* position, tchar_t const* const end) : position_(position), end_(end) {
+				if constexpr (sizeof(tchar_t) != sizeof(char32_t)) {
+					update();
+				}
+			}
+		protected:
+			void update() {
+				if (position_ >= end_)
+					return;
+				if constexpr (sizeof(tchar_t) == sizeof(char8_t)) {
+					// utf8
+					constexpr static uint8_t mask_3bit = 0b0000'0111;
+					constexpr static uint8_t mask_4bit = 0b0000'1111;
+					constexpr static uint8_t mask_6bit = 0b0011'1111;
+					if (position_[0] < 0x80) {
+						code_ = position_[0];
+						char_len_ = 1;
+					}
+					else if ((position_[0] & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
+						if ((position_ + 1 >= end_)
+							|| ((position_[1] & 0b1100'0000) != 0b1000'0000)
+							)
+							throw std::invalid_argument{ "not a utf-8" };
+						code_ = ((position_[0] & mask_6bit) << 6) | (position_[1] & mask_6bit);
+						char_len_ = 2;
+					}
+					else if ((position_[0] & 0b1111'0000) == 0b1110'000) {	// ~0x7ff
+						if ((position_ + 2 >= end_)
+							|| ((position_[1] & 0b1100'0000) != 0b1000'0000)
+							|| ((position_[2] & 0b1100'0000) != 0b1000'0000)
+							)
+							throw std::invalid_argument{ "not a utf-8" };
+						code_ = ((position_[0] & mask_4bit) << 12) | ((position_[1] & mask_6bit) << 6) | (position_[2] & mask_6bit);
+						char_len_ = 3;
+					}
+					else if ((position_[0] & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
+						if ((position_ + 3 >= end_)
+							|| ((position_[1] & 0b1100'0000) != 0b1000'0000)
+							|| ((position_[2] & 0b1100'0000) != 0b1000'0000)
+							|| ((position_[3] & 0b1100'0000) != 0b1000'0000)
+							)
+							throw std::invalid_argument{ "not a utf-8" };
+						code_ = ((position_[0] & mask_3bit) << 18) | ((position_[1] & mask_6bit) << 12) | ((position_[2] & mask_6bit) << 6) | (position_[3] & mask_6bit);
+						char_len_ = 4;
+					}
+					else {
+						throw std::invalid_argument{ "not a utf-8" };
+					}
+				}
+				else if constexpr (sizeof(tchar_t) == sizeof(char16_t)) {
+					// utf16
+					constexpr char16_t const fSurrogateW1_B{ 0xd800u };	// 0xd800u ~ 0xdbffu;
+					constexpr char16_t const fSurrogateW1_E{ 0xdbffu };	// 0xdbffu ~ 0xdbffu;
+					constexpr char16_t const fSurrogateW2_B{ 0xdc00u };	// 0xdc00u ~ 0xdfffu;
+					constexpr char16_t const fSurrogateW2_E{ 0xdfffu };	// 0xdfffu ~ 0xdfffu;
+					constexpr int const nBitSurrogate{ 10 };
+					if ( (position_[0] < fSurrogateW1_B) || (position_[0] > fSurrogateW2_E) ) [[ likely ]] {
+						code_ = position_[0];
+						char_len_ = 1;
+					}
+					else if (position_[0] <= fSurrogateW2_B) [[unlikely]] { // leading surrogate
+						if ( ((position_ + 1) >= end_)
+							|| ( (position_[1] < fSurrogateW2_B) || (position_[1] > fSurrogateW2_E) )
+							)
+							throw std::invalid_argument{"cannot convert string from utf16 to utf32. invalid trailing surrogate"};
+
+						constexpr static uint32_t const pre = 0x1'0000 - ((fSurrogateW1_B << nBitSurrogate) + fSurrogateW2_B);
+						code_ = (pre + (position_[0] << 10) + position_[1]);
+						char_len_ = 2;
+					}
+					else {
+						throw std::invalid_argument{ "cannot convert string from utf16 to utf32. invalid surrogate" };
+					}
+				}
+				else if constexpr (sizeof(tchar_t) == sizeof(char32_t)) {
+					code_ = *position_;
+					char_len_ = 1;
+				}
+			}
+		public:
+			//auto operator == (iterator const& b) const {
+			//	return position_ == b.position_;
+			//}
+			auto operator != (iterator const& b) const {
+				return position_ < b.position_;
+			}
+			iterator& operator++ () {
+				if constexpr (std::is_same_v<tchar_t, char32_t>) {
+					position_++;
+				}
+				else {
+					auto len = std::exchange(char_len_, 0);
+					code_ = 0;
+					position_ += len;
+
+					update();
+				}
+
+				return *this;
+			}
+			char32_t const& operator* () const {
+				if constexpr (std::is_same_v<tchar_t, char32_t>) {
+					return *position_;
+				}
+				else {
+					return code_;
+				}
+			}
+		};
+
+	public:
+		iterator begin() {
+			return iterator{ sv_.data(), sv_.data() + sv_.size() };
+		}
+		iterator end() {
+			return iterator{ sv_.data() + sv_.size(), sv_.data() + sv_.size() };
+		}
+
+	};
 
 
 	namespace internal {

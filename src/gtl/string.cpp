@@ -14,18 +14,27 @@
 #include "gtl/string/basic_string.h"
 #include "gtl/string/convert_codepage.h"
 #include "gtl/string/convert_codepage_kssm.h"
+#include "gtl/string/HangeulCodeTable.h"
 #include "gtl/string/old_format.h"
 #include "gtl/string.h"
 //#include "gtl/archive.h"
-#include "HangeulCodeTable.h"
 
 namespace gtl {
 
 	constexpr static bool const IsUTF8SigChar(char c) { return (c & 0b1100'0000) == 0b1000'0000; }
 
+	template <typename tchar_t>
+	inline constexpr int eCODEPAGE_OTHER;
+	template <>
+	inline constexpr int eCODEPAGE_OTHER<wchar_t> = eCODEPAGE::_UCS2_other;
+	template <>
+	inline constexpr int eCODEPAGE_OTHER<char16_t> = eCODEPAGE::_UTF16_other;
+	template <>
+	inline constexpr int eCODEPAGE_OTHER<char32_t> = eCODEPAGE::_UTF16_other;
+
 	template < typename tchar_t >
-	inline [[nodiscard]] std::optional<std::basic_string<tchar_t>> ConvertEndian(std::basic_string_view<tchar_t> sv, int eCodepageExpected, int eCodepage) {
-		if (eCodepageExpected != eCodepage) {
+	inline [[nodiscard]] std::optional<std::basic_string<tchar_t>> CheckAndConvertEndian(std::basic_string_view<tchar_t> sv, int eCodepage) {
+		if (eCODEPAGE_OTHER<tchar_t> != eCodepage) {
 			[[likely]]
 			return {};
 		}
@@ -38,8 +47,8 @@ namespace gtl {
 	}
 
 	template < typename tchar_t, template < typename, typename ... tstr_args> typename tstr, typename ... tstr_args >
-	inline bool ConvertEndian(tstr<tchar_t, tstr_args...>& str, int eCodepageExpected, int eCodepage) {
-		if (eCodepageExpected != eCodepage) {
+	inline bool CheckAndConvertEndian(tstr<tchar_t, tstr_args...>& str, int eCodepage) {
+		if (eCODEPAGE_OTHER<tchar_t> != eCodepage) {
 			[[likely]]
 			return false;
 		}
@@ -62,7 +71,7 @@ namespace gtl {
 			return str;
 
 		// check endian, Convert
-		auto strOther = ConvertEndian(svFrom, eCODEPAGE::_UTF16_other, codepage.from);
+		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		auto* pszFrom = (wchar_t const*)svFrom.data();
@@ -92,7 +101,7 @@ namespace gtl {
 		MultiByteToWideChar(codepage.from, 0, pszFrom, (int)svFrom.size(), (LPWSTR)str.data(), (int)str.size());
 
 		// check endian, Convert
-		ConvertEndian(str, eCODEPAGE::_UTF16_other, codepage.to);
+		CheckAndConvertEndian(str, codepage.to);
 
 		return str;
 	}
@@ -107,7 +116,7 @@ namespace gtl {
 		}
 
 		// check endian, Convert
-		auto strOther = ConvertEndian(svFrom, eCODEPAGE::_UTF16_other, codepage.from);
+		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		auto const* pszSourceBegin = svFrom.data();
@@ -168,7 +177,7 @@ namespace gtl {
 			throw std::invalid_argument{"String Cannot be transformed!"};
 
 		// check endian, Convert
-		ConvertEndian(str, eCODEPAGE::_UTF16_other, codepage.to);
+		CheckAndConvertEndian(str, codepage.to);
 
 		return str;
 	}
@@ -186,7 +195,7 @@ namespace gtl {
 			return str;
 
 		// check endian, Convert
-		auto strOther = ConvertEndian(svFrom, eCODEPAGE::_UTF16_other, codepage.from);
+		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 
@@ -216,7 +225,7 @@ namespace gtl {
 		MultiByteToWideChar(CP_UTF8, 0, pszFrom, -1, (LPWSTR)str.data(), (int)str.size());
 
 		// check endian, Convert
-		ConvertEndian(str, eCODEPAGE::_UTF16_other, codepage.to);
+		CheckAndConvertEndian(str, codepage.to);
 
 		return str;
 	}
@@ -234,20 +243,25 @@ namespace gtl {
 		}
 
 		// check endian, Convert
-		auto strOther = ConvertEndian(svFrom, eCODEPAGE::_UTF16_other, codepage.from);
+		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		size_t nOutputLen = 0;
 		for (auto c : svFrom) {
-			if (c < 0x80)
-				nOutputLen ++;
-			else if (c < 0x0800)
+			if (c < 0x80u)
+				nOutputLen++;
+			else if (c < 0x0800u)
 				nOutputLen += 2;
-			else if ( (c < 0xd800) || ( (c >= 0xe000) && (c <= 0xffff) ) )
+			else if ((c < 0xd800u) || (c >= 0xe000u))
 				nOutputLen += 3;
+			else if (c <= 0xdc00u) {
+				// todo :.....
+				if ( c & 0b1100'0000)
+				nOutputLen += 4;
+			}
 			else {
-				throw std::invalid_argument{"Cannot Convert from u16 to u8."};
-				nOutputLen ++;
+				throw std::invalid_argument{ "Cannot Convert from u32 to u8." };
+				nOutputLen++;
 			}
 		}
 
@@ -255,18 +269,30 @@ namespace gtl {
 			return str;
 
 		str.reserve(nOutputLen);
-		for (auto c : svFrom) {
-			if (c < 0x80)
+		for (auto sv = utf_string_view{ svFrom }; auto c : sv) {
+			constexpr uint8_t mask_3bits = 0b0000'0111;
+			constexpr uint8_t mask_4bits = 0b0000'1111;
+			constexpr uint8_t mask_6bits = 0b0011'1111;
+			if (c <= 0x7f)
 				str.push_back(static_cast<char8_t>(c));
-			else if (c < 0x0800) {
-				str.push_back(static_cast<char8_t>(0xc0 | (((c)>>6)&0x03f)));
-				str.push_back(static_cast<char8_t>(0x80 | ((c)&0x3F)));
-			} else if ( (c < 0xd800) || ( (c >= 0xe000) && (c <= 0xffff) ) ) {
-				str.push_back(static_cast<char8_t>(0xe0 | (((c)>>12)&0x0f)));
-				str.push_back(static_cast<char8_t>(0x80 | (((c)>> 6)&0x3f)));
-				str.push_back(static_cast<char8_t>(0x80 | ((c)&0x3f)));
-			} else {
-				throw std::invalid_argument{"Cannot Convert from u16 to u8."};
+			else if (c <= 0x07ff) {
+				str.push_back(static_cast<char8_t>(0xc0 | (((c) >> 6) & mask_6bits)));
+				str.push_back(static_cast<char8_t>(0x80 | ((c)&mask_6bits)));
+			}
+			else if (c <= 0xffff) /*((c < 0xd800) || ((c >= 0xe000) && (c <= 0xffff)))*/ {
+				str.push_back(static_cast<char8_t>(0xe0 | (((c) >> 12) & mask_4bits)));		// 4 bits
+				str.push_back(static_cast<char8_t>(0x80 | (((c) >> 6) & mask_6bits)));		// 6 bits
+				str.push_back(static_cast<char8_t>(0x80 | ((c)&mask_6bits)));				// 6 bits
+			}
+			else if (c <= 0x10'ffff) {
+				str.push_back(static_cast<char8_t>(0xf0 | (((c) >> 18) & mask_3bits)));		// 3 bits
+				str.push_back(static_cast<char8_t>(0x80 | (((c) >> 12) & mask_6bits)));		// 6 bits
+				str.push_back(static_cast<char8_t>(0x80 | (((c) >> 6) & mask_6bits)));		// 6 bits
+				str.push_back(static_cast<char8_t>(0x80 | ((c)&mask_6bits)));				// 6 bits
+			}
+
+			else {
+				throw std::invalid_argument{ "Cannot Convert from u16 to u8." };
 			}
 		}
 
@@ -333,7 +359,7 @@ namespace gtl {
 		}
 
 		// check endian, Convert
-		ConvertEndian(str, eCODEPAGE::_UTF16_other, codepage.to);
+		CheckAndConvertEndian(str, codepage.to);
 
 		return str;
 	}
@@ -341,7 +367,6 @@ namespace gtl {
 
 
 	std::u32string ConvUTF16_UTF32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		// _Convert_wide_to_utf32 from <filesystem> (MSVC)
 		std::u32string str;
 
 		if (svFrom.size() <= 0)
@@ -353,50 +378,60 @@ namespace gtl {
 		}
 
 		// check endian, Convert
-		auto strOther = ConvertEndian(svFrom, eCODEPAGE::_UTF16_other, codepage.from);
+		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		str.reserve(svFrom.size());
 
-		char16_t const* first { svFrom.data() };
-		char16_t const* iter {first};
-		char16_t const* const last { first + svFrom.size()};
-
-		// todo : make source according to spec.
-		for (; iter != last; ++iter) {
-			if (*iter <= 0xd7ffu) {
-				str.push_back(*iter);
-			} else if (*iter <= 0xdbffu) { // found leading surrogate
-				const char32_t cLeading = *iter; // widen for later math
-
-				++iter;
-
-				if (iter == last) { // missing trailing surrogate
-					throw std::invalid_argument{"cannot convert string from utf16 to utf32. missing trailing surrogate"};
-				}
-
-				char32_t const cTrailing = *iter; // widen for later math
-
-				if (0xdc00u <= cTrailing && cTrailing <= 0xdfffu) { // valid trailing surrogate
-					str.push_back(0xfca02400u + (cLeading << 10) + cTrailing);
-				} else { // invalid trailing surrogate
-					throw std::invalid_argument{"cannot convert string from utf16 to utf32. invalid trailing surrogate"};
-				}
-			} else if (*iter <= 0xdfffu) { // found trailing surrogate by itself, invalid
-				throw std::invalid_argument{"cannot convert string from utf16 to utf32. found trailing surrogate by itself, invalid"};
-			} else {
-				str.push_back(*iter);
-			}
+		for (auto c : utf_string_view{ svFrom }) {
+			str.push_back(c);
 		}
 
+		//constexpr char16_t const fSurrogateW1_B{ 0xd800u };	// 0xd800u ~ 0xdbffu;
+		//constexpr char16_t const fSurrogateW1_E{ 0xdbffu };	// 0xdbffu ~ 0xdbffu;
+		//constexpr char16_t const fSurrogateW2_B{ 0xdc00u };	// 0xdc00u ~ 0xdfffu;
+		//constexpr char16_t const fSurrogateW2_E{ 0xdfffu };	// 0xdfffu ~ 0xdfffu;
+		//constexpr int const nBitSurrogate{ 10 };
+		//char16_t const* const last { svFrom.data() + svFrom.size()};
+		//for (char16_t const* pos = svFrom.data(); pos < last; ++pos) {
+		//	if (*pos < fSurrogateW1_B) [[likely]] {
+		//		str.push_back(*pos);
+		//	} else if (*pos <= fSurrogateW1_E) [[unlikely]] { // leading surrogate
+		//		char32_t const cLeading = *pos; // widen for later math
+
+		//		if (++pos == last) { // missing trailing surrogate
+		//			throw std::invalid_argument{"cannot convert string from utf16 to utf32. missing trailing surrogate"};
+		//		}
+
+		//		char32_t const cTrailing = *pos; // widen for later math
+
+		//		if (fSurrogateW2_B <= cTrailing && cTrailing <= fSurrogateW2_E) { // valid trailing surrogate
+		//			//str.push_back(0xfca02400u + (cLeading << 10) + cTrailing);
+		//			constexpr static uint32_t const pre = 0x1'0000 - ((fSurrogateW1_B << nBitSurrogate) + fSurrogateW2_B);
+		//			str.push_back(pre + (cLeading << nBitSurrogate) + cTrailing);
+		//		} else { // invalid trailing surrogate
+		//			throw std::invalid_argument{"cannot convert string from utf16 to utf32. invalid trailing surrogate"};
+		//		}
+		//	} else if (*pos <= 0xdfffu) { // found trailing surrogate by itself, invalid
+		//		[[unlikely]]
+		//		throw std::invalid_argument{"cannot convert string from utf16 to utf32. found trailing surrogate by itself, invalid"};
+		//	} else {
+		//		[[likely]]
+		//		str.push_back(*pos);
+		//	}
+		//}
+
 		// check endian, Convert
-		ConvertEndian(str, eCODEPAGE::_UTF32_other, codepage.to);
+		CheckAndConvertEndian(str, codepage.to);
 
 		return str;
 	}
 
 	std::u16string ConvUTF32_UTF16(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		// function _Convert_utf32_to_wide from <filesystem> (MSVC)
+		// Original License :
+				// Copyright (c) Microsoft Corporation.
+				// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 		std::u16string str;
 
 		if (svFrom.size() <= 0)
@@ -408,7 +443,7 @@ namespace gtl {
 		}
 
 		// check endian, Convert
-		auto strOther = ConvertEndian(svFrom, eCODEPAGE::_UTF32_other, codepage.from);
+		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		str.reserve(svFrom.size());
@@ -420,7 +455,7 @@ namespace gtl {
 				throw std::invalid_argument{"cannot convert string from utf32 to utf16. 0xdffu < c < 0xdfffu"};
 			} else if (c <= 0xffffu) {
 				str.push_back(static_cast<std::u16string::value_type>(c));
-			} else if (c <= 0x10ffffu) {
+			} else if (c <= 0x10'ffffu) {
 				str.push_back(static_cast<char16_t>(0xd7c0u + (c >> 10)));
 				str.push_back(static_cast<char16_t>(0xdc00u + (c & 0x3ffu)));
 			} else {
@@ -429,7 +464,153 @@ namespace gtl {
 		}
 
 		// check endian, Convert
-		ConvertEndian(str, eCODEPAGE::_UTF16_other, codepage.to);
+		CheckAndConvertEndian(str, codepage.to);
+
+		return str;
+	}
+
+	std::u8string ConvUTF32_UTF8(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		std::u8string str;
+		if (svFrom.empty())
+			return str;
+
+		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+			[[unlikely]]
+			throw std::invalid_argument{ "string is too long." };
+		}
+
+		// check endian, Convert
+		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
+		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
+
+		size_t nOutputLen = 0;
+		for (auto c : svFrom) {
+			if (c < 0x80)
+				nOutputLen++;
+			else if (c < 0x0800)
+				nOutputLen += 2;
+			else if (c <= 0xffff) /*((c < 0xd800) || ((c >= 0xe000) && (c <= 0xffff)))*/
+				nOutputLen += 3;
+			else if (c <= 0x10'ffff)
+				nOutputLen += 4;
+			else {
+				throw std::invalid_argument{ "Cannot Convert from u32 to u8." };
+				nOutputLen++;
+			}
+		}
+
+		if (nOutputLen <= 0)
+			return str;
+
+		str.reserve(nOutputLen);
+		for (auto c : svFrom) {
+			constexpr uint8_t mask_3bits = 0b0000'0111;
+			constexpr uint8_t mask_4bits = 0b0000'1111;
+			constexpr uint8_t mask_6bits = 0b0011'1111;
+			if (c <= 0x7f)
+				str.push_back(static_cast<char8_t>(c));
+			else if (c <= 0x07ff) {
+				str.push_back(static_cast<char8_t>(0xc0 | (((c) >> 6) & mask_6bits)));
+				str.push_back(static_cast<char8_t>(0x80 | ((c) &mask_6bits)));
+			}
+			else if (c <= 0xffff) /*((c < 0xd800) || ((c >= 0xe000) && (c <= 0xffff)))*/ {
+				str.push_back(static_cast<char8_t>(0xe0 | (((c) >> 12) & mask_4bits)));		// 4 bits
+				str.push_back(static_cast<char8_t>(0x80 | (((c) >> 6) & mask_6bits)));		// 6 bits
+				str.push_back(static_cast<char8_t>(0x80 | ((c) & mask_6bits)));				// 6 bits
+			}
+			else if (c <= 0x10'ffff) {
+				str.push_back(static_cast<char8_t>(0xf0 | (((c) >> 18) & mask_3bits)));		// 3 bits
+				str.push_back(static_cast<char8_t>(0x80 | (((c) >> 12) & mask_6bits)));		// 6 bits
+				str.push_back(static_cast<char8_t>(0x80 | (((c) >> 6) & mask_6bits)));		// 6 bits
+				str.push_back(static_cast<char8_t>(0x80 | ((c) & mask_6bits)));				// 6 bits
+			}
+
+			else {
+				throw std::invalid_argument{ "Cannot Convert from u16 to u8." };
+			}
+		}
+
+		return str;
+	}
+	std::u32string ConvUTF8_UTF32(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		std::u32string str;
+		if (svFrom.empty())
+			return str;
+
+		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+			[[unlikely]]
+			throw std::invalid_argument{ "string is too long." };
+		}
+
+		size_t nOutputLen = 0;
+		auto const* pszEnd = svFrom.data() + svFrom.size();
+		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
+			auto const c = psz[0];
+
+			if (c < 0x80)
+				;
+			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
+				if ( (psz+1 >= pszEnd)
+					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
+					)
+					throw std::invalid_argument{ "not a utf-8" };
+			}
+			else if ((c & 0b1111'0000) == 0b1110'000) {	// ~0x7ff
+				if ((psz+2 >= pszEnd)
+					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
+					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
+					)
+					throw std::invalid_argument{ "not a utf-8" };
+			}
+			else if ((c & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
+				if ((psz+3 >= pszEnd)
+					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
+					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
+					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
+					)
+					throw std::invalid_argument{ "not a utf-8" };
+			}
+			else {
+				throw std::invalid_argument{ "not a utf-8" };
+			}
+
+			nOutputLen++;
+		}
+
+		if (nOutputLen <= 0)
+			return str;
+		str.reserve(nOutputLen);
+		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
+			constexpr uint8_t mask_3bits { 0b0000'0111 };
+			constexpr uint8_t mask_4bits { 0b0000'1111 };
+			constexpr uint8_t mask_6bits { 0b0011'1111 };
+
+			auto const c { *psz };
+
+			char32_t v{};
+			if (c < 0x80)
+				v = c;
+			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
+				v = (*psz & mask_6bits) << 6;
+				v |= *++psz & mask_6bits;
+			}
+			else if ((c & 0b1111'0000) == 0b1110'000) {	// ~0x7ff
+				v = (*psz & mask_4bits) << 12;
+				v |= (*++psz & mask_6bits) << 6;
+				v |= (*++psz & mask_6bits);
+			}
+			else if ((c & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
+				v = (*psz & mask_3bits) << 18;
+				v |= (*++psz & mask_6bits) << 12;
+				v |= (*++psz & mask_6bits) << 6;
+				v |= (*++psz & mask_6bits);
+			}
+
+			str.push_back(v);
+		}
+
+		// check endian, Convert
+		CheckAndConvertEndian(str, codepage.to);
 
 		return str;
 	}
@@ -448,14 +629,6 @@ namespace gtl {
 //		return (std::u8string&)conversion.to_bytes(sv.data());
 //	}
 //#pragma warning(pop)
-
-
-	/*GTL_API */std::map<char16_t, uint16_t> const& GetHangeulCodeMap(char16_t, uint16_t) {
-		return GetHangeulCodeMapUTF16toKSSM();
-	}
-	/*GTL_API */std::map<uint16_t, char16_t> const& GetHangeulCodeMap(uint16_t, char16_t) {
-		return GetHangeulCodeMapKSSMtoUTF16();
-	}
 
 
 	//-----------------------------------------------------------------------------

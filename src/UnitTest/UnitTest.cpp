@@ -92,5 +92,19 @@ namespace UnitTest {
 			Assert::AreEqual('b', str2[1]);
 			str2 = L"abcde";
 		}
+
+		TEST_METHOD(Test2) {
+			//constexpr char16_t cLeading{ 0xd801 };
+			//constexpr char16_t cTrailing{ 0xdc03 };
+			//constexpr char32_t c32{ 1 << 10 | 03 };
+
+			//constexpr auto c = ((cLeading - 0xd800) << 10) + (cTrailing - 0xdc00);
+			//constexpr char32_t adder = -((0xd800 << 10) + 0xdc00);
+			//constexpr auto c_ = adder + (cLeading << 10) + cTrailing;
+			//constexpr auto c2 = 0xfca0'2400u + (cLeading << 10) + cTrailing;
+
+			//Assert::AreEqual((uint32_t)c32, (uint32_t)c);
+			//Assert::AreEqual((uint32_t)c32, (uint32_t)c2);
+		}
 	};
 }

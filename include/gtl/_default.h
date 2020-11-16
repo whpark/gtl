@@ -99,8 +99,8 @@
 #endif
 
 
+#include "gtl/config_gtl.h"
 
-#define GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY true
 
 namespace gtl {
 
@@ -127,12 +127,12 @@ namespace gtl {
 	template < std::integral tvar_t >
 	[[nodiscard]] inline tvar_t GetByteSwap(tvar_t const v) {
 		tvar_t r{};
-		std::reverse_copy((uint8_t const*)v, (uint8_t const*)v+sizeof(v), (uint8_t*)&r);
+		std::reverse_copy((uint8_t const*)&v, (uint8_t const*)&v+sizeof(v), (uint8_t*)&r);
 		return r;
 	}
 	template < std::integral tvar_t >
 	inline void ByteSwap(tvar_t& v) {
-		std::reverse((uint8_t const*)v, (uint8_t const*)v+sizeof(v));
+		std::reverse((uint8_t*)&v, (uint8_t*)&v+sizeof(v));
 	}
 #endif
 

@@ -423,7 +423,9 @@ namespace gtl {
 	using CStringU8 = TString<char8_t>;			// Unicode UTF-8
 	using CStringU16 = TString<char16_t>;		// Unicode UTF-16
 	using CStringU32 = TString<char32_t>;		// Unicode UTF-32
+#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
 	using CStringKSSM = TString<uint16_t>;		// KSSM (codepage 1361)
+#endif
 
 
 #pragma pack(pop)

@@ -168,17 +168,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\concepts.h" />
+    <ClInclude Include="..\..\include\gtl\config_gtl.h" />
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\string\basic_string.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h" />
+    <ClInclude Include="..\..\include\gtl\string\HangeulCodeTable.h" />
     <ClInclude Include="..\..\include\gtl\string\old_format.h" />
     <ClInclude Include="..\..\include\gtl\_default.h" />
     <ClInclude Include="..\..\include\gtl\string.h" />
     <ClInclude Include="..\..\include\gtl\__lib.h" />
     <ClInclude Include="..\..\include\gtl\_lib_gtl.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="HangeulCodeTable.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
