@@ -63,6 +63,9 @@
     <ClInclude Include="..\..\include\gtl\string\HangeulCodeTable.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\string\utf_string_view.h">
+      <Filter>gtl\string</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

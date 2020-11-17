@@ -63,7 +63,7 @@ namespace gtl {
 	std::string ConvUTF16_MBCS(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{"string is too long."};
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		std::string str;
@@ -85,7 +85,7 @@ namespace gtl {
 	std::u16string ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{"string is too long."};
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		std::u16string str;
@@ -112,7 +112,7 @@ namespace gtl {
 			return str;
 
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
-			throw std::invalid_argument{"string is too long."};
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		// check endian, Convert
@@ -138,7 +138,7 @@ namespace gtl {
 					   str.data(), str.data()+len, pszDestNext);
 
 		if (result != std::codecvt_base::error)
-			throw std::invalid_argument{"String Cannot be transformed!"};
+			throw std::invalid_argument{ GTL__FUNCSIG "String Cannot be transformed!" };
 		return str;
 	}
 	std::u16string ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
@@ -147,7 +147,7 @@ namespace gtl {
 			return str;
 
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
-			throw std::invalid_argument{"string is too long."};
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		auto const* pszSourceBegin = svFrom.data();
@@ -174,7 +174,7 @@ namespace gtl {
 							   (utf16_t*)str.data(), (utf16_t*)str.data()+len, pszDestNext);
 
 		if (result != std::codecvt_base::error)
-			throw std::invalid_argument{"String Cannot be transformed!"};
+			throw std::invalid_argument{ GTL__FUNCSIG "String Cannot be transformed!" };
 
 		// check endian, Convert
 		CheckAndConvertEndian(str, codepage.to);
@@ -187,7 +187,7 @@ namespace gtl {
 	std::u8string ConvUTF16_UTF8(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{"string is too long."};
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		std::u8string str;
@@ -210,7 +210,7 @@ namespace gtl {
 	std::u16string ConvUTF8_UTF16(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{"string is too long."};
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		std::u16string str;
@@ -239,7 +239,7 @@ namespace gtl {
 
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{ "string is too long." };
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		// check endian, Convert
@@ -248,19 +248,17 @@ namespace gtl {
 
 		size_t nOutputLen = 0;
 		for (auto c : svFrom) {
-			if (c < 0x80u)
+			if (c <= 0x7f)
 				nOutputLen++;
-			else if (c < 0x0800u)
+			else if (c <= 0x07ffu)
 				nOutputLen += 2;
-			else if ((c < 0xd800u) || (c >= 0xe000u))
+			else if ((c <= 0xd7ffu) || (c >= 0xe000u))
 				nOutputLen += 3;
-			else if (c <= 0xdc00u) {
-				// todo :.....
-				if ( c & 0b1100'0000)
+			else if (c <= utf_const::fSurrogateW1.second) {
 				nOutputLen += 4;
 			}
 			else {
-				throw std::invalid_argument{ "Cannot Convert from u32 to u8." };
+				throw std::invalid_argument{ GTL__FUNCSIG "Cannot Convert from u32 to u8." };
 				nOutputLen++;
 			}
 		}
@@ -290,9 +288,8 @@ namespace gtl {
 				str.push_back(static_cast<char8_t>(0x80 | (((c) >> 6) & mask_6bits)));		// 6 bits
 				str.push_back(static_cast<char8_t>(0x80 | ((c)&mask_6bits)));				// 6 bits
 			}
-
 			else {
-				throw std::invalid_argument{ "Cannot Convert from u16 to u8." };
+				throw std::invalid_argument{ GTL__FUNCSIG "Cannot Convert from u16 to u8." };
 			}
 		}
 
@@ -305,56 +302,79 @@ namespace gtl {
 
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{ "string is too long." };
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		size_t nOutputLen = 0;
-		auto const* pszEnd = svFrom.data() + svFrom.size();
-		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
-			auto const c1 = psz[0];
-			auto const c2 = psz[0] && (psz+1 < pszEnd) ? psz[1] : 0;
-			auto const c3 = psz[1] && (psz+2 < pszEnd) ? psz[2] : 0;
-
-			if ( c1 && c2 && ((c1 & 0b1110'0000) == 0b1100'0000) && IsUTF8SigChar(c2) ) {		// 110xxxxx 10xxxxxx
-				char16_t b = ((c1 & 0b0001'1111) << 6) | (c2 & 0b0011'1111);
-				if ( (b >= 0x0080) && (b <= 0x07ff) ) {
-					psz += 1;
-				}
-			} else if (c1 && c2 && c3 && ((c1&0b1111'0000) == 0b1110'0000) && IsUTF8SigChar(c2) && IsUTF8SigChar(c3) ) {
-				char16_t b = ((c1 & 0b0000'1111) << 12) | ((c2 & 0b0011'1111) << 6) | (c3 & 0b0011'1111);
-				if ( (b >= 0x0800) && (b <= 0xFFFF) ) {
-					psz += 2;
-				}
+		auto const* const end = svFrom.data() + svFrom.size();
+		for (auto const* pos = svFrom.data(); pos < end; pos++) {
+			if (pos[0] <= 0x7f) {
+				nOutputLen++;
 			}
-			nOutputLen++;
+			else if ((pos[0] & 0b1110'0000) == 0b1100'0000) {	// 0~0x7ff
+				if ((pos + 1 >= end)
+					|| ((pos[1] & 0b1100'0000) != 0b1000'0000)
+					)
+					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+				pos += 1;
+				nOutputLen += 1;
+			}
+			else if ((pos[0] & 0b1111'0000) == 0b1110'000) {	// ~0xffff
+				if ((pos + 2 >= end)
+					|| ((pos[1] & 0b1100'0000) != 0b1000'0000)
+					|| ((pos[2] & 0b1100'0000) != 0b1000'0000)
+					)
+					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+				pos += 2;
+				nOutputLen++;
+			}
+			else if ((pos[0] & 0b1111'1000) == 0b1111'0000) {	// ~0x10'ffff
+				if ((pos + 3 >= end)
+					|| ((pos[1] & 0b1100'0000) != 0b1000'0000)
+					|| ((pos[2] & 0b1100'0000) != 0b1000'0000)
+					|| ((pos[3] & 0b1100'0000) != 0b1000'0000)
+					)
+					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+				pos += 3;
+				nOutputLen += 2;
+			}
+			else {
+				throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+			}
+
 		}
+
 
 		if (nOutputLen <= 0)
 			return str;
 		str.reserve(nOutputLen);
-		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
-			auto const c1 = psz[0];
-			auto const c2 = psz[0] && (psz+1 < pszEnd) ? psz[1] : 0;
-			auto const c3 = psz[1] && (psz+2 < pszEnd) ? psz[2] : 0;
 
-			if ( c1 && c2 && ((c1&0b1110'0000) == 0b1100'0000) && IsUTF8SigChar(c2) ) {		// 110xxxxx 10xxxxxx
-				char16_t b = ((c1 & 0b0001'1111) << 6) | (c2 & 0b0011'1111);
-				if ( (b >= 0x0080) && (b <= 0x07ff) ) {
-					str.push_back(b);
-					psz += 1;
-				} else {
-					str.push_back(*psz);
-				}
-			} else if (c1 && c2 && c3 && ((c1&0b1111'0000) == 0b1110'0000) && IsUTF8SigChar(c2) && IsUTF8SigChar(c3) ) {
-				char16_t b = ((c1 & 0b0000'1111) << 12) | ((c2 & 0b0011'1111) << 6) | (c3 & 0b0011'1111);
-				if ( (b >= 0x0800) && (b <= 0xFFFF) ) {
-					str.push_back(b);
-					psz += 2;
-				} else {
-					str.push_back(*psz);
-				}
-			} else {
-				str.push_back(c1);
+		for (auto const* pos = svFrom.data(); pos < end; pos++) {
+
+			namespace uc = utf_const;
+
+			if (pos[0] <= 0x7f) {
+				str.push_back(pos[0]);
+			}
+			else if ((pos[0] & 0b1110'0000) == 0b1100'0000) {	// 0~0x7ff
+				str.push_back(((pos[0] & uc::mask_6bit) << 6) | (pos[1] & uc::mask_6bit));
+				pos += 1;
+			}
+			else if ((pos[0] & 0b1111'0000) == 0b1110'000) {	// ~0xffff
+				str.push_back(((pos[0] & uc::mask_4bit) << 12) | ((pos[1] & uc::mask_6bit) << 6) | (pos[2] & uc::mask_6bit));
+				pos += 2;
+			}
+			else if ((pos[0] & 0b1111'1000) == 0b1111'0000) {	// ~0x10'ffff
+				//char32_t c = ((pos[0] & uc::mask_3bit) << 18) | ((pos[1] & uc::mask_6bit) << 12) | ((pos[2] & uc::mask_6bit) << 6) | (pos[3] & uc::mask_6bit);
+				constexpr static auto const preH = uc::fSurrogateW1.first - (0x1'0000u >> uc::nBitSurrogate);
+				constexpr static auto const preL = uc::fSurrogateW2.first;
+
+				str.push_back(preH + ( (pos[0] & uc::mask_3bit) << 8) | ((pos[1] & uc::mask_6bit) << 2) | ((pos[2]>> 4) & 0b0011) );
+				str.push_back(preL + ( (pos[2] & uc::mask_4bit) << 6) | (pos[3] & uc::mask_6bit) );
+				pos += 3;
+			}
+			else {
+				throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
 			}
 		}
 
@@ -374,7 +394,7 @@ namespace gtl {
 
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{ "string is too long." };
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		// check endian, Convert
@@ -400,7 +420,7 @@ namespace gtl {
 		//		char32_t const cLeading = *pos; // widen for later math
 
 		//		if (++pos == last) { // missing trailing surrogate
-		//			throw std::invalid_argument{"cannot convert string from utf16 to utf32. missing trailing surrogate"};
+		//			throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. missing trailing surrogate"};
 		//		}
 
 		//		char32_t const cTrailing = *pos; // widen for later math
@@ -410,11 +430,11 @@ namespace gtl {
 		//			constexpr static uint32_t const pre = 0x1'0000 - ((fSurrogateW1_B << nBitSurrogate) + fSurrogateW2_B);
 		//			str.push_back(pre + (cLeading << nBitSurrogate) + cTrailing);
 		//		} else { // invalid trailing surrogate
-		//			throw std::invalid_argument{"cannot convert string from utf16 to utf32. invalid trailing surrogate"};
+		//			throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. invalid trailing surrogate"};
 		//		}
 		//	} else if (*pos <= 0xdfffu) { // found trailing surrogate by itself, invalid
 		//		[[unlikely]]
-		//		throw std::invalid_argument{"cannot convert string from utf16 to utf32. found trailing surrogate by itself, invalid"};
+		//		throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. found trailing surrogate by itself, invalid"};
 		//	} else {
 		//		[[likely]]
 		//		str.push_back(*pos);
@@ -439,7 +459,7 @@ namespace gtl {
 
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{ "string is too long." };
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		// check endian, Convert
@@ -452,14 +472,14 @@ namespace gtl {
 			if (c <= 0xd7ffu) {
 				str.push_back(static_cast<std::u16string::value_type>(c));
 			} else if (c <= 0xdfffu) {
-				throw std::invalid_argument{"cannot convert string from utf32 to utf16. 0xdffu < c < 0xdfffu"};
+				throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf32 to utf16. 0xdffu < c < 0xdfffu"};
 			} else if (c <= 0xffffu) {
 				str.push_back(static_cast<std::u16string::value_type>(c));
 			} else if (c <= 0x10'ffffu) {
 				str.push_back(static_cast<char16_t>(0xd7c0u + (c >> 10)));
 				str.push_back(static_cast<char16_t>(0xdc00u + (c & 0x3ffu)));
 			} else {
-				throw std::invalid_argument{"cannot convert string from utf32 to utf16. 0x10FFFFU < c"};
+				throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf32 to utf16. 0x10FFFFU < c"};
 			}
 		}
 
@@ -476,7 +496,7 @@ namespace gtl {
 
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{ "string is too long." };
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		// check endian, Convert
@@ -494,7 +514,7 @@ namespace gtl {
 			else if (c <= 0x10'ffff)
 				nOutputLen += 4;
 			else {
-				throw std::invalid_argument{ "Cannot Convert from u32 to u8." };
+				throw std::invalid_argument{ GTL__FUNCSIG "Cannot Convert from u32 to u8." };
 				nOutputLen++;
 			}
 		}
@@ -526,7 +546,7 @@ namespace gtl {
 			}
 
 			else {
-				throw std::invalid_argument{ "Cannot Convert from u16 to u8." };
+				throw std::invalid_argument{ GTL__FUNCSIG "Cannot Convert from u16 to u8." };
 			}
 		}
 
@@ -539,7 +559,7 @@ namespace gtl {
 
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
-			throw std::invalid_argument{ "string is too long." };
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		size_t nOutputLen = 0;
@@ -547,20 +567,20 @@ namespace gtl {
 		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
 			auto const c = psz[0];
 
-			if (c < 0x80)
+			if (c <= 0x7f)
 				;
 			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
 				if ( (psz+1 >= pszEnd)
 					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
 					)
-					throw std::invalid_argument{ "not a utf-8" };
+					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
 			}
 			else if ((c & 0b1111'0000) == 0b1110'000) {	// ~0x7ff
 				if ((psz+2 >= pszEnd)
 					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
 					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
 					)
-					throw std::invalid_argument{ "not a utf-8" };
+					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
 			}
 			else if ((c & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
 				if ((psz+3 >= pszEnd)
@@ -568,10 +588,10 @@ namespace gtl {
 					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
 					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
 					)
-					throw std::invalid_argument{ "not a utf-8" };
+					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
 			}
 			else {
-				throw std::invalid_argument{ "not a utf-8" };
+				throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
 			}
 
 			nOutputLen++;
@@ -588,13 +608,13 @@ namespace gtl {
 			auto const c { *psz };
 
 			char32_t v{};
-			if (c < 0x80)
+			if (c <= 0x7f)
 				v = c;
 			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
 				v = (*psz & mask_6bits) << 6;
 				v |= *++psz & mask_6bits;
 			}
-			else if ((c & 0b1111'0000) == 0b1110'000) {	// ~0x7ff
+			else if ((c & 0b1111'0000) == 0b1110'0000) {	// ~0x7ff
 				v = (*psz & mask_4bits) << 12;
 				v |= (*++psz & mask_6bits) << 6;
 				v |= (*++psz & mask_6bits);
@@ -632,7 +652,7 @@ namespace gtl {
 
 
 	//-----------------------------------------------------------------------------
-	/*GTL_API */bool IsUTF8String(std::string_view str, int* pOutputBufferCount, bool* pbIsMSBSet) {
+	bool IsUTF8String(std::string_view str, int* pOutputBufferCount, bool* pbIsMSBSet) {
 		if (pOutputBufferCount)
 			*pOutputBufferCount = 0;
 		if (pbIsMSBSet)

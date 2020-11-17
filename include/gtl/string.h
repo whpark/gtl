@@ -408,7 +408,7 @@ namespace gtl {
 
 			//#ifdef _DEBUG
 			//	if (nNewLen == nCapacity)
-			//		throw std::overflow_error(__FMSG "String Length Overflowed.");
+			//		throw std::overflow_error(GTL__FUNCSIG "String Length Overflowed.");
 			//#endif
 			base_t::resize(nNewLen, 0);
 			return base_t::length();

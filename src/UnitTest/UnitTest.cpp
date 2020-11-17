@@ -5,7 +5,20 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
+namespace Microsoft::VisualStudio::CppUnitTestFramework {
+	template<> inline std::wstring ToString<char8_t>               (char8_t const& t)               { return fmt::format(L"{}", (int)t); }
+	//template<> inline std::wstring ToString<char8_t>               (char8_t const* t)               { return fmt::format(L"{}", t); }
+	//template<> inline std::wstring ToString<char8_t>               (char8_t* t)                     { return fmt::format(L"{}", t); }
+	template<> inline std::wstring ToString<char16_t>              (char16_t const& t)              { return fmt::format(L"{}", (int)t); }
+	//template<> inline std::wstring ToString<char16_t>              (char16_t const* t)              { return fmt::format(L"{}", t); }
+	//template<> inline std::wstring ToString<char16_t>              (char16_t* t)                    { return fmt::format(L"{}", t); }
+	template<> inline std::wstring ToString<char32_t>              (char32_t const& t)              { return fmt::format(L"{}", (int)t); }
+	//template<> inline std::wstring ToString<char32_t>              (char32_t const* t)              { return fmt::format(L"{}", t); }
+	//template<> inline std::wstring ToString<char32_t>              (char32_t* t)                    { return fmt::format(L"{}", t); }
+}
+
 namespace UnitTest {
+
 
 	//BEGIN_TEST_MODULE_ATTRIBUTE()
 	//	TEST_MODULE_ATTRIBUTE(L"Date", L"2020/11/03")
@@ -94,17 +107,18 @@ namespace UnitTest {
 		}
 
 		TEST_METHOD(Test2) {
-			//constexpr char16_t cLeading{ 0xd801 };
-			//constexpr char16_t cTrailing{ 0xdc03 };
-			//constexpr char32_t c32{ 1 << 10 | 03 };
 
-			//constexpr auto c = ((cLeading - 0xd800) << 10) + (cTrailing - 0xdc00);
-			//constexpr char32_t adder = -((0xd800 << 10) + 0xdc00);
-			//constexpr auto c_ = adder + (cLeading << 10) + cTrailing;
-			//constexpr auto c2 = 0xfca0'2400u + (cLeading << 10) + cTrailing;
+			constexpr char16_t cLeading{ 0xd801 };
+			constexpr char16_t cTrailing{ 0xdc03 };
+			constexpr char32_t c32{ (1 << 10 | 03) + 0x1'0000 };
 
-			//Assert::AreEqual((uint32_t)c32, (uint32_t)c);
-			//Assert::AreEqual((uint32_t)c32, (uint32_t)c2);
+			constexpr auto c = ((cLeading - 0xd800) << 10) + (cTrailing - 0xdc00) + 0x1'0000;
+			constexpr char32_t adder = 0x1'0000 -((0xd800 << 10) + 0xdc00);
+			constexpr auto c_ = adder + (cLeading << 10) + cTrailing;
+			constexpr auto c2 = 0xfca0'2400u + (cLeading << 10) + cTrailing;
+
+			Assert::AreEqual(c32, (char32_t)c);
+			Assert::AreEqual((uint32_t)c32, (uint32_t)c2);
 		}
 	};
 }

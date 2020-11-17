@@ -105,7 +105,7 @@ namespace gtl::old_format {
 		basic_string_t<tchar_t> str;
 		int len = tsz_vsnprintf(nullptr, 0, pszFormat, argList);
 		if (len < 0)
-			throw std::invalid_argument("formatting error");
+			throw std::invalid_argument(GTL__FUNCSIG "formatting error");
 		if (len) {
 			//str.reserve(len+1);	// for NULL-Terminating char... VS2017 still uses it.
 			str.resize(len);
@@ -120,7 +120,7 @@ namespace gtl::old_format {
 		basic_string_t<tchar_t> str;
 		int len = tsz_snprintf(nullptr, 0, pszFormat, args ...);
 		if (len < 0)
-			throw std::invalid_argument("formatting error");
+			throw std::invalid_argument(GTL__FUNCSIG "formatting error");
 		if (len) {
 			//str.reserve(len+1);	// for NULL-Terminating char... VS2017 still uses it.
 			str.resize(len);

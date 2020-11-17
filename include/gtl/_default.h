@@ -104,6 +104,8 @@
 
 namespace gtl {
 
+#define GTL__FUNCSIG __FUNCSIG__ " : "
+
 
 	// byte swap
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY)

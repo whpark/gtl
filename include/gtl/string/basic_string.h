@@ -127,22 +127,31 @@ namespace gtl {
 	}
 
 
+	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
+	inline constexpr int ToLower(int c/* Locale Irrelavant */) { if ((c >= 'A') && (c <= 'Z')) return c - 'A' + 'a'; return c; }
+	inline constexpr int ToUpper(int c/* Locale Irrelavant */) { if ((c >= 'a') && (c <= 'z')) return c - 'a' + 'A'; return c; }
+	inline constexpr int IsDigit(int const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '9'); }
+	inline constexpr int IsOdigit(int const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '7'); }
+	inline constexpr int IsXdigit(int const c/* Locale Irrelavant */) { return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F')); }
+	inline constexpr int IsSpace(int const c/* Locale Irrelavant */) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
+	inline constexpr int IsNotSpace(int const c/* Locale Irrelavant */) { return !IsSpace(c); }
+
 	/// @brief  tszlen (string length)
 	/// @param psz : string
 	/// @return string length
 	template < gtlc::string_elem tchar_t >
-	constexpr size_t tszlen(const tchar_t* psz) {
+	constexpr size_t tszlen(tchar_t const* psz) {
 		if (!psz) return 0;
-		size_t size = 0;
-		while (*psz) { psz++, size++; }
+		tchar_t const pos = psz;
+		while (*psz) { psz++; }
 		return size;
 	}
 
 	// todo : primitive functions
-#if 0
+#if 1
 	/// @brief tchar_t wrapper (string function)
 	template < gtlc::string_elem tchar_t >
-	constexpr size_t tszlen(const tchar_t* psz) {
+	constexpr size_t tszlen(tchar_t const* psz) {
 		if (!psz) return 0;
 		size_t size = 0;
 		while (*psz) { psz++, size++; }
@@ -166,13 +175,19 @@ namespace gtl {
 		szDest[0] = 0;
 		return ERANGE;
 	}
+
+	template < gtlc::string_elem tchar_t, int size >
+	errno_t tszcpy(std::array<tchar_t, size>& szDest, tchar_t const* pszSrc) {
+		return tszcpy(szDest.data(), size, pszSrfc);
+	}
+
 	template < gtlc::string_elem tchar_t, int size >
 	errno_t tszcpy(tchar_t (&szDest)[size], tchar_t const* pszSrc) {
 		return tszcpy(szDest, size, pszSrfc);
 	}
 
 	template < gtlc::string_elem tchar_t >
-	errno_t tszncpy(char* pszDest, size_t size, const char* pszSrc, size_t nLen = _TRUNCATE) {
+	errno_t tszncpy(tchar_t* pszDest, size_t size, tchar_t const* pszSrc, size_t nLen = _TRUNCATE) {
 		if (!szDest)
 			return EINVAL;
 		if (size <= 0)
@@ -196,50 +211,253 @@ namespace gtl {
 		return ERANGE;
 		//return strncpy_s(pszDest, size, pszSrc, nLen);
 	}
+	template < int size, gtlc::string_elem tchar_t >
+	errno_t tszncpy(tchar_t (&szDest)[size], tchar_t const* pszSrc, size_t nLen = _TRUNCATE) {
+		return tszncpy(szDest, size, pszSrc, nLen);
+	}
+	template < int size, gtlc::string_elem tchar_t >
+	errno_t tszncpy(std::array<tchar_t, size>& szDest, tchar_t const* pszSrc, size_t nLen = _TRUNCATE) {
+		return tszncpy(szDest.data(), size, pszSrc, nLen);
+	}
 	template < gtlc::string_elem tchar_t >
-	template < int size >	errno_t			tszncpy(char (&szDest)[size], const char* pszSrc, size_t nLen)					{ return strncpy_s(szDest, pszSrc, nLen); }
+	errno_t tszcat(tchar_t* pszDest, size_t size, tchar_t const* pszSrc) {
+		if (!szDest || (size <= 0) || (size > RSIZE_MAX) )
+			return EINVAL;
+		if (!pszSrc) {
+			if (size && (size <= RSIZE_MAX))
+				szDest[0] = 0;
+			return EINVAL;
+		}
+		auto const* const pszEnd = pszDest + size;
+		for (; pszDest < pszEnd; pszDest++, pszSrc++) {
+			*pszDest = *pszSrc;
+			if (!*pszSrc)
+				return 0;
+		}
+		// pszSrc is longer
+		if (size && (size <= RSIZE_MAX))
+			szDest[0] = 0;
+		return ERANGE;
+	}
+	template < int size, gtlc::string_elem tchar_t >
+	errno_t tszcat(tchar_t (&szDest)[size], tchar_t const* pszSrc) {
+		return tszcat(szDest, size, pszSrc);
+	}
+	template < int size, gtlc::string_elem tchar_t >
+	errno_t tszcat(std::array<tchar_t, size>& szDest, tchar_t const* pszSrc) {
+		return tszcat(szDest.data(), size, pszSrc);
+	}
 	template < gtlc::string_elem tchar_t >
-	template < int size >	errno_t			tszcat(char (&szDest)[size], const char* pszSrc)								{ return strcat_s(szDest, pszSrc); }
+	int tszcmp(tchar_t const* pszA, tchar_t const* pszB) {
+		if (!pszA && !pszB)	// if both are nullptr, return 0;
+			return 0;
+		if (pszA && !pszB)	// if only one has value, its bigger.
+			return *pszA;
+		else if (!pszA && pszB)
+			return *pszB;
+
+		for (; !*pszA || !*pszB; pszA++, pszB++) {
+			auto r = *pszA - *pszB;
+			if (!r)
+				return r;
+		}
+		if (!*pszA && !*pszB)
+			return 0;
+		auto r = *pszA - *pszB;
+		return r;
+	}
+
 	template < gtlc::string_elem tchar_t >
-	errno_t			tszcat(char* pszDest, size_t size, const char* pszSrc)							{ return strcat_s(pszDest, size, pszSrc); }
+	int tszncmp(tchar_t const* pszA, tchar_t const* pszB, size_t nLen) {
+		if (!pszA && !pszB)
+			return 0;
+		if (pszA && !pszB)
+			return *pszA;
+		else if (!pszA && pszB)
+			return *pszB;
+
+		if (!nLen)
+			return 0;
+
+		for (; !*pszA || !*pszB; pszA++, pszB++) {
+			auto r = *pszA - *pszB;
+			if (!r)
+				return r;
+			if (--nLen == 0)
+				return 0;
+		}
+		if (!*pszA && !*pszB)
+			return 0;
+		auto r = *pszA - *pszB;
+		return r;
+	}
 	template < gtlc::string_elem tchar_t >
-	errno_t			tszcmp(const char* pszA, const char* pszB)										{ return strcmp(pszA, pszB); }
+	int tszicmp(tchar_t const* pszA, tchar_t const* pszB) {
+		if (!pszA && !pszB)	// if both are nullptr, return 0;
+			return 0;
+		if (pszA && !pszB)	// if only one has value, its bigger.
+			return *pszA;
+		else if (!pszA && pszB)
+			return *pszB;
+
+		for (; !*pszA || !*pszB; pszA++, pszB++) {
+			auto r = ToLower(*pszA) - ToLower(*pszB);
+			if (!r)
+				return r;
+		}
+		if (!*pszA && !*pszB)
+			return 0;
+		auto r = *pszA - *pszB;
+		return r;
+	}
 	template < gtlc::string_elem tchar_t >
-	errno_t			tszncmp(const char* pszA, const char* pszB, size_t nLen)						{ return strncmp(pszA, pszB, nLen); }
+	int tsznicmp(tchar_t const* pszA, tchar_t const* pszB, size_t nLen) {
+		if (!pszA && !pszB)
+			return 0;
+		if (pszA && !pszB)
+			return *pszA;
+		else if (!pszA && pszB)
+			return *pszB;
+
+		if (!nLen)
+			return 0;
+
+		for (; !*pszA || !*pszB; pszA++, pszB++) {
+			auto r = ToLower(*pszA) - ToLower(*pszB);
+			if (!r)
+				return r;
+			if (--nLen == 0)
+				return 0;
+		}
+		if (!*pszA && !*pszB)
+			return 0;
+		auto r = *pszA - *pszB;
+		return r;
+	}
+
 	template < gtlc::string_elem tchar_t >
-	errno_t			tszicmp(const char* pszA, const char* pszB)										{ return _stricmp(pszA, pszB); }
+	errno_t tszupr(tchar_t* sz, size_t nLen) {
+		if (!sz)
+			return EINVAL;
+		for (size_t i = 0; i < nLen; i++) {
+			auto& c = *sz++;
+			if (!c)
+				break;
+			c = ToUpper(c);
+		}
+		return 0;
+	}
+	template < int size, gtlc::string_elem tchar_t >
+	errno_t tszupr(tchar_t (&sz)[size]) {
+		for (auto& c : sz) {
+			if (!c)
+				break;
+			c = ToUpper(c);
+		}
+		return 0;
+	}
+	template < int size, gtlc::string_elem tchar_t >
+	errno_t tszupr(std::array<tchar_t, size>& sz) {
+		for (auto& c : sz) {
+			if (!c)
+				break;
+			c = ToUpper(c);
+		}
+		return 0;
+	}
+
 	template < gtlc::string_elem tchar_t >
-	errno_t			tsznicmp(const char* pszA, const char* pszB, size_t nLen)						{ return _strnicmp(pszA, pszB, nLen); }
+	errno_t tszlwr(tchar_t* sz, size_t nLen) {
+		if (!sz)
+			return EINVAL;
+		for (size_t i = 0; i < nLen; i++) {
+			auto& c = *sz++;
+			if (!c)
+				break;
+			c = ToLower(c);
+		}
+		return 0;
+	}
+	template < int size, gtlc::string_elem tchar_t >
+	errno_t tszlwr(tchar_t(&sz)[size]) {
+		for (auto& c : sz) {
+			if (!c)
+				break;
+			c = ToLower(c);
+		}
+		return 0;
+	}
+	template < int size, gtlc::string_elem tchar_t >
+	errno_t tszlwr(std::array<tchar_t, size>& sz) {
+		for (auto& c : sz) {
+			if (!c)
+				break;
+			c = ToLower(c);
+		}
+		return 0;
+	}
+
 	template < gtlc::string_elem tchar_t >
-	template < int size >	errno_t			tszupr(char (&sz)[size])														{ return _strupr_s(sz); }
+	tchar_t* tszrev(tchar_t* psz) {
+		if (!psz)
+			return nullptr;
+		std::reverse(psz, psz + tszlen(psz));
+	}
 	template < gtlc::string_elem tchar_t >
-	errno_t			tszupr(char* psz, size_t size)													{ return _strupr_s(psz, size); }
+	tchar_t const* tszsearch(tchar_t const* psz, tchar_t c) {
+		if (!psz)
+			return nullptr;
+		auto const* const end = psz + tszlen(psz);
+		auto const* p = std::search(psz, end, c);
+		if (p == end)
+			return nullptr;
+		return p;
+	}
 	template < gtlc::string_elem tchar_t >
-	template < int size >	errno_t			tszlwr(char (&sz)[size])														{ return _strlwr_s(sz); }
+	tchar_t* tszsearch(tchar_t* psz, tchar_t c) {
+		if (!psz)
+			return nullptr;
+		auto* const end = psz + tszlen(psz);
+		auto* p = std::search(psz, end, c);
+		if (p == end)
+			return nullptr;
+		return p;
+	}
 	template < gtlc::string_elem tchar_t >
-	errno_t			tszlwr(char* psz, int size)														{ return _strlwr_s(psz, size); }
+	tchar_t const* tszsearch(tchar_t const* psz, tchar_t const* pszSub) {
+		if (!psz || !pszSub)
+			return nullptr;
+		auto const* const end = psz + tszlen(psz);
+		auto const* const endSub = pszSub + tszlen(pszSub);
+		auto const* p = std::search(psz, end, pszSub, endSub);
+		if (p == end)
+			return nullptr;
+		return p;
+	}
 	template < gtlc::string_elem tchar_t >
-	char*			tszrev(char* psz)																{ return _strrev(psz); }
+	tchar_t* tszsearch(tchar_t* psz, tchar_t* pszSub) {
+		if (!psz || !pszSub)
+			return nullptr;
+		auto* const end = psz + tszlen(psz);
+		auto* const endSub = pszSub + tszlen(pszSub);
+		auto* p = std::search(psz, end, pszSub, endSub);
+		if (p == end)
+			return nullptr;
+		return p;
+	}
+
 	template < gtlc::string_elem tchar_t >
-	char*			tszsearch(char* const psz, int c)												{ return strchr(psz, c); }
+	int				tsztoi(tchar_t const* psz)															{ return atoi(psz); }
 	template < gtlc::string_elem tchar_t >
-	char*			tszsearch(char* const psz, const char* const pszSub)							{ return strstr(psz, pszSub); }
+	int32_t			tsztol(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr,    int radix = 0)	{ return strtol(psz, (tchar_t**)ppszEnd, radix); }
 	template < gtlc::string_elem tchar_t >
-	const char*		tszsearch(const char* const psz, int c)											{ return strchr(psz, c); }
+	uint32_t		tsztoul(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr,    int radix = 0)	{ return strtoul(psz, (tchar_t**)ppszEnd, radix); }
 	template < gtlc::string_elem tchar_t >
-	const char*		tszsearch(const char* const psz, const char* const pszSub)						{ return strstr(psz, pszSub); }
+	int64_t			tsztoi64(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr,    int radix = 0)	{ return _strtoi64(psz, (tchar_t**)ppszEnd, radix); }
 	template < gtlc::string_elem tchar_t >
-	int				tsztoi(const char* psz)															{ return atoi(psz); }
+	uint64_t		tsztoui64(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr,    int radix = 0)	{ return _strtoui64(psz, (tchar_t**)ppszEnd, radix); }
 	template < gtlc::string_elem tchar_t >
-	int32_t			tsztol(const char* psz,    char const** ppszEnd = nullptr,    int radix = 0)	{ return strtol(psz, (char**)ppszEnd, radix); }
-	template < gtlc::string_elem tchar_t >
-	uint32_t		tsztoul(const char* psz,    char const** ppszEnd = nullptr,    int radix = 0)	{ return strtoul(psz, (char**)ppszEnd, radix); }
-	template < gtlc::string_elem tchar_t >
-	int64_t			tsztoi64(const char* psz,    char const** ppszEnd = nullptr,    int radix = 0)	{ return _strtoi64(psz, (char**)ppszEnd, radix); }
-	template < gtlc::string_elem tchar_t >
-	uint64_t		tsztoui64(const char* psz,    char const** ppszEnd = nullptr,    int radix = 0)	{ return _strtoui64(psz, (char**)ppszEnd, radix); }
-	template < gtlc::string_elem tchar_t >
-	double			tsztod(const char* psz,    char const** ppszEnd = nullptr)						{ return strtod(psz, (char**)ppszEnd); }
+	double			tsztod(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr)						{ return strtod(psz, (tchar_t**)ppszEnd); }
 
 #else
 
@@ -355,15 +573,6 @@ namespace gtl {
 	inline					uint64_t		tsztoui64(const char16_t* psz, char16_t const ** ppszEnd = nullptr, int radix = 0)	{ return _wcstoui64((wchar_t const*)psz, (wchar_t**)ppszEnd, radix); }
 	inline					double			tsztod(const char16_t* psz, char16_t const ** ppszEnd = nullptr)					{ return wcstod    ((wchar_t const*)psz, (wchar_t**)ppszEnd); }
 #endif
-
-	/// @brief ToLower, ToUpper, ToDigit, IsSpace ...
-	inline					constexpr int	ToLower(int c/* Locale Irrelavant */)											{ if ( (c >= 'A') && (c <= 'Z') ) return c-'A'+'a'; return c; }
-	inline					constexpr int	ToUpper(int c/* Locale Irrelavant */)											{ if ( (c >= 'a') && (c <= 'z') ) return c-'a'+'A'; return c; }
-	inline					constexpr int	IsDigit(const int c/* Locale Irrelavant */)										{ return (c >= '0') && (c <= '9'); }
-	inline					constexpr int	IsOdigit(const int c/* Locale Irrelavant */)									{ return (c >= '0') && (c <= '7'); }
-	inline					constexpr int	IsXdigit(const int c/* Locale Irrelavant */)									{ return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F')); }
-	inline					constexpr int	IsSpace(const int c/* Locale Irrelavant */)										{ return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
-	inline					constexpr int	IsNotSpace(const int c/* Locale Irrelavant */)									{ return !IsSpace(c); }
 
 	template < gtlc::string_elem tchar_t >
 	constexpr size_t tszrmchar(tchar_t* psz, int chRemove);	// Remove Charactor from str. returns str length
