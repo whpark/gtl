@@ -13,7 +13,7 @@
 #ifndef GTL_HEADER__STRING_UTF_STRING_VIEW
 #define GTL_HEADER__STRING_UTF_STRING_VIEW
 
-#include "basic_string.h"
+#include "string_primitives.h"
 
 #include <experimental/generator>
 

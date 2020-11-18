@@ -14,7 +14,7 @@
 
 #include <experimental/generator>
 
-#include "basic_string.h"
+#include "string_primitives.h"
 #include "utf_string_view.h"
 
 namespace gtl {

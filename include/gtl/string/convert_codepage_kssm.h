@@ -15,7 +15,7 @@
 #include "gtl/config_gtl.h"
 #if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
 
-#include "basic_string.h"
+#include "string_primitives.h"
 #include "HangeulCodeTable.h"
 
 namespace gtl {

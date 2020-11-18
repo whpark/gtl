@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "basic_string.h"
+#include "string_primitives.h"
 
 
 //-----------------------------------------------------------------------------

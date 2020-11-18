@@ -23,7 +23,7 @@
 
 #include "_lib_gtl.h"
 #include "concepts.h"
-#include "string/basic_string.h"
+#include "string/string_primitives.h"
 #include "string/convert_codepage.h"
 //#include "string/convert_codepage_kssm.h"
 //#include "string/old_format.h"
@@ -104,6 +104,11 @@ namespace gtl {
 
 		// operator []
 		using base_t::operator[];
+
+		// returns string_view
+		operator std::basic_string_view<tchar_t>() const {
+			return { this->data(), this->data() + this->size() };
+		}
 
 		//---------------------------------------------------------------------
 		// oeprator =
@@ -417,7 +422,7 @@ namespace gtl {
 	};	// TString
 
 
-	using CString = TString<TCHAR>;
+	using CString = TString<char16_t>;
 	using CStringA = TString<char>;				// MBCS
 	using CStringW = TString<wchar_t>;			// Unicode (WideChar)
 	using CStringU8 = TString<char8_t>;			// Unicode UTF-8

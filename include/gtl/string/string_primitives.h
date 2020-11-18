@@ -50,15 +50,14 @@
 #define EOLu8			_u8(_EOL)
 #define SPACE_STRING	" \t\r\n"
 
-
 namespace gtl {
 #pragma pack(push, 8)
 
-#ifdef _UNICODE
-	using TCHAR = char16_t;
-#else
-	using TCHAR = char;
-#endif
+//#ifdef _UNICODE
+//	using TCHAR = char16_t;
+//#else
+//	using TCHAR = char;
+//#endif
 
 	//-----------------------------------------------------------------------------
 	/// @brief pre-defines : basic_string_t
@@ -80,6 +79,9 @@ namespace gtl {
 	[[nodiscard]] GTL_API constexpr const char*		GetSpaceStringA()				{ return GetSpaceString<char>(); }
 	[[nodiscard]] GTL_API constexpr const wchar_t*	GetSpaceStringW()				{ return GetSpaceString<wchar_t>(); }
 	[[nodiscard]] GTL_API constexpr const char8_t*	GetSpaceStringU8()				{ return GetSpaceString<char8_t>(); }
+
+	constexpr static inline bool is_space(int const c) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
+
 
 	//-----------------------------------------------------------------------------
 	/// @brief TrimLeft, TrimRight, Trim
@@ -136,6 +138,8 @@ namespace gtl {
 	inline constexpr int IsSpace(int const c/* Locale Irrelavant */) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
 	inline constexpr int IsNotSpace(int const c/* Locale Irrelavant */) { return !IsSpace(c); }
 
+
+#if 1
 	/// @brief  tszlen (string length)
 	/// @param psz : string
 	/// @return string length
@@ -143,23 +147,23 @@ namespace gtl {
 	constexpr size_t tszlen(tchar_t const* psz) {
 		if (!psz) return 0;
 		tchar_t const pos = psz;
-		while (*psz) { psz++; }
-		return size;
+		while (*pos) { pos++; }
+		return pos-psz;
 	}
 
-	// todo : primitive functions
-#if 1
-	/// @brief tchar_t wrapper (string function)
-	template < gtlc::string_elem tchar_t >
-	constexpr size_t tszlen(tchar_t const* psz) {
-		if (!psz) return 0;
-		size_t size = 0;
-		while (*psz) { psz++, size++; }
-		return size;
-	}
+
+	// todo : documents...
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="pszDest"></param>
+	/// <param name="size"></param>
+	/// <param name="pszSrc"></param>
+	/// <returns></returns>
 	template < gtlc::string_elem tchar_t >
 	errno_t tszcpy(tchar_t* pszDest, size_t size, tchar_t const* pszSrc) {
-		if (!szDest)
+		if (!pszDest)
 			return EINVAL;
 		if (size <= 0)
 			return ERANGE;
@@ -168,27 +172,27 @@ namespace gtl {
 			return EINVAL;
 		}
 		for (int i = 0; i < size; i++) {
-			szDest[i] = pszSrc[i];
+			pszDest[i] = pszSrc[i];
 			if (!*pszSrc)
 				return 0;
 		}
-		szDest[0] = 0;
+		pszDest[0] = 0;
 		return ERANGE;
 	}
 
 	template < gtlc::string_elem tchar_t, int size >
 	errno_t tszcpy(std::array<tchar_t, size>& szDest, tchar_t const* pszSrc) {
-		return tszcpy(szDest.data(), size, pszSrfc);
+		return tszcpy(szDest.data(), size, pszSrc);
 	}
 
 	template < gtlc::string_elem tchar_t, int size >
 	errno_t tszcpy(tchar_t (&szDest)[size], tchar_t const* pszSrc) {
-		return tszcpy(szDest, size, pszSrfc);
+		return tszcpy(szDest, size, pszSrc);
 	}
 
 	template < gtlc::string_elem tchar_t >
 	errno_t tszncpy(tchar_t* pszDest, size_t size, tchar_t const* pszSrc, size_t nLen = _TRUNCATE) {
-		if (!szDest)
+		if (!pszDest)
 			return EINVAL;
 		if (size <= 0)
 			return ERANGE;
@@ -199,15 +203,15 @@ namespace gtl {
 		auto n = (nLen == _TRUNCATE) ? (size-1) : (std::min(size-1, nLen));
 		decltype(size) i {};
 		for (; i < n; i++) {
-			szDest[i] = pszSrc[i];
+			pszDest[i] = pszSrc[i];
 			if (!*pszSrc)
 				return 0;
 		}
 		if (i < size-1) {
-			szDest[i] = 0;
+			pszDest[i] = 0;
 			return 0;
 		}
-		szDest[0] = 0;
+		pszDest[0] = 0;
 		return ERANGE;
 		//return strncpy_s(pszDest, size, pszSrc, nLen);
 	}
@@ -219,13 +223,14 @@ namespace gtl {
 	errno_t tszncpy(std::array<tchar_t, size>& szDest, tchar_t const* pszSrc, size_t nLen = _TRUNCATE) {
 		return tszncpy(szDest.data(), size, pszSrc, nLen);
 	}
+
 	template < gtlc::string_elem tchar_t >
 	errno_t tszcat(tchar_t* pszDest, size_t size, tchar_t const* pszSrc) {
-		if (!szDest || (size <= 0) || (size > RSIZE_MAX) )
+		if (!pszDest || (size <= 0) || (size > RSIZE_MAX) )
 			return EINVAL;
 		if (!pszSrc) {
 			if (size && (size <= RSIZE_MAX))
-				szDest[0] = 0;
+				pszDest[0] = 0;
 			return EINVAL;
 		}
 		auto const* const pszEnd = pszDest + size;
@@ -236,7 +241,7 @@ namespace gtl {
 		}
 		// pszSrc is longer
 		if (size && (size <= RSIZE_MAX))
-			szDest[0] = 0;
+			pszDest[0] = 0;
 		return ERANGE;
 	}
 	template < int size, gtlc::string_elem tchar_t >
@@ -446,18 +451,225 @@ namespace gtl {
 		return p;
 	}
 
-	template < gtlc::string_elem tchar_t >
-	int				tsztoi(tchar_t const* psz)															{ return atoi(psz); }
-	template < gtlc::string_elem tchar_t >
-	int32_t			tsztol(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr,    int radix = 0)	{ return strtol(psz, (tchar_t**)ppszEnd, radix); }
-	template < gtlc::string_elem tchar_t >
-	uint32_t		tsztoul(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr,    int radix = 0)	{ return strtoul(psz, (tchar_t**)ppszEnd, radix); }
-	template < gtlc::string_elem tchar_t >
-	int64_t			tsztoi64(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr,    int radix = 0)	{ return _strtoi64(psz, (tchar_t**)ppszEnd, radix); }
-	template < gtlc::string_elem tchar_t >
-	uint64_t		tsztoui64(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr,    int radix = 0)	{ return _strtoui64(psz, (tchar_t**)ppszEnd, radix); }
-	template < gtlc::string_elem tchar_t >
-	double			tsztod(tchar_t const* psz,    tchar_t const** ppszEnd = nullptr)						{ return strtod(psz, (tchar_t**)ppszEnd); }
+	namespace internal {
+		template < typename tvalue, int tsize >
+		struct digit_table {
+			tvalue tbl[tsize];
+			consteval digit_table() {
+				for (int i = 0; i < tsize; i++) tbl[i] = -1;
+				for (int i = 0; i < 10; i++) tbl[i + '0'] = i;
+				for (int i = 0; i < 'Z' - 'A' + 1; i++) tbl[i + 'A'] = i + 10;
+				for (int i = 0; i < 'z' - 'a' + 1; i++) tbl[i + 'a'] = i + 10;
+			}
+			consteval size_t size() const { return tsize; }
+			constexpr tvalue operator[] (int i) const {
+				return tbl[i];
+			}
+		};
+	}
+
+	/// <summary>
+	/// digit contants to integral type value.
+	///  - radix detecting (c++ notation)
+	///	   ex "0b1001'1100", "0xABCD1234", "0b1234568"
+	///  - digit seperator (such as ',' or '\'' for c++ notation.)
+	///  - only throws when (radix > 36)
+	/// </summary>
+	/// <param name="psz"></param>
+	/// <param name="pszEnd"></param>
+	/// <param name="ppszStopped">where conversion stopped</param>
+	/// <param name="radix">radix</param>
+	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
+	/// <returns>number value. (no overflow checked)</returns>
+	template < std::integral tvalue_t = int, gtlc::string_elem tchar_t >
+	tvalue_t _tsztoi(tchar_t const* psz, tchar_t const* pszEnd, tchar_t** ppszStopped = nullptr, int radix = 0, tchar_t cSplitter = 0) {
+		if (!psz)
+			return {};
+
+		// skip white space
+		while ((psz < pszEnd) && is_space(*psz))
+			psz++;
+
+		if (psz >= pszEnd)
+			return {};
+
+		// Check sign (+/-)
+		bool bMinus{};
+		if (*psz == '-')
+			psz++, bMinus = true;
+		else if (*psz == '+')
+			psz++;
+
+		// skip white space
+		while ((psz < pszEnd) && is_space(*psz))
+			psz++;
+
+		// skip white space
+		if (radix == 0) {
+			radix = 10;
+			if ( (psz[0] == '0') && (psz+1 < pszEnd) ) {
+				auto const s = psz[1];
+				if ('b' == s || 'B' == s) {
+					psz += 2;
+					radix = 2;
+				}
+				else if (('x' == s) || ('X' == s)) {
+					psz += 2;
+					radix = 16;
+				}
+				else if (('0' <= s) && (s < '8')) {
+					psz += 1;
+					radix = 8;
+				}
+			}
+		}
+		else if (radix > 10+('z'-'a'+1))
+			throw std::invalid_argument{ GTL__FUNCSIG "wrong radix" };
+
+		tvalue_t value{};
+		constexpr static auto const tbl = internal::digit_table<uint8_t, 256>{};
+
+		for (; (psz < pszEnd) && *psz; psz++) {
+			if (cSplitter == *psz)
+				continue;
+			auto c = *psz;
+			if constexpr (sizeof(tchar_t) > sizeof(uint8_t)) {
+				if (c > 'z')
+					break;
+			}
+			auto v = tbl[c];
+			if (v >= radix)
+				break;
+			value = value*radix + v;	// no overflow-check
+		}
+		if (bMinus)
+			value = -value;
+
+		if (ppszStopped)
+			*ppszStopped = const_cast<tchar_t*>(psz);
+
+		return value;
+	}
+
+	template < std::integral tvalue_t = int, gtlc::string_elem tchar_t = char16_t >
+	inline tvalue_t tsztoi(std::basic_string_view<tchar_t> sv, tchar_t** ppszStopped = nullptr, int radix = 0, tchar_t cSplitter = 0) {
+		return _tsztoi<tvalue_t, tchar_t>(sv.data(), sv.data() + sv.size(), ppszStopped, radix, cSplitter);
+	}
+	//template < std::integral tvalue_t = int, gtlc::string_elem tchar_t = char16_t >
+	//inline tvalue_t tsztoi(std::basic_string<tchar_t> const& str, tchar_t** ppszStopped = nullptr, int radix = 0, tchar_t cSplitter = 0) {
+	//	return _tsztoi<tvalue_t, tchar_t>(str.data(), str.data() + str.size(), ppszStopped, radix, cSplitter);
+	//}
+
+	template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t >
+	[[deprecated]] constexpr tvalue_t _tsztod(tchar_t const* psz, tchar_t const* pszEnd, tchar_t** ppszStopped = nullptr, tchar_t cSplitter = 0) {
+		if (!psz)
+			return {};
+
+		using namespace ctre::literals;
+
+		// skip white space
+		while ((psz < pszEnd) && is_space(*psz))
+			psz++;
+
+		// Check sign (+/-)
+		bool bMinus{};
+		if (*psz == '-')
+			psz++, bMinus = true;
+		else if (*psz == '+')
+			psz++;
+
+		tvalue_t value{};
+		constexpr static auto const tbl = internal::digit_table<uint8_t, 256>{};
+
+		// mantissa
+		for (; (psz < pszEnd) && *psz; psz++) {
+			if (cSplitter == *psz)
+				continue;
+			auto c{ *psz };
+			if constexpr (sizeof(tchar_t) > sizeof(uint8_t)) {
+				if (c > 'z')
+					break;
+			}
+			auto v = tbl[c];
+			if (v >= 10)
+				break;
+			value = value * 10. + v;	// no overflow-check
+		}
+		// below .
+		if ( (psz < pszEnd) && (*psz == '.') ) {
+			psz++;
+			for (int i = 1; (psz < pszEnd) && *psz; psz++, i++) {
+				if (cSplitter == *psz)
+					continue;
+				auto c{ *psz };
+				if constexpr (sizeof(tchar_t) > sizeof(uint8_t)) {
+					if (c > 'z')
+						break;
+				}
+				double v = tbl[c];
+				if (v >= 10)
+					break;
+				value += v * std::pow(0.1, i);
+			}
+		}
+		// exponent
+		if ((psz+1 < pszEnd) && ((psz[0] == 'e') || (psz[0] == 'E'))
+			&& ( IsDigit(psz[1]) || ( (psz+2 < pszEnd) && (psz[1] == '-') && IsDigit(psz[2]) ) )
+			)
+		{
+			psz++;
+			tchar_t* ppszStopped_local{};
+			int e = tsztoi(psz, pszEnd, &ppszStopped_local, 10, cSplitter);
+			psz = ppszStopped_local;
+			if (e != 0)
+				value *= std::pow(10, e);
+		}
+
+		if (bMinus)
+			value = -value;
+
+		if (ppszStopped)
+			*ppszStopped = const_cast<tchar_t*>(psz);
+
+		return value;
+	}
+
+
+	template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t>
+	inline tvalue_t tsztod(std::basic_string_view<tchar_t> sv, tchar_t** ppszStopped = nullptr) {
+		if constexpr (sizeof(tchar_t) == sizeof(char)) {
+			tvalue_t value;
+			auto [ptr, ec] = std::from_chars(sv.data(), sv.data()+sv.size(), value, std::chars_format::general);
+			if (ppszStopped)
+				*ppszStopped = const_cast<tchar_t*>(ptr);
+			return value;
+		}
+		else {
+			std::string str;
+			str.reserve(16);
+			tchar_t const* pos = sv.data();
+			tchar_t const* end = sv.data() + sv.size();
+			while (pos < end && is_space(*pos))
+				pos++;
+			for (; pos < end; pos++) {
+				static_assert(std::is_unsigned_v<tchar_t>);
+				if (*pos > 127 || !std::strchr("+-.0123456789eE", *pos))
+					break;
+				str += *pos;
+			}
+			return tsztod<tvalue_t, char>(str, ppszStopped);
+		}
+	}
+
+	//template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t >
+	//inline tvalue_t tsztod(std::basic_string_view<tchar_t> sv, tchar_t** ppszStopped = nullptr) {
+	//	return _tsztod<tvalue_t, tchar_t>(sv.data(), sv.data() + sv.size(), ppszStopped, cSplitter);
+	//}
+	//template < gtlc::string_elem tchar_t, std::floating_point tvalue_t = double >
+	//inline double tsztod(std::basic_string<tchar_t> const& str, tchar_t** ppszStopped = nullptr) {
+	//	return _tsztod<tvalue_t, tchar_t>(str.data(), str.data() + str.size(), ppszStopped, cSplitter);
+	//}
+
 
 #else
 
@@ -593,14 +805,6 @@ namespace gtl {
 	/// @param pszSet : chars to find
 	/// @return position of found char.
 	template < gtlc::string_elem tchar_t >
-	tchar_t* tszsearch_oneof(tchar_t* psz, tchar_t const * const pszSet);
-	template < gtlc::string_elem tchar_t >
-	tchar_t const* tszsearch_oneof(tchar_t const* psz, tchar_t const* const pszSet);
-	template < gtlc::string_elem tchar_t >
-	tchar_t const* tszsearch_oneof(tchar_t const* psz, tchar_t const* const pszSet);
-
-
-	template < gtlc::string_elem tchar_t >
 	tchar_t* tszsearch_oneof(tchar_t* psz, tchar_t const * const pszSet) {
 		for (; *psz; psz++) {
 			if (tszsearch(pszSet, *psz))
@@ -623,24 +827,12 @@ namespace gtl {
 	/// @param pszEnd 
 	/// @param radix 
 	/// @return number
-	template < gtlc::string_elem tchar_t, gtlc::arithmetic T_NUMBER >
-	T_NUMBER tszto_number(const tchar_t* psz, tchar_t const** pszEnd = nullptr, int radix = 0) {
-		if constexpr (std::is_integral_v<T_NUMBER>) {
-			if constexpr (std::is_signed_v<T_NUMBER>) {
-				if constexpr (sizeof(T_NUMBER) == sizeof(std::int64_t)) {
-					return tsztoi64(psz, pszEnd, radix);
-				} else {
-					return tsztoi(psz, pszEnd, radix);
-				}
-			} else {
-				if constexpr (sizeof(T_NUMBER) == sizeof(std::uint64_t)) {
-					return tsztoui64(psz, pszEnd, radix);
-				} else {
-					return tsztoul(psz, pszEnd, radix);
-				}
-			}
+	template < gtlc::string_elem tchar_t, gtlc::arithmetic tvalue_t >
+	tvalue_t tszto(const tchar_t* psz, tchar_t const* pszEnd, tchar_t** pszStopped = nullptr, int radix = 0, int cSplitter = 0) {
+		if constexpr (std::is_integral_v<tvalue_t>) {
+			return tsztoi<tvalue_t>(psz, pszEnd, pszStopped, radix, cSplitter);
 		} else {
-			return tsztod(psz, pszEnd);
+			return tsztod<tvalue_t>(psz, pszEnd, pszStopped, cSplitter);
 		}
 	}
 

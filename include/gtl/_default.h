@@ -54,9 +54,16 @@
 #include <string>
 #include <string_view>
 #if defined(__cpp_lib_format)
-#	include <format.h>
+#	include <format>
 #else
+#	define FMT_HEADER_ONLY
 #	include <fmt/format.h>
+#endif
+#include <regex>
+#if defined (__cpp_lib_ctre)
+#	include <ctre>
+#else
+#	include <ctre.hpp>
 #endif
 
 #include <algorithm>
@@ -94,6 +101,7 @@
 #include <future>
 #include <coroutine>
 #include <latch>
+
 #if !defined (__cpp_lib_jthread)
 #	include <jthread.hpp>
 #endif
@@ -102,9 +110,19 @@
 #include "gtl/config_gtl.h"
 
 
+#define GTL__FUNCSIG __FUNCSIG__ " : "
+
+
+#define NOMINMAX	// disable Windows::min/max
+#if defined(min) || defined(max)
+#	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
+#endif
+
 namespace gtl {
 
-#define GTL__FUNCSIG __FUNCSIG__ " : "
+	namespace literals {
+	};
+
 
 
 	// byte swap

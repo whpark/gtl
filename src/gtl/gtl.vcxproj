@@ -170,7 +170,7 @@
     <ClInclude Include="..\..\include\gtl\concepts.h" />
     <ClInclude Include="..\..\include\gtl\config_gtl.h" />
     <ClInclude Include="..\..\include\gtl\gtl.h" />
-    <ClInclude Include="..\..\include\gtl\string\basic_string.h" />
+    <ClInclude Include="..\..\include\gtl\string\string_primitives.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h" />
     <ClInclude Include="..\..\include\gtl\string\HangeulCodeTable.h" />

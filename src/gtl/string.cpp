@@ -11,7 +11,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "gtl/string/basic_string.h"
+#include "gtl/string/string_primitives.h"
 #include "gtl/string/convert_codepage.h"
 #include "gtl/string/convert_codepage_kssm.h"
 #include "gtl/string/HangeulCodeTable.h"
@@ -107,6 +107,7 @@ namespace gtl {
 	}
 #else
 	std::string ConvUTF16_MBCS(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		// todo : to be tested.
 		std::string str;
 		if (svFrom.empty())
 			return str;
@@ -142,6 +143,7 @@ namespace gtl {
 		return str;
 	}
 	std::u16string ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		// todo : to be tested.
 		std::u16string str;
 		if (svFrom.empty())
 			return str;
