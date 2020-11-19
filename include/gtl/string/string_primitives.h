@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
 //
-// basic_string.h:
+// string_primitives.h:
 //
 // PWH
 // 2020.11.13.
@@ -12,23 +12,11 @@
 #ifndef GTL_HEADER__BASIC_STRING
 #define GTL_HEADER__BASIC_STRING
 
-#include <string>
-#include <concepts>
-
-
 #include "gtl/_lib_gtl.h"
 #include "gtl/concepts.h"
 
 #if !defined(__cpp_lib_concepts)
 #	error ERROR! Supports C++v20 only.
-#endif
-
-#ifndef _t
-#	ifdef _UNICODE
-#		define _t(x) _u(x)
-#	else
-#		define _t(x) x
-#	endif
 #endif
 
 //-----------------------------------------------------------------------------
@@ -49,6 +37,7 @@
 #define EOLW			_W(_EOL)
 #define EOLu8			_u8(_EOL)
 #define SPACE_STRING	" \t\r\n"
+
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -146,7 +135,7 @@ namespace gtl {
 	template < gtlc::string_elem tchar_t >
 	constexpr size_t tszlen(tchar_t const* psz) {
 		if (!psz) return 0;
-		tchar_t const pos = psz;
+		tchar_t const* pos = psz;
 		while (*pos) { pos++; }
 		return pos-psz;
 	}
@@ -468,6 +457,7 @@ namespace gtl {
 		};
 	}
 
+
 	/// <summary>
 	/// digit contants to integral type value.
 	///  - radix detecting (c++ notation)
@@ -481,10 +471,13 @@ namespace gtl {
 	/// <param name="radix">radix</param>
 	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
 	/// <returns>number value. (no overflow checked)</returns>
-	template < std::integral tvalue_t = int, gtlc::string_elem tchar_t >
-	tvalue_t _tsztoi(tchar_t const* psz, tchar_t const* pszEnd, tchar_t** ppszStopped = nullptr, int radix = 0, tchar_t cSplitter = 0) {
-		if (!psz)
+	template < std::integral tvalue_t = int, typename tchar_t = char>
+	tvalue_t tsztoi(std::basic_string_view<tchar_t> svNumberString, tchar_t** ppszStopped = nullptr, int radix = 0, int cSplitter = 0) {
+		if (svNumberString.empty())
 			return {};
+
+		tchar_t const* psz = svNumberString.data();
+		tchar_t const* const pszEnd = svNumberString.data() + svNumberString.size();
 
 		// skip white space
 		while ((psz < pszEnd) && is_space(*psz))
@@ -551,17 +544,20 @@ namespace gtl {
 		return value;
 	}
 
-	template < std::integral tvalue_t = int, gtlc::string_elem tchar_t = char16_t >
-	inline tvalue_t tsztoi(std::basic_string_view<tchar_t> sv, tchar_t** ppszStopped = nullptr, int radix = 0, tchar_t cSplitter = 0) {
-		return _tsztoi<tvalue_t, tchar_t>(sv.data(), sv.data() + sv.size(), ppszStopped, radix, cSplitter);
+	template < std::integral tvalue_t = int, gtlc::string_elem tchar_t >
+	inline tvalue_t tsztoi(std::basic_string<tchar_t> const& str, tchar_t** ppszStopped = nullptr, int radix = 0, tchar_t cSplitter = 0) {
+		return tsztoi<tvalue_t, tchar_t>((std::basic_string_view<tchar_t>)str, ppszStopped, radix, cSplitter);
 	}
-	//template < std::integral tvalue_t = int, gtlc::string_elem tchar_t = char16_t >
-	//inline tvalue_t tsztoi(std::basic_string<tchar_t> const& str, tchar_t** ppszStopped = nullptr, int radix = 0, tchar_t cSplitter = 0) {
-	//	return _tsztoi<tvalue_t, tchar_t>(str.data(), str.data() + str.size(), ppszStopped, radix, cSplitter);
-	//}
+	template < std::integral tvalue_t = int, gtlc::string_elem tchar_t >
+	inline tvalue_t tsztoi(tchar_t const* psz, tchar_t** ppszStopped = nullptr, int radix = 0, tchar_t cSplitter = 0) {
+		return tsztoi<tvalue_t, tchar_t>(std::basic_string_view<tchar_t>{ psz, psz + tszlen(psz) }, ppszStopped, radix, cSplitter);
+	}
+
+
+
 
 	template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t >
-	[[deprecated]] constexpr tvalue_t _tsztod(tchar_t const* psz, tchar_t const* pszEnd, tchar_t** ppszStopped = nullptr, tchar_t cSplitter = 0) {
+	[[deprecated("NOT exact Convert from string to floating point.")]] constexpr tvalue_t _tsztod(tchar_t const* psz, tchar_t const* pszEnd, tchar_t** ppszStopped = nullptr, tchar_t cSplitter = 0) {
 		if (!psz)
 			return {};
 
@@ -618,9 +614,9 @@ namespace gtl {
 			)
 		{
 			psz++;
-			tchar_t* ppszStopped_local{};
-			int e = tsztoi(psz, pszEnd, &ppszStopped_local, 10, cSplitter);
-			psz = ppszStopped_local;
+			tchar_t* pszStopped_local{};
+			int e = tsztoi(psz, pszEnd, &pszStopped_local, 10, cSplitter);
+			psz = pszStopped_local;
 			if (e != 0)
 				value *= std::pow(10, e);
 		}
@@ -659,6 +655,15 @@ namespace gtl {
 			}
 			return tsztod<tvalue_t, char>(str, ppszStopped);
 		}
+	}
+
+	//template < std::floating_point tvalue_t = double >
+	//inline tvalue_t tsztod(std::basic_string_view<char> sv, char** ppszStopped = nullptr) {
+	//	return _tsztod<tvalue_t, char>(sv, ppszStopped);
+	//}
+	template < std::floating_point tvalue_t = double >
+	inline tvalue_t tsztod(std::basic_string_view<char> sv, char** ppszStopped = nullptr) {
+		return tsztod<tvalue_t, char>(sv, ppszStopped);
 	}
 
 	//template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t >

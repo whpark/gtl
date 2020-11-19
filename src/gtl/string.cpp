@@ -116,14 +116,16 @@ namespace gtl {
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
+		auto eCodepageFrom = codepage.From();
+
 		// check endian, Convert
-		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
+		auto strOther = CheckAndConvertEndian(svFrom, eCodepageFrom);
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		auto const* pszSourceBegin = svFrom.data();
 		auto const* pszSourceEnd = svFrom.data()+svFrom.size();
 
-		std::locale loc(fmt::format(".{}", codepage.from));
+		std::locale loc(fmt::format(".{}", eCodepageFrom));
 		auto const& facet = std::use_facet<std::codecvt<char, char16_t, mbstate_t>>(loc);
 
 		std::mbstate_t state = {0}; // zero-initialization represents the initial conversion state for mbstate_t
@@ -138,7 +140,7 @@ namespace gtl {
 		auto result = facet.in(state, pszSourceBegin, pszSourceEnd, pszSourceNext,
 					   str.data(), str.data()+len, pszDestNext);
 
-		if (result != std::codecvt_base::error)
+		if (result == std::codecvt_base::error)
 			throw std::invalid_argument{ GTL__FUNCSIG "String Cannot be transformed!" };
 		return str;
 	}
@@ -155,7 +157,9 @@ namespace gtl {
 		auto const* pszSourceBegin = svFrom.data();
 		auto const* pszSourceEnd = svFrom.data()+svFrom.size();
 
-		std::locale loc(fmt::format(".{}", codepage.from));
+		auto eCodepageFrom = codepage.From();
+
+		std::locale loc(fmt::format(".{}", eCodepageFrom));
 	#ifdef _WINDOWS
 		using utf16_t = wchar_t;
 	#else
@@ -175,8 +179,12 @@ namespace gtl {
 		auto result = facet.in(state, pszSourceBegin, pszSourceEnd, pszSourceNext,
 							   (utf16_t*)str.data(), (utf16_t*)str.data()+len, pszDestNext);
 
-		if (result != std::codecvt_base::error)
+		if (result == std::codecvt_base::error)
 			throw std::invalid_argument{ GTL__FUNCSIG "String Cannot be transformed!" };
+
+		len = (char16_t*)pszDestNext - str.data();
+		if (str.size() != len)
+			str.resize(len);
 
 		// check endian, Convert
 		CheckAndConvertEndian(str, codepage.to);

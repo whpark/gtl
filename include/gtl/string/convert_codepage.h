@@ -50,6 +50,19 @@ namespace gtl {
 	struct S_CODEPAGE_OPTION {
 		uint32_t from {eCODEPAGE::Default};
 		uint32_t to {eCODEPAGE::Default};
+
+		uint16_t From() const {
+			if (from > 0xffff) {	// wrong or default value
+				return GTL_DEFAULT_CODEPAGE;
+			}
+			return from;
+		}
+		uint16_t To() const {
+			if (from > 0xffff) {	// wrong or default value
+				return GTL_DEFAULT_CODEPAGE;
+			}
+			return to;
+		}
 	};
 
 
@@ -144,12 +157,12 @@ namespace gtl {
 
 	/// @brief Converts Codepage To StringA (MBCS)
 	std::string ToStringA(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		if (codepage.from == codepage.to) {
+		if (codepage.From() == codepage.To()) {
 			return std::string{ svFrom };
 		}
 		else {
-			auto strU = ConvMBCS_UTF16(svFrom, { .from = codepage.from });
-			return ConvUTF16_MBCS(strU, { .to = codepage.to });
+			auto strU = ConvMBCS_UTF16(svFrom, { .from = codepage.From() });
+			return ConvUTF16_MBCS(strU, { .to = codepage.To() });
 		}
 	}
 	std::string ToStringA(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
