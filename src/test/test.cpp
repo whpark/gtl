@@ -24,7 +24,22 @@ TEST(gtl_string, tszto) {
 	};
 
 	using namespace gtl;
-	
+
+	EXPECT_EQ(7, gtl::tszlen("dsafdjk"));
+	EXPECT_EQ(3, gtl::tszlen(U"가나다"));
+	EXPECT_EQ(4, gtl::tszlen(u"가나다라"));
+	EXPECT_EQ(4, gtl::tszlen(L"가나다라"));
+	EXPECT_EQ(8, gtl::tszlen("가나다라"));
+
+	char16_t sz[30];
+	char16_t szS[]{u"가나다라마바사"};
+	tszcpy(sz, szS);
+
+	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef0000123456789aaaa") == 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef000012345678aaaa") > 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef00001234567891aaaa") < 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef0000123456788aaaa") > 0);
+
 	auto a1 = gtl::tsztoi("12345"sv);
 	auto a2 = gtl::tsztoi("12345"s);
 	auto a3 = gtl::tsztoi("12345");

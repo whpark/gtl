@@ -61,14 +61,14 @@ namespace gtl {
 
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
 	std::string ConvUTF16_MBCS(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
-			[[unlikely]]
-			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
-		}
-
 		std::string str;
 		if (svFrom.empty())
 			return str;
+
+		if (svFrom.size() > static_cast<size_t>(RSIZE_MAX)) {
+			[[unlikely]]
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
+		}
 
 		// check endian, Convert
 		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
@@ -83,14 +83,14 @@ namespace gtl {
 		return str;
 	}
 	std::u16string ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
-			[[unlikely]]
-			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
-		}
-
 		std::u16string str;
 		if (svFrom.empty())
 			return str;
+
+		if (svFrom.size() > static_cast<size_t>(RSIZE_MAX)) {
+			[[unlikely]]
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
+		}
 
 		auto* pszFrom = (char const*)svFrom.data();
 		// todo : test return value is size or length?
@@ -112,7 +112,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > static_cast<size_t>(RSIZE_MAX)) {
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
@@ -150,7 +150,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > static_cast<size_t>(RSIZE_MAX)) {
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
@@ -182,7 +182,7 @@ namespace gtl {
 		if (result == std::codecvt_base::error)
 			throw std::invalid_argument{ GTL__FUNCSIG "String Cannot be transformed!" };
 
-		len = (char16_t*)pszDestNext - str.data();
+		len = (int)((char16_t*)pszDestNext - str.data());
 		if (str.size() != len)
 			str.resize(len);
 
@@ -195,14 +195,14 @@ namespace gtl {
 
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
 	std::u8string ConvUTF16_UTF8(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		std::u8string str;
+		if (svFrom.empty())
+			return str;
+
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
-
-		std::u8string str;
-		if (svFrom.empty())
-			return str;
 
 		// check endian, Convert
 		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
@@ -218,14 +218,14 @@ namespace gtl {
 		return str;
 	}
 	std::u16string ConvUTF8_UTF16(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
+		std::u16string str;
+		if (svFrom.empty())
+			return str;
+
 		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
-
-		std::u16string str;
-		if (svFrom.empty())
-			return str;
 
 		char const* pszFrom = (char const*)svFrom.data();
 		auto n = MultiByteToWideChar(CP_UTF8, 0, pszFrom, (int)svFrom.size(), nullptr, 0);
@@ -398,7 +398,6 @@ namespace gtl {
 
 	std::u32string ConvUTF16_UTF32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		std::u32string str;
-
 		if (svFrom.size() <= 0)
 			return str;
 
@@ -463,7 +462,6 @@ namespace gtl {
 				// Copyright (c) Microsoft Corporation.
 				// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 		std::u16string str;
-
 		if (svFrom.size() <= 0)
 			return str;
 

@@ -119,16 +119,15 @@ namespace gtl {
 
 
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
-	inline constexpr int ToLower(int c/* Locale Irrelavant */) { if ((c >= 'A') && (c <= 'Z')) return c - 'A' + 'a'; return c; }
-	inline constexpr int ToUpper(int c/* Locale Irrelavant */) { if ((c >= 'a') && (c <= 'z')) return c - 'a' + 'A'; return c; }
-	inline constexpr int IsDigit(int const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '9'); }
-	inline constexpr int IsOdigit(int const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '7'); }
-	inline constexpr int IsXdigit(int const c/* Locale Irrelavant */) { return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F')); }
-	inline constexpr int IsSpace(int const c/* Locale Irrelavant */) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
-	inline constexpr int IsNotSpace(int const c/* Locale Irrelavant */) { return !IsSpace(c); }
+	template < typename tchar_t > constexpr inline tchar_t ToLower(tchar_t c/* Locale Irrelavant */) { if ((c >= 'A') && (c <= 'Z')) return c - 'A' + 'a'; return c; }
+	template < typename tchar_t > constexpr inline tchar_t ToUpper(tchar_t c/* Locale Irrelavant */) { if ((c >= 'a') && (c <= 'z')) return c - 'a' + 'A'; return c; }
+	template < typename tchar_t > constexpr inline tchar_t IsDigit(tchar_t const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '9'); }
+	template < typename tchar_t > constexpr inline tchar_t IsOdigit(tchar_t const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '7'); }
+	template < typename tchar_t > constexpr inline tchar_t IsXdigit(tchar_t const c/* Locale Irrelavant */) { return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F')); }
+	template < typename tchar_t > constexpr inline tchar_t IsSpace(tchar_t const c/* Locale Irrelavant */) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
+	template < typename tchar_t > constexpr inline tchar_t IsNotSpace(tchar_t const c/* Locale Irrelavant */) { return !IsSpace(c); }
 
 
-#if 1
 	/// @brief  tszlen (string length)
 	/// @param psz : string
 	/// @return string length
@@ -555,9 +554,8 @@ namespace gtl {
 
 
 
-
 	template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t >
-	[[deprecated("NOT exact Convert from string to floating point.")]] constexpr tvalue_t _tsztod(tchar_t const* psz, tchar_t const* pszEnd, tchar_t** ppszStopped = nullptr, tchar_t cSplitter = 0) {
+	[[deprecated("NOT STANDARD CONVERTING !")]] constexpr tvalue_t _tsztod(tchar_t const* psz, tchar_t const* pszEnd, tchar_t** ppszStopped = nullptr, tchar_t cSplitter = 0) {
 		if (!psz)
 			return {};
 
@@ -630,7 +628,6 @@ namespace gtl {
 		return value;
 	}
 
-
 	template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t>
 	inline tvalue_t tsztod(std::basic_string_view<tchar_t> sv, tchar_t** ppszStopped = nullptr) {
 		if constexpr (sizeof(tchar_t) == sizeof(char)) {
@@ -640,6 +637,10 @@ namespace gtl {
 				*ppszStopped = const_cast<tchar_t*>(ptr);
 			return value;
 		}
+		// ... not secure.
+		//else if constexpr (sizeof(tchar_t) == sizeof(wchar_t)) {
+		//	return wcstod((wchar_t const*)sv.data(), ppszStopped);
+		//}
 		else {
 			std::string str;
 			str.reserve(16);
@@ -657,152 +658,28 @@ namespace gtl {
 		}
 	}
 
-	//template < std::floating_point tvalue_t = double >
-	//inline tvalue_t tsztod(std::basic_string_view<char> sv, char** ppszStopped = nullptr) {
-	//	return _tsztod<tvalue_t, char>(sv, ppszStopped);
-	//}
-	template < std::floating_point tvalue_t = double >
-	inline tvalue_t tsztod(std::basic_string_view<char> sv, char** ppszStopped = nullptr) {
-		return tsztod<tvalue_t, char>(sv, ppszStopped);
+	template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t>
+	inline tvalue_t tsztod(std::basic_string<tchar_t> const& str, tchar_t** ppszStopped = nullptr) {
+		return tsztod<tvalue_t, tchar_t>((std::basic_string_view<tchar_t>)str, ppszStopped);
 	}
-
-	//template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t >
-	//inline tvalue_t tsztod(std::basic_string_view<tchar_t> sv, tchar_t** ppszStopped = nullptr) {
-	//	return _tsztod<tvalue_t, tchar_t>(sv.data(), sv.data() + sv.size(), ppszStopped, cSplitter);
-	//}
-	//template < gtlc::string_elem tchar_t, std::floating_point tvalue_t = double >
-	//inline double tsztod(std::basic_string<tchar_t> const& str, tchar_t** ppszStopped = nullptr) {
-	//	return _tsztod<tvalue_t, tchar_t>(str.data(), str.data() + str.size(), ppszStopped, cSplitter);
-	//}
-
-
-#else
-
-	//-- char
-	//template <>				size_t			tszlen<char>(const char* psz)													{ return std::strlen(psz); }
-	template < int size >	errno_t			tszcpy(char (&szDest)[size], const char* pszSrc)								{ return strcpy_s(szDest, pszSrc); }
-	inline					errno_t			tszcpy(char* pszDest, size_t size, const char* pszSrc)							{ return strcpy_s(pszDest, size, pszSrc); }
-	template < int size >	errno_t			tszncpy(char (&szDest)[size], const char* pszSrc, size_t nLen)					{ return strncpy_s(szDest, pszSrc, nLen); }
-	inline					errno_t			tszncpy(char* pszDest, size_t size, const char* pszSrc, size_t nLen)			{ return strncpy_s(pszDest, size, pszSrc, nLen); }
-	template < int size >	errno_t			tszcat(char (&szDest)[size], const char* pszSrc)								{ return strcat_s(szDest, pszSrc); }
-	inline					errno_t			tszcat(char* pszDest, size_t size, const char* pszSrc)							{ return strcat_s(pszDest, size, pszSrc); }
-	inline					errno_t			tszcmp(const char* pszA, const char* pszB)										{ return strcmp(pszA, pszB); }
-	inline					errno_t			tszncmp(const char* pszA, const char* pszB, size_t nLen)						{ return strncmp(pszA, pszB, nLen); }
-	inline					errno_t			tszicmp(const char* pszA, const char* pszB)										{ return _stricmp(pszA, pszB); }
-	inline					errno_t			tsznicmp(const char* pszA, const char* pszB, size_t nLen)						{ return _strnicmp(pszA, pszB, nLen); }
-	template < int size >	errno_t			tszupr(char (&sz)[size])														{ return _strupr_s(sz); }
-	inline					errno_t			tszupr(char* psz, size_t size)													{ return _strupr_s(psz, size); }
-	template < int size >	errno_t			tszlwr(char (&sz)[size])														{ return _strlwr_s(sz); }
-	inline					errno_t			tszlwr(char* psz, int size)														{ return _strlwr_s(psz, size); }
-	inline					char*			tszrev(char* psz)																{ return _strrev(psz); }
-	inline					char*			tszsearch(char* const psz, int c)												{ return strchr(psz, c); }
-	inline					char*			tszsearch(char* const psz, const char* const pszSub)							{ return strstr(psz, pszSub); }
-	inline					const char*		tszsearch(const char* const psz, int c)											{ return strchr(psz, c); }
-	inline					const char*		tszsearch(const char* const psz, const char* const pszSub)						{ return strstr(psz, pszSub); }
-	inline					int				tsztoi(const char* psz)															{ return atoi(psz); }
-	inline					int32_t			tsztol(const char* psz,    char const** ppszEnd = nullptr,    int radix = 0)	{ return strtol(psz, (char**)ppszEnd, radix); }
-	inline					uint32_t		tsztoul(const char* psz,    char const** ppszEnd = nullptr,    int radix = 0)	{ return strtoul(psz, (char**)ppszEnd, radix); }
-	inline					int64_t			tsztoi64(const char* psz,    char const** ppszEnd = nullptr,    int radix = 0)	{ return _strtoi64(psz, (char**)ppszEnd, radix); }
-	inline					uint64_t		tsztoui64(const char* psz,    char const** ppszEnd = nullptr,    int radix = 0)	{ return _strtoui64(psz, (char**)ppszEnd, radix); }
-	inline					double			tsztod(const char* psz,    char const** ppszEnd = nullptr)						{ return strtod(psz, (char**)ppszEnd); }
-
-	//-- wchar_t
-	//template<>				size_t			tszlen<wchar_t>(const wchar_t* psz)												{ return wcslen(psz); }
-	template < int size >	errno_t			tszcpy(wchar_t (&szDest)[size], const wchar_t* pszSrc)							{ return wcscpy_s(szDest, pszSrc); }
-	inline					errno_t			tszcpy(wchar_t* pszDest, size_t size, const wchar_t* pszSrc)					{ return wcscpy_s(pszDest, size, pszSrc); }
-	template < int size >	errno_t			tszncpy(wchar_t (&szDest)[size], const wchar_t* pszSrc, size_t nLen)			{ return wcsncpy_s(szDest, pszSrc, nLen); }
-	inline					errno_t			tszncpy(wchar_t* pszDest, size_t size, const wchar_t* pszSrc, size_t nLen)		{ return wcsncpy_s(pszDest, size, pszSrc, nLen); }
-	template < int size >	errno_t			tszcat(wchar_t (&szDest)[size], const wchar_t* pszSrc)							{ return wcscat_s(szDest, pszSrc); }
-	inline					errno_t			tszcat(wchar_t* pszDest, size_t size, const wchar_t* pszSrc)					{ return wcscat_s(pszDest, size, pszSrc); }
-	inline					errno_t			tszcmp(const wchar_t* pszA, const wchar_t* pszB)								{ return wcscmp(pszA, pszB); }
-	inline					errno_t			tszncmp(const wchar_t* pszA, const wchar_t* pszB, size_t nLen)					{ return wcsncmp(pszA, pszB, nLen); }
-	inline					errno_t			tszicmp(const wchar_t* pszA, const wchar_t* pszB)								{ return _wcsicmp(pszA, pszB); }
-	inline					errno_t			tsznicmp(const wchar_t* pszA, const wchar_t* pszB, size_t nLen)					{ return _wcsnicmp(pszA, pszB, nLen); }
-	template < int size >	errno_t			tszupr(wchar_t (&sz)[size])														{ return _wcsupr_s(sz); }
-	inline					errno_t			tszupr(wchar_t* psz, size_t size)												{ return _wcsupr_s(psz, size); }
-	template < int size >	errno_t			tszlwr(wchar_t (&sz)[size])														{ return _wcslwr_s(sz); }
-	inline					errno_t			tszlwr(wchar_t* psz, int size)													{ return _wcslwr_s(psz, size); }
-	inline					wchar_t*		tszrev(wchar_t* psz)															{ return _wcsrev(psz); }
-	inline					wchar_t*		tszsearch(wchar_t* const psz, int c)											{ return wcschr(psz, c); }
-	inline					wchar_t*		tszsearch(wchar_t* const psz, const wchar_t* const pszSub)						{ return wcsstr(psz, pszSub); }
-	inline					const wchar_t*	tszsearch(const wchar_t* const psz, int c)										{ return wcschr(psz, c); }
-	inline					const wchar_t*	tszsearch(const wchar_t* const psz, const wchar_t* const pszSub)				{ return wcsstr(psz, pszSub); }
-	inline					int				tsztoi(const wchar_t* psz)														{ return wcstol(psz, nullptr, 10); }
-	inline					int32_t			tsztol(const wchar_t* psz, wchar_t const ** ppszEnd = nullptr, int radix = 0)	{ return wcstol    (psz, (wchar_t**)ppszEnd, radix); }
-	inline					uint32_t		tsztoul(const wchar_t* psz, wchar_t const ** ppszEnd = nullptr, int radix = 0)	{ return wcstoul   (psz, (wchar_t**)ppszEnd, radix); }
-	inline					int64_t			tsztoi64(const wchar_t* psz, wchar_t const ** ppszEnd = nullptr, int radix = 0)	{ return _wcstoi64 (psz, (wchar_t**)ppszEnd, radix); }
-	inline					uint64_t		tsztoui64(const wchar_t* psz, wchar_t const ** ppszEnd = nullptr, int radix = 0){ return _wcstoui64(psz, (wchar_t**)ppszEnd, radix); }
-	inline					double			tsztod(const wchar_t* psz, wchar_t const ** ppszEnd = nullptr)					{ return wcstod    (psz, (wchar_t**)ppszEnd); }
-
-	//-- utf8 (utf8 에 대해서는 동작 되는지 테스트 안해봄. 안되는 함수가 많을 것 같은데....)
-	//template<>				size_t			tszlen<char8_t>(const char8_t* psz)												{ return strlen((const char*)psz); }
-	template < int size >	errno_t			tszcpy(char8_t (&szDest)[size], const char8_t* pszSrc)							{ return strcpy_s(szDest, pszSrc); }
-	inline					errno_t			tszcpy(char8_t* pszDest, size_t size, const char8_t* pszSrc)					{ return strcpy_s((char*)pszDest, size, (const char*)pszSrc); }
-	template < int size >	errno_t			tszncpy(char8_t (&szDest)[size], const char8_t* pszSrc, size_t nLen)			{ return strncpy_s(szDest, pszSrc, nLen); }
-	inline					errno_t			tszncpy(char8_t* pszDest, size_t size, const char8_t* pszSrc, size_t nLen)		{ return strncpy_s((char*)pszDest, size, (const char*)pszSrc, nLen); }
-	template < int size >	errno_t			tszcat(char8_t (&szDest)[size], const char8_t* pszSrc)							{ return strcat_s(szDest, pszSrc); }
-	inline					errno_t			tszcat(char8_t* pszDest, size_t size, const char8_t* pszSrc)					{ return strcat_s((char*)pszDest, size, (const char*)pszSrc); }
-	inline					errno_t			tszcmp(const char8_t* pszA, const char8_t* pszB)								{ return strcmp((const char*)pszA, (const char*)pszB); }
-	inline					errno_t			tszncmp(const char8_t* pszA, const char8_t* pszB, size_t nLen)					{ return strncmp((const char*)pszA, (const char*)pszB, nLen); }
-	inline					errno_t			tszicmp(const char8_t* pszA, const char8_t* pszB)								{ return _stricmp((const char*)pszA, (const char*)pszB); }
-	inline					errno_t			tsznicmp(const char8_t* pszA, const char8_t* pszB, size_t nLen)					{ return _strnicmp((const char*)pszA, (const char*)pszB, nLen); }
-	template < int size >	errno_t			tszupr(char8_t (&sz)[size])														{ return _strupr_s(sz); }
-	inline					errno_t			tszupr(char8_t* psz, size_t size)												{ return _strupr_s((char*)psz, size); }
-	template < int size >	errno_t			tszlwr(char8_t (&sz)[size])														{ return _strlwr_s(sz); }
-	inline					errno_t			tszlwr(char8_t* psz, int size)													{ return _strlwr_s((char*)psz, size); }
-	inline					char8_t*		tszrev(char8_t* psz)															{ return (char8_t*)_strrev((char*)psz); }
-	inline					char8_t*		tszsearch(char8_t* const psz, int c)											{ return (char8_t*)strchr((char*)psz, c); }
-	inline					char8_t*		tszsearch(char8_t* const psz, const char8_t* const pszSub)						{ return (char8_t*)strstr((char*)psz, (const char*)pszSub); }
-	inline					const char8_t*	tszsearch(const char8_t* const psz, int c)										{ return (const char8_t*)strchr((const char*)psz, c); }
-	inline					const char8_t*	tszsearch(const char8_t* const psz, const char8_t* const pszSub)				{ return (const char8_t*)strstr((const char*)psz, (const char*)pszSub); }
-	inline					int				tsztoi(const char8_t* psz)														{ return atoi((const char*)psz); }
-	inline					int32_t			tsztol(const char8_t* psz, char8_t const** ppszEnd = nullptr, int radix = 0)	{ return strtol((const char*)psz, (char**)ppszEnd, radix); }
-	inline					uint32_t		tsztoul(const char8_t* psz, char8_t const** ppszEnd = nullptr, int radix = 0)	{ return strtoul((const char*)psz, (char**)ppszEnd, radix); }
-	inline					int64_t			tsztoi64(const char8_t* psz, char8_t const** ppszEnd = nullptr, int radix = 0)	{ return _strtoi64((const char*)psz, (char**)ppszEnd, radix); }
-	inline					uint64_t		tsztoui64(const char8_t* psz, char8_t const** ppszEnd = nullptr, int radix = 0)	{ return _strtoui64((const char*)psz, (char**)ppszEnd, radix); }
-	inline					double			tsztod(const char8_t* psz, char8_t const** ppszEnd = nullptr)					{ return strtod((const char*)psz, (char**)ppszEnd); }
-
-	//-- char16_t
-	//template<>				size_t			tszlen<char16_t>(const char16_t* psz)												{ return wcslen(psz); }
-	template < int size >	errno_t			tszcpy(char16_t (&szDest)[size], const char16_t* pszSrc)						{ return wcscpy_s((wchar_t*)szDest, (wchar_t const*)pszSrc); }
-	inline					errno_t			tszcpy(char16_t* pszDest, size_t size, const char16_t* pszSrc)					{ return wcscpy_s((wchar_t*)pszDest, size, (wchar_t const*)pszSrc); }
-	template < int size >	errno_t			tszncpy(char16_t (&szDest)[size], const char16_t* pszSrc, size_t nLen)			{ return wcsncpy_s((wchar_t*)szDest, (wchar_t const*)pszSrc, nLen); }
-	inline					errno_t			tszncpy(char16_t* pszDest, size_t size, const char16_t* pszSrc, size_t nLen)	{ return wcsncpy_s((wchar_t*)pszDest, size, (wchar_t const*)pszSrc, nLen); }
-	template < int size >	errno_t			tszcat(char16_t (&szDest)[size], const char16_t* pszSrc)						{ using var_t = wchar_t[size]; return wcscat_s((var_t&)szDest, (wchar_t const*)pszSrc); }
-	inline					errno_t			tszcat(char16_t* pszDest, size_t size, const char16_t* pszSrc)					{ return wcscat_s((wchar_t*)pszDest, size, (wchar_t const*)pszSrc); }
-	inline					errno_t			tszcmp(const char16_t* pszA, const char16_t* pszB)								{ return wcscmp((wchar_t const*)pszA, (wchar_t const*)pszB); }
-	inline					errno_t			tszncmp(const char16_t* pszA, const char16_t* pszB, size_t nLen)				{ return wcsncmp((wchar_t const*)pszA, (wchar_t const*)pszB, nLen); }
-	inline					errno_t			tszicmp(const char16_t* pszA, const char16_t* pszB)								{ return _wcsicmp((wchar_t const*)pszA, (wchar_t const*)pszB); }
-	inline					errno_t			tsznicmp(const char16_t* pszA, const char16_t* pszB, size_t nLen)				{ return _wcsnicmp((wchar_t const*)pszA, (wchar_t const*)pszB, nLen); }
-	template < int size >	errno_t			tszupr(char16_t (&sz)[size])													{ using var_t = wchar_t[size]; return _wcsupr_s((var_t&)sz); }
-	inline					errno_t			tszupr(char16_t* psz, size_t size)												{ return _wcsupr_s((wchar_t*)psz, size); }
-	template < int size >	errno_t			tszlwr(char16_t (&sz)[size])													{ using var_t = wchar_t[size]; return _wcslwr_s((var_t&)sz); }
-	inline					errno_t			tszlwr(char16_t* psz, int size)													{ return _wcslwr_s((wchar_t*)psz, size); }
-	inline					char16_t*		tszrev(char16_t* psz)															{ return (char16_t*)_wcsrev((wchar_t*)psz); }
-	inline					char16_t*		tszsearch(char16_t* const psz, int c)											{ return (char16_t*)wcschr((wchar_t*)psz, c); }
-	inline					char16_t*		tszsearch(char16_t* const psz, const char16_t* const pszSub)					{ return (char16_t*)wcsstr((wchar_t const*)psz, (wchar_t const*)pszSub); }
-	inline					const char16_t*	tszsearch(const char16_t* const psz, int c)										{ return (char16_t const*)wcschr((wchar_t const*)psz, c); }
-	inline					const char16_t*	tszsearch(const char16_t* const psz, const char16_t* const pszSub)				{ return (char16_t const*)wcsstr((wchar_t const*)psz, (wchar_t const*)pszSub); }
-	inline					int				tsztoi(const char16_t* psz)															{ return wcstol    ((wchar_t const*)psz, nullptr, 10); }
-	inline					int32_t			tsztol(const char16_t* psz, char16_t const ** ppszEnd = nullptr, int radix = 0)		{ return wcstol    ((wchar_t const*)psz, (wchar_t**)ppszEnd, radix); }
-	inline					uint32_t		tsztoul(const char16_t* psz, char16_t const ** ppszEnd = nullptr, int radix = 0)	{ return wcstoul   ((wchar_t const*)psz, (wchar_t**)ppszEnd, radix); }
-	inline					int64_t			tsztoi64(const char16_t* psz, char16_t const ** ppszEnd = nullptr, int radix = 0)	{ return _wcstoi64 ((wchar_t const*)psz, (wchar_t**)ppszEnd, radix); }
-	inline					uint64_t		tsztoui64(const char16_t* psz, char16_t const ** ppszEnd = nullptr, int radix = 0)	{ return _wcstoui64((wchar_t const*)psz, (wchar_t**)ppszEnd, radix); }
-	inline					double			tsztod(const char16_t* psz, char16_t const ** ppszEnd = nullptr)					{ return wcstod    ((wchar_t const*)psz, (wchar_t**)ppszEnd); }
-#endif
+	template < std::floating_point tvalue_t = double, gtlc::string_elem tchar_t = char16_t>
+	inline tvalue_t tsztod(tchar_t const* psz, tchar_t** ppszStopped = nullptr) {
+		return tsztod<tvalue_t, tchar_t>(std::basic_string_view<tchar_t>{ psz, psz+tszlen(psz) }, ppszStopped);
+	}
 
 	template < gtlc::string_elem tchar_t >
 	constexpr size_t tszrmchar(tchar_t* psz, int chRemove);	// Remove Charactor from str. returns str length
 
-															/// @brief Compare strings (according to numbers)
+	/// @brief Compare strings (according to numbers)
 	template < gtlc::string_elem tchar_t >
 	constexpr int	CompareStringIncludingNumber(const tchar_t* pszA, const tchar_t* pszB, bool bIgnoreCase = false);
-	inline					constexpr int	tdszcmp(const char* pszA, const char* pszB)										{ return CompareStringIncludingNumber<char>(pszA, pszB, false); }
-	inline					constexpr int	tdszcmp(const wchar_t* pszA, const wchar_t* pszB)								{ return CompareStringIncludingNumber<wchar_t>(pszA, pszB, false); }
-	inline					constexpr int	tdszcmp(const char8_t* pszA, const char8_t* pszB)								{ return CompareStringIncludingNumber<char8_t>(pszA, pszB, false); }
-	inline					constexpr int	tdszicmp(const char* pszA, const char* pszB)									{ return CompareStringIncludingNumber<char>(pszA, pszB, true); }
-	inline					constexpr int	tdszicmp(const wchar_t* pszA, const wchar_t* pszB)								{ return CompareStringIncludingNumber<wchar_t>(pszA, pszB, true); }
-	inline					constexpr int	tdszicmp(const char8_t* pszA, const char8_t* pszB)								{ return CompareStringIncludingNumber<char8_t>(pszA, pszB, true); }
+	constexpr inline int tdszcmp(const char* pszA, const char* pszB)		{ return CompareStringIncludingNumber<char>(pszA, pszB, false); }
+	constexpr inline int tdszcmp(const wchar_t* pszA, const wchar_t* pszB)	{ return CompareStringIncludingNumber<wchar_t>(pszA, pszB, false); }
+	constexpr inline int tdszcmp(const char8_t* pszA, const char8_t* pszB)	{ return CompareStringIncludingNumber<char8_t>(pszA, pszB, false); }
+
+	constexpr inline int tdszicmp(const char* pszA, const char* pszB)		{ return CompareStringIncludingNumber<char>(pszA, pszB, true); }
+	constexpr inline int tdszicmp(const wchar_t* pszA, const wchar_t* pszB)	{ return CompareStringIncludingNumber<wchar_t>(pszA, pszB, true); }
+	constexpr inline int tdszicmp(const char8_t* pszA, const char8_t* pszB)	{ return CompareStringIncludingNumber<char8_t>(pszA, pszB, true); }
 
 
 	/// @brief  tszsearch_oneof
@@ -871,43 +748,51 @@ namespace gtl {
 	/// @param pszB 
 	/// @return 
 	template < gtlc::string_elem tchar_t, bool bIgnoreCase >
-	constexpr int CompareStringIncludingNumber(const tchar_t* pszA, const tchar_t* pszB) {
-		const tchar_t* p0 = pszA;
-		const tchar_t* p1 = pszB;
-		for (; *p0 && *p1; p0++, p1++) {
-			tchar_t c0 = *p0;
-			tchar_t c1 = *p1;
-			if (IsDigit(c0) && IsDigit(c1)) {	// for numbers
-												// skip '0'
-				while (c0 == '0')
-					c0 = *(++p0);
-				while (c1 == '0')
-					c1 = *(++p1);
+	constexpr int/*std::strong_ordering*/ CompareStringIncludingNumber(std::basic_string_view<tchar_t> svA, std::basic_string_view<tchar_t> svB) {
+		tchar_t const* pszA				= svA.data();
+		tchar_t const* const pszAend	= svA.data() + svA.size();
+		tchar_t const* pszB				= svB.data();
+		tchar_t const* const pszBend	= svB.data() + svB.size();
+
+		for (; (pszA < pszAend) && (pszB < pszBend) && *pszA && *pszB; pszA++, pszB++) {
+			if (IsDigit(*pszA) && IsDigit(*pszB)) {	// for numbers
+				// skip '0'
+				auto Skip0 = [](tchar_t const*& psz, tchar_t const* const pszEnd) {
+					for ( ; (psz < pszEnd) and ('0' == *psz); psz++)
+						;
+				};
+				Skip0(pszA, pszAend);
+				Skip0(pszB, pszBend);
 
 				// Count Digit Length
-				int nDigit0, nDigit1;
-				for (nDigit0 = 0; IsDigit(p0[nDigit0]); nDigit0++)
-					;
-				for (nDigit1 = 0; IsDigit(p1[nDigit1]); nDigit1++)
-					;
+				auto CountDigitLength = [](tchar_t const*& psz, tchar_t const* const pszEnd) -> int {
+					int nDigit{};
+					for (; (psz + nDigit < pszEnd) and IsDigit(psz[nDigit]); nDigit++)
+						;
+					return nDigit;
+				};
+				int nDigitA = CountDigitLength(pszA, pszAend);
+				int nDigitB = CountDigitLength(pszB, pszBend);
 
-				// Compare
-				if (nDigit0 == nDigit1) {
-					if (nDigit0 == 0) {
+				// Compare digit length
+				if (int diff = nDigitA - nDigitB; diff)
+					return diff;
+
+				if (nDigitA == 0) {
+					continue;
+				}
+				for (; (nDigitA > 0); pszA++, pszB++, nDigitA--) {
+					if (*pszA == *pszB)
 						continue;
-					}
-					for (; (nDigit0 > 0) && *p0 && *p1; p0++, p1++, nDigit0--) {
-						if (*p0 == *p1)
-							continue;
-						return *p0 - *p1;
-					}
-					p0--;
-					p1--;
-				} else
-					return nDigit0 - nDigit1;
+					return *pszA - *pszB;
+				}
+				pszA--;
+				pszB--;
 			} else {
-				if constexpr (bIgnoreCase) { c0 = (tchar_t)ToLower(c0); c1 = (tchar_t)ToLower(c1); }
-				auto r = c0 - c1;
+				tchar_t cA = *pszA;
+				tchar_t cB = *pszB;
+				if constexpr (bIgnoreCase) { cA = (tchar_t)ToLower(cA); cB = (tchar_t)ToLower(cB); }
+				auto r = cA - cB;
 				if (r == 0)
 					continue;
 				return r;
@@ -915,8 +800,8 @@ namespace gtl {
 		}
 
 		if constexpr (bIgnoreCase)
-			return tszicmp(p0, p1);
-		return tszcmp(p0, p1);
+			return tszicmp(pszA, pszB);
+		return tszcmp(pszA, pszB);
 	}
 	template < gtlc::string_elem tchar_t >
 	constexpr int CompareStringIncludingNumber(const tchar_t* pszA, const tchar_t* pszB, bool bIgnoreCase) {
