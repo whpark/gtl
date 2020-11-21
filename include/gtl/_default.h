@@ -31,7 +31,8 @@
 #include <clocale>
 #include <cstring>
 #include <cwchar>
-#include <tchar.h>
+#include <ciso646>
+//#include <tchar.h>
 //#include <cstdbool>
 
 #include <concepts>
@@ -127,8 +128,8 @@ namespace gtl {
 
 	// byte swap
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY)
-	template < std::integral tvar_t >
-	[[nodiscard]] inline auto GetByteSwap(tvar_t v) {
+	template < std::integral tvar >
+	[[nodiscard]] inline auto GetByteSwap(tvar v) {
 		if constexpr (sizeof(v) == sizeof(std::uint16_t)) {
 			return _byteswap_ushort(v);
 		} else if constexpr (sizeof(v) == sizeof(std::uint32_t)) {
@@ -139,19 +140,19 @@ namespace gtl {
 			static_assert(false, "not supported data type.");
 		}
 	}
-	template < std::integral tvar_t >
-	inline void ByteSwap(tvar_t& v) {
+	template < std::integral tvar >
+	inline void ByteSwap(tvar& v) {
 		v = GetByteSwap(v);
 	}
 #else
-	template < std::integral tvar_t >
-	[[nodiscard]] inline tvar_t GetByteSwap(tvar_t const v) {
-		tvar_t r{};
+	template < std::integral tvar >
+	[[nodiscard]] inline tvar GetByteSwap(tvar const v) {
+		tvar r{};
 		std::reverse_copy((uint8_t const*)&v, (uint8_t const*)&v+sizeof(v), (uint8_t*)&r);
 		return r;
 	}
-	template < std::integral tvar_t >
-	inline void ByteSwap(tvar_t& v) {
+	template < std::integral tvar >
+	inline void ByteSwap(tvar& v) {
 		std::reverse((uint8_t*)&v, (uint8_t*)&v+sizeof(v));
 	}
 #endif

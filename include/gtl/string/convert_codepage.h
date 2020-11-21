@@ -117,25 +117,25 @@ namespace gtl {
 	namespace internal {
 
 		/// @brief static type cast (wide string/string_view) -> char16_t/char32_t string/string_vew. (according to its size), NO code conversion.
-		/// @tparam tchar_t 
+		/// @tparam tchar 
 		/// @param str : basic_string or basic_string_view. (or whatever )
 		/// @return same container with char??_t
-		template < typename tchar_t, template <typename tchar_t, typename ... tstr_args> typename tstr, typename ... tstr_args >
-		auto WideAsCharXX(tstr<tchar_t, tstr_args...>& str) {
-			if constexpr (sizeof(tchar_t) == sizeof(char8_t)) {
+		template < typename tchar, template <typename tchar, typename ... tstr_args> typename tstr, typename ... tstr_args >
+		auto WideAsCharXX(tstr<tchar, tstr_args...>& str) {
+			if constexpr (sizeof(tchar) == sizeof(char8_t)) {
 				return (tstr<char8_t>)(tstr<char8_t>&)str;
 			}
-			else if constexpr (sizeof(tchar_t) == sizeof(char16_t)) {
+			else if constexpr (sizeof(tchar) == sizeof(char16_t)) {
 				return (tstr<char16_t>)(tstr<char16_t>&)str;
 			}
-			else if constexpr (sizeof(tchar_t) == sizeof(char32_t)) {
+			else if constexpr (sizeof(tchar) == sizeof(char32_t)) {
 				return (tstr<char32_t>)(tstr<char32_t>&)str;
 			}
 		}
 
 		/// @brief static type cast (char16_t/char32_t string/string_view) -> char16_t/char32_t string/string_view. (according to its size), NO code conversion.
-		template < typename tchar_t, template <typename tchar_t, typename ... tstr_args> typename tstr, typename ... tstr_args >
-		tstr<wchar_t>& CharAsWideXX(tstr<tchar_t, tstr_args...>& str) {
+		template < typename tchar, template <typename tchar, typename ... tstr_args> typename tstr, typename ... tstr_args >
+		tstr<wchar_t>& CharAsWideXX(tstr<tchar, tstr_args...>& str) {
 			return (tstr<wchar_t>&)(str);
 		}
 
@@ -262,36 +262,36 @@ namespace gtl {
 	}
 
 	/// @brief Converts Codepage (Unicode <-> MBCS ...)
-	template < gtlc::string_elem tchar_t1, gtlc::string_elem tchar_t2 >
-	basic_string_t<tchar_t2> ToString(std::basic_string_view<tchar_t1> str, S_CODEPAGE_OPTION codepage = {}) {
-		basic_string_t<tchar_t2> result;
-		if constexpr (std::is_same_v<tchar_t2, char>) {
+	template < gtlc::string_elem tchar1, gtlc::string_elem tchar2 >
+	basic_string_t<tchar2> ToString(std::basic_string_view<tchar1> str, S_CODEPAGE_OPTION codepage = {}) {
+		basic_string_t<tchar2> result;
+		if constexpr (std::is_same_v<tchar2, char>) {
 			result = ToStringA(str, codepage);
-		} else if constexpr (std::is_same_v<tchar_t2, wchar_t>) {
+		} else if constexpr (std::is_same_v<tchar2, wchar_t>) {
 			result = ToStringW(str, codepage);
-		} else if constexpr (std::is_same_v<tchar_t2, char8_t>) {
+		} else if constexpr (std::is_same_v<tchar2, char8_t>) {
 			result = ToStringU8(str, codepage);
-		} else if constexpr (std::is_same_v<tchar_t2, char16_t>) {
+		} else if constexpr (std::is_same_v<tchar2, char16_t>) {
 			result = ToStringU16(str, codepage);
-		} else if constexpr (std::is_same_v<tchar_t2, char32_t>) {
+		} else if constexpr (std::is_same_v<tchar2, char32_t>) {
 			result = ToStringU32(str, codepage);
 		}
 		return result;
 	}
 	/// @brief Converts Codepage (Unicode <-> MBCS ...)
-	template < gtlc::string_elem tchar_t1, gtlc::string_elem tchar_t2 >
-	void ToString(std::basic_string_view<tchar_t1> strFrom, std::basic_string<tchar_t2>& strTo, S_CODEPAGE_OPTION codepage = {}) {
-		strTo = ToString<tchar_t1, tchar_t2>(strFrom);
+	template < gtlc::string_elem tchar1, gtlc::string_elem tchar2 >
+	void ToString(std::basic_string_view<tchar1> strFrom, std::basic_string<tchar2>& strTo, S_CODEPAGE_OPTION codepage = {}) {
+		strTo = ToString<tchar1, tchar2>(strFrom);
 	}
 
 	//-------------------------------------------------------------
 	// experimental
 	//
-	template < gtlc::utf_string_elem tchar_return_t, gtlc::utf_string_elem tchar_t >
-	requires ( (sizeof(tchar_t) != sizeof(tchar_return_t)) && (sizeof(tchar_t) != sizeof(char32_t)) )
-	std::experimental::generator<tchar_return_t> StringSequence(utf_string_view<tchar_t> sv) {
-		using usv = utf_string_view<tchar_t>;
-		if constexpr (sizeof(tchar_return_t) == sizeof(char8_t)) {
+	template < gtlc::utf_string_elem tchar_return, gtlc::utf_string_elem tchar >
+	requires ( (sizeof(tchar) != sizeof(tchar_return)) && (sizeof(tchar) != sizeof(char32_t)) )
+	std::experimental::generator<tchar_return> StringSequence(utf_string_view<tchar> sv) {
+		using usv = utf_string_view<tchar>;
+		if constexpr (sizeof(tchar_return) == sizeof(char8_t)) {
 			for (auto const c : sv) {
 				if (c <= 0x7f) {
 					co_yield c;
@@ -315,7 +315,7 @@ namespace gtl {
 					throw std::invalid_argument{ GTL__FUNCSIG "no utf" };
 			}
 		}
-		else if constexpr (sizeof(tchar_return_t) == sizeof(char16_t)) {
+		else if constexpr (sizeof(tchar_return) == sizeof(char16_t)) {
 			for (auto const c : sv) {
 				if (c <= 0xffff) {
 					[[likely]]
@@ -331,7 +331,7 @@ namespace gtl {
 					co_yield c;
 			}
 		}
-		else if constexpr (sizeof(tchar_return_t) == sizeof(char32_t)) {
+		else if constexpr (sizeof(tchar_return) == sizeof(char32_t)) {
 			for (auto const c : sv) {
 				co_yield c;
 			}

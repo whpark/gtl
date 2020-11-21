@@ -38,17 +38,17 @@ namespace gtl {
 	/// char32_t character from utf8/16 string. (yet, NOT having std::generator...)
 	///   someday, upgrate to std::generator std::generator<tchar_return_t> ...
 	/// </summary>
-	template < gtlc::utf_string_elem tchar_t >
+	template < gtlc::utf_string_elem tchar >
 	class utf_string_view {
 	public:
 		using utf_char_return_t = char32_t;
 
 	protected:
-		std::basic_string_view<tchar_t> sv_;
+		std::basic_string_view<tchar> sv_;
 
 	public:
-		utf_string_view(std::basic_string_view<tchar_t> sv) : sv_(sv) { }
-		utf_string_view(std::basic_string<tchar_t> const& str) : sv_(str.data(), str.data() + str.size()) { }
+		utf_string_view(std::basic_string_view<tchar> sv) : sv_(sv) { }
+		utf_string_view(std::basic_string<tchar> const& str) : sv_(str.data(), str.data() + str.size()) { }
 		utf_string_view() = default;
 		utf_string_view(utf_string_view const&) = default;
 		utf_string_view(utf_string_view&&) = default;
@@ -56,7 +56,7 @@ namespace gtl {
 		utf_string_view& operator = (utf_string_view const&) = default;
 
 		size_t CountOutputLength() {
-			if constexpr (sizeof(tchar_t) == sizeof(char8_t)) {
+			if constexpr (sizeof(tchar) == sizeof(char8_t)) {
 				// utf8
 				size_t count{};
 				auto const* const end = sv_.data() + sv_.end();
@@ -77,7 +77,7 @@ namespace gtl {
 				}
 				return count;
 			}
-			else if constexpr (sizeof(tchar_t) == sizeof(char16_t)) {
+			else if constexpr (sizeof(tchar) == sizeof(char16_t)) {
 				// utf16
 				size_t count{};
 				auto const* const end = sv_.data() + sv_.end();
@@ -90,7 +90,7 @@ namespace gtl {
 				}
 				return count;
 			}
-			else if constexpr (sizeof(tchar_t) == sizeof(char32_t)) {
+			else if constexpr (sizeof(tchar) == sizeof(char32_t)) {
 				// utf32
 				return sv_.size();
 			}
@@ -99,13 +99,13 @@ namespace gtl {
 	public:
 		class iterator {
 		private:
-			tchar_t const* position_;
-			tchar_t const* const end_;
+			tchar const* position_;
+			tchar const* const end_;
 			int diff_to_next_{};		// 
 			utf_char_return_t code_{};
 		public:
-			iterator(tchar_t const* position, tchar_t const* const end) : position_(position), end_(end) {
-				if constexpr (sizeof(tchar_t) != sizeof(char32_t)) {
+			iterator(tchar const* position, tchar const* const end) : position_(position), end_(end) {
+				if constexpr (sizeof(tchar) != sizeof(char32_t)) {
 					update();
 				}
 			}
@@ -114,7 +114,7 @@ namespace gtl {
 				namespace uc = utf_const;
 				if (position_ >= end_)
 					return;
-				if constexpr (sizeof(tchar_t) == sizeof(char8_t)) {
+				if constexpr (sizeof(tchar) == sizeof(char8_t)) {
 					// utf8
 					if (position_[0] <= 0x7f) {
 						code_ = position_[0];
@@ -151,7 +151,7 @@ namespace gtl {
 						throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
 					}
 				}
-				else if constexpr (sizeof(tchar_t) == sizeof(char16_t)) {
+				else if constexpr (sizeof(tchar) == sizeof(char16_t)) {
 					// utf16
 					if ((position_[0] < uc::fSurrogateW1.first) || (position_[0] > uc::fSurrogateW2.second)) [[ likely ]] {
 						code_ = position_[0];
@@ -171,7 +171,7 @@ namespace gtl {
 						throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. invalid surrogate" };
 					}
 				}
-				else if constexpr (sizeof(tchar_t) == sizeof(char32_t)) {
+				else if constexpr (sizeof(tchar) == sizeof(char32_t)) {
 					code_ = *position_;
 					diff_to_next_ = 1;
 				}
@@ -185,7 +185,7 @@ namespace gtl {
 				return position_ != b.position_;
 			}
 			iterator& operator++ () {
-				if constexpr (std::is_same_v<tchar_t, char32_t>) {
+				if constexpr (std::is_same_v<tchar, char32_t>) {
 					position_++;
 				}
 				else {
@@ -199,7 +199,7 @@ namespace gtl {
 				return *this;
 			}
 			char32_t const& operator* () const {
-				if constexpr (std::is_same_v<tchar_t, char32_t>) {
+				if constexpr (std::is_same_v<tchar, char32_t>) {
 					return *position_;
 				}
 				else {

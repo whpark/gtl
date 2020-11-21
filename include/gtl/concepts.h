@@ -29,23 +29,23 @@ namespace gtl::concepts {
 	///	variadic template check version of 'std::is_same_v<t, t2>'
 	///	is_one_of_v<>
 	/// </summary>
-	/// <typeparam name="tchar_t"></typeparam>
+	/// <typeparam name="tchar"></typeparam>
 	/// <typeparam name="...types_t"></typeparam>
-	template < typename tchar_t, typename ... types_t >
-	concept is_one_of_v = (std::is_same_v<tchar_t, types_t> || ...);
+	template < typename tchar, typename ... ttypes >
+	concept is_one_of_v = (std::is_same_v<tchar, ttypes> || ...);
 
 
-	template < typename tchar_t >
-	concept string_elem = is_one_of_v<tchar_t, char, wchar_t, char8_t, char16_t, char32_t, uint16_t>;
-		//|| std::is_same_v<tchar_t, wchar_t>
-		//|| std::is_same_v<tchar_t, char8_t>
-		//|| std::is_same_v<tchar_t, char16_t>
-		//|| std::is_same_v<tchar_t, char32_t>
-		//|| std::is_same_v<tchar_t, uint16_t>	// for KSSM
+	template < typename tchar >
+	concept string_elem = is_one_of_v<tchar, char, wchar_t, char8_t, char16_t, char32_t, uint16_t>;
+		//|| std::is_same_v<tchar, wchar_t>
+		//|| std::is_same_v<tchar, char8_t>
+		//|| std::is_same_v<tchar, char16_t>
+		//|| std::is_same_v<tchar, char32_t>
+		//|| std::is_same_v<tchar, uint16_t>	// for KSSM (Korean Johab)
 		//;
 
-	template < typename tchar_t >
-	concept utf_string_elem = is_one_of_v<tchar_t, char8_t, char16_t, char32_t>;
+	template < typename tchar >
+	concept utf_string_elem = is_one_of_v<tchar, char8_t, char16_t, char32_t>;
 }
 
 namespace gtlc = gtl::concepts;

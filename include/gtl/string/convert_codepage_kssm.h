@@ -39,21 +39,21 @@ namespace gtl {
 
 
 	/// @brief KSSM <=> Codepage 949 (Korean Text Conversion. 조합형 <=> 완성형949(UTF16))
-	/// @tparam tchar_t1 char16_t for UTF16, or uint16_t for KSSM
-	/// @tparam tchar_t2 
+	/// @tparam tchar1 char16_t for UTF16, or uint16_t for KSSM
+	/// @tparam tchar2 
 	/// @return Converted String.
-	template < typename tchar_t1, typename tchar_t2 >
-	requires ( (std::is_same_v<tchar_t1, char16_t> && std::is_same_v<tchar_t2, uint16_t>)
-			  || (std::is_same_v<tchar_t1, uint16_t> && std::is_same_v<tchar_t2, char16_t>)
+	template < typename tchar1, typename tchar2 >
+	requires ( (std::is_same_v<tchar1, char16_t> && std::is_same_v<tchar2, uint16_t>)
+			  || (std::is_same_v<tchar1, uint16_t> && std::is_same_v<tchar2, char16_t>)
 			  )
-	basic_string_t<tchar_t2> _Conv_KSSM_UTF16(basic_string_t<tchar_t1> const& strSource, tchar_t2 cErrorFillCode = L'?') {
-		basic_string_t<tchar_t2> str;
+	basic_string_t<tchar2> _Conv_KSSM_UTF16(basic_string_t<tchar1> const& strSource, tchar2 cErrorFillCode = L'?') {
+		basic_string_t<tchar2> str;
 		str.reserve(strSource.size());
-		static auto const& map1to2 = GetHangeulCodeMap(tchar_t1{}, tchar_t2{});
-		static auto const& map2to1 = GetHangeulCodeMap(tchar_t2{}, tchar_t1{});
+		static auto const& map1to2 = GetHangeulCodeMap(tchar1{}, tchar2{});
+		static auto const& map2to1 = GetHangeulCodeMap(tchar2{}, tchar1{});
 
 		for (auto c : strSource) {
-			if constexpr (std::is_same_v<tchar_t1, uint16_t>) {
+			if constexpr (std::is_same_v<tchar1, uint16_t>) {
 				if ( (c < 0x8444) || (c > 0xd3bd) ) {
 					str += c;
 					continue;
@@ -78,18 +78,18 @@ namespace gtl {
 	}
 
 	/// @brief KSSM <=> Codepage 949 (Korean Text Conversion. 조합형 <=> 완성형949(UTF16))
-	/// @tparam tchar_t1 char16_t for UTF16, or uint16_t for KSSM
-	/// @tparam tchar_t2 
+	/// @tparam tchar1 char16_t for UTF16, or uint16_t for KSSM
+	/// @tparam tchar2 
 	/// @return Converted Char.
-	template < typename tchar_t1, typename tchar_t2 >
-	requires ( (std::is_same_v<tchar_t1, char16_t> && std::is_same_v<tchar_t2, uint16_t>)
-			  || (std::is_same_v<tchar_t1, uint16_t> && std::is_same_v<tchar_t2, char16_t>)
+	template < typename tchar1, typename tchar2 >
+	requires ( (std::is_same_v<tchar1, char16_t> && std::is_same_v<tchar2, uint16_t>)
+			  || (std::is_same_v<tchar1, uint16_t> && std::is_same_v<tchar2, char16_t>)
 			  )
-	tchar_t2 _Conv_KSSM_UTF16(tchar_t1 c, tchar_t2 cErrorFillCode = L'?') {
-		static auto const& map1to2 = GetHangeulCodeMap(tchar_t1{}, tchar_t2{});
-		static auto const& map2to1 = GetHangeulCodeMap(tchar_t2{}, tchar_t1{});
+	tchar2 _Conv_KSSM_UTF16(tchar1 c, tchar2 cErrorFillCode = L'?') {
+		static auto const& map1to2 = GetHangeulCodeMap(tchar1{}, tchar2{});
+		static auto const& map2to1 = GetHangeulCodeMap(tchar2{}, tchar1{});
 
-		if constexpr (std::is_same_v<tchar_t1, uint16_t>) {
+		if constexpr (std::is_same_v<tchar1, uint16_t>) {
 			if ( (c < 0x8444) || (c > 0xd3bd) ) {
 				return c;
 			}

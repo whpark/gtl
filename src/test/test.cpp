@@ -35,10 +35,22 @@ TEST(gtl_string, tszto) {
 	char16_t szS[]{u"가나다라마바사"};
 	tszcpy(sz, szS);
 
+	EXPECT_TRUE(CompareStringIncludingNumber(u"", u"") == 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"0", u"") > 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"", u"0") < 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"1", u"1") == 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"1", u"2") < 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"2", u"1") > 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"01", u"001") < 0);	// 같을 경우, 길이가 길수록 큰 값
+	EXPECT_TRUE(CompareStringIncludingNumber(u"10", u"100") < 0);
 	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef0000123456789aaaa") == 0);
 	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef000012345678aaaa") > 0);
 	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef00001234567891aaaa") < 0);
 	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef0000123456788aaaa") > 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"0123456789", u"0123456789") == 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"0123456789", u"012345678") > 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"0123456789", u"01234567891") < 0);
+	EXPECT_TRUE(CompareStringIncludingNumber(u"0123456789", u"0123456788") > 0);
 
 	auto a1 = gtl::tsztoi("12345"sv);
 	auto a2 = gtl::tsztoi("12345"s);

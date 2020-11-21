@@ -63,11 +63,11 @@ namespace gtl::old_format {
 		}
 	}
 
-	template < gtlc::string_elem tchar_t, gtlc::arithmetic T_NUMBER >
-	constexpr tchar_t const* GetDefaultFormatSpecifier(T_NUMBER) {
-		if constexpr (std::is_same_v<tchar_t, char> || std::is_same_v<tchar_t, char8_t>) {
+	template < gtlc::string_elem tchar, gtlc::arithmetic T_NUMBER >
+	constexpr tchar const* GetDefaultFormatSpecifier(T_NUMBER) {
+		if constexpr (std::is_same_v<tchar, char> || std::is_same_v<tchar, char8_t>) {
 			return GetDefaultFormatSpecifierA<T_NUMBER>();
-		} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
+		} else if constexpr (std::is_same_v<tchar, wchar_t>) {
 			return GetDefaultFormatSpecifierW<T_NUMBER>();
 		} else {
 			static_assert(false, "char or wchar_t only.");
@@ -100,9 +100,9 @@ namespace gtl::old_format {
 		return ::vsnprintf((char*)buffer, _Count, (char*)format, argptr);
 	}
 
-	template < gtlc::string_elem tchar_t >
-	basic_string_t<tchar_t> TFormatV(tchar_t const* pszFormat, va_list argList) {
-		basic_string_t<tchar_t> str;
+	template < gtlc::string_elem tchar >
+	basic_string_t<tchar> TFormatV(tchar const* pszFormat, va_list argList) {
+		basic_string_t<tchar> str;
 		int len = tsz_vsnprintf(nullptr, 0, pszFormat, argList);
 		if (len < 0)
 			throw std::invalid_argument(GTL__FUNCSIG "formatting error");
@@ -115,9 +115,9 @@ namespace gtl::old_format {
 	}
 #endif
 
-	template < gtlc::string_elem tchar_t, typename ... Args/*, ENABLE_IF(std::is_integral_v<tchar_t>)*/ >
-	basic_string_t<tchar_t> TFormat(tchar_t const* pszFormat, Args&& ... args) {
-		basic_string_t<tchar_t> str;
+	template < gtlc::string_elem tchar, typename ... Args/*, ENABLE_IF(std::is_integral_v<tchar>)*/ >
+	basic_string_t<tchar> TFormat(tchar const* pszFormat, Args&& ... args) {
+		basic_string_t<tchar> str;
 		int len = tsz_snprintf(nullptr, 0, pszFormat, args ...);
 		if (len < 0)
 			throw std::invalid_argument(GTL__FUNCSIG "formatting error");
@@ -130,26 +130,26 @@ namespace gtl::old_format {
 	}
 
 
-	template < gtlc::string_elem tchar_t, typename tchar2_t = tchar_t >
-	tchar2_t const* FilterStringTypeToCSTR(basic_string_t<tchar2_t> const& str) {
-		static_assert(std::is_same_v<tchar_t, tchar2_t>, "Check String Type...");
+	template < gtlc::string_elem tchar, typename tchar2 = tchar >
+	tchar2 const* FilterStringTypeToCSTR(basic_string_t<tchar2> const& str) {
+		static_assert(std::is_same_v<tchar, tchar2>, "Check String Type...");
 		return str.c_str();
 	}
 
-	template < gtlc::string_elem tchar_t, typename tchar2_t = tchar_t >
-	tchar2_t const* FilterStringTypeToCSTR(std::basic_string_view<tchar2_t> const& sv) {
-		static_assert(std::is_same_v<tchar_t, tchar2_t>, "Check String Type...");
+	template < gtlc::string_elem tchar, typename tchar2 = tchar >
+	tchar2 const* FilterStringTypeToCSTR(std::basic_string_view<tchar2> const& sv) {
+		static_assert(std::is_same_v<tchar, tchar2>, "Check String Type...");
 		return sv.data();
 	}
 
-	template < gtlc::string_elem tchar_t, typename TYPE >
+	template < gtlc::string_elem tchar, typename TYPE >
 	TYPE const& FilterStringTypeToCSTR(TYPE const& v) {
 		return v; 
 	}
 
-	template < gtlc::string_elem tchar_t, typename ... Args >
-	basic_string_t<tchar_t> TFFormat(tchar_t const* pszFormat, Args&& ... args) {
-		return TFormat(pszFormat, FilterStringTypeToCSTR<tchar_t>(args)...);
+	template < gtlc::string_elem tchar, typename ... Args >
+	basic_string_t<tchar> TFFormat(tchar const* pszFormat, Args&& ... args) {
+		return TFormat(pszFormat, FilterStringTypeToCSTR<tchar>(args)...);
 	}
 
 	// for Wrong Paramters

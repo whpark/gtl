@@ -23,7 +23,7 @@ namespace gtl {
 
 	constexpr static bool const IsUTF8SigChar(char c) { return (c & 0b1100'0000) == 0b1000'0000; }
 
-	template <typename tchar_t>
+	template <typename tchar>
 	inline constexpr int eCODEPAGE_OTHER;
 	template <>
 	inline constexpr int eCODEPAGE_OTHER<wchar_t> = eCODEPAGE::_UCS2_other;
@@ -32,13 +32,13 @@ namespace gtl {
 	template <>
 	inline constexpr int eCODEPAGE_OTHER<char32_t> = eCODEPAGE::_UTF16_other;
 
-	template < typename tchar_t >
-	inline [[nodiscard]] std::optional<std::basic_string<tchar_t>> CheckAndConvertEndian(std::basic_string_view<tchar_t> sv, int eCodepage) {
-		if (eCODEPAGE_OTHER<tchar_t> != eCodepage) {
+	template < typename tchar >
+	inline [[nodiscard]] std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, int eCodepage) {
+		if (eCODEPAGE_OTHER<tchar> != eCodepage) {
 			[[likely]]
 			return {};
 		}
-		std::basic_string<tchar_t> strOther;
+		std::basic_string<tchar> strOther;
 		strOther.reserve(sv.size());
 		for (auto c : sv) {
 			strOther.push_back(GetByteSwap(c));
@@ -46,9 +46,9 @@ namespace gtl {
 		return strOther;
 	}
 
-	template < typename tchar_t, template < typename, typename ... tstr_args> typename tstr, typename ... tstr_args >
-	inline bool CheckAndConvertEndian(tstr<tchar_t, tstr_args...>& str, int eCodepage) {
-		if (eCODEPAGE_OTHER<tchar_t> != eCodepage) {
+	template < typename tchar, template < typename, typename ... tstr_args> typename tstr, typename ... tstr_args >
+	inline bool CheckAndConvertEndian(tstr<tchar, tstr_args...>& str, int eCodepage) {
+		if (eCODEPAGE_OTHER<tchar> != eCodepage) {
 			[[likely]]
 			return false;
 		}
