@@ -125,11 +125,11 @@ namespace gtl {
 	template < typename tchar > constexpr inline tchar IsNotSpace(tchar const c/* Locale Irrelavant */) { return !IsSpace(c); }
 
 
-	/// @brief  tszlen (string length)
-	/// @param psz : string
+	/// @brief  tszlen (string length). you cannot input string literal. you don't need tszlen("testlen");. ==> just call "testlen"sv.size();
+	/// @param psz : string (!!! no string literal)
 	/// @return string length
 	template < gtlc::string_elem tchar >
-	constexpr [[deprecated("NOT Secure")]] size_t tszlen(tchar const* psz) {
+	constexpr [[nodiscard]] [[deprecated("NOT Secure")]] size_t tszlen(tchar const* psz) {
 		if (!psz) return 0;
 		tchar const* pos = psz;
 		while (*pos) { pos++; }
@@ -141,7 +141,7 @@ namespace gtl {
 	/// @return string length. if not reached, SIZE_MAX.
 	namespace internal {
 		template < gtlc::string_elem tchar >
-		constexpr inline size_t tszlen(tchar const* psz, tchar const* const pszMax) {
+		constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax) {
 			for (tchar const* pos = psz; pos < pszMax; pos++) {
 				if (!*pos)
 					return pos-psz;
@@ -150,18 +150,26 @@ namespace gtl {
 		}
 	}
 	template < gtlc::string_elem tchar >
-	constexpr size_t tszlen(tchar const* psz, tchar const* const pszMax) {
+	constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax) {
 		if (!psz)
 			return 0;
-		internal::tszlen(psz, pszMax);
+		return internal::tszlen(psz, pszMax);
+	}
+	template < gtlc::string_elem tchar >
+	constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t max) {
+		return tszlen(psz, psz+max);
 	}
 	template < gtlc::string_elem tchar, int sizeOfBuf >
-	constexpr size_t tszlen(tchar const (&sz)[sizeOfBuf]) {
-		return interanl::tszlen(sz, sz+sizeOfBuf);
+	constexpr inline [[nodiscard]] size_t tszlen(tchar const (&sz)[sizeOfBuf]) {
+		return internal::tszlen(sz, sz+sizeOfBuf);
 	}
 	template < gtlc::string_elem tchar, int sizeOfBuf >
-	constexpr inline size_t tszlen(std::array<tchar, sizeOfBuf> const& sz) {
-		return interanl::tszlen(sz, sz+sizeOfBuf);
+	constexpr inline [[nodiscard]] size_t tszlen(std::array<tchar, sizeOfBuf> const& sz) {
+		return internal::tszlen(sz, sz+sizeOfBuf);
+	}
+	template < gtlc::string_elem tchar, int sizeOfBuf >
+	constexpr inline [[nodiscard]] size_t tszlen(std::array<tchar const, sizeOfBuf> const& sz) {
+		return internal::tszlen(sz, sz+sizeOfBuf);
 	}
 
 
@@ -186,8 +194,10 @@ namespace gtl {
 			pszDest = 0;
 			return EINVAL;
 		}
-		for (int i = 0; i < sizeDest; i++) {
-			pszDest[i] = pszSrc[i];
+		tchar* pos = pszDest;
+		tchar* const pszEnd = pszDest+sizeDest;
+		for (; pos < pszEnd; pos++, pszSrc++) {
+			*pos = *pszSrc;
 			if (!*pszSrc)
 				return 0;
 		}
@@ -240,7 +250,7 @@ namespace gtl {
 	}
 	template < gtlc::string_elem tchar >
 	inline errno_t tszcpy(tchar* pszDest, size_t sizeDest, std::basic_string<tchar> const& strSrc) {
-		return tszcpy(szDest.data(), sizeDest, (std::basic_string_view<tchar>)strSrc);
+		return tszcpy(pszDest, sizeDest, (std::basic_string_view<tchar>)strSrc);
 	}
 	template < gtlc::string_elem tchar, int sizeDest >
 	inline errno_t tszcpy(std::array<tchar, sizeDest>& szDest, std::basic_string<tchar> const& strSrc) {
@@ -248,66 +258,92 @@ namespace gtl {
 	}
 	template < gtlc::string_elem tchar, int sizeDest >
 	inline errno_t tszcpy(tchar (&szDest)[sizeDest], std::basic_string<tchar> const& strSrc) {
-		return tszcpy(szDest.data(), sizeDest, (std::basic_string_view<tchar>)strSrc);
+		return tszcpy(szDest, sizeDest, (std::basic_string_view<tchar>)strSrc);
 	}
 
+	// tszncpy
 	template < gtlc::string_elem tchar >
-	errno_t tszncpy(tchar* pszDest, size_t sizeDest, tchar const* pszSrc, size_t nLen = _TRUNCATE) {
+	constexpr errno_t tszncpy(tchar* pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount = _TRUNCATE) {
 		if (!pszDest or !sizeDest or (sizeDest > RSIZE_MAX) )
 			return EINVAL;
+		tchar* pos = pszDest;
 		if (!pszSrc) {
-			pszDest = 0;
+			*pos = 0;
 			return EINVAL;
 		}
-		auto n = (nLen == _TRUNCATE) ? (sizeDest-1) : (std::min(sizeDest-1, nLen));
-		decltype(sizeDest) i {};
-		for (; i < n; i++) {
-			pszDest[i] = pszSrc[i];
+		if (nCount == _TRUNCATE) {
+			nCount = sizeDest-1;
+		} else if (sizeDest <= nCount) {
+			*pos = 0;
+			return ERANGE;
+		}
+
+		tchar* const pszEnd = pszDest + nCount;	// not sizeDest
+		for (; pos < pszEnd; pos++, pszSrc++) {
+			*pos = *pszSrc;
 			if (!*pszSrc)
 				return 0;
 		}
-		if (i < sizeDest-1) {
-			pszDest[i] = 0;
-			return 0;
-		}
-		pszDest[0] = 0;
-		return ERANGE;
-		//return strncpy_s(pszDest, sizeDest, pszSrc, nLen);
-	}
-	template < gtlc::string_elem tchar, int sizeDest >
-	errno_t tszncpy(tchar (&szDest)[sizeDest], tchar const* pszSrc, size_t nLen = _TRUNCATE) {
-		return tszncpy(szDest, sizeDest, pszSrc, nLen);
-	}
-	template < gtlc::string_elem tchar, int sizeDest >
-	errno_t tszncpy(std::array<tchar, sizeDest>& szDest, tchar const* pszSrc, size_t nLen = _TRUNCATE) {
-		return tszncpy(szDest.data(), sizeDest, pszSrc, nLen);
-	}
-
-	// sv
-	template < gtlc::string_elem tchar >
-	errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc, size_t nLen = _TRUNCATE) {
-		if (!pszDest or !sizeDest or (sizeDest > RSIZE_MAX) or (svSrc.size() > RSIZE_MAX))
-			return EINVAL;
-		if (nLen == _TRUNCATE)
-			nLen = std::min(sizeDest-1, svSrc.size());
-		else if (sizeDest <= nLen)	// svSrc might be smaller and it can be ok sometimes. but you'd better make error here. for safety.
-			return ERANGE;
-		else
-			nLen = std::min(std::min(nLen, svSrc.size()), sizeDest-1);
-
-		decltype(nLen) i {};
-		tchar const* pszSrc = sv.data();
-		for (; i < nLen; i++) {
-			pszDest[i] = pszSrc[i];
-		}
-		pszDest[i] = 0;
+		*pos = 0;	// null terminator
 		return 0;
 	}
-	// todo: 2020.11.21 - tszncpy(...)
+	template < gtlc::string_elem tchar, int sizeDest >
+	constexpr inline errno_t tszncpy(tchar (&szDest)[sizeDest], tchar const* pszSrc, size_t nCount = _TRUNCATE) {
+		return tszncpy(szDest, sizeDest, pszSrc, nCount);
+	}
+	template < gtlc::string_elem tchar, int sizeDest >
+	constexpr inline errno_t tszncpy(std::array<tchar, sizeDest>& szDest, tchar const* pszSrc, size_t nCount = _TRUNCATE) {
+		return tszncpy(szDest.data(), sizeDest, pszSrc, nCount);
+	}
 
-
+	// tszncpy (sv)
 	template < gtlc::string_elem tchar >
-	errno_t tszcat(tchar* pszDest, size_t sizeDest, tchar const* pszSrc) {
+	constexpr errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE) {
+		if (!pszDest or !sizeDest or (sizeDest > RSIZE_MAX) or (svSrc.size() > RSIZE_MAX))
+			return EINVAL;
+		tchar* pos = pszDest;
+		if (nCount == _TRUNCATE) {
+			nCount = std::min(sizeDest-1, svSrc.size());
+		} else if (sizeDest <= nCount) {	// svSrc might be smaller and it could be ok sometimes. but it's safer to make some noise, here.
+			*pos = 0;
+			return ERANGE;
+		} else {
+			nCount = std::min(nCount, svSrc.size());
+		}
+
+		tchar const* pszSrc = svSrc.data();
+		tchar* const pszEnd = pszDest + nCount;	// not sizeDest
+		for (; pos < pszEnd; pos++, pszSrc++) {
+			*pos = *pszSrc;
+		}
+		*pos = 0;	// null terminator
+		return 0;
+	}
+	template < gtlc::string_elem tchar, int sizeDest >
+	constexpr inline errno_t tszncpy(tchar (&szDest)[sizeDest], std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE) {
+		return tszncpy(szDest, sizeDest, svSrc, nCount);
+	}
+	template < gtlc::string_elem tchar, int sizeDest >
+	constexpr inline errno_t tszncpy(std::array<tchar, sizeDest>& szDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE) {
+		return tszncpy(szDest.data(), sizeDest, svSrc, nCount);
+	}
+	template < gtlc::string_elem tchar >
+	constexpr inline errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string<tchar> const& strSrc, size_t nCount = _TRUNCATE) {
+		return tszncpy(pszDest, sizeDest, std::basic_string_view<tchar>{strSrc.data(), strSrc.end()}, nCount);
+	}
+
+	template < gtlc::string_elem tchar, int sizeDest >
+	constexpr inline errno_t tszncpy(tchar (&szDest)[sizeDest], std::basic_string<tchar> const& strSrc, size_t nCount = _TRUNCATE) {
+		return tszncpy(szDest, sizeDest, std::basic_string_view<tchar>{strSrc.data(), strSrc.end()}, nCount);
+	}
+	template < gtlc::string_elem tchar, int sizeDest >
+	constexpr inline errno_t tszncpy(std::array<tchar, sizeDest>& szDest, std::basic_string<tchar> const& strSrc, size_t nCount = _TRUNCATE) {
+		return tszncpy(szDest.data(), sizeDest, std::basic_string_view<tchar>{strSrc.data(), strSrc.end()}, nCount);
+	}
+
+	// tszcat
+	template < gtlc::string_elem tchar >
+	constexpr errno_t tszcat(tchar* pszDest, size_t sizeDest, tchar const* pszSrc) {
 		if (!pszDest or !sizeDest or (sizeDest > RSIZE_MAX) )
 			return EINVAL;
 		if (!pszSrc) {
@@ -315,24 +351,48 @@ namespace gtl {
 			return EINVAL;
 		}
 		auto const* const pszEnd = pszDest + sizeDest;
-		for (; pszDest < pszEnd; pszDest++, pszSrc++) {
-			*pszDest = *pszSrc;
+		auto nCount = tszlen(pszDest, pszEnd);
+		if (nCount > RSIZE_MAX)
+			return ERANGE;
+		for (tchar* pos = pszDest + nCount; pos < pszEnd; pos++, pszSrc++) {
+			*pos = *pszSrc;
 			if (!*pszSrc)
 				return 0;
 		}
 		// pszSrc is longer
-		if (sizeDest && (sizeDest <= RSIZE_MAX))
-			pszDest[0] = 0;
+		pszDest[0] = 0;
 		return ERANGE;
 	}
 	template < gtlc::string_elem tchar, int sizeDest >
-	errno_t tszcat(tchar (&szDest)[sizeDest], tchar const* pszSrc) {
+	constexpr inline errno_t tszcat(tchar (&szDest)[sizeDest], tchar const* pszSrc) {
 		return tszcat(szDest, sizeDest, pszSrc);
 	}
 	template < gtlc::string_elem tchar, int sizeDest >
-	errno_t tszcat(std::array<tchar, sizeDest>& szDest, tchar const* pszSrc) {
+	constexpr inline errno_t tszcat(std::array<tchar, sizeDest>& szDest, tchar const* pszSrc) {
 		return tszcat(szDest.data(), sizeDest, pszSrc);
 	}
+	template < gtlc::string_elem tchar >
+	constexpr errno_t tszcat(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc) {
+		if (!pszDest or !sizeDest or (sizeDest > RSIZE_MAX) or (svSrc.size() > RSIZE_MAX))
+			return EINVAL;
+		auto const* const pszEnd = pszDest + sizeDest;
+		auto nCount = tszlen(pszDest, pszEnd);
+		if (nCount > RSIZE_MAX)
+			return ERANGE;
+		tchar* pos = pszDest + nCount;
+		if (sizeDest <= nCount + svSrc.size() + 1) {
+			*pos = 0;
+			return ERANGE;
+		}
+		tchar const* pszSrc = svSrc.data();
+		tchar const* const pszSrcEnd = pszSrc + svSrc.size();
+		for (; (pos < pszEnd) and (pszSrc < pszSrcEnd); pos++, pszSrc++) {
+			*pos = *pszSrc;
+		}
+		*pos = 0;
+		return 0;
+	}
+
 	template < gtlc::string_elem tchar >
 	int tszcmp(tchar const* pszA, tchar const* pszB) {
 		if (!pszA && !pszB)	// if both are nullptr, return 0;
@@ -354,7 +414,7 @@ namespace gtl {
 	}
 
 	template < gtlc::string_elem tchar >
-	int tszncmp(tchar const* pszA, tchar const* pszB, size_t nLen) {
+	int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount) {
 		if (!pszA && !pszB)
 			return 0;
 		if (pszA && !pszB)
@@ -362,14 +422,14 @@ namespace gtl {
 		else if (!pszA && pszB)
 			return *pszB;
 
-		if (!nLen)
+		if (!nCount)
 			return 0;
 
 		for (; !*pszA || !*pszB; pszA++, pszB++) {
 			auto r = *pszA - *pszB;
 			if (!r)
 				return r;
-			if (--nLen == 0)
+			if (--nCount == 0)
 				return 0;
 		}
 		if (!*pszA && !*pszB)
@@ -397,7 +457,7 @@ namespace gtl {
 		return r;
 	}
 	template < gtlc::string_elem tchar >
-	int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nLen) {
+	int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount) {
 		if (!pszA && !pszB)
 			return 0;
 		if (pszA && !pszB)
@@ -405,14 +465,14 @@ namespace gtl {
 		else if (!pszA && pszB)
 			return *pszB;
 
-		if (!nLen)
+		if (!nCount)
 			return 0;
 
 		for (; !*pszA || !*pszB; pszA++, pszB++) {
 			auto r = ToLower(*pszA) - ToLower(*pszB);
 			if (!r)
 				return r;
-			if (--nLen == 0)
+			if (--nCount == 0)
 				return 0;
 		}
 		if (!*pszA && !*pszB)
@@ -422,10 +482,10 @@ namespace gtl {
 	}
 
 	template < gtlc::string_elem tchar >
-	errno_t tszupr(tchar* sz, size_t nLen) {
+	errno_t tszupr(tchar* sz, size_t nCount) {
 		if (!sz)
 			return EINVAL;
-		for (size_t i = 0; i < nLen; i++) {
+		for (size_t i = 0; i < nCount; i++) {
 			auto& c = *sz++;
 			if (!c)
 				break;
@@ -453,10 +513,10 @@ namespace gtl {
 	}
 
 	template < gtlc::string_elem tchar >
-	errno_t tszlwr(tchar* sz, size_t nLen) {
+	errno_t tszlwr(tchar* sz, size_t nCount) {
 		if (!sz)
 			return EINVAL;
-		for (size_t i = 0; i < nLen; i++) {
+		for (size_t i = 0; i < nCount; i++) {
 			auto& c = *sz++;
 			if (!c)
 				break;
@@ -858,8 +918,8 @@ namespace gtl {
 	/// @param pszA
 	/// @param pszB
 	/// @return 
-	template < gtlc::string_elem tchar, bool bIgnoreCase >
-	constexpr int/*std::strong_ordering*/ CompareStringIncludingNumber(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB) {
+	template < gtlc::string_elem tchar, bool bIgnoreCase = false >
+	constexpr int/*std::strong_ordering*/ CompareStringContainingNumbers(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB) {
 		tchar const* pszA				= svA.data();
 		tchar const* const pszAend	= svA.data() + svA.size();
 		tchar const* pszB				= svB.data();
@@ -924,12 +984,15 @@ namespace gtl {
 		return tszcmp(pszA, pszB);
 	}
 	template < gtlc::string_elem tchar >
-	constexpr int CompareStringIncludingNumber(std::basic_string<tchar> const& strA, std::basic_string<tchar> const& strB, bool bIgnoreCase) {
+	constexpr int CompareStringContainingNumbers(std::basic_string<tchar> const& strA, std::basic_string<tchar> const& strB, bool bIgnoreCase) {
 		return bIgnoreCase
-			? CompareStringIncludingNumber<tchar, true>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB)
-			: CompareStringIncludingNumber<tchar, false>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB);
+			? CompareStringContainingNumbers<tchar, true>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB)
+			: CompareStringContainingNumbers<tchar, false>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB);
 	}
-
+	template < gtlc::string_elem tchar, bool bIgnoreCase = false >
+	constexpr inline int/*std::strong_ordering*/ CompareStringContainingNumbers(tchar const* pszA, tchar const* pszB) {
+		return CompareStringContainingNumbers<tchar, bIgnoreCase>({pszA, pszA+tszlen(pszA)}, {pszB, pszB+tszlen(pszB)});
+	}
 
 #pragma pack(pop)
 };	// namespace gtl;

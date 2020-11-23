@@ -5,6 +5,8 @@
 using namespace std::literals;
 using namespace gtl::literals;
 
+using namespace gtl;
+
 namespace {
 	using namespace std;
 
@@ -17,40 +19,70 @@ namespace {
 
 };
 
+TEST(gtl_string, tszlen) {
+	//tszlen
+#pragma warning(push)
+#pragma warning(disable:4996)
+	EXPECT_EQ(5, "asdfe"sv.size());
+	EXPECT_EQ(7, (gtl::tszlen(u"asdfjaskdlf", u"asdfjaskdlf"sv.size()+1)));
+	EXPECT_EQ(3, gtl::tszlen((const char32_t*)U"가나다"));
+	EXPECT_EQ(4, gtl::tszlen((const char16_t*)u"가나다라"));
+	EXPECT_EQ(4, gtl::tszlen((const wchar_t*)L"가나다라"));
+	EXPECT_EQ(8, gtl::tszlen((const char*)"가나다라"));
+
+	char16_t str[128] {u"abcdefghijklmnopqrstu_________________________"};
+	EXPECT_EQ(69-31, tszlen(str));
+
+	std::array<char, 10> szArray {"ABCDEFG"};
+	EXPECT_EQ(7, tszlen(szArray));
+
+	std::array<char const, 10> szConstArray {"ABCDEFG"};
+	EXPECT_EQ(7, tszlen(szConstArray));
+
+#pragma warning(pop)
+}
+
+TEST(gtl_string, tszcpy) {
+#pragma warning(push)
+#pragma warning(disable:4996)
+
+	std::vector<char> buf;
+	buf.resize(10);
+	tszcpy(buf.data(), buf.size(), "ABCDEF");
+
+	// todo : 2020.11.23 여기까지.
+
+
+#pragma warning(pop)
+}
+
 TEST(gtl_string, tszto) {
 
 	auto ExpectEQ = []<typename T1, typename T2 = T1>(T1 && a, T2 && b) {
 		EXPECT_EQ(std::forward<T1>(a), std::forward<T2>(b));
 	};
 
-	using namespace gtl;
-
-	EXPECT_EQ(7, gtl::tszlen("dsafdjk"));
-	EXPECT_EQ(3, gtl::tszlen(U"가나다"));
-	EXPECT_EQ(4, gtl::tszlen(u"가나다라"));
-	EXPECT_EQ(4, gtl::tszlen(L"가나다라"));
-	EXPECT_EQ(8, gtl::tszlen("가나다라"));
 
 	char16_t sz[30];
 	char16_t szS[]{u"가나다라마바사"};
 	tszcpy(sz, szS);
 
-	EXPECT_TRUE(CompareStringIncludingNumber(u"", u"") == 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"0", u"") > 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"", u"0") < 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"1", u"1") == 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"1", u"2") < 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"2", u"1") > 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"01", u"001") < 0);	// 같을 경우, 길이가 길수록 큰 값
-	EXPECT_TRUE(CompareStringIncludingNumber(u"10", u"100") < 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef0000123456789aaaa") == 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef000012345678aaaa") > 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef00001234567891aaaa") < 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"abcdef0123456789aaaa", u"abcdef0000123456788aaaa") > 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"0123456789", u"0123456789") == 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"0123456789", u"012345678") > 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"0123456789", u"01234567891") < 0);
-	EXPECT_TRUE(CompareStringIncludingNumber(u"0123456789", u"0123456788") > 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"", u"") == 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"0", u"") > 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"", u"0") < 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"1", u"1") == 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"1", u"2") < 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"2", u"1") > 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"01", u"001") < 0);	// 같을 경우, 길이가 길수록 큰 값
+	EXPECT_TRUE(CompareStringContainingNumbers(u"10", u"100") < 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"abcdef0123456789aaaa", u"abcdef0000123456789aaaa") == 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"abcdef0123456789aaaa", u"abcdef000012345678aaaa") > 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"abcdef0123456789aaaa", u"abcdef00001234567891aaaa") < 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"abcdef0123456789aaaa", u"abcdef0000123456788aaaa") > 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"0123456789", u"0123456789") == 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"0123456789", u"012345678") > 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"0123456789", u"01234567891") < 0);
+	EXPECT_TRUE(CompareStringContainingNumbers(u"0123456789", u"0123456788") > 0);
 
 	auto a1 = gtl::tsztoi("12345"sv);
 	auto a2 = gtl::tsztoi("12345"s);
