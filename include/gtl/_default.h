@@ -61,11 +61,11 @@
 #	include <fmt/format.h>
 #endif
 #include <regex>
-#if defined (__cpp_lib_ctre)
-#	include <ctre>
-#else
-#	include <ctre.hpp>
-#endif
+//#if defined (__cpp_lib_ctre)
+//#	include <ctre>
+//#else
+//#	include <ctre.hpp>
+//#endif
 
 #include <algorithm>
 #include <iterator>
@@ -119,12 +119,11 @@
 #	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
 #endif
 
+
 namespace gtl {
 
 	namespace literals {
 	};
-
-
 
 	// byte swap
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY)

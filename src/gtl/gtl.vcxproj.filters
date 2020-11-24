@@ -66,6 +66,9 @@
     <ClInclude Include="..\..\include\gtl\string\string_primitives.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\string\string_primitives.hpp">
+      <Filter>gtl\string</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
