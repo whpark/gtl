@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "gtl/gtl.h"
 
@@ -86,27 +86,62 @@ void TestFuncVar() {
 }
 #endif
 
+namespace template_instantiation {
 
+	template < typename T, typename T2 >
+	concept addable =
+	requires (T2 a) { a+a; a*a;};
+
+	template < typename T >
+	void func() {
+		if constexpr (addable<int, T>) {
+			static_assert(true);
+		}
+		else {
+			static_assert(false);
+		}
+	}
+
+	template <> void func<int>() {
+	}
+	template void func<float>();
+	//template void func<std::string_view>();
+
+};
 
 TEST(gtl_string, tszlen) {
+	{
+		char buf0[100];
+		std::array<char, 10> buf1;
+		std::vector<char> buf2;
+
+		auto const* v0 = data(buf0);
+		auto const* v1 = data(buf1);
+		auto const* v2 = data(buf2);
+		auto s1 = std::size(buf1);
+		auto s2 = std::size(buf2);
+	}
 
 	//tszlen
 	EXPECT_EQ(5, "asdfe"sv.size());
+	gtl::tszlen("123456789012");
 	EXPECT_EQ(12, gtl::tszlen("123456789012"));
 	EXPECT_EQ(11, (gtl::tszlen(u"asdfjaskdlf", u"asdfjaskdlf"sv.size()+1)));
-	EXPECT_EQ(3, gtl::tszlen(U"������"));
-	EXPECT_EQ(4, gtl::tszlen(u"�����ٶ�"));
-	EXPECT_EQ(4, gtl::tszlen(L"�����ٶ�"));
-	EXPECT_EQ(8, gtl::tszlen("�����ٶ�"));
-	constexpr char16_t const* sz3 = u"������";
+	EXPECT_EQ(3, gtl::tszlen(U"가나다"));
+	EXPECT_EQ(4, gtl::tszlen(u"가나다라"));
+	EXPECT_EQ(4, gtl::tszlen(L"가나다라"));
+	EXPECT_EQ(8, gtl::tszlen("가나다라"));
+	constexpr char16_t const* sz3 = u"가나다";
 	constexpr auto l0 = tszlen(sz3);	// will generate compiler warning ("NOT Secure")
 	static_assert(l0 == 3);
-	constexpr auto l1 = gtl::tszlen(u"������");
+	constexpr auto l1 = gtl::tszlen(u"가나다");
 	static_assert(l1 == 3);
 
 	char16_t sz[128] {u"abcdefghijklmnopqrstu_________________________"};
 	EXPECT_EQ(68-22, tszlen(sz));
 
+	std::vector<char> szVec{ {'1', '2', '3', '4', '5', 0}};
+	EXPECT_EQ(szVec.size()-1, tszlen(szVec));
 	std::array<char, 10> szArray {"ABCDEFG"};
 	EXPECT_EQ(7, tszlen(szArray));
 
@@ -129,73 +164,207 @@ TEST(gtl_string, tszcpy) {
 		auto const* pszLong = "long string................";
 		EXPECT_TRUE(ERANGE == tszcpy(buf.data(), buf.size(), pszLong));			// will generate compiler warning ("NOT Secure")
 		EXPECT_TRUE(     0 == tszlen(buf.data(), buf.size()));
+
+		EXPECT_TRUE(     0 == tszcpy(buf, psz1));								// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(buf.data() == "ABCDEF"sv);
+
+		std::array<char, 32> buf2;
+		EXPECT_TRUE(     0 == tszcpy(buf2, psz1));								// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(buf2.data() == "ABCDEF"sv);
+
+		char buf3[32]{};
+		EXPECT_TRUE(     0 == tszcpy(buf3, psz1));								// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(buf3 == "ABCDEF"sv);
+
+		EXPECT_TRUE(ERANGE == tszcpy(buf, pszLong));							// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(     0 == tszlen(buf));
 	}
 
 	// tszcpy from string_view
 	{
+		constexpr bool b = gtlc::string_container_fixed_c<std::basic_string_view<char>, char>;
+
 		char16_t buf[32] {};
-		EXPECT_TRUE(     0 == tszcpy(buf, u"�����ٶ󸶹ٻ�"sv));
-		EXPECT_TRUE(buf == u"�����ٶ󸶹ٻ�"sv);
+		EXPECT_TRUE(     0 == tszcpy(buf, size(buf), u"가나다라마바사"sv));
+		EXPECT_TRUE(     0 == tszcpy(buf, u"가나다라마바사"sv));
+		EXPECT_TRUE(buf == u"가나다라마바사"sv);
 	}
 	{
 		std::vector<char> buf;
-		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), buf.size(), "abcdef"sv));
+		EXPECT_TRUE(EINVAL == tszcpy(buf, "abcdef"sv));
 
 		buf.resize(10);
-		EXPECT_TRUE(     0 == tszcpy(buf.data(), buf.size(), "abcdef"sv));
+		EXPECT_TRUE(     0 == tszcpy(buf, "abcdef"sv));
 		EXPECT_TRUE(     0 == memcmp(buf.data(), "abcdef"sv.data(), 7*sizeof(buf[0])));
 		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), 0, "abcdef"sv));
-		EXPECT_TRUE(ERANGE == tszcpy(buf.data(), buf.size(), "long string...... ............"sv));
+		EXPECT_TRUE(ERANGE == tszcpy(buf, "long string...... ............"sv));
 	}
 	{
 		std::vector<char16_t> buf;
-		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), buf.size(), u"abcdef"sv));
+		EXPECT_TRUE(EINVAL == tszcpy(buf, u"abcdef"sv));
 
 		buf.resize(10);
-		EXPECT_TRUE(     0 == tszcpy(buf.data(), buf.size(), u"�����ٶ󸶹�"sv));
-		EXPECT_TRUE(     0 == memcmp(buf.data(), u"�����ٶ󸶹�"sv.data(), 7*sizeof(buf[0])));
+		EXPECT_TRUE(     0 == tszcpy(buf, u"가나다라마바"sv));
+		EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다라마바"sv.data(), 7*sizeof(buf[0])));
 		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), 0, u"abcdef"sv));
-		EXPECT_TRUE(ERANGE == tszcpy(buf.data(), buf.size(), u"long string...... ............"sv));
+		EXPECT_TRUE(ERANGE == tszcpy(buf, u"long string...... ............"sv));
 	}
 	{
 		std::vector<char32_t> buf;
-		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), buf.size(), U"abcdef"sv));
+		EXPECT_TRUE(EINVAL == tszcpy(buf, U"abcdef"sv));
 
 		buf.resize(10);
-		EXPECT_TRUE(     0 == tszcpy(buf.data(), buf.size(), U"�����ٶ󸶹�"sv));
-		EXPECT_TRUE(     0 == memcmp(buf.data(), U"�����ٶ󸶹�"sv.data(), 7*sizeof(buf[0])));
+		EXPECT_TRUE(     0 == tszcpy(buf, U"가나다라마바"sv));
+		EXPECT_TRUE(     0 == memcmp(buf.data(), U"가나다라마바"sv.data(), 7*sizeof(buf[0])));
 		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), 0, U"abcdef"sv));
-		EXPECT_TRUE(ERANGE == tszcpy(buf.data(), buf.size(), U"long string...... ............"sv));
+		EXPECT_TRUE(ERANGE == tszcpy(buf, U"long string...... ............"sv));
 	}
 	{
 		std::array<char16_t, 32> buf;
-		EXPECT_TRUE(     0 == tszcpy(buf, u"�����ٶ󸶹ٻ�"s));
-		EXPECT_TRUE(buf.data() == u"�����ٶ󸶹ٻ�"s);
+		EXPECT_TRUE(     0 == tszcpy(buf, u"가나다라마바사"s));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사"s);
 	}
 }
 
 TEST(gtl_string, tszncpy) {
 	std::vector<char16_t> buf;
-	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), buf.size(), u"�����ٶ󸶹ٻ�", _TRUNCATE));	// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), buf.size(), u"�����ٶ󸶹ٻ�", 4));			// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), buf.size(), u"가나다라마바사", _TRUNCATE));	// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 4));			// will generate compiler warning ("NOT Secure")
 	buf.resize(10);
-	EXPECT_TRUE(ERANGE == tszncpy(buf.data(), buf.size(), u"�����ٶ󸶹ٻ�", 10));			// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(EINVAL == tszncpy(buf.data(),          0, u"�����ٶ󸶹ٻ�", 2));			// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(     0 == tszncpy(buf.data(), buf.size(), u"�����ٶ󸶹ٻ�", 9));			// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(ERANGE == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 10));			// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(EINVAL == tszncpy(buf.data(),          0, u"가나다라마바사", 2));			// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 9));			// will generate compiler warning ("NOT Secure")
 
 	buf.resize(10);
-	EXPECT_TRUE(     0 == tszncpy(buf.data(), buf.size(), u"�����ٶ󸶹ٻ�", _TRUNCATE));	// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(     0 == memcmp(buf.data(), u"�����ٶ󸶹ٻ�", 8*sizeof(buf[0])));
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사", _TRUNCATE));	// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다라마바사", 8*sizeof(buf[0])));
 
-	EXPECT_TRUE(     0 == tszncpy(buf.data(), buf.size(), u"������", _TRUNCATE));			// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(     0 == memcmp(buf.data(), u"������", 4*sizeof(buf[0])));
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다", _TRUNCATE));			// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다", 4*sizeof(buf[0])));
 
-	EXPECT_TRUE(     0 == tszncpy(buf.data(), buf.size(), u"������", 5));					// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(     0 == memcmp(buf.data(), u"������", 3*sizeof(buf[0])));
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다", 5));					// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다", 3*sizeof(buf[0])));
 
 	buf.resize(5);
-	EXPECT_TRUE(     0 == tszncpy(buf.data(), buf.size(), u"�����ٶ󸶹ٻ�", 4));			// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(     0 == memcmp(buf.data(), u"�����ٶ�", 5*sizeof(buf[0])));
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사", 4));			// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다라", 5*sizeof(buf[0])));
+
+	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), 0, u"가나다라마바사"sv));
+	buf.resize(1);
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사"sv));
+	EXPECT_TRUE(ERANGE == tszncpy(buf, u"가나다라마바사"sv, 1));
+	buf.resize(32);
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사"sv, 3));
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다", 4*sizeof(buf[0])));
+
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사"sv, _TRUNCATE));
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다라마바사", 8*sizeof(buf[0])));
+
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다"sv, _TRUNCATE));
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다", 4*sizeof(buf[0])));
+
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다"sv, 5));
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다", 3*sizeof(buf[0])));
+
+	buf.resize(5);
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사"sv, 4));
+	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다라", 5*sizeof(buf[0])));
+}
+
+TEST(gtl_string, tszcat) {
+	{
+		std::vector<char16_t> buf;
+		EXPECT_TRUE(EINVAL == tszcat(buf.data(), 1, u"가나다라마바사"));						// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(EINVAL == tszcat(buf, (char16_t*)nullptr));								// will generate compiler warning ("NOT Secure")
+		buf.resize(32);
+		EXPECT_TRUE(EINVAL == tszcat(buf.data(), -1, u"가나다"));								// will generate compiler warning ("NOT Secure")
+
+		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"sv));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
+		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"sv));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사ABCDEFG"sv);
+
+		buf[0] = 0;
+		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"s));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
+		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"s));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사ABCDEFG"sv);
+	}
+	{
+		std::array<char16_t, 32> buf;
+		EXPECT_TRUE(ERANGE == tszcat(buf.data(), 1, u"가나다라마바사"sv));
+		EXPECT_TRUE(EINVAL == tszcat(buf.data(), -1, u"가나다"sv));
+
+		buf[0] = 0;
+		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"sv));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
+		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"sv));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사ABCDEFG"sv);
+
+		buf[0] = 0;
+		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"s));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
+		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"s));
+		EXPECT_TRUE(buf.data() == u"가나다라마바사ABCDEFG"sv);
+	}
+	{
+		char16_t buf[32];
+		EXPECT_TRUE(ERANGE == tszcat(buf, 1, u"가나다라마바사"sv));
+		EXPECT_TRUE(EINVAL == tszcat(buf, -1, u"가나다"sv));
+
+		buf[0] = 0;
+		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"sv));
+		EXPECT_TRUE(   buf == u"가나다라마바사"sv);
+		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"sv));
+		EXPECT_TRUE(   buf == u"가나다라마바사ABCDEFG"sv);
+
+		buf[0] = 0;
+		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"s));
+		EXPECT_TRUE(   buf == u"가나다라마바사"sv);
+		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"s));
+		EXPECT_TRUE(   buf == u"가나다라마바사ABCDEFG"sv);
+	}
+
+}
+
+TEST(gtl_string, tszrmchar) {
+	EXPECT_TRUE(     0 == tszrmchar((char*)nullptr, (char*)nullptr, '1'));
+
+	{
+		char buf[32]{"AhBhCDEFGh0123h4"};
+		EXPECT_TRUE(12 == tszrmchar(buf, buf+std::size(buf), 'h'));
+		EXPECT_TRUE(buf == "ABCDEFG01234"sv);
+		EXPECT_TRUE(12 == tszrmchar(buf, buf+std::size(buf), 'Z'));
+	}
+	{
+		char buf[32]{"AhBhCDEFGh0123h4"};
+		EXPECT_TRUE(12 == tszrmchar(buf, 'h'));
+		EXPECT_TRUE(buf == "ABCDEFG01234"sv);
+	}
+	{
+		std::array<char, 32> buf{"AhBhCDEFGh0123h4"};
+		EXPECT_TRUE(12 == tszrmchar(buf, 'h'));
+		EXPECT_TRUE(buf.data() == "ABCDEFG01234"sv);
+	}
+	{
+		std::vector<char> buf;
+		buf.resize(32);
+		tszcpy(buf, "AhBhCDEFGh0123h4"sv);
+		EXPECT_TRUE(12 == tszrmchar(buf, 'h'));
+		EXPECT_TRUE(buf.data() == "ABCDEFG01234"sv);
+	}
+
+	{
+		char16_t buf[32]{u"가나다ABC나0나12345나6789❤나💕나😁😉"};
+		EXPECT_TRUE(22 == tszrmchar(buf, buf+std::size(buf), u'나'));
+		EXPECT_TRUE(buf == u"가다ABC0123456789❤💕😁😉"sv);
+	}
+
+	{
+		char32_t buf[32]{U"가나다❤ABC0❤12345❤6789❤💕😁😉"};
+		EXPECT_TRUE(19 == tszrmchar(buf, U'❤'));
+		EXPECT_TRUE(buf == U"가나다ABC0123456789💕😁😉"sv);
+	}
 
 }
 
@@ -207,7 +376,7 @@ TEST(gtl_string, tszto) {
 
 
 	char16_t sz[30];
-	char16_t szS[]{u"�����ٶ󸶹ٻ�"};
+	char16_t szS[]{u"가나다라마바사"};
 	tszcpy(sz, std::basic_string_view{szS, szS+std::size(szS)});
 	static_assert(std::size(szS) == 7+1);
 
@@ -217,7 +386,7 @@ TEST(gtl_string, tszto) {
 	EXPECT_TRUE(CompareStringContainingNumbers(u"1"sv, u"1"sv) == 0);
 	EXPECT_TRUE(CompareStringContainingNumbers(u"1"sv, u"2"sv) < 0);
 	EXPECT_TRUE(CompareStringContainingNumbers(u"2"sv, u"1"sv) > 0);
-	EXPECT_TRUE(CompareStringContainingNumbers(u"01"sv, u"001"sv) < 0);	// ���� ���, ���̰� ����� ū ��
+	EXPECT_TRUE(CompareStringContainingNumbers(u"01"sv, u"001"sv) < 0);	// 같을 경우, 길이가 길수록 큰 값
 	EXPECT_TRUE(CompareStringContainingNumbers(u"10"sv, u"100"sv) < 0);
 	EXPECT_TRUE(CompareStringContainingNumbers(u"abcdef0123456789aaaa"sv, u"abcdef0000123456789aaaa"sv) < 0);
 	EXPECT_TRUE(CompareStringContainingNumbers(u"abcdef0123456789aaaa"sv, u"abcdef000012345678aaaa"sv) > 0);
@@ -232,7 +401,7 @@ TEST(gtl_string, tszto) {
 	auto a2 = gtl::tsztoi("12345"s);
 	auto a3 = gtl::tsztoi("12345");
 	auto a4 = gtl::tsztoi(CString("12345"));
-	EXPECT_TRUE(ToStringU16("�����ٶ󸶹ٻ������īŸ���σM�g�n�e���J�V") == u"�����ٶ󸶹ٻ������īŸ���σM�g�n�e���J�V");
+	EXPECT_TRUE(ToStringU16("가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍") == u"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍");
 
 	std::string str;
 	gtl::CStringA str2;

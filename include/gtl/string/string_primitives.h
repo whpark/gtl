@@ -42,6 +42,8 @@
 namespace gtl {
 #pragma pack(push, 8)
 
+#define GTL_DEPR_SEC [[deprecated("NOT Secure")]]
+
 	// todo : hpp 쪽으로 implementation 분리.
 	// todo : string primitives argument 에 string_view 추가
 
@@ -94,13 +96,10 @@ namespace gtl {
 	/// @return string length
 	/// @param pszMax : (end+1) of the allocated buffer.
 	/// @return string length. if not reached, SIZE_MAX.
-	template < gtlc::string_elem tchar >				constexpr		 [[nodiscard]] [[deprecated("NOT Secure")]] size_t tszlen(tchar const*const& psz);
-	template < gtlc::string_elem tchar >				constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax);
-	template < gtlc::string_elem tchar >				constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf);
-	template < gtlc::string_elem tchar, int sizeOfBuf > constexpr inline [[nodiscard]] size_t tszlen(tchar (&sz)[sizeOfBuf]);
-	template < gtlc::string_elem tchar, int sizeOfBuf > constexpr inline [[nodiscard]] size_t tszlen(tchar const (&sz)[sizeOfBuf]);
-	template < gtlc::string_elem tchar, int sizeOfBuf > constexpr inline [[nodiscard]] size_t tszlen(std::array<tchar, sizeOfBuf> const& sz);
-	template < gtlc::string_elem tchar, int sizeOfBuf > constexpr inline [[nodiscard]] size_t tszlen(std::array<tchar const, sizeOfBuf> const& sz);
+	template < gtlc::string_elem tchar >					constexpr		 [[nodiscard]] GTL_DEPR_SEC size_t tszlen(tchar const*const& psz);
+	template < gtlc::string_elem tchar >					constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax);
+	template < gtlc::string_elem tchar >					constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf);
+	template < gtlc::string_container_fixed tcontainer >	constexpr inline [[nodiscard]] size_t tszlen(tcontainer const& v);
 
 
 	// todo : documents...
@@ -116,66 +115,80 @@ namespace gtl {
 	/// EINVAL : if !pszDest || !pszSrc
 	/// ERANGE : if sizeDest is smaller
 	/// </returns>
-	template < gtlc::string_elem tchar >				constexpr		 [[deprecated("NOT Secure")]] errno_t tszcpy(tchar* const& pszDest, size_t sizeDest,	tchar const*const& pszSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline [[deprecated("NOT Secure")]] errno_t tszcpy(tchar (&szDest)[sizeDest],					tchar const*const& pszSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline [[deprecated("NOT Secure")]] errno_t tszcpy(std::array<tchar, sizeDest>& szDest,		tchar const*const& pszSrc);
+	template < gtlc::string_elem tchar >
+	constexpr		 GTL_DEPR_SEC errno_t tszcpy(tchar* const& pszDest, size_t sizeDest, tchar const*const& pszSrc);
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline GTL_DEPR_SEC errno_t tszcpy(tcontainer& szDest, tchar const* const pszSrc);
+
 
 	/// <summary>
 	/// tszcpy : utf8/16/32/wchar_t ver. of strcpy_s
 	/// </summary>
 	/// <param name="pszDest">dest. buffer</param>
 	/// <param name="sizeDest">size of dest. including null terminating char.</param>
+	/// <param name="szDest">
+	/// dest.
+	///  ex) char szDest[30];</param>
+	///      std::array<char16_t> szDest;</param>
+	///      std::vector<char> szDest;</param>
 	/// <param name="svSrc">source string. do not need to be NULL terminated string</param>
+	/// <param name="strSrc">source string.</param>
 	/// <returns>
 	/// 0 : ok.
 	/// EINVAL : if !pszDest
 	/// ERANGE : if sizeDest is not enough.
 	/// </returns>
-	template < gtlc::string_elem tchar >				constexpr		 errno_t tszcpy(tchar* pszDest, size_t sizeDest,		std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszcpy(tchar (&szDest)[sizeDest],				std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszcpy(std::array<tchar, sizeDest>& szDest,	std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar >				constexpr inline errno_t tszcpy(tchar* pszDest, size_t sizeDest,		std::basic_string<tchar> const& strSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszcpy(tchar (&szDest)[sizeDest],				std::basic_string<tchar> const& strSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszcpy(std::array<tchar, sizeDest>& szDest,	std::basic_string<tchar> const& strSrc);
+	template < gtlc::string_elem tchar >
+	constexpr errno_t tszcpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
+
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline errno_t tszcpy(tcontainer& szDest, std::basic_string_view<tchar> svSrc);
+
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline errno_t tszcpy(tcontainer& szDest, std::basic_string<tchar> const& strSrc);
 
 	// tszncpy
 	template < gtlc::string_elem tchar >
-	constexpr			[[deprecated("NOT Secure")]] errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, int sizeDest >
-	constexpr inline	[[deprecated("NOT Secure")]] errno_t tszncpy(tchar (&szDest)[sizeDest], tchar const* pszSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, int sizeDest >
-	constexpr inline	[[deprecated("NOT Secure")]] errno_t tszncpy(std::array<tchar, sizeDest>& szDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
+	constexpr			GTL_DEPR_SEC errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline	GTL_DEPR_SEC errno_t tszncpy(tcontainer& szDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
 
 	// tszncpy (sv)
-	template < gtlc::string_elem tchar >				constexpr		 errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszncpy(tchar (&szDest)[sizeDest], std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszncpy(std::array<tchar, sizeDest>& szDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar >				constexpr inline errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string<tchar> const& strSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszncpy(tchar (&szDest)[sizeDest], std::basic_string<tchar> const& strSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszncpy(std::array<tchar, sizeDest>& szDest, std::basic_string<tchar> const& strSrc, size_t nCount = _TRUNCATE);
+	template < gtlc::string_elem tchar >
+	constexpr		 errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline errno_t tszncpy(tcontainer &szDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline errno_t tszncpy(tcontainer &szDest, std::basic_string<tchar> const& svSrc, size_t nCount = _TRUNCATE);
 
 	// tszcat
-	template < gtlc::string_elem tchar >				constexpr		 [[deprecated("NOT Secure")]] errno_t tszcat(tchar* pszDest, size_t sizeDest, tchar const* pszSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline [[deprecated("NOT Secure")]] errno_t tszcat(tchar (&szDest)[sizeDest], tchar const* pszSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline [[deprecated("NOT Secure")]] errno_t tszcat(std::array<tchar, sizeDest>& szDest, tchar const* pszSrc);
+	template < gtlc::string_elem tchar >
+	constexpr		 GTL_DEPR_SEC errno_t tszcat(tchar* pszDest, size_t sizeDest, tchar const* pszSrc);
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline GTL_DEPR_SEC errno_t tszcat(tcontainer& szDest, tchar const* pszSrc);
 
-	template < gtlc::string_elem tchar >				constexpr		 errno_t tszcat(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszcat(tchar (&szDest)[sizeDest], std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar, int sizeDest >	constexpr inline errno_t tszcat(std::array<tchar, sizeDest>& szDest, std::basic_string_view<tchar> svSrc);
+	template < gtlc::string_elem tchar >
+	constexpr		 errno_t tszcat(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline errno_t tszcat(tcontainer &szDest, std::basic_string_view<tchar> svSrc);
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline errno_t tszcat(tcontainer &szDest, std::basic_string<tchar> const& strSrc);
 
 
 	/// @brief Remove Charactors from str.
 	/// @param psz 
 	/// @param chRemove 
 	/// @return str length
-	template < gtlc::string_elem tchar >				 constexpr [[deprecated("Not Secure")]]	size_t tszrmchar(tchar* const psz, tchar chRemove);
-	template < gtlc::string_elem tchar >				 constexpr inline size_t tszrmchar(tchar* const psz, tchar* const pszEnd, tchar chRemove);
-	template < gtlc::string_elem tchar, int sizeBuffer > constexpr inline size_t tszrmchar(tchar (&sz)[sizeBuffer], tchar chRemove);
-	template < gtlc::string_elem tchar, int sizeBuffer > constexpr inline size_t tszrmchar(std::array<tchar, sizeBuffer>& psz, tchar chRemove);
+	template < gtlc::string_elem tchar >
+	constexpr GTL_DEPR_SEC	size_t tszrmchar(tchar* const& psz, tchar chRemove);
+	template < gtlc::string_elem tchar >
+	constexpr size_t tszrmchar(tchar* const psz, tchar const* const pszMax, tchar chRemove);
+	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
+	constexpr inline size_t tszrmchar(tcontainer &sz, tchar chRemove);
 
 
 	template < gtlc::string_elem tchar >
-	constexpr [[nodiscard]] [[deprecated("Not Secure")]] int tszcmp(tchar const* pszA, tchar const* pszB);
+	constexpr [[nodiscard]] GTL_DEPR_SEC int tszcmp(tchar const* pszA, tchar const* pszB);
 
 	template < gtlc::string_elem tchar >
 	constexpr [[nodiscard]] int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount);

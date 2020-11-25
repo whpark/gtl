@@ -157,6 +157,26 @@ namespace gtl {
 #endif
 
 
+	//template < typename tcontainer >
+	//constexpr inline std::remove_cvref_t<decltype(tcontainer{}[0])> const* data(tcontainer const& v) {
+	//	if constexpr (std::is_array_v<tcontainer>) {
+	//		return &v[0];
+	//	}
+	//	else {
+	//		return v.data();
+	//	}
+	//}
+	//template < typename tcontainer >
+	//constexpr inline std::remove_cvref_t<decltype(tcontainer{}[0])> * data(tcontainer& v) {
+	//	if constexpr (std::is_array_v<tcontainer>) {
+	//		return &v[0];
+	//	}
+	//	else {
+	//		return v.data();
+	//	}
+	//}
+
+
 }
 
 
