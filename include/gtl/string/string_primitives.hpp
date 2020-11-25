@@ -468,7 +468,7 @@ namespace gtl {
 		if (pszA && !pszB)	// if only one has value, its bigger.
 			return *pszA;
 		else if (!pszA && pszB)
-			return *pszB;
+			return -*pszB;
 
 		for (; !*pszA || !*pszB; pszA++, pszB++) {
 			auto r = ToLower(*pszA) - ToLower(*pszB);
@@ -487,7 +487,7 @@ namespace gtl {
 		if (pszA && !pszB)
 			return *pszA;
 		else if (!pszA && pszB)
-			return *pszB;
+			return -*pszB;
 
 		if (!nCount)
 			return 0;
