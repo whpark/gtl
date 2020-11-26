@@ -38,7 +38,7 @@ namespace gtl {
 	/// char32_t character from utf8/16 string. (yet, NOT having std::generator...)
 	///   someday, upgrate to std::generator std::generator<tchar_return_t> ...
 	/// </summary>
-	template < gtlc::utf_string_elem tchar >
+	template < gtlc::string_elem_utf tchar >
 	class utf_string_view {
 	public:
 		using utf_char_return_t = char32_t;
@@ -128,7 +128,7 @@ namespace gtl {
 						code_ = ((position_[0] & uc::mask_6bit) << 6) | (position_[1] & uc::mask_6bit);
 						diff_to_next_ = 2;
 					}
-					else if ((position_[0] & 0b1111'0000) == 0b1110'000) {	// ~0xffff
+					else if ((position_[0] & 0b1111'0000) == 0b1110'0000) {	// ~0xffff
 						if ((position_ + 2 >= end_)
 							|| ((position_[1] & 0b1100'0000) != 0b1000'0000)
 							|| ((position_[2] & 0b1100'0000) != 0b1000'0000)
@@ -164,7 +164,7 @@ namespace gtl {
 							throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. invalid trailing surrogate" };
 
 						constexpr static uint32_t const pre = 0x1'0000 - ((uc::fSurrogateW1.first << uc::nBitSurrogate) + uc::fSurrogateW2.first);
-						code_ = (pre + (position_[0] << 10) + position_[1]);
+						code_ = (pre + (uint32_t)(position_[0] << 10) + position_[1]);
 						diff_to_next_ = 2;
 					}
 					else {

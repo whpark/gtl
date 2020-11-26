@@ -81,11 +81,14 @@ namespace gtl {
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */) { if ((c >= 'A') && (c <= 'Z')) return c - 'A' + 'a'; return c; }
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */) { if ((c >= 'a') && (c <= 'z')) return c - 'a' + 'A'; return c; }
+	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c/* Locale Irrelavant */) { if ((c >= 'A') && (c <= 'Z')) c += 'a' - 'A'; }
+	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c/* Locale Irrelavant */) { if ((c >= 'a') && (c <= 'z')) c -= 'a' - 'A'; }
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '9'); }
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '7'); }
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c/* Locale Irrelavant */) { return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F')); }
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsSpace(tchar const c/* Locale Irrelavant */) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsNotSpace(tchar const c/* Locale Irrelavant */) { return !IsSpace(c); }
+
 
 
 	/// @brief  tszlen (string length). you cannot input string literal. you don't need tszlen("testlen");. ==> just call "testlen"sv.size();
@@ -122,12 +125,8 @@ namespace gtl {
 	constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf) {
 		return tszlen(psz, psz + sizeOfBuf);
 	}
-	//template < gtlc::string_elem tchar, int sizeOfBuf >
-	//constexpr inline [[nodiscard]] size_t tszlen(tchar const (&sz)[sizeOfBuf]) {
-	//	return internal::tszlen(sz, sz+sizeOfBuf);
-	//}
-	template < gtlc::string_container_fixed tcontainer >
-	constexpr inline [[nodiscard]] size_t tszlen(tcontainer const& v) {
+	template < gtlc::string_buffer_fixed tstring_buf >
+	constexpr inline [[nodiscard]] size_t tszlen(tstring_buf const& v) {
 		return tszlen(std::data(v), std::size(v));
 	}
 
@@ -146,7 +145,7 @@ namespace gtl {
 	/// ERANGE : if sizeDest is smaller
 	/// </returns>
 	template < gtlc::string_elem tchar >
-	constexpr GTL_DEPR_SEC errno_t tszcpy(tchar* const& pszDest, size_t sizeDest, tchar const*const& pszSrc) {
+	constexpr GTL_DEPR_SEC errno_t tszcpy(tchar* const& pszDest, size_t sizeDest, tchar const* const& pszSrc) {
 		if (!pszDest or !sizeDest or (sizeDest > RSIZE_MAX))
 			return EINVAL;
 		tchar* pos = pszDest;
@@ -164,8 +163,8 @@ namespace gtl {
 		pszDest[0] = 0;
 		return ERANGE;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline GTL_DEPR_SEC errno_t tszcpy(tcontainer& szDest, tchar const* const pszSrc) {
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline GTL_DEPR_SEC errno_t tszcpy(tstring_buf& szDest, tchar const* const& pszSrc) {
 #pragma warning(suppress:4996)
 		return tszcpy(std::data(szDest), std::size(szDest), pszSrc);
 	}
@@ -199,14 +198,14 @@ namespace gtl {
 		return 0;
 	}
 
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszcpy(tcontainer& szDest, std::basic_string_view<tchar> svSrc) {
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string_view<tchar> svSrc) {
 		tchar* const pszDest = std::data(szDest);
 		size_t sizeDest = std::size(szDest);
 		return tszcpy(pszDest, sizeDest, svSrc);
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszcpy(tcontainer& szDest, std::basic_string<tchar> const& strSrc) {
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string<tchar> const& strSrc) {
 		tchar* const pszDest = std::data(szDest);
 		size_t sizeDest = std::size(szDest);
 		return tszcpy(pszDest, sizeDest, std::basic_string_view{strSrc.data(), strSrc.size()});
@@ -214,7 +213,7 @@ namespace gtl {
 	}
 
 #if 0	// any type <- any type.... 너무 많은 옵션.
-	template < gtlc::string_container_fixed tcontainer1, gtlc::string_container_fixed tcontainer2 >
+	template < gtlc::string_buffer_fixed tcontainer1, gtlc::string_buffer_fixed tcontainer2 >
 	requires requires (tcontainer1 t1, tcontainer2 t2) {
 		requires std::is_same_v<std::remove_cvref_t<decltype(t1[0])>, std::remove_cvref_t<decltype(t2[0])> >
 		&& gtlc::string_elem<std::remove_cvref_t<decltype(t1[0])>>;
@@ -243,7 +242,7 @@ namespace gtl {
 
 	// tszncpy
 	template < gtlc::string_elem tchar >
-	constexpr GTL_DEPR_SEC errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount) {
+	constexpr errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount) {
 		if (!pszDest or !sizeDest or (sizeDest > RSIZE_MAX) )
 			return EINVAL;
 		tchar* pos = pszDest;
@@ -268,9 +267,8 @@ namespace gtl {
 		*pos = 0;	// null terminator
 		return 0;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline GTL_DEPR_SEC errno_t tszncpy(tcontainer &szDest, tchar const* pszSrc, size_t nCount) {
-#pragma warning(suppress:4996)
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszncpy(tstring_buf &szDest, tchar const* pszSrc, size_t nCount) {
 		return tszncpy(std::data(szDest), std::size(szDest), pszSrc, nCount);
 	}
 
@@ -293,17 +291,19 @@ namespace gtl {
 		tchar* const MaxEnd = pszDest + nCount;	// not sizeDest
 		for (; pos < MaxEnd; pos++, posSrc++) {
 			*pos = *posSrc;
+			if (!*pos)
+				return 0;
 		}
 		*pos = 0;	// null terminator
 		return 0;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszncpy(tcontainer &szDest, std::basic_string_view<tchar> svSrc, size_t nCount) {
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string_view<tchar> svSrc, size_t nCount) {
 		return tszncpy(std::data(szDest), std::size(szDest), svSrc, nCount);
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszncpy(tcontainer &szDest, std::basic_string<tchar> const& strSrc, size_t nCount) {
-		return tszncpy(std::data(szDest), std::size(szDest), std::basic_string_view<tchar>{strSrc.data(), strSrc.end()}, nCount);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string<tchar> const& strSrc, size_t nCount) {
+		return tszncpy(std::data(szDest), std::size(szDest), std::basic_string_view<tchar>{strSrc}, nCount);
 	}
 
 	// tszcat
@@ -323,15 +323,15 @@ namespace gtl {
 		tchar const* posSrc = pszSrc;
 		for (; pos < pszMax; pos++, posSrc++) {
 			*pos = *posSrc;
-			if (!*posSrc)
+			if (!*pos)
 				return 0;
 		}
 		// pszSrc is longer
 		pszDest[0] = 0;
 		return ERANGE;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline GTL_DEPR_SEC errno_t tszcat(tcontainer &szDest, tchar const* pszSrc) {
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline GTL_DEPR_SEC errno_t tszcat(tstring_buf &szDest, tchar const* pszSrc) {
 #pragma warning(suppress:4996)
 		return tszcat(std::data(szDest), std::size(szDest), pszSrc);
 	}
@@ -352,16 +352,18 @@ namespace gtl {
 		tchar const* const pszSrcEnd = posSrc + svSrc.size();
 		for (; (pos < pszMax) and (posSrc < pszSrcEnd); pos++, posSrc++) {
 			*pos = *posSrc;
+			if (!*pos)
+				return 0;
 		}
 		*pos = 0;
 		return 0;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline GTL_DEPR_SEC errno_t tszcat(tcontainer &szDest, std::basic_string_view<tchar> svSrc) {
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string_view<tchar> svSrc) {
 		return tszcat(std::data(szDest), std::size(szDest), svSrc);
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline GTL_DEPR_SEC errno_t tszcat(tcontainer &szDest, std::basic_string<tchar> const& strSrc) {
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string<tchar> const& strSrc) {
 		return tszcat(std::data(szDest), std::size(szDest), std::basic_string_view{strSrc.data(), strSrc.size()});
 	}
 
@@ -411,168 +413,135 @@ namespace gtl {
 		}
 		return pos - psz;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline size_t tszrmchar(tcontainer &sz, tchar chRemove) {
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline size_t tszrmchar(tstring_buf &sz, tchar chRemove) {
 		return tszrmchar(std::data(sz), std::data(sz) + std::size(sz), chRemove);
 	}
 
-
-	template < gtlc::string_elem tchar >
-	constexpr [[nodiscard]] GTL_DEPR_SEC int tszcmp(tchar const* pszA, tchar const* pszB) {
-		if (!pszA && !pszB)	// if both are nullptr, return 0;
-			return 0;
-		if (pszA && !pszB)	// if only one has value, its bigger.
-			return *pszA;
-		else if (!pszA && pszB)
-			return -*pszB;
-
-		for (; !*pszA || !*pszB; pszA++, pszB++) {
-			auto r = *pszA - *pszB;
-			if (!r)
-				return r;
-		}
-		if (!*pszA && !*pszB)
-			return 0;
-		auto r = *pszA - *pszB;
-		return r;
-	}
-
-	template < gtlc::string_elem tchar >
-	constexpr [[nodiscard]] int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount) {
-		if ((!pszA and !pszB) or !nCount or (nCount > RSIZE_MAX))
-			return 0;
-		if (pszA && !pszB)
-			return *pszA;
-		else if (!pszA && pszB)
-			return -*pszB;
-
-		if (!nCount)
-			return 0;
-
-		for (; !*pszA || !*pszB; pszA++, pszB++) {
-			auto r = *pszA - *pszB;
-			if (!r)
-				return r;
-			if (--nCount == 0)
+	namespace internal {
+		template < gtlc::string_elem tchar, bool bUseCount, class Eval >
+		constexpr [[nodiscard]] int tszcmp(tchar const* pszA, tchar const* pszB, size_t nCount, Eval&& eval) {
+			if constexpr (bUseCount) {
+				if (!nCount or (nCount > RSIZE_MAX))
+					return 0;
+			}
+			if (!pszA && !pszB)	// if both are nullptr, return 0;
 				return 0;
-		}
-		if (!*pszA && !*pszB)
-			return 0;
-		auto r = *pszA - *pszB;
-		return r;
-	}
-	template < gtlc::string_elem tchar >
-	int tszicmp(tchar const* pszA, tchar const* pszB) {
-		if (!pszA && !pszB)	// if both are nullptr, return 0;
-			return 0;
-		if (pszA && !pszB)	// if only one has value, its bigger.
-			return *pszA;
-		else if (!pszA && pszB)
-			return -*pszB;
+			if (pszA && !pszB)	// if only one has value, its bigger.
+				return *pszA ? *pszA : 1;
+			else if (!pszA && pszB)
+				return *pszB ? -*pszB : -1;
 
-		for (; !*pszA || !*pszB; pszA++, pszB++) {
-			auto r = ToLower(*pszA) - ToLower(*pszB);
-			if (!r)
-				return r;
-		}
-		if (!*pszA && !*pszB)
-			return 0;
-		auto r = *pszA - *pszB;
-		return r;
-	}
-	template < gtlc::string_elem tchar >
-	int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount) {
-		if (!pszA && !pszB)
-			return 0;
-		if (pszA && !pszB)
-			return *pszA;
-		else if (!pszA && pszB)
-			return -*pszB;
-
-		if (!nCount)
-			return 0;
-
-		for (; !*pszA || !*pszB; pszA++, pszB++) {
-			auto r = ToLower(*pszA) - ToLower(*pszB);
-			if (!r)
-				return r;
-			if (--nCount == 0)
+			for (; *pszA && *pszB; pszA++, pszB++) {
+				int r = eval(*pszA, *pszB);
+				if (r)
+					return r;
+				if constexpr (bUseCount) {
+					if (--nCount == 0)
+						return 0;
+				}
+			}
+			if (!*pszA && !*pszB)
 				return 0;
+			auto r = eval(*pszA, *pszB);
+			return r;
 		}
-		if (!*pszA && !*pszB)
-			return 0;
-		auto r = *pszA - *pszB;
-		return r;
 	}
 
+
 	template < gtlc::string_elem tchar >
-	errno_t tszupr(tchar* sz, size_t nCount) {
-		if (!sz)
+	constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszcmp(tchar const* pszA, tchar const* pszB) {
+		return gtl::internal::tszcmp<tchar, false>(pszA, pszB, {}, [](tchar a, tchar b) -> int {return (int)a - (int)b;});
+	}
+	template < gtlc::string_elem tchar >
+	constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount) {
+		return gtl::internal::tszcmp<tchar, true>(pszA, pszB, nCount, [](tchar a, tchar b) -> int {return (int)a - (int)b;});
+	}
+	template < gtlc::string_elem tchar >
+	constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszicmp(tchar const* pszA, tchar const* pszB) {
+		return gtl::internal::tszcmp<tchar, false>(pszA, pszB, {}, [](tchar a, tchar b) -> int {return (int)ToLower(a) - (int)ToLower(b);});
+	}
+	template < gtlc::string_elem tchar >
+	constexpr inline GTL_DEPR_SEC [[nodiscard]] int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount) {
+		return gtl::internal::tszcmp<tchar, true>(pszA, pszB, nCount, [](tchar a, tchar b) -> int {return (int)ToLower(a) - (int)ToLower(b);});
+	}
+
+	template < gtlc::string_buffer_fixed tstring_buf >
+	errno_t tszupr(tstring_buf& buf) {
+		if (!std::data(buf))
 			return EINVAL;
-		for (size_t i = 0; i < nCount; i++) {
-			auto& c = *sz++;
+		if (std::size(buf) > RSIZE_MAX)
+			return ERANGE;
+		for (auto& c : buf) {
 			if (!c)
 				break;
-			c = ToUpper(c);
+			MakeUpper(c);
 		}
 		return 0;
 	}
-	template < gtlc::string_elem tchar, int sizeBuffer >
-	errno_t tszupr(tchar (&sz)[sizeBuffer]) {
-		for (auto& c : sz) {
-			if (!c)
-				break;
-			c = ToUpper(c);
-		}
-		return 0;
-	}
-	template < gtlc::string_elem tchar, int sizeBuffer >
-	errno_t tszupr(std::array<tchar, sizeBuffer>& sz) {
-		for (auto& c : sz) {
-			if (!c)
-				break;
-			c = ToUpper(c);
-		}
-		return 0;
-	}
-
 	template < gtlc::string_elem tchar >
-	errno_t tszlwr(tchar* sz, size_t nCount) {
-		if (!sz)
+	errno_t tszupr(tchar* const psz, size_t size) {
+		if (!psz)
 			return EINVAL;
-		for (size_t i = 0; i < nCount; i++) {
-			auto& c = *sz++;
-			if (!c)
+		if (size > RSIZE_MAX)
+			return ERANGE;
+		tchar* pos = psz;
+		for (size_t i = 0; i < size; i++) {
+			if (!*pos)
 				break;
-			c = ToLower(c);
-		}
-		return 0;
-	}
-	template < gtlc::string_elem tchar, int sizeBuffer >
-	errno_t tszlwr(tchar(&sz)[sizeBuffer]) {
-		for (auto& c : sz) {
-			if (!c)
-				break;
-			c = ToLower(c);
-		}
-		return 0;
-	}
-	template < gtlc::string_elem tchar, int sizeBuffer >
-	errno_t tszlwr(std::array<tchar, sizeBuffer>& sz) {
-		for (auto& c : sz) {
-			if (!c)
-				break;
-			c = ToLower(c);
+			MakeUpper(*pos);
 		}
 		return 0;
 	}
 
+	template < gtlc::string_buffer_fixed tstring_buf >
+	errno_t tszlwr(tstring_buf& buf) {
+		if (!std::data(buf))
+			return EINVAL;
+		if (std::size(buf) > RSIZE_MAX)
+			return ERANGE;
+		for (auto& c : buf) {
+			if (!c)
+				break;
+			MakeLower(c);
+		}
+		return 0;
+	}
 	template < gtlc::string_elem tchar >
-	tchar* tszrev(tchar* psz) {
+	errno_t tszlwr(tchar* const& psz, size_t size) {
+		if (!psz)
+			return EINVAL;
+		if (size > RSIZE_MAX)
+			return ERANGE;
+		tchar* pos = psz;
+		for (size_t i = 0; i < size; i++) {
+			if (!*pos)
+				break;
+			MakeLower(*pos);
+		}
+		return 0;
+	}
+
+	//template < gtlc::string_elem tchar >
+	//GTL_DEPR_SEC tchar* tszrev(tchar* psz) {
+	//	if (!psz)
+	//		return nullptr;
+	//	std::reverse(psz, psz + tszlen(psz));
+	//	return psz;
+	//}
+	template < gtlc::string_elem tchar >
+	tchar* tszrev(tchar* psz, tchar const* const pszEnd) {
 		if (!psz)
 			return nullptr;
-		std::reverse(psz, psz + tszlen(psz));
+		std::reverse(psz, pszEnd);
+		return psz;
 	}
+	template < gtlc::string_buffer_fixed tstring_buf >
+	std::remove_cvref_t<decltype(tstring_buf{}[0])>* tszrev(tstring_buf& buf) {
+		std::reverse(std::data(buf), std::data(buf)+tszlen(buf, std::size(buf)));
+		return std::data(buf);
+	}
+
 	template < gtlc::string_elem tchar >
 	tchar const* tszsearch(tchar const* psz, tchar c) {
 		if (!psz)
@@ -637,7 +606,7 @@ namespace gtl {
 	/// <summary>
 	/// digit contants to integral type value.
 	///  - radix detecting (c++ notation)
-	///	   ex "0b1001'1100", "0xABCD1234", "0b1234568"
+	///	   ex "0b1001'1100", "0xABCD1234", "0123456"
 	///  - digit seperator (such as ',' or '\'' for c++ notation.)
 	///  - only throws when (radix > 36)
 	/// </summary>
@@ -978,9 +947,7 @@ namespace gtl {
 		else if (pszB < pszBend)
 			return -*pszB;
 
-		if constexpr (bIgnoreCase)
-			return tszicmp(pszA, pszB);
-		return tszcmp(pszA, pszB);
+		return 0;
 	}
 	template < gtlc::string_elem tchar >
 	constexpr int CompareStringContainingNumbers(std::basic_string<tchar> const& strA, std::basic_string<tchar> const& strB, bool bIgnoreCase) {

@@ -42,8 +42,6 @@
 namespace gtl {
 #pragma pack(push, 8)
 
-#define GTL_DEPR_SEC [[deprecated("NOT Secure")]]
-
 	// todo : hpp 쪽으로 implementation 분리.
 	// todo : string primitives argument 에 string_view 추가
 
@@ -51,6 +49,70 @@ namespace gtl {
 	/// @brief pre-defines : basic_string_t
 	template < gtlc::string_elem tchar, class ttraits = std::char_traits<tchar>, class tallocator = std::allocator<tchar> >
 	using basic_string_t = std::basic_string<tchar, ttraits, tallocator>;
+
+
+#if 0	// NOT available. Template Argument Deductino for Function Argument is NOT, YET!
+	template < gtlc::string_elem tchar >
+		requires (std::is_same_v<std::remove_const_t<tchar>, tchar>)
+	class tstr_buf {
+	public:
+		tchar* const psz_;
+		//[[no_unique_address]]std::enable_if_t<bSized, tchar const* const> pszEnd_;
+		tchar const* const pszEnd_;
+		bool const bSized_;
+
+	public:
+		tstr_buf() = delete;
+		tstr_buf(tstr_buf const&) = default;
+		tstr_buf(tstr_buf &&) = default;
+		tstr_buf& operator = (tstr_buf const&) = default;
+		tstr_buf& operator = (tstr_buf &&) = default;
+
+		constexpr tstr_buf(tchar* const& psz) : psz_(psz), pszEnd_(nullptr), bSized_(false) {}
+
+		constexpr tstr_buf(tchar* const& psz, size_t size) : psz_(psz), pszEnd_(), bSized_(false) {}
+
+		template < size_t size >
+		constexpr tstr_buf(tchar(&sz)[size]) : psz_(sz), pszEnd_(sz+size), bSized_(true) {} 
+
+		template < typename tstring_buf >
+		requires (gtlc::string_buffer_fixed_c<tstring_buf, tchar>
+			and !std::is_convertible_v<tstring_buf, std::basic_string<tchar>>
+			and !std::is_convertible_v<tstring_buf, std::basic_string_view<tchar>>)
+		constexpr tstr_buf(tstring_buf const& sv) : psz_(std::data(sv)), pszEnd_(std::data(sv)+std::size(sv)), bSized_(true) {}
+
+	};
+
+	template < gtlc::string_elem tchar >
+	class tstr_view {
+	public:
+		tchar const* const psz_;
+		//[[no_unique_address]]std::enable_if_t<bSized, tchar const* const> pszEnd_;
+		tchar const* const pszEnd_;
+		bool const bSized_{};
+
+	public:
+		tstr_view() = delete;
+		tstr_view(tstr_view const&) = default;
+		tstr_view(tstr_view &&) = default;
+		tstr_view& operator = (tstr_view const&) = default;
+		tstr_view& operator = (tstr_view &&) = default;
+
+		constexpr tstr_view(tchar const * const& psz) : psz_(psz), pszEnd_(nullptr), bSized_(false) {}
+
+		constexpr tstr_view(tchar const * const& psz, size_t size) : psz_(psz), pszEnd_(psz_+size), bSized_(true) {}
+
+		template < size_t size >
+		constexpr tstr_view(tchar const (&sz)[size]) : psz_(sz), pszEnd_(sz+size), bSized_(true) {} 
+
+		template < gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+		constexpr tstr_view(tstring_buf const& sv) : psz_(std::data(sv)), pszEnd_(std::data(sv)+std::size(sv)), bSized_(true) {}
+
+	};
+
+	template < typename tchar, size_t size >
+	tstr_view(tchar const[size]) -> tstr_view<tchar>;
+#endif
 
 	//-----------------------------------------------------------------------------
 	/// @brief  misc. GetSpaceString()
@@ -96,83 +158,74 @@ namespace gtl {
 	/// @return string length
 	/// @param pszMax : (end+1) of the allocated buffer.
 	/// @return string length. if not reached, SIZE_MAX.
-	template < gtlc::string_elem tchar >					constexpr		 [[nodiscard]] GTL_DEPR_SEC size_t tszlen(tchar const*const& psz);
-	template < gtlc::string_elem tchar >					constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax);
-	template < gtlc::string_elem tchar >					constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf);
-	template < gtlc::string_container_fixed tcontainer >	constexpr inline [[nodiscard]] size_t tszlen(tcontainer const& v);
-
+	template < gtlc::string_elem tchar >				constexpr		 [[nodiscard]] GTL_DEPR_SEC size_t tszlen(tchar const*const& psz);
+	template < gtlc::string_elem tchar >				constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax);
+	template < gtlc::string_elem tchar >				constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf);
+	template < gtlc::string_buffer_fixed tstring_buf >	constexpr inline [[nodiscard]] size_t tszlen(tstring_buf const& v);
 
 	// todo : documents...
 
-	/// <summary>
-	/// tszcpy : utf8/16/32/wchar_t ver. of strcpy_s
-	/// </summary>
-	/// <param name="pszDest"></param>
-	/// <param name="sizeDest"></param>
-	/// <param name="pszSrc"></param>
-	/// <returns>
-	/// 0 : ok.
-	/// EINVAL : if !pszDest || !pszSrc
-	/// ERANGE : if sizeDest is smaller
-	/// </returns>
+	/// @brief utf8/16/32/wchar_t ver. of strcpy_s
+	/// @param pszDest 
+	/// @param sizeDest 
+	/// @param pszSrc 
+	/// @return 0 : ok.
+	///  EINVAL : if !pszDest || !pszSrc
+	///  ERANGE : if sizeDest is smaller
 	template < gtlc::string_elem tchar >
 	constexpr		 GTL_DEPR_SEC errno_t tszcpy(tchar* const& pszDest, size_t sizeDest, tchar const*const& pszSrc);
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline GTL_DEPR_SEC errno_t tszcpy(tcontainer& szDest, tchar const* const pszSrc);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline GTL_DEPR_SEC errno_t tszcpy(tstring_buf& szDest, tchar const* const& pszSrc);
 
 
-	/// <summary>
-	/// tszcpy : utf8/16/32/wchar_t ver. of strcpy_s
-	/// </summary>
-	/// <param name="pszDest">dest. buffer</param>
-	/// <param name="sizeDest">size of dest. including null terminating char.</param>
-	/// <param name="szDest">
-	/// dest.
+	/// @brief tszcpy utf8/16/32/wchar_t ver. of strcpy_s
+	/// @param pszDest dest. buffer
+	/// @param sizeDest size of dest. including null terminating char.</param>
+	/// @param szDest dest. string buffer. 
 	///  ex) char szDest[30];</param>
 	///      std::array<char16_t> szDest;</param>
 	///      std::vector<char> szDest;</param>
-	/// <param name="svSrc">source string. do not need to be NULL terminated string</param>
-	/// <param name="strSrc">source string.</param>
-	/// <returns>
-	/// 0 : ok.
-	/// EINVAL : if !pszDest
-	/// ERANGE : if sizeDest is not enough.
-	/// </returns>
+	/// @param svSrc source string. do not need to be NULL terminated string</param>
+	/// @param strSrc null terminated source string.
+	/// @return 
+	///  0 : ok.
+	///  EINVAL : if !pszDest
+	///  ERANGE : if sizeDest is not enough.
 	template < gtlc::string_elem tchar >
 	constexpr errno_t tszcpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
 
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszcpy(tcontainer& szDest, std::basic_string_view<tchar> svSrc);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string_view<tchar> svSrc);
 
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszcpy(tcontainer& szDest, std::basic_string<tchar> const& strSrc);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string<tchar> const& strSrc);
 
 	// tszncpy
 	template < gtlc::string_elem tchar >
-	constexpr			GTL_DEPR_SEC errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline	GTL_DEPR_SEC errno_t tszncpy(tcontainer& szDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
+	constexpr		 errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszncpy(tstring_buf& szDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
 
 	// tszncpy (sv)
 	template < gtlc::string_elem tchar >
 	constexpr		 errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszncpy(tcontainer &szDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszncpy(tcontainer &szDest, std::basic_string<tchar> const& svSrc, size_t nCount = _TRUNCATE);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string<tchar> const& svSrc, size_t nCount = _TRUNCATE);
 
 	// tszcat
 	template < gtlc::string_elem tchar >
 	constexpr		 GTL_DEPR_SEC errno_t tszcat(tchar* pszDest, size_t sizeDest, tchar const* pszSrc);
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline GTL_DEPR_SEC errno_t tszcat(tcontainer& szDest, tchar const* pszSrc);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline GTL_DEPR_SEC errno_t tszcat(tstring_buf& szDest, tchar const* pszSrc);
 
 	template < gtlc::string_elem tchar >
 	constexpr		 errno_t tszcat(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszcat(tcontainer &szDest, std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline errno_t tszcat(tcontainer &szDest, std::basic_string<tchar> const& strSrc);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string_view<tchar> svSrc);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string<tchar> const& strSrc);
 
 
 	/// @brief Remove Charactors from str.
@@ -183,41 +236,35 @@ namespace gtl {
 	constexpr GTL_DEPR_SEC	size_t tszrmchar(tchar* const& psz, tchar chRemove);
 	template < gtlc::string_elem tchar >
 	constexpr size_t tszrmchar(tchar* const psz, tchar const* const pszMax, tchar chRemove);
-	template < gtlc::string_elem tchar, gtlc::string_container_fixed_c<tchar> tcontainer >
-	constexpr inline size_t tszrmchar(tcontainer &sz, tchar chRemove);
+	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	constexpr inline size_t tszrmchar(tstring_buf &sz, tchar chRemove);
 
 
-	template < gtlc::string_elem tchar >
-	constexpr [[nodiscard]] GTL_DEPR_SEC int tszcmp(tchar const* pszA, tchar const* pszB);
+	template < gtlc::string_elem tchar > constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszcmp(tchar const* pszA, tchar const* pszB);
+	template < gtlc::string_elem tchar > constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount);
+	template < gtlc::string_elem tchar > constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszicmp(tchar const* pszA, tchar const* pszB);
+	template < gtlc::string_elem tchar > constexpr inline GTL_DEPR_SEC [[nodiscard]] int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount);
 
-	template < gtlc::string_elem tchar >
-	constexpr [[nodiscard]] int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount);
 
-	template < gtlc::string_elem tchar >
-	int tszicmp(tchar const* pszA, tchar const* pszB);
+	template < gtlc::string_buffer_fixed tstring_buf >	errno_t tszupr(tstring_buf& buf);
+	template < gtlc::string_elem tchar >			 	errno_t tszupr(tchar* const psz, size_t size);
+	template < gtlc::string_buffer_fixed tstring_buf >	errno_t tszlwr(tstring_buf& buf);
+	template < gtlc::string_elem tchar >			 	errno_t tszlwr(tchar* const& psz, size_t size);
 
-	template < gtlc::string_elem tchar >
-	int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount);
+	//template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar* tszrev(tchar* psz);
+	template < gtlc::string_elem tchar >			  [[nodiscard]] tchar* tszrev(tchar* psz, tchar const* const pszEnd);
+	template < gtlc::string_buffer_fixed tstring_buf > std::remove_cvref_t<decltype(tstring_buf{}[0])>* tszrev(tstring_buf& buf);
 
-	template < gtlc::string_elem tchar >					errno_t tszupr(tchar* sz, size_t nCount);
-	template < gtlc::string_elem tchar, int sizeBuffer >	errno_t tszupr(tchar (&sz)[sizeBuffer]);
-	template < gtlc::string_elem tchar, int sizeBuffer >	errno_t tszupr(std::array<tchar, sizeBuffer>& sz);
-
-	template < gtlc::string_elem tchar >					errno_t tszlwr(tchar* sz, size_t nCount);
-	template < gtlc::string_elem tchar, int sizeBuffer >	errno_t tszlwr(tchar(&sz)[sizeBuffer]);
-	template < gtlc::string_elem tchar, int sizeBuffer >	errno_t tszlwr(std::array<tchar, sizeBuffer>& sz);
-
-	template < gtlc::string_elem tchar > [[nodiscard]] tchar* tszrev(tchar* psz);
-	template < gtlc::string_elem tchar > [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar c);
-	template < gtlc::string_elem tchar > [[nodiscard]] tchar* tszsearch(tchar* psz, tchar c);
-	template < gtlc::string_elem tchar > [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar const* pszSub);
-	template < gtlc::string_elem tchar > [[nodiscard]] tchar* tszsearch(tchar* psz, tchar* pszSub);
+	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar c);
+	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar* tszsearch(tchar* psz, tchar c);
+	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar const* pszSub);
+	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar* tszsearch(tchar* psz, tchar* pszSub);
 
 
 	/// <summary>
 	/// digit contants to integral type value.
 	///  - radix detecting (c++ notation)
-	///	   ex "0b1001'1100", "0xABCD1234", "0b1234568"
+	///	   ex "0b1001'1100", "0xABCD1234", "0123456"
 	///  - digit seperator (such as ',' or '\'' for c++ notation.)
 	///  - only throws when (radix > 36)
 	/// </summary>

@@ -1,2 +1,2 @@
-copy HangeulCodeTable.cpp ..\gtl\
-copy HangeulCodeTable.h ..\..\include\gtl\string\
+copy HangeulCodeMap*.cpp ..\gtl\
+copy HangeulCodeMap.h ..\..\include\gtl\string\

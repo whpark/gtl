@@ -7,107 +7,98 @@ using namespace gtl::literals;
 
 using namespace gtl;
 
-namespace {
-	using namespace std;
+//#if 0
+//template < typename tchar >				void TestFuncAsConst(tchar const* psz, size_t size) {}
+//
+//template < typename tchar, int size >	void TestFuncAsConst(tchar const (&sz)[size]) {}
+//template < typename tchar, int size >	void TestFuncAsConst(std::array<tchar, size> const& sz) {}
+//template < typename tchar >				[[deprecated("NotSecure")]]void TestFuncAsConst(tchar const*const& psz) {}
+//template < typename tchar >				void TestFuncAsConst(std::basic_string_view<tchar> sv) {}
+//template < typename tchar >				void TestFuncAsConst(std::basic_string<tchar> const& str) {}
+//char const* SomeFunc() { return nullptr; }
+//
+//template < typename tchar, int size >	void TestFuncAsNonConst(tchar (&sz)[size]) {}
+//template < typename tchar, int size >	void TestFuncAsNonConst(std::array<tchar, size>& sz) {}
+//template < typename tchar >				[[deprecated("NotSecure")]]void TestFuncAsNonConst(tchar*const& psz) {}
+////template < typename tchar >				void TestFuncAsNonConst(std::basic_string_view<tchar> sv) {}
+//template < typename tchar >				void TestFuncAsNonConst(std::basic_string<tchar>& str) {}
+//
+//void TestFuncVar() {
+//	if constexpr (false) {
+//		TestFuncAsConst("abc");
+//
+//		char buf[100];
+//		TestFuncAsConst(buf);
+//
+//		std::array<char, 32> bufa;
+//		TestFuncAsConst(bufa);
+//
+//		char const* psz1 = "asdf";
+//		TestFuncAsConst(psz1);
+//
+//		TestFuncAsConst(SomeFunc());
+//
+//		constexpr char const * psz2 = "asdf";
+//		TestFuncAsConst(psz2);
+//
+//
+//		TestFuncAsConst("abc"sv);
+//		TestFuncAsConst("abc"s);
+//		std::string str {"abcdef"};
+//		TestFuncAsConst(str);
+//	}
+//
+//	if constexpr (false) {
+//		TestFuncAsNonConst("abc");
+//
+//		char buf[100];
+//		TestFuncAsNonConst(buf);
+//
+//		std::array<char, 32> bufa;
+//		TestFuncAsNonConst(bufa);
+//
+//		char const* psz1 = "asdf";
+//		TestFuncAsNonConst(psz1);
+//
+//		TestFuncAsNonConst(SomeFunc());
+//
+//		constexpr char const * psz2 = "asdf";
+//		TestFuncAsNonConst(psz2);
+//
+//
+//		//TestFuncAsNonConst("abc"sv);
+//		//TestFuncAsNonConst("abc"s);
+//		std::string str {"abcdef"};
+//		TestFuncAsNonConst(str);
+//	}
+//}
+//#endif
 
-	template<class... Ts>
-	struct overload : Ts... {
-		using Ts::operator()...;
-	};
-	template<class... Ts>
-	overload(Ts...) -> overload<Ts...>;
+//#if 0
+//namespace template_instantiation {
+//
+//	template < typename T, typename T2 >
+//	concept addable =
+//	requires (T2 a) { a+a; a*a;};
+//
+//	template < typename T >
+//	void func() {
+//		if constexpr (addable<int, T>) {
+//			static_assert(true);
+//		}
+//		else {
+//			static_assert(false);
+//		}
+//	}
+//
+//	template <> void func<int>() {
+//	}
+//	template void func<float>();
+//	//template void func<std::string_view>();
+//
+//};
+//#endif
 
-};
-
-#if 0
-template < typename tchar >				void TestFuncAsConst(tchar const* psz, size_t size) {}
-
-template < typename tchar, int size >	void TestFuncAsConst(tchar const (&sz)[size]) {}
-template < typename tchar, int size >	void TestFuncAsConst(std::array<tchar, size> const& sz) {}
-template < typename tchar >				[[deprecated("NotSecure")]]void TestFuncAsConst(tchar const*const& psz) {}
-template < typename tchar >				void TestFuncAsConst(std::basic_string_view<tchar> sv) {}
-template < typename tchar >				void TestFuncAsConst(std::basic_string<tchar> const& str) {}
-char const* SomeFunc() { return nullptr; }
-
-template < typename tchar, int size >	void TestFuncAsNonConst(tchar (&sz)[size]) {}
-template < typename tchar, int size >	void TestFuncAsNonConst(std::array<tchar, size>& sz) {}
-template < typename tchar >				[[deprecated("NotSecure")]]void TestFuncAsNonConst(tchar*const& psz) {}
-//template < typename tchar >				void TestFuncAsNonConst(std::basic_string_view<tchar> sv) {}
-template < typename tchar >				void TestFuncAsNonConst(std::basic_string<tchar>& str) {}
-
-void TestFuncVar() {
-	if constexpr (false) {
-		TestFuncAsConst("abc");
-
-		char buf[100];
-		TestFuncAsConst(buf);
-
-		std::array<char, 32> bufa;
-		TestFuncAsConst(bufa);
-
-		char const* psz1 = "asdf";
-		TestFuncAsConst(psz1);
-
-		TestFuncAsConst(SomeFunc());
-
-		constexpr char const * psz2 = "asdf";
-		TestFuncAsConst(psz2);
-
-
-		TestFuncAsConst("abc"sv);
-		TestFuncAsConst("abc"s);
-		std::string str {"abcdef"};
-		TestFuncAsConst(str);
-	}
-
-	if constexpr (false) {
-		TestFuncAsNonConst("abc");
-
-		char buf[100];
-		TestFuncAsNonConst(buf);
-
-		std::array<char, 32> bufa;
-		TestFuncAsNonConst(bufa);
-
-		char const* psz1 = "asdf";
-		TestFuncAsNonConst(psz1);
-
-		TestFuncAsNonConst(SomeFunc());
-
-		constexpr char const * psz2 = "asdf";
-		TestFuncAsNonConst(psz2);
-
-
-		//TestFuncAsNonConst("abc"sv);
-		//TestFuncAsNonConst("abc"s);
-		std::string str {"abcdef"};
-		TestFuncAsNonConst(str);
-	}
-}
-#endif
-
-namespace template_instantiation {
-
-	template < typename T, typename T2 >
-	concept addable =
-	requires (T2 a) { a+a; a*a;};
-
-	template < typename T >
-	void func() {
-		if constexpr (addable<int, T>) {
-			static_assert(true);
-		}
-		else {
-			static_assert(false);
-		}
-	}
-
-	template <> void func<int>() {
-	}
-	template void func<float>();
-	//template void func<std::string_view>();
-
-};
 
 TEST(gtl_string, tszlen) {
 	{
@@ -115,9 +106,9 @@ TEST(gtl_string, tszlen) {
 		std::array<char, 10> buf1;
 		std::vector<char> buf2;
 
-		auto const* v0 = data(buf0);
-		auto const* v1 = data(buf1);
-		auto const* v2 = data(buf2);
+		auto const* v0 = std::data(buf0);
+		auto const* v1 = std::data(buf1);
+		auto const* v2 = std::data(buf2);
 		auto s1 = std::size(buf1);
 		auto s2 = std::size(buf2);
 	}
@@ -146,17 +137,19 @@ TEST(gtl_string, tszlen) {
 	EXPECT_EQ(7, tszlen(szArray));
 
 	std::array<char const, 10> szConstArray {"ABCDEFG"};
-	EXPECT_EQ(7, tszlen(szConstArray));
+	EXPECT_EQ("ABCDEFG"sv.size(), tszlen(szConstArray));
 
 }
 
+
 TEST(gtl_string, tszcpy) {
 
-	// tszcpy char*
+	// tszcpy
 	{
 		std::vector<char> buf;
 		buf.resize(10);
-		EXPECT_TRUE(EINVAL == tszcpy((char*)nullptr, buf.size(), "ABCDEF"sv));
+		char const* pszSrc = "ABCDEF";
+		EXPECT_TRUE(EINVAL == tszcpy((char*)nullptr, buf.size(), pszSrc));		// will generate compiler warning ("NOT Secure")
 		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), 0, "ABCDEF"sv));
 		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), buf.size(), (char*)nullptr));	// will generate compiler warning ("NOT Secure")
 		auto const* psz1 = "ABCDEF";
@@ -182,11 +175,11 @@ TEST(gtl_string, tszcpy) {
 
 	// tszcpy from string_view
 	{
-		constexpr bool b = gtlc::string_container_fixed_c<std::basic_string_view<char>, char>;
+		constexpr bool b = gtlc::string_buffer_fixed_c<std::basic_string_view<char>, char>;
 
 		char16_t buf[32] {};
-		EXPECT_TRUE(     0 == tszcpy(buf, size(buf), u"가나다라마바사"sv));
-		EXPECT_TRUE(     0 == tszcpy(buf, u"가나다라마바사"sv));
+		EXPECT_TRUE(  0 == tszcpy(buf, std::size(buf), u"가나다라마바사"sv));
+		EXPECT_TRUE(  0 == tszcpy(buf, u"가나다라마바사"sv));
 		EXPECT_TRUE(buf == u"가나다라마바사"sv);
 	}
 	{
@@ -221,7 +214,7 @@ TEST(gtl_string, tszcpy) {
 	}
 	{
 		std::array<char16_t, 32> buf;
-		EXPECT_TRUE(     0 == tszcpy(buf, u"가나다라마바사"s));
+		EXPECT_TRUE(         0 == tszcpy(buf, u"가나다라마바사"s));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사"s);
 	}
 }
@@ -279,15 +272,15 @@ TEST(gtl_string, tszcat) {
 		buf.resize(32);
 		EXPECT_TRUE(EINVAL == tszcat(buf.data(), -1, u"가나다"));								// will generate compiler warning ("NOT Secure")
 
-		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"sv));
+		EXPECT_TRUE(         0 == tszcat(buf, u"가나다라마바사"sv));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
-		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"sv));
+		EXPECT_TRUE(         0 == tszcat(buf, u"ABCDEFG"sv));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사ABCDEFG"sv);
 
 		buf[0] = 0;
-		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"s));
+		EXPECT_TRUE(         0 == tszcat(buf, u"가나다라마바사"s));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
-		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"s));
+		EXPECT_TRUE(         0 == tszcat(buf, u"ABCDEFG"s));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사ABCDEFG"sv);
 	}
 	{
@@ -296,15 +289,15 @@ TEST(gtl_string, tszcat) {
 		EXPECT_TRUE(EINVAL == tszcat(buf.data(), -1, u"가나다"sv));
 
 		buf[0] = 0;
-		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"sv));
+		EXPECT_TRUE(         0 == tszcat(buf, u"가나다라마바사"sv));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
-		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"sv));
+		EXPECT_TRUE(         0 == tszcat(buf, u"ABCDEFG"sv));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사ABCDEFG"sv);
 
 		buf[0] = 0;
-		EXPECT_TRUE(     0 == tszcat(buf, u"가나다라마바사"s));
+		EXPECT_TRUE(         0 == tszcat(buf, u"가나다라마바사"s));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
-		EXPECT_TRUE(     0 == tszcat(buf, u"ABCDEFG"s));
+		EXPECT_TRUE(         0 == tszcat(buf, u"ABCDEFG"s));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사ABCDEFG"sv);
 	}
 	{
@@ -332,41 +325,137 @@ TEST(gtl_string, tszrmchar) {
 
 	{
 		char buf[32]{"AhBhCDEFGh0123h4"};
-		EXPECT_TRUE(12 == tszrmchar(buf, buf+std::size(buf), 'h'));
-		EXPECT_TRUE(buf == "ABCDEFG01234"sv);
-		EXPECT_TRUE(12 == tszrmchar(buf, buf+std::size(buf), 'Z'));
+		EXPECT_TRUE("ABCDEFG01234"sv.size() == tszrmchar(buf, buf+std::size(buf), 'h'));
+		EXPECT_TRUE("ABCDEFG01234"sv        == buf);
+		EXPECT_TRUE("ABCDEFG01234"sv.size() == tszrmchar(buf, buf+std::size(buf), 'Z'));
 	}
 	{
 		char buf[32]{"AhBhCDEFGh0123h4"};
-		EXPECT_TRUE(12 == tszrmchar(buf, 'h'));
-		EXPECT_TRUE(buf == "ABCDEFG01234"sv);
+		EXPECT_TRUE("ABCDEFG01234"sv.size() == tszrmchar(buf, 'h'));
+		EXPECT_TRUE("ABCDEFG01234"sv        == buf);
 	}
 	{
 		std::array<char, 32> buf{"AhBhCDEFGh0123h4"};
-		EXPECT_TRUE(12 == tszrmchar(buf, 'h'));
-		EXPECT_TRUE(buf.data() == "ABCDEFG01234"sv);
+		EXPECT_TRUE("ABCDEFG01234"sv.size() == tszrmchar(buf, 'h'));
+		EXPECT_TRUE("ABCDEFG01234"sv        == buf.data());
 	}
 	{
 		std::vector<char> buf;
-		buf.resize(32);
+		buf.resize(32); 
 		tszcpy(buf, "AhBhCDEFGh0123h4"sv);
-		EXPECT_TRUE(12 == tszrmchar(buf, 'h'));
-		EXPECT_TRUE(buf.data() == "ABCDEFG01234"sv);
+		EXPECT_TRUE("ABCDEFG01234"sv.size() == tszrmchar(buf, 'h'));
+		EXPECT_TRUE("ABCDEFG01234"sv        == buf.data());
 	}
 
+#pragma warning(push)
+#pragma warning(disable:4566)
 	{
 		char16_t buf[32]{u"가나다ABC나0나12345나6789❤나💕나😁😉"};
-		EXPECT_TRUE(22 == tszrmchar(buf, buf+std::size(buf), u'나'));
-		EXPECT_TRUE(buf == u"가다ABC0123456789❤💕😁😉"sv);
+		EXPECT_TRUE(u"가다ABC0123456789❤💕😁😉"sv.size() == tszrmchar(buf, buf+std::size(buf), u'나'));
+		EXPECT_TRUE(u"가다ABC0123456789❤💕😁😉"sv == buf);
 	}
 
 	{
 		char32_t buf[32]{U"가나다❤ABC0❤12345❤6789❤💕😁😉"};
-		EXPECT_TRUE(19 == tszrmchar(buf, U'❤'));
-		EXPECT_TRUE(buf == U"가나다ABC0123456789💕😁😉"sv);
+		EXPECT_TRUE(U"가나다ABC0123456789💕😁😉"sv.size() == tszrmchar(buf, U'❤'));
+		EXPECT_TRUE(U"가나다ABC0123456789💕😁😉"sv == buf);
 	}
+#pragma warning(pop)
+}
+
+
+TEST(gtl_string, tszcmp) {
+
+	constexpr auto e = tszcmp<char>(nullptr, nullptr);
+	static_assert(e == 0);
+
+	constexpr auto e2 = tszcmp("abcdef", "abcdefa");
+	static_assert(e2 < 0);
+
+	//char ptr[] = "abcdef";
+	//constexpr auto e3 = tszcmp(ptr, "abcdefa");
+	//static_assert(e3 < 0);
+
+	EXPECT_TRUE(tszcmp<char>(nullptr, nullptr) == 0);
+	EXPECT_TRUE(tszcmp<char>(nullptr, "") < 0);
+	EXPECT_TRUE(tszcmp<char>("", nullptr) > 0);
+	EXPECT_TRUE(tszcmp("", "") == 0);
+	EXPECT_TRUE(tszcmp("abcdef", "abcdefa") < 0);
+	EXPECT_TRUE(tszcmp("abcdefa", "abcdef") > 0);
+
+	EXPECT_TRUE(tszicmp<char>(nullptr, nullptr) == 0);
+	EXPECT_TRUE(tszicmp<char>(nullptr, "") < 0);
+	EXPECT_TRUE(tszicmp<char>("", nullptr) > 0);
+	EXPECT_TRUE(tszicmp("", "") == 0);
+	EXPECT_TRUE(tszicmp("aBCdef", "abcdEFa") < 0);
+	EXPECT_TRUE(tszicmp("abcDefa", "aBCDef") > 0);
+	EXPECT_TRUE(tszicmp("abCdef", "AbCdefA") < 0);
+	EXPECT_TRUE(tszicmp("aBcDEFa", "abcdef") > 0);
+	EXPECT_TRUE(tszicmp("aBCdef", "abcdEF") == 0);
+	EXPECT_TRUE(tszicmp("abcDef", "aBCDef") == 0);
+	EXPECT_TRUE(tszicmp("abCdef", "AbCdef") == 0);
+	EXPECT_TRUE(tszicmp("aBcDEF", "abcdef") == 0);
+
+	EXPECT_TRUE(tszncmp<char>(nullptr, nullptr, 0) == 0);
+	EXPECT_TRUE(tszncmp<char>(nullptr, "", 0) == 0);
+	EXPECT_TRUE(tszncmp<char>("", nullptr, 0) == 0);
+	EXPECT_TRUE(tszncmp<char>(nullptr, nullptr, 10) == 0);
+	EXPECT_TRUE(tszncmp<char>(nullptr, "", 10) < 0);
+	EXPECT_TRUE(tszncmp<char>("", nullptr, 10) > 0);
+	EXPECT_TRUE(tszncmp("", "", 10) == 0);
+	EXPECT_TRUE(tszncmp("abcdef", "abcdefa", 10) < 0);
+	EXPECT_TRUE(tszncmp("abcdefa", "abcdef", 10) > 0);
+	EXPECT_TRUE(tszncmp("", "", 10) == 0);
+	EXPECT_TRUE(tszncmp("abcdef", "abcdefa", 4) == 0);
+	EXPECT_TRUE(tszncmp("abcdefa", "abcdef", 4) == 0);
+
+	EXPECT_TRUE(tsznicmp<char>(nullptr, nullptr, 0) == 0);
+	EXPECT_TRUE(tsznicmp<char>(nullptr, "", 0) == 0);
+	EXPECT_TRUE(tsznicmp<char>("", nullptr, 0) == 0);
+	EXPECT_TRUE(tsznicmp<char>(nullptr, nullptr, 10) == 0);
+	EXPECT_TRUE(tsznicmp<char>(nullptr, "", 10) < 0);
+	EXPECT_TRUE(tsznicmp<char>("", nullptr, 10) > 0);
+	EXPECT_TRUE(tsznicmp("", "", 10) == 0);
+	EXPECT_TRUE(tsznicmp("abcdef", "abcdefa", 10) < 0);
+	EXPECT_TRUE(tsznicmp("abcdefa", "abcdef", 10) > 0);
+	EXPECT_TRUE(tsznicmp("", "", 10) == 0);
+	EXPECT_TRUE(tsznicmp("abcdef", "abcdefa", 4) == 0);
+	EXPECT_TRUE(tsznicmp("abcdefa", "abcdef", 4) == 0);
+
+	EXPECT_TRUE(tsznicmp("aBCdef", "abcdEFa", 10) < 0);
+	EXPECT_TRUE(tsznicmp("abcDefa", "aBCDef", 10) > 0);
+	EXPECT_TRUE(tsznicmp("abCdef", "AbCdefA", 10) < 0);
+	EXPECT_TRUE(tsznicmp("aBcDEFa", "abcdef", 10) > 0);
+	EXPECT_TRUE(tsznicmp("aBCdef", "abcdEF", 10) == 0);
+	EXPECT_TRUE(tsznicmp("abcDef", "aBCDef", 10) == 0);
+	EXPECT_TRUE(tsznicmp("abCdef", "AbCdef", 10) == 0);
+	EXPECT_TRUE(tsznicmp("aBcDEF", "abcdef", 10) == 0);
+
+	EXPECT_TRUE(tsznicmp("aBCdef", "abcdEFa", 4) == 0);
+	EXPECT_TRUE(tsznicmp("abcDefa", "aBCDef", 4) == 0);
+	EXPECT_TRUE(tsznicmp("abCdef", "AbCdefA", 4) == 0);
+	EXPECT_TRUE(tsznicmp("aBcDEFa", "abcdef", 4) == 0);
+	EXPECT_TRUE(tsznicmp("aBCdef", "abcdEF", 3) == 0);
+	EXPECT_TRUE(tsznicmp("abcDef", "aBCDef", 3) == 0);
+	EXPECT_TRUE(tsznicmp("abCdef", "AbCdef", 3) == 0);
+	EXPECT_TRUE(tsznicmp("aBcDEF", "abcdef", 3) == 0);
 
 }
+
+
+TEST(gtl_string, tszupr_lwr) {
+
+	char16_t str[64] { u"ABCDEFG abcdefg 012345678 가나다라마바사"};
+	tszupr(str);
+	EXPECT_TRUE(str == u"ABCDEFG ABCDEFG 012345678 가나다라마바사"sv);
+	tszlwr(str);
+	EXPECT_TRUE(str == u"abcdefg abcdefg 012345678 가나다라마바사"sv);
+
+	EXPECT_TRUE(EINVAL == tszupr((char*)nullptr, 0));
+	char16_t* ptr = str;
+	EXPECT_TRUE(ERANGE == tszupr(ptr, -1));
+}
+
 
 TEST(gtl_string, tszto) {
 
@@ -401,14 +490,6 @@ TEST(gtl_string, tszto) {
 	auto a2 = gtl::tsztoi("12345"s);
 	auto a3 = gtl::tsztoi("12345");
 	auto a4 = gtl::tsztoi(CString("12345"));
-	EXPECT_TRUE(ToStringU16("가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍") == u"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍");
-
-	std::string str;
-	gtl::CStringA str2;
-	std::string_view sv { str2 };
-
-	ToString<char>("sas"s, str);
-
 	//auto aa = overload{
 	//	[]() { std::cout << "()" << std::endl; },
 	//	[](int) { std::cout << "(int)" << std::endl; },
@@ -450,27 +531,13 @@ TEST(gtl_string, tszto) {
 
 
 
-
 }
 
 
-//template <typename X> struct Identity {
-//	using type = X;
-//};
-//template <typename T> struct Corner1 {
-//	Corner1(typename Identity<T>::type, int) { }
-//};
-//Corner1(double, int)->Corner1<double>;
-//
-//void main043435() {
-//	Corner1 corner1(3.14, 1729);
-//}
-//
-//template <typename T> struct Corner2 {
-//	Corner2(T, long) { }
-//	Corner2(typename Identity<T>::type, unsigned long) { }
-//};
-//Corner2(double, unsigned long)->Corner2<double>;
-//void main21212() {
-//	Corner2 corner2(3.14, 1729ul);
-//}
+TEST(gtl_string, etc) {
+
+	char16_t buf[64] {u"0123456789"};
+	tszrev(buf);
+	EXPECT_TRUE(buf == u"9876543210"sv);
+
+}

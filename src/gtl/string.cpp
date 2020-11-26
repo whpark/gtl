@@ -14,12 +14,14 @@
 #include "gtl/string/string_primitives.h"
 #include "gtl/string/convert_codepage.h"
 #include "gtl/string/convert_codepage_kssm.h"
-#include "gtl/string/HangeulCodeTable.h"
+#include "gtl/string/HangeulCodeMap.h"
 #include "gtl/string/old_format.h"
 #include "gtl/string.h"
 //#include "gtl/archive.h"
 
 namespace gtl {
+
+	GTL_DATA int eGTLDefaultCodepage_g = GTL_DEFAULT_CODEPAGE;
 
 	constexpr static bool const IsUTF8SigChar(char c) { return (c & 0b1100'0000) == 0b1000'0000; }
 
@@ -116,20 +118,25 @@ namespace gtl {
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
-		auto eCodepageFrom = codepage.From();
-
 		// check endian, Convert
-		auto strOther = CheckAndConvertEndian(svFrom, eCodepageFrom);
+		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		auto const* pszSourceBegin = svFrom.data();
 		auto const* pszSourceEnd = svFrom.data()+svFrom.size();
 
-		std::locale loc(fmt::format(".{}", eCodepageFrom));
-		auto const& facet = std::use_facet<std::codecvt<char, char16_t, mbstate_t>>(loc);
+		auto eCodepageTo = codepage.To();
+		std::locale loc(fmt::format(".{}", eCodepageTo));
+
+#ifdef _WINDOWS
+		using utf16_t = wchar_t;
+#else
+		using utf16_t = char16_t;
+#endif
+		auto const& facet = std::use_facet<std::codecvt<utf16_t, char, mbstate_t>>(loc);
 
 		std::mbstate_t state = {0}; // zero-initialization represents the initial conversion state for mbstate_t
-		auto len = facet.length(state, pszSourceBegin, pszSourceEnd, svFrom.size());
+		auto len = svFrom.size()*sizeof(char16_t);//facet.length(state, pszSourceBegin, pszSourceEnd, svFrom.size());
 		if (len <= 0)
 			return str;
 		str.resize(len);
@@ -137,11 +144,15 @@ namespace gtl {
 		state = {}; // init.
 		std::remove_cvref_t<decltype(svFrom)>::value_type const* pszSourceNext{};
 		std::remove_cvref_t<decltype(str)>::value_type* pszDestNext{};
-		auto result = facet.in(state, pszSourceBegin, pszSourceEnd, pszSourceNext,
+		auto result = facet.out(state, (utf16_t const*)pszSourceBegin, (utf16_t const*)pszSourceEnd, (utf16_t const*&)pszSourceNext,
 					   str.data(), str.data()+len, pszDestNext);
 
 		if (result == std::codecvt_base::error)
 			throw std::invalid_argument{ GTL__FUNCSIG "String Cannot be transformed!" };
+
+		len = tszlen(str.data(), str.data()+len+1);
+		if (str.size() > len)
+			str.resize(len);
 		return str;
 	}
 	std::u16string ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
@@ -257,19 +268,22 @@ namespace gtl {
 		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		size_t nOutputLen = 0;
-		for (auto c : svFrom) {
+		auto const* const pszEnd = svFrom.data() + svFrom.size();
+		for (auto const* pos = svFrom.data(); pos < pszEnd; pos++) {
+			auto c = *pos;
 			if (c <= 0x7f)
-				nOutputLen++;
+				nOutputLen += 1;
 			else if (c <= 0x07ffu)
 				nOutputLen += 2;
-			else if ((c <= 0xd7ffu) || (c >= 0xe000u))
+			else if ((c <= 0xd7ffu) || (c >= 0xe000u)) {
 				nOutputLen += 3;
+			}
 			else if (c <= utf_const::fSurrogateW1.second) {
 				nOutputLen += 4;
+				pos++;
 			}
 			else {
 				throw std::invalid_argument{ GTL__FUNCSIG "Cannot Convert from u32 to u8." };
-				nOutputLen++;
 			}
 		}
 
@@ -329,7 +343,7 @@ namespace gtl {
 				pos += 1;
 				nOutputLen += 1;
 			}
-			else if ((pos[0] & 0b1111'0000) == 0b1110'000) {	// ~0xffff
+			else if ((pos[0] & 0b1111'0000) == 0b1110'0000) {	// ~0xffff
 				if ((pos + 2 >= end)
 					|| ((pos[1] & 0b1100'0000) != 0b1000'0000)
 					|| ((pos[2] & 0b1100'0000) != 0b1000'0000)
@@ -370,17 +384,17 @@ namespace gtl {
 				str.push_back(((pos[0] & uc::mask_6bit) << 6) | (pos[1] & uc::mask_6bit));
 				pos += 1;
 			}
-			else if ((pos[0] & 0b1111'0000) == 0b1110'000) {	// ~0xffff
+			else if ((pos[0] & 0b1111'0000) == 0b1110'0000) {	// ~0xffff
 				str.push_back(((pos[0] & uc::mask_4bit) << 12) | ((pos[1] & uc::mask_6bit) << 6) | (pos[2] & uc::mask_6bit));
 				pos += 2;
 			}
 			else if ((pos[0] & 0b1111'1000) == 0b1111'0000) {	// ~0x10'ffff
 				//char32_t c = ((pos[0] & uc::mask_3bit) << 18) | ((pos[1] & uc::mask_6bit) << 12) | ((pos[2] & uc::mask_6bit) << 6) | (pos[3] & uc::mask_6bit);
-				constexpr static auto const preH = uc::fSurrogateW1.first - (0x1'0000u >> uc::nBitSurrogate);
-				constexpr static auto const preL = uc::fSurrogateW2.first;
+				constexpr static uint16_t const preH = uc::fSurrogateW1.first - (0x1'0000u >> uc::nBitSurrogate);
+				constexpr static uint16_t const preL = uc::fSurrogateW2.first;
 
-				str.push_back(preH + ( (pos[0] & uc::mask_3bit) << 8) | ((pos[1] & uc::mask_6bit) << 2) | ((pos[2]>> 4) & 0b0011) );
-				str.push_back(preL + ( (pos[2] & uc::mask_4bit) << 6) | (pos[3] & uc::mask_6bit) );
+				str.push_back(preH + (uint16_t)( ((pos[0] & uc::mask_3bit) << 8) | ((pos[1] & uc::mask_6bit) << 2) | ((pos[2]>> 4) & 0b0011) ));
+				str.push_back(preL + (uint16_t)( ((pos[2] & uc::mask_4bit) << 6) | (pos[3] & uc::mask_6bit)) );
 				pos += 3;
 			}
 			else {
@@ -583,7 +597,7 @@ namespace gtl {
 					)
 					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
 			}
-			else if ((c & 0b1111'0000) == 0b1110'000) {	// ~0x7ff
+			else if ((c & 0b1111'0000) == 0b1110'0000) {	// ~0x7ff
 				if ((psz+2 >= pszEnd)
 					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
 					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
@@ -619,18 +633,18 @@ namespace gtl {
 			if (c <= 0x7f)
 				v = c;
 			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
-				v = (*psz & mask_6bits) << 6;
-				v |= *++psz & mask_6bits;
+				v = ((char32_t)*psz & mask_6bits) << 6;
+				v |= (char32_t)*++psz & mask_6bits;
 			}
 			else if ((c & 0b1111'0000) == 0b1110'0000) {	// ~0x7ff
-				v = (*psz & mask_4bits) << 12;
-				v |= (*++psz & mask_6bits) << 6;
+				v = ((char32_t)*psz & mask_4bits) << 12;
+				v |= ((char32_t)*++psz & mask_6bits) << 6;
 				v |= (*++psz & mask_6bits);
 			}
 			else if ((c & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
-				v = (*psz & mask_3bits) << 18;
-				v |= (*++psz & mask_6bits) << 12;
-				v |= (*++psz & mask_6bits) << 6;
+				v = ((char32_t)*psz & mask_3bits) << 18;
+				v |= ((char32_t)*++psz & mask_6bits) << 12;
+				v |= ((char32_t)*++psz & mask_6bits) << 6;
 				v |= (*++psz & mask_6bits);
 			}
 

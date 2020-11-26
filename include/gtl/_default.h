@@ -106,13 +106,24 @@
 #if !defined (__cpp_lib_jthread)
 #	include <jthread.hpp>
 #endif
+#if defined(__cpp_lib_source_location)
+#	include <source_location>
+#endif
 
+#define GTL_DEPR_SEC [[deprecated("NOT Secure")]]
 
 #include "gtl/config_gtl.h"
 
-
-#define GTL__FUNCSIG __FUNCSIG__ " : "
-
+// until c++20 source_location
+#ifdef __cpp_lib_source_location
+#	define GTL__FUNCSIG std::u8string(std::source_location::current().function_name()) + " : "
+#else
+	#ifdef _MSC_VER
+		#define GTL__FUNCSIG __FUNCSIG__ " : "
+	#else
+		#error ..... ????...
+	#endif
+#endif
 
 #define NOMINMAX	// disable Windows::min/max
 #if defined(min) || defined(max)

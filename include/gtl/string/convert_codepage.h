@@ -47,19 +47,21 @@ namespace gtl {
 		KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
 	}; };
 
+	GTL_DATA extern int eGTLDefaultCodepage_g;
+
 	struct S_CODEPAGE_OPTION {
 		uint32_t from {eCODEPAGE::Default};
 		uint32_t to {eCODEPAGE::Default};
 
 		uint16_t From() const {
 			if (from > 0xffff) {	// wrong or default value
-				return GTL_DEFAULT_CODEPAGE;
+				return eGTLDefaultCodepage_g;
 			}
 			return from;
 		}
 		uint16_t To() const {
-			if (from > 0xffff) {	// wrong or default value
-				return GTL_DEFAULT_CODEPAGE;
+			if (to > 0xffff) {	// wrong or default value
+				return eGTLDefaultCodepage_g;
 			}
 			return to;
 		}
@@ -67,49 +69,49 @@ namespace gtl {
 
 
 	/// @brief Converts Codepage To StringA (MBCS)
-	inline std::string		ToStringA(std::string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::string		ToStringA(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::string		ToStringA(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::string		ToStringA(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::string		ToStringA(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::string		ToStringA(std::string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::string		ToStringA(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::string		ToStringA(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::string		ToStringA(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::string		ToStringA(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 
 	/// @brief Converts Codepage To StringW (unicode ~ utf16)
-	inline std::wstring		ToStringW(std::string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::wstring		ToStringW(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::wstring		ToStringW(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::wstring		ToStringW(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::wstring		ToStringW(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::wstring		ToStringW(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 
 	/// @brief Converts Codepage To utf-8
-	inline std::u8string	ToStringU8(std::string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u8string	ToStringU8(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u8string	ToStringU8(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u8string	ToStringU8(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u8string	ToStringU8(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u8string	ToStringU8(std::string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u8string	ToStringU8(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u8string	ToStringU8(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u8string	ToStringU8(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u8string	ToStringU8(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 
 	/// @brief Converts Codepage To utf-16
-	inline std::u16string	ToStringU16(std::string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u16string	ToStringU16(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u16string	ToStringU16(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u16string	ToStringU16(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u16string	ToStringU16(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u16string	ToStringU16(std::string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u16string	ToStringU16(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u16string	ToStringU16(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u16string	ToStringU16(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u16string	ToStringU16(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 
 	/// @brief Converts Codepage To utf-32
-	inline std::u32string	ToStringU32(std::string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u32string	ToStringU32(std::wstring_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u32string	ToStringU32(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u32string	ToStringU32(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage = {});
-	inline std::u32string	ToStringU32(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u32string	ToStringU32(std::string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u32string	ToStringU32(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u32string	ToStringU32(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u32string	ToStringU32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+	inline std::u32string	ToStringU32(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 
 
-	GTL_API std::string ConvUTF16_MBCS(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u16string ConvMBCS_UTF16(std::string_view strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u8string ConvUTF16_UTF8(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u16string ConvUTF8_UTF16(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u32string ConvUTF16_UTF32(std::u16string_view strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u16string ConvUTF32_UTF16(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u8string ConvUTF32_UTF8(std::u32string_view strFrom, S_CODEPAGE_OPTION codepage);
-	GTL_API std::u32string ConvUTF8_UTF32(std::u8string_view strFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::string		ConvUTF16_MBCS(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u16string	ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u16string	ConvUTF8_UTF16(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u32string	ConvUTF8_UTF32(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u8string	ConvUTF16_UTF8(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u32string	ConvUTF16_UTF32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u8string	ConvUTF32_UTF8(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage);
+	GTL_API std::u16string	ConvUTF32_UTF16(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage);
 
 	GTL_API bool IsUTF8String(std::string_view str, int* pOutputBufferCount = nullptr, bool* pbIsMSBSet = nullptr);
 
@@ -205,8 +207,7 @@ namespace gtl {
 		return ConvUTF16_UTF8(svFrom, codepage);
 	}
 	std::u8string ToStringU8(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		auto str = ConvUTF32_UTF16(svFrom, { .from = codepage.from });
-		return ConvUTF16_UTF8(str, { .to = codepage.to });
+		return ConvUTF32_UTF8(svFrom, codepage);
 	}
 
 	/// @brief Converts Codepage To utf-16
@@ -243,8 +244,7 @@ namespace gtl {
 		return ToStringU32(internal::WideAsCharXX(svFrom), codepage);
 	}
 	std::u32string ToStringU32(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		auto str = ConvUTF8_UTF16(svFrom, { .from = codepage.from });
-		return ConvUTF16_UTF32(str, { .to = codepage.to });
+		return ConvUTF8_UTF32(svFrom, codepage);
 	}
 	std::u32string ToStringU32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		return ConvUTF16_UTF32(svFrom, codepage);
@@ -287,7 +287,7 @@ namespace gtl {
 	//-------------------------------------------------------------
 	// experimental
 	//
-	template < gtlc::utf_string_elem tchar_return, gtlc::utf_string_elem tchar >
+	template < gtlc::string_elem_utf tchar_return, gtlc::string_elem_utf tchar >
 	requires ( (sizeof(tchar) != sizeof(tchar_return)) && (sizeof(tchar) != sizeof(char32_t)) )
 	std::experimental::generator<tchar_return> StringSequence(utf_string_view<tchar> sv) {
 		using usv = utf_string_view<tchar>;

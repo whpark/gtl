@@ -1,8 +1,9 @@
 ﻿import os
 
 pathIn = 'HangeulCodeTable.txt'
-pathOutH = 'HangeulCodeTable.h'
-pathOutC = 'HangeulCodeTable.cpp'
+pathOutH = 'HangeulCodeMap.h'
+pathOutC_UTF16_KSSM = 'HangeulCodeMapUTF16_KSSM.cpp'
+pathOutC_KSSM_UTF16 = 'HangeulCodeMapKSSM_UTF16.cpp'
 
 class codepair:
     codeUni = ''
@@ -76,24 +77,24 @@ fOutHeader.write(
                 '\n'
                 '\n'
                 '#include "gtl/_lib_gtl.h"\n\n'
-                'namespace gtl {\n'
+                'namespace gtl::KSSM {\n'
                 '#pragma pack(push, 8)\n'
                 '\n'
                 '\n'
-                '\tstruct S_HANGEUL_CODE {\n'
-                '\t\twchar_t cUnicode;\n'
-                '\t\tuint16_t cKSC;\n'
-                '\t\tuint16_t c949;\n'
-                '\t\tuint16_t cKSSM;\n'
-                '\t};\n'
-                '\t\n'
-                '\tusing T_HANGEUL_TABLE = std::array<S_HANGEUL_CODE, ' + '{}'.format(nItems) + '>;\n\n'
-                '\tGTL_DATA extern T_HANGEUL_TABLE const tblHangeulCode_g;\n'
+#                '\tstruct S_HANGEUL_CODE {\n'
+#                '\t\twchar_t cUnicode;\n'
+#                '\t\tuint16_t cKSC;\n'
+#                '\t\tuint16_t c949;\n'
+#                '\t\tuint16_t cKSSM;\n'
+#                '\t};\n'
+#                '\t\n'
+#                '\tusing T_HANGEUL_TABLE = std::array<S_HANGEUL_CODE, ' + '{}'.format(nItems) + '>;\n\n'
+#                '\tGTL_DATA extern T_HANGEUL_TABLE const tblHangeulCode_g;\n'
                 '\tGTL_DATA extern std::map<char16_t, uint16_t> const mapUTF16toKSSM_g;\n'
                 '\tGTL_DATA extern std::map<uint16_t, char16_t> const mapKSSMtoUTF16_g;\n'
                 '\n'
                 '#pragma pack(pop)\n'
-                '}\t// namespace gtl\n'
+                '}\t// namespace gtl::KSSM\n'
                 '\n\n'
                 '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
                 )
@@ -101,10 +102,59 @@ fOutHeader.write(
 fOutHeader.flush()
 
 
+##=================
+## .cpp
+#fOutImpl = open(pathOutC_UTF16_KSSM, mode='w', encoding='utf-8-sig')
+#fOutImpl.write(#'#include "pch.h"\n\n' 
+#                '//=========\n'
+#                '//Automatically Generated File.\n'
+#                '//\n'
+#                '//        PWH.\n'
+#                '//\n'
+#                '//=========\n'
+#                '\n\n'
+#                '#include "gtl/config_gtl.h"\n'
+#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)\n'
+#                '\n\n'
+#                '#include <cstdlib>\n'
+#                '#include <cstdint>\n'
+#                '#include <array>\n\n'
+#                '#include "gtl/string/' + pathOutH + '"\n\n\n'
+#                'namespace gtl::KSSM {\n\n\n'
+#                '\t' + strLineSeperator
+#                )
+
+
+##-----------------
+## Whole Table
+#codes.sort(key=codepair.KeyUnicode)
+#nCount = 0
+#fOutImpl.write('\tGTL_DATA T_HANGEUL_TABLE const tblHangeulCode_g { {\n\n');
+#fOutImpl.write('\t\t//               unicode,  5601,    949,   kssm\n')
+#for code in codes :
+#    #out = '\t' + '/*' + code.index.format("{:5}") + '*/' + '{ 0x' + code.codeUni + '/*' + chr(int(code.codeUni, 16)) + '*/' + ', 0x' + code.code5601 + ', 0x' + code.code949 + ', 0x' + code.codeKSSM + ' },'
+#    #out = '\t /*{:5}*/ \{ 0x{}/*{}*/, 0x{}, 0x{}, 0x{} \}'.format(code.index, code.codeUni, chr(int(code.codeUni, 16)), code.code5601, code.code949, code.codeKSSM);
+#    if (nCount == 0) :
+#        fOutImpl.write('\t\t');
+
+#    out = '/*{v.index:>5}*/ {{ 0x{v.codeUni:<4}/*{codePrint}*/, 0x{v.code5601:<4}, 0x{v.code949:<4}, 0x{v.codeKSSM:<4} }}'.format(v = code, codePrint = chr(int(code.codeUni, 16)));
+#    fOutImpl.write(out)
+
+#    nCount += 1;
+#    if (nCount < 4) :
+#        fOutImpl.write(',\t');
+#    else :
+#        nCount = 0;
+#        fOutImpl.write(',\n');
+
+#fOutImpl.write('\n\t} };\n\n\n');
+#fOutImpl.write('\n\n');
+
+
 #=================
-# .cpp
-fOutImpl = open(pathOutC, mode='w', encoding='utf-8-sig')
-fOutImpl.write(#'#include "pch.h"\n\n' 
+# .cpp U16->KSSM
+fOutImpl = open(pathOutC_UTF16_KSSM, mode='w', encoding='utf-8-sig')
+fOutImpl.write( '#include "pch.h"\n\n'
                 '//=========\n'
                 '//Automatically Generated File.\n'
                 '//\n'
@@ -119,37 +169,9 @@ fOutImpl.write(#'#include "pch.h"\n\n'
                 '#include <cstdint>\n'
                 '#include <array>\n\n'
                 '#include "gtl/string/' + pathOutH + '"\n\n\n'
-                'namespace gtl {\n\n\n'
+                'namespace gtl::KSSM {\n\n\n'
+                '\t' + strLineSeperator
                 )
-
-fOutImpl.write('\t' + strLineSeperator)
-
-
-#-----------------
-# Whole Table
-codes.sort(key=codepair.KeyUnicode)
-nCount = 0
-fOutImpl.write('\tGTL_DATA T_HANGEUL_TABLE const tblHangeulCode_g { {\n\n');
-fOutImpl.write('\t\t//               unicode,  5601,    949,   kssm\n')
-for code in codes :
-    #out = '\t' + '/*' + code.index.format("{:5}") + '*/' + '{ 0x' + code.codeUni + '/*' + chr(int(code.codeUni, 16)) + '*/' + ', 0x' + code.code5601 + ', 0x' + code.code949 + ', 0x' + code.codeKSSM + ' },'
-    #out = '\t /*{:5}*/ \{ 0x{}/*{}*/, 0x{}, 0x{}, 0x{} \}'.format(code.index, code.codeUni, chr(int(code.codeUni, 16)), code.code5601, code.code949, code.codeKSSM);
-    if (nCount == 0) :
-        fOutImpl.write('\t\t');
-
-    out = '/*{v.index:>5}*/ {{ 0x{v.codeUni:<4}/*{codePrint}*/, 0x{v.code5601:<4}, 0x{v.code949:<4}, 0x{v.codeKSSM:<4} }}'.format(v = code, codePrint = chr(int(code.codeUni, 16)));
-    fOutImpl.write(out)
-
-    nCount += 1;
-    if (nCount < 4) :
-        fOutImpl.write(',\t');
-    else :
-        nCount = 0;
-        fOutImpl.write(',\n');
-
-fOutImpl.write('\n\t} };\n\n\n');
-fOutImpl.write('\n\n');
-
 
 #-----------------
 # map W -> KSSM
@@ -174,8 +196,36 @@ for code in codes :
 fOutImpl.write('\n\t} };\n')
 fOutImpl.write('\n\n')
 
+fOutImpl.write('}\t// namespace gtl::KSSM\n\n'
+               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
+               )
+fOutImpl.flush()
+fOutImpl.close()
+
+#=================
+# .cpp KSSM->U16
+fOutImpl = open(pathOutC_KSSM_UTF16, mode='w', encoding='utf-8-sig')
+fOutImpl.write( '#include "pch.h"\n\n'
+                '//=========\n'
+                '//Automatically Generated File.\n'
+                '//\n'
+                '//        PWH.\n'
+                '//\n'
+                '//=========\n'
+                '\n\n'
+                '#include "gtl/config_gtl.h"\n'
+                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)\n'
+                '\n\n'
+                '#include <cstdlib>\n'
+                '#include <cstdint>\n'
+                '#include <array>\n\n'
+                '#include "gtl/string/' + pathOutH + '"\n\n\n'
+                'namespace gtl::KSSM {\n\n\n'
+                '\t' + strLineSeperator
+                )
+
 #-----------------
-# map KSSM -> W
+# map KSSM -> U16
 codes.sort(key=codepair.KeyKSSM)
 nCount = 0
 fOutImpl.write('\t' + strLineSeperator)
@@ -197,7 +247,7 @@ for code in codes :
 fOutImpl.write('\n\t} };\n')
 fOutImpl.write('\n\n')
 
-fOutImpl.write('}\t// namespace gtl\n\n'
+fOutImpl.write('}\t// namespace gtl::KSSM\n\n'
                '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
                )
 
@@ -212,3 +262,4 @@ fOutImpl.write('}\t// namespace gtl\n\n'
 #fOutImpl.write('----\n' '*' '/\n\n')
 
 fOutImpl.flush()
+fOutImpl.close()
