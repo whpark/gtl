@@ -7,6 +7,10 @@ using namespace gtl::literals;
 
 using namespace gtl;
 
+
+
+#define	SUPPRESS_DEPRECATED_WARNING _Pragma ("warning(suppress:4996)")
+
 //#if 0
 //template < typename tchar >				void TestFuncAsConst(tchar const* psz, size_t size) {}
 //
@@ -123,7 +127,8 @@ TEST(gtl_string, tszlen) {
 	EXPECT_EQ(4, gtl::tszlen(L"가나다라"));
 	EXPECT_EQ(8, gtl::tszlen("가나다라"));
 	constexpr char16_t const* sz3 = u"가나다";
-	constexpr auto l0 = tszlen(sz3);	// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	constexpr auto l0 = tszlen(sz3);
 	static_assert(l0 == 3);
 	constexpr auto l1 = gtl::tszlen(u"가나다");
 	static_assert(l1 == 3);
@@ -149,27 +154,35 @@ TEST(gtl_string, tszcpy) {
 		std::vector<char> buf;
 		buf.resize(10);
 		char const* pszSrc = "ABCDEF";
-		EXPECT_TRUE(EINVAL == tszcpy((char*)nullptr, buf.size(), pszSrc));		// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(EINVAL == tszcpy((char*)nullptr, buf.size(), pszSrc));
 		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), 0, "ABCDEF"sv));
-		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), buf.size(), (char*)nullptr));	// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(EINVAL == tszcpy(buf.data(), buf.size(), (char*)nullptr));
 		auto const* psz1 = "ABCDEF";
-		EXPECT_TRUE(     0 == tszcpy(buf.data(), buf.size(), psz1));			// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(     0 == tszcpy(buf.data(), buf.size(), psz1));
 		auto const* pszLong = "long string................";
-		EXPECT_TRUE(ERANGE == tszcpy(buf.data(), buf.size(), pszLong));			// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(ERANGE == tszcpy(buf.data(), buf.size(), pszLong));
 		EXPECT_TRUE(     0 == tszlen(buf.data(), buf.size()));
 
-		EXPECT_TRUE(     0 == tszcpy(buf, psz1));								// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(     0 == tszcpy(buf, psz1));
 		EXPECT_TRUE(buf.data() == "ABCDEF"sv);
 
 		std::array<char, 32> buf2;
-		EXPECT_TRUE(     0 == tszcpy(buf2, psz1));								// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(     0 == tszcpy(buf2, psz1));
 		EXPECT_TRUE(buf2.data() == "ABCDEF"sv);
 
 		char buf3[32]{};
-		EXPECT_TRUE(     0 == tszcpy(buf3, psz1));								// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(     0 == tszcpy(buf3, psz1));
 		EXPECT_TRUE(buf3 == "ABCDEF"sv);
 
-		EXPECT_TRUE(ERANGE == tszcpy(buf, pszLong));							// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(ERANGE == tszcpy(buf, pszLong));
 		EXPECT_TRUE(     0 == tszlen(buf));
 	}
 
@@ -221,25 +234,34 @@ TEST(gtl_string, tszcpy) {
 
 TEST(gtl_string, tszncpy) {
 	std::vector<char16_t> buf;
-	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), buf.size(), u"가나다라마바사", _TRUNCATE));	// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 4));			// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), buf.size(), u"가나다라마바사", _TRUNCATE));
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 4));
 	buf.resize(10);
-	EXPECT_TRUE(ERANGE == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 10));			// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(EINVAL == tszncpy(buf.data(),          0, u"가나다라마바사", 2));			// will generate compiler warning ("NOT Secure")
-	EXPECT_TRUE(     0 == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 9));			// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(ERANGE == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 10));
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(EINVAL == tszncpy(buf.data(),          0, u"가나다라마바사", 2));
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == tszncpy(buf.data(), buf.size(), u"가나다라마바사", 9));
 
 	buf.resize(10);
-	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사", _TRUNCATE));	// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사", _TRUNCATE));
 	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다라마바사", 8*sizeof(buf[0])));
 
-	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다", _TRUNCATE));			// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다", _TRUNCATE));
 	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다", 4*sizeof(buf[0])));
 
-	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다", 5));					// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다", 5));
 	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다", 3*sizeof(buf[0])));
 
 	buf.resize(5);
-	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사", 4));			// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(     0 == tszncpy(buf, u"가나다라마바사", 4));
 	EXPECT_TRUE(     0 == memcmp(buf.data(), u"가나다라", 5*sizeof(buf[0])));
 
 	EXPECT_TRUE(EINVAL == tszncpy(buf.data(), 0, u"가나다라마바사"sv));
@@ -267,10 +289,14 @@ TEST(gtl_string, tszncpy) {
 TEST(gtl_string, tszcat) {
 	{
 		std::vector<char16_t> buf;
-		EXPECT_TRUE(EINVAL == tszcat(buf.data(), 1, u"가나다라마바사"));						// will generate compiler warning ("NOT Secure")
-		EXPECT_TRUE(EINVAL == tszcat(buf, (char16_t*)nullptr));								// will generate compiler warning ("NOT Secure")
+		SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(EINVAL == tszcat(buf.data(), 1, u"가나다라마바사"));
+		SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(EINVAL == tszcat(buf, (char16_t*)nullptr));
+		SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 		buf.resize(32);
-		EXPECT_TRUE(EINVAL == tszcat(buf.data(), -1, u"가나다"));								// will generate compiler warning ("NOT Secure")
+		SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+		EXPECT_TRUE(EINVAL == tszcat(buf.data(), -1, u"가나다"));
 
 		EXPECT_TRUE(         0 == tszcat(buf, u"가나다라마바사"sv));
 		EXPECT_TRUE(buf.data() == u"가나다라마바사"sv);
@@ -366,80 +392,211 @@ TEST(gtl_string, tszrmchar) {
 
 TEST(gtl_string, tszcmp) {
 
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	constexpr auto e = tszcmp<char>(nullptr, nullptr);
 	static_assert(e == 0);
 
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	constexpr auto e2 = tszcmp("abcdef", "abcdefa");
 	static_assert(e2 < 0);
+
+	static_assert(tszcmp("abcdef"sv, "abcdef"sv) == 0);
+	static_assert(tszncmp("abcdef"sv, "abcdef"sv, 4) == 0);
+	//static_assert(tszicmp("ABCDEF"sv, "abcdef"sv) == 0);
+	//static_assert(tsznicmp("ABCDEF"sv, "abcdef"sv, 4) == 0);
 
 	//char ptr[] = "abcdef";
 	//constexpr auto e3 = tszcmp(ptr, "abcdefa");
 	//static_assert(e3 < 0);
 
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszcmp<char>(nullptr, nullptr) == 0);
-	EXPECT_TRUE(tszcmp<char>(nullptr, "") < 0);
-	EXPECT_TRUE(tszcmp<char>("", nullptr) > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(tszcmp<char>(nullptr, "") == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(tszcmp<char>("", nullptr) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszcmp("", "") == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszcmp("abcdef", "abcdefa") < 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszcmp("abcdefa", "abcdef") > 0);
 
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp<char>(nullptr, nullptr) == 0);
-	EXPECT_TRUE(tszicmp<char>(nullptr, "") < 0);
-	EXPECT_TRUE(tszicmp<char>("", nullptr) > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(tszicmp<char>(nullptr, "") == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(tszicmp<char>("", nullptr) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("", "") == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("aBCdef", "abcdEFa") < 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("abcDefa", "aBCDef") > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("abCdef", "AbCdefA") < 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("aBcDEFa", "abcdef") > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("aBCdef", "abcdEF") == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("abcDef", "aBCDef") == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("abCdef", "AbCdef") == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszicmp("aBcDEF", "abcdef") == 0);
 
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp<char>(nullptr, nullptr, 0) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp<char>(nullptr, "", 0) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp<char>("", nullptr, 0) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp<char>(nullptr, nullptr, 10) == 0);
-	EXPECT_TRUE(tszncmp<char>(nullptr, "", 10) < 0);
-	EXPECT_TRUE(tszncmp<char>("", nullptr, 10) > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(tszncmp<char>(nullptr, "", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(tszncmp<char>("", nullptr, 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp("", "", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp("abcdef", "abcdefa", 10) < 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp("abcdefa", "abcdef", 10) > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp("", "", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp("abcdef", "abcdefa", 4) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tszncmp("abcdefa", "abcdef", 4) == 0);
 
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp<char>(nullptr, nullptr, 0) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp<char>(nullptr, "", 0) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp<char>("", nullptr, 0) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp<char>(nullptr, nullptr, 10) == 0);
-	EXPECT_TRUE(tsznicmp<char>(nullptr, "", 10) < 0);
-	EXPECT_TRUE(tsznicmp<char>("", nullptr, 10) > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(tsznicmp<char>(nullptr, "", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	EXPECT_TRUE(tsznicmp<char>("", nullptr, 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("", "", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abcdef", "abcdefa", 10) < 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abcdefa", "abcdef", 10) > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("", "", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abcdef", "abcdefa", 4) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abcdefa", "abcdef", 4) == 0);
 
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("aBCdef", "abcdEFa", 10) < 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abcDefa", "aBCDef", 10) > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abCdef", "AbCdefA", 10) < 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("aBcDEFa", "abcdef", 10) > 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("aBCdef", "abcdEF", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abcDef", "aBCDef", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abCdef", "AbCdef", 10) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("aBcDEF", "abcdef", 10) == 0);
 
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("aBCdef", "abcdEFa", 4) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abcDefa", "aBCDef", 4) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abCdef", "AbCdefA", 4) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("aBcDEFa", "abcdef", 4) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("aBCdef", "abcdEF", 3) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abcDef", "aBCDef", 3) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("abCdef", "AbCdef", 3) == 0);
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	EXPECT_TRUE(tsznicmp("aBcDEF", "abcdef", 3) == 0);
 
+
+
+
+	EXPECT_TRUE(tszcmp(std::string_view{nullptr, 0}, std::string_view{nullptr, 0}) == 0);
+	EXPECT_TRUE(tszcmp({nullptr, 0}, ""sv) == 0);
+	EXPECT_TRUE(tszcmp(""sv, {nullptr, 0}) == 0);
+	EXPECT_TRUE(tszcmp(""sv, ""sv) == 0);
+	EXPECT_TRUE(tszcmp("abcdef"sv, "abcdefa"sv) < 0);
+	EXPECT_TRUE(tszcmp("abcdefa"sv, "abcdef"sv) > 0);
+
+	EXPECT_TRUE(tszicmp(std::string_view{nullptr, 0}, {nullptr, 0}) == 0);
+	EXPECT_TRUE(tszicmp({nullptr, 0}, ""sv) == 0);
+	EXPECT_TRUE(tszicmp(""sv, {nullptr, 0}) == 0);
+	EXPECT_TRUE(tszicmp(""sv, ""sv) == 0);
+	EXPECT_TRUE(tszicmp("aBCdef"sv, "abcdEFa"sv) < 0);
+	EXPECT_TRUE(tszicmp("abcDefa"sv, "aBCDef"sv) > 0);
+	EXPECT_TRUE(tszicmp("abCdef"sv, "AbCdefA"sv) < 0);
+	EXPECT_TRUE(tszicmp("aBcDEFa"sv, "abcdef"sv) > 0);
+	EXPECT_TRUE(tszicmp("aBCdef"sv, "abcdEF"sv) == 0);
+	EXPECT_TRUE(tszicmp("abcDef"sv, "aBCDef"sv) == 0);
+	EXPECT_TRUE(tszicmp("abCdef"sv, "AbCdef"sv) == 0);
+	EXPECT_TRUE(tszicmp("aBcDEF"sv, "abcdef"sv) == 0);
+
+	EXPECT_TRUE(tszncmp<char>({nullptr, 0}, {nullptr, 0}, 0) == 0);
+	EXPECT_TRUE(tszncmp({nullptr, 0}, ""sv, 0) == 0);
+	EXPECT_TRUE(tszncmp(""sv, {nullptr, 0}, 0) == 0);
+	EXPECT_TRUE(tszncmp<char>({nullptr, 0}, {nullptr, 0}, 10) == 0);
+	EXPECT_TRUE(tszncmp({nullptr, 0}, ""sv, 10) == 0);
+	EXPECT_TRUE(tszncmp(""sv, {nullptr, 0}, 10) == 0);
+	EXPECT_TRUE(tszncmp(""sv, ""sv, 10) == 0);
+	EXPECT_TRUE(tszncmp("abcdef"sv, "abcdefa"sv, 10) < 0);
+	EXPECT_TRUE(tszncmp("abcdefa"sv, "abcdef"sv, 10) > 0);
+	EXPECT_TRUE(tszncmp(""sv, ""sv, 10) == 0);
+	EXPECT_TRUE(tszncmp("abcdef"sv, "abcdefa"sv, 4) == 0);
+	EXPECT_TRUE(tszncmp("abcdefa"sv, "abcdef"sv, 4) == 0);
+
+	EXPECT_TRUE(tsznicmp<char>({nullptr, 0}, {nullptr, 0}, 0) == 0);
+	EXPECT_TRUE(tsznicmp({nullptr, 0}, ""sv, 0) == 0);
+	EXPECT_TRUE(tsznicmp(""sv, {nullptr, 0}, 0) == 0);
+	EXPECT_TRUE(tsznicmp<char>({nullptr, 0}, {nullptr, 0}, 10) == 0);
+	EXPECT_TRUE(tsznicmp({nullptr, 0}, ""sv, 10) == 0);
+	EXPECT_TRUE(tsznicmp(""sv, {nullptr, 0}, 10) == 0);
+	EXPECT_TRUE(tsznicmp(""sv, ""sv, 10) == 0);
+	EXPECT_TRUE(tsznicmp("abcdef"sv, "abcdefa"sv, 10) < 0);
+	EXPECT_TRUE(tsznicmp("abcdefa"sv, "abcdef"sv, 10) > 0);
+	EXPECT_TRUE(tsznicmp(""sv, ""sv, 10) == 0);
+	EXPECT_TRUE(tsznicmp("abcdef"sv, "abcdefa"sv, 4) == 0);
+	EXPECT_TRUE(tsznicmp("abcdefa"sv, "abcdef"sv, 4) == 0);
+
+	EXPECT_TRUE(tsznicmp("aBCdef"sv, "abcdEFa"sv, 10) < 0);
+	EXPECT_TRUE(tsznicmp("abcDefa"sv, "aBCDef"sv, 10) > 0);
+	EXPECT_TRUE(tsznicmp("abCdef"sv, "AbCdefA"sv, 10) < 0);
+	EXPECT_TRUE(tsznicmp("aBcDEFa"sv, "abcdef"sv, 10) > 0);
+	EXPECT_TRUE(tsznicmp("aBCdef"sv, "abcdEF"sv, 10) == 0);
+	EXPECT_TRUE(tsznicmp("abcDef"sv, "aBCDef"sv, 10) == 0);
+	EXPECT_TRUE(tsznicmp("abCdef"sv, "AbCdef"sv, 10) == 0);
+	EXPECT_TRUE(tsznicmp("aBcDEF"sv, "abcdef"sv, 10) == 0);
+
+	EXPECT_TRUE(tsznicmp("aBCdef"sv, "abcdEFa"sv, 4) == 0);
+	EXPECT_TRUE(tsznicmp("abcDefa"sv, "aBCDef"sv, 4) == 0);
+	EXPECT_TRUE(tsznicmp("abCdef"sv, "AbCdefA"sv, 4) == 0);
+	EXPECT_TRUE(tsznicmp("aBcDEFa"sv, "abcdef"sv, 4) == 0);
+	EXPECT_TRUE(tsznicmp("aBCdef"sv, "abcdEF"sv, 3) == 0);
+	EXPECT_TRUE(tsznicmp("abcDef"sv, "aBCDef"sv, 3) == 0);
+	EXPECT_TRUE(tsznicmp("abCdef"sv, "AbCdef"sv, 3) == 0);
+	EXPECT_TRUE(tsznicmp("aBcDEF"sv, "abcdef"sv, 3) == 0);
 }
 
 
@@ -489,6 +646,8 @@ TEST(gtl_string, tszto) {
 	auto a1 = gtl::tsztoi("12345"sv);
 	auto a2 = gtl::tsztoi("12345"s);
 	auto a3 = gtl::tsztoi("12345");
+	CString str;
+	str = "12345";
 	auto a4 = gtl::tsztoi(CString("12345"));
 	//auto aa = overload{
 	//	[]() { std::cout << "()" << std::endl; },

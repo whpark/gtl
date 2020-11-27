@@ -47,24 +47,47 @@ namespace gtl {
 		KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
 	}; };
 
+	template <typename tchar>	constexpr inline static uint32_t const eCODEPAGE_DEFAULT = eCODEPAGE::Default;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char> = eCODEPAGE::KO_KR_949;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char8_t> = eCODEPAGE::UTF8;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char16_t> = eCODEPAGE::UTF16;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char32_t> = eCODEPAGE::UTF32;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<wchar_t> = eCODEPAGE::UCS2;
+
+	template <typename tchar>	constexpr inline static uint32_t const eCODEPAGE_OTHER_ENDIAN = eCODEPAGE::Default;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_OTHER_ENDIAN<char16_t> = eCODEPAGE::_UTF16_other;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_OTHER_ENDIAN<char32_t> = eCODEPAGE::_UTF32_other;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_OTHER_ENDIAN<wchar_t> = eCODEPAGE::_UCS2_other;
+
+
+	/// @brief default codepage for MBCS (windows)
+	/// you can set this value for your region.
 	GTL_DATA extern int eGTLDefaultCodepage_g;
 
 	struct S_CODEPAGE_OPTION {
 		uint32_t from {eCODEPAGE::Default};
 		uint32_t to {eCODEPAGE::Default};
 
-		uint16_t From() const {
-			if (from > 0xffff) {	// wrong or default value
-				return eGTLDefaultCodepage_g;
+		// no constructors. for designated initializer...
+		template < typename tchar_from > uint32_t From() const { return GetCodepage<tchar_from>(from); }
+		template < typename tchar_to >	 uint32_t To() const   { return GetCodepage<tchar_to>(to); }
+
+	private:
+		template < typename tchar >
+		constexpr inline static uint32_t GetCodepage(uint32_t codepage) {
+			if (codepage == eCODEPAGE::Default) {	// wrong or default value
+				if constexpr (std::is_same_v<tchar, char>) {
+					std::numbers::pi;
+					return eGTLDefaultCodepage_g;
+				}
+				else {
+					if (eCODEPAGE_DEFAULT<tchar> != eCODEPAGE::Default)
+						return eCODEPAGE_DEFAULT<tchar>;
+				}
 			}
-			return from;
+			return codepage;
 		}
-		uint16_t To() const {
-			if (to > 0xffff) {	// wrong or default value
-				return eGTLDefaultCodepage_g;
-			}
-			return to;
-		}
+
 	};
 
 
@@ -159,12 +182,12 @@ namespace gtl {
 
 	/// @brief Converts Codepage To StringA (MBCS)
 	std::string ToStringA(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		if (codepage.From() == codepage.To()) {
+		if (codepage.From<char>() == codepage.To<char>()) {
 			return std::string{ svFrom };
 		}
 		else {
-			auto strU = ConvMBCS_UTF16(svFrom, { .from = codepage.From() });
-			return ConvUTF16_MBCS(strU, { .to = codepage.To() });
+			auto strU = ConvMBCS_UTF16(svFrom, { .from = codepage.From<char>() });
+			return ConvUTF16_MBCS(strU, { .to = codepage.To<char>() });
 		}
 	}
 	std::string ToStringA(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {

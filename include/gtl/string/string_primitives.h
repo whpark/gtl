@@ -42,16 +42,13 @@
 namespace gtl {
 #pragma pack(push, 8)
 
-	// todo : hpp 쪽으로 implementation 분리.
-	// todo : string primitives argument 에 string_view 추가
-
 	//-----------------------------------------------------------------------------
 	/// @brief pre-defines : basic_string_t
 	template < gtlc::string_elem tchar, class ttraits = std::char_traits<tchar>, class tallocator = std::allocator<tchar> >
 	using basic_string_t = std::basic_string<tchar, ttraits, tallocator>;
 
 
-#if 0	// NOT available. Template Argument Deductino for Function Argument is NOT, YET!
+#if 0	// NOT available. Template Argument Deduction for Function Argument is NOT, YET!
 	template < gtlc::string_elem tchar >
 		requires (std::is_same_v<std::remove_const_t<tchar>, tchar>)
 	class tstr_buf {
@@ -245,6 +242,10 @@ namespace gtl {
 	template < gtlc::string_elem tchar > constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszicmp(tchar const* pszA, tchar const* pszB);
 	template < gtlc::string_elem tchar > constexpr inline GTL_DEPR_SEC [[nodiscard]] int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount);
 
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tszcmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tszncmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount);
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tszicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tsznicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount);
 
 	template < gtlc::string_buffer_fixed tstring_buf >	errno_t tszupr(tstring_buf& buf);
 	template < gtlc::string_elem tchar >			 	errno_t tszupr(tchar* const psz, size_t size);

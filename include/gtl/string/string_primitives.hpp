@@ -422,18 +422,20 @@ namespace gtl {
 		template < gtlc::string_elem tchar, bool bUseCount, class Eval >
 		constexpr [[nodiscard]] int tszcmp(tchar const* pszA, tchar const* pszB, size_t nCount, Eval&& eval) {
 			if constexpr (bUseCount) {
-				if (!nCount or (nCount > RSIZE_MAX))
+				if (!nCount)
 					return 0;
+				if (nCount > RSIZE_MAX)
+					throw std::invalid_argument(GTL__FUNCSIG "nCount is too big!");
 			}
 			if (!pszA && !pszB)	// if both are nullptr, return 0;
 				return 0;
 			if (pszA && !pszB)	// if only one has value, its bigger.
-				return *pszA ? *pszA : 1;
+				return *pszA ? *pszA : 0;//1;
 			else if (!pszA && pszB)
-				return *pszB ? -*pszB : -1;
+				return *pszB ? -*pszB : 0;//-1;
 
 			for (; *pszA && *pszB; pszA++, pszB++) {
-				int r = eval(*pszA, *pszB);
+				int r = eval(*pszA) - eval(*pszB);
 				if (r)
 					return r;
 				if constexpr (bUseCount) {
@@ -443,28 +445,95 @@ namespace gtl {
 			}
 			if (!*pszA && !*pszB)
 				return 0;
-			auto r = eval(*pszA, *pszB);
+			int r = eval(*pszA) - eval(*pszB);
 			return r;
+		}
+
+		template < gtlc::string_elem tchar, bool bUseCount, class Eval >
+		constexpr [[nodiscard]] int tszcmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount, Eval&& eval) {
+			if constexpr (bUseCount) {
+				if (!nCount)
+					return 0;
+				if (nCount > RSIZE_MAX)
+					throw std::invalid_argument(GTL__FUNCSIG "nCount is too big!");
+			}
+			bool bEmptyA = svA.empty();
+			bool bEmptyB = svB.empty();
+			if (bEmptyA || bEmptyB) {
+				if (bEmptyA and bEmptyB)
+					return 0;
+				if (!bEmptyA)
+					return 1;
+				if (!bEmptyB)
+					return -1;
+			}
+			tchar const* pszA = svA.data();
+			tchar const* pszB = svB.data();
+			tchar const* const pszAEnd = svA.data() + svA.size();
+			tchar const* const pszBEnd = svB.data() + svB.size();
+
+			for (; pszA < pszAEnd and pszB < pszBEnd; pszA++, pszB++) {
+				int r = eval(*pszA) - eval(*pszB);
+				if (r)
+					return r;
+				if constexpr (bUseCount) {
+					if (--nCount == 0)
+						return 0;
+				}
+				if (!*pszA)	[[unlikely]]
+					return 0;
+			}
+			//if ((pszA < pszAEnd) and (pszB < pszBEnd)) [[unlkely]] // actually, never happens here.
+			//{
+			//	
+			//	return eval(*pszA, *pszB);
+			//}
+			//else {
+				if (pszA < pszAEnd)
+					return eval(*pszA);
+				if (pszB < pszBEnd)
+					return -eval(*pszB);
+			//}
+
+			return 0;
 		}
 	}
 
 
 	template < gtlc::string_elem tchar >
 	constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszcmp(tchar const* pszA, tchar const* pszB) {
-		return gtl::internal::tszcmp<tchar, false>(pszA, pszB, {}, [](tchar a, tchar b) -> int {return (int)a - (int)b;});
+		return gtl::internal::tszcmp<tchar, false>(pszA, pszB, {}, [](auto v) -> int { return (int)v; });
 	}
 	template < gtlc::string_elem tchar >
 	constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount) {
-		return gtl::internal::tszcmp<tchar, true>(pszA, pszB, nCount, [](tchar a, tchar b) -> int {return (int)a - (int)b;});
+		return gtl::internal::tszcmp<tchar, true>(pszA, pszB, nCount, [](auto v) -> int { return (int)v; });
 	}
 	template < gtlc::string_elem tchar >
 	constexpr inline GTL_DEPR_SEC [[nodiscard]] int tszicmp(tchar const* pszA, tchar const* pszB) {
-		return gtl::internal::tszcmp<tchar, false>(pszA, pszB, {}, [](tchar a, tchar b) -> int {return (int)ToLower(a) - (int)ToLower(b);});
+		return gtl::internal::tszcmp<tchar, false>(pszA, pszB, {}, [](auto v) -> int { return std::tolower(v); });
 	}
 	template < gtlc::string_elem tchar >
 	constexpr inline GTL_DEPR_SEC [[nodiscard]] int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount) {
-		return gtl::internal::tszcmp<tchar, true>(pszA, pszB, nCount, [](tchar a, tchar b) -> int {return (int)ToLower(a) - (int)ToLower(b);});
+		return gtl::internal::tszcmp<tchar, true>(pszA, pszB, nCount, [](auto v) -> int { return std::tolower(v); });
 	}
+
+	template < gtlc::string_elem tchar >
+	constexpr inline [[nodiscard]] int tszcmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB) {
+		return gtl::internal::tszcmp<tchar, false>(svA, svB, {}, [](auto v) -> int { return (int)v; });
+	}
+	template < gtlc::string_elem tchar >
+	constexpr inline [[nodiscard]] int tszncmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount) {
+		return gtl::internal::tszcmp<tchar, true>(svA, svB, nCount, [](auto v) -> int { return (int)v; });
+	}
+	template < gtlc::string_elem tchar >
+	constexpr inline [[nodiscard]] int tszicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB) {
+		return gtl::internal::tszcmp<tchar, false>(svA, svB, {}, [](auto v) -> int { return std::tolower(v); });
+	}
+	template < gtlc::string_elem tchar >
+	constexpr inline [[nodiscard]] int tsznicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount) {
+		return gtl::internal::tszcmp<tchar, true>(svA, svB, nCount, [](auto v) -> int { return std::tolower(v); });
+	}
+
 
 	template < gtlc::string_buffer_fixed tstring_buf >
 	errno_t tszupr(tstring_buf& buf) {

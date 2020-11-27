@@ -61,7 +61,7 @@ namespace gtl::concepts {
 	/// @brief type for string buffer with type constraints
 	template < typename tcontainer, typename tchar >
 	concept string_buffer_fixed_c = 
-		(std::is_same_v<typename tcontainer::value_type, tchar> or std::is_same_v<std::remove_reference_t<decltype(tcontainer()[0])>, tchar>)
+		(std::is_same_v<std::remove_cvref_t<typename tcontainer::value_type>, tchar> or std::is_same_v<std::remove_cvref_t<decltype(tcontainer()[0])>, tchar>)
 		and string_buffer_fixed<tcontainer>;
 
 
