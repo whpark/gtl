@@ -40,9 +40,9 @@ namespace gtl {
 	// TString : MFC::CString-like std::string wrapper
 	//
 	template < gtlc::string_elem tchar, class ttraits, class tallocator>
-	class TString : public basic_string_t<tchar, ttraits, tallocator> {
+	class TString : public std::basic_string<tchar, ttraits, tallocator> {
 	public:
-		using base_t = basic_string_t<tchar, ttraits, tallocator>;
+		using base_t = std::basic_string<tchar, ttraits, tallocator>;
 		using value_type = typename base_t::value_type;
 		using size_type = typename base_t::size_type;
 		using index_type = intptr_t;
@@ -53,7 +53,7 @@ namespace gtl {
 		TString() = default;
 		TString(TString const& B) = default;
 		TString(TString&& B) = default;
-		TString(basic_string_t<tchar> const& B) : basic_string_t<tchar>(B) {}
+		TString(std::basic_string<tchar> const& B) : std::basic_string<tchar>(B) {}
 
 
 		/// @brief Constructor from other codepage (string)
@@ -117,7 +117,7 @@ namespace gtl {
 		// operator = ( char??_t type conversion)
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
-		TString& operator = (basic_string_t<tchar_other> const& str) {
+		TString& operator = (std::basic_string<tchar_other> const& str) {
 			*this = ToString<tchar_other, tchar>(str);
 			return *this;
 		}
@@ -135,7 +135,8 @@ namespace gtl {
 		template < gtlc::string_buffer_fixed tstring_buf_other >
 		requires (!std::is_same_v< std::remove_cvref_t<decltype(tstring_buf_other{}[0]) >, std::remove_cvref_t<tchar>>)
 		TString& operator = (tstring_buf_other const& buf) {
-			*this = ToString<std::remove_cvref_t<decltype(tstring_buf_other{}[0])>, tchar>(std::basic_string_view{std::data(buf), std::size(buf)});
+			std::basic_string_view sv{std::data(buf), tszlen(buf)};
+			*this = ToString<std::remove_cvref_t<decltype(tstring_buf_other{}[0])>, tchar>(sv);
 			return *this;
 		}
 
@@ -147,7 +148,7 @@ namespace gtl {
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other >
-		TString& operator += (const basic_string_t<tchar_other>& B) {
+		TString& operator += (const std::basic_string<tchar_other>& B) {
 			if constexpr (std::is_same_v<tchar, tchar_other>) {
 				base_t::operator += (B);
 			} else {
@@ -157,12 +158,12 @@ namespace gtl {
 		}
 		template < gtlc::string_elem tchar_other >
 		TString& operator += (const tchar_other* psz) {
-			operator += (basic_string_t<tchar_other>(psz));
+			operator += (std::basic_string<tchar_other>(psz));
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other >
 		TString& operator += (tchar_other ch) {
-			operator += (basic_string_t<tchar_other>(1, ch));
+			operator += (std::basic_string<tchar_other>(1, ch));
 			return *this;
 		}
 
@@ -170,17 +171,17 @@ namespace gtl {
 		// operator +
 		// operand 둘 중 하나는 TString 이라야 함.
 		friend TString operator + (const TString& A, const TString<char>& B)				{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const basic_string_t<char>& B)			{ return TString(A) += B; }
+		friend TString operator + (const TString& A, const std::basic_string<char>& B)		{ return TString(A) += B; }
 		friend TString operator + (const TString& A, const char B)							{ return TString(A) += B; }
 		friend TString operator + (const TString& A, const char* B)							{ return TString(A) += B; }
 		friend TString operator + (const TString& A, const TString<wchar_t>& B)				{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const basic_string_t<wchar_t>& B)		{ return TString(A) += B; }
+		friend TString operator + (const TString& A, const std::basic_string<wchar_t>& B)	{ return TString(A) += B; }
 		friend TString operator + (const TString& A, const wchar_t B)						{ return TString(A) += B; }
 		friend TString operator + (const TString& A, const wchar_t* B)						{ return TString(A) += B; }
-		friend TString operator + (const basic_string_t<char>& A,		const TString& B)	{ return TString(A) += B; }
+		friend TString operator + (const std::basic_string<char>& A,	const TString& B)	{ return TString(A) += B; }
 		friend TString operator + (const char A,						const TString& B)	{ return TString(A) += B; }
 		friend TString operator + (const char* A,						const TString& B)	{ return TString(A) += B; }
-		friend TString operator + (const basic_string_t<wchar_t>& A,	const TString& B)	{ return TString(A) += B; }
+		friend TString operator + (const std::basic_string<wchar_t>& A,	const TString& B)	{ return TString(A) += B; }
 		friend TString operator + (const wchar_t A,						const TString& B)	{ return TString(A) += B; }
 		friend TString operator + (const wchar_t* A,					const TString& B)	{ return TString(A) += B; }
 
@@ -209,17 +210,31 @@ namespace gtl {
 		//---------------------------------------------------------------------
 		// SubString
 		TString Mid(index_type iBegin) const {
-			return TString(this->substr(iBegin, this->size() - iBegin));
+			return this->substr(iBegin, this->size() - iBegin);
 		}
 		TString Mid(index_type iBegin, index_type nCount) const {
-			return TString(this->substr(iBegin, nCount));
+			return this->substr(iBegin, nCount);
 		}
 		TString Left(index_type nCount) const {
-			return TString(this->substr(0, nCount));
+			return this->substr(0, nCount);
 		}
 		TString Right(index_type nCount) const {
 			index_type iBegin = ((index_type)this->size() < nCount) ? 0 : (index_type)this->size()-nCount;
-			return TString(this->substr(iBegin, nCount));
+			return this->substr(iBegin, nCount);
+		}
+
+		[[nodiscard]] std::basic_string_view<tchar> MidView(index_type iBegin) const {
+			return std::basic_string_view<tchar>{this}.substr(iBegin, this->size() - iBegin);
+		}
+		[[nodiscard]] std::basic_string_view<tchar> MidView(index_type iBegin, index_type nCount) const {
+			return std::basic_string_view<tchar>{this}.substr(iBegin, nCount);
+		}
+		[[nodiscard]] std::basic_string_view<tchar> LeftView(index_type nCount) const {
+			return std::basic_string_view<tchar>{this}.substr(0, nCount);
+		}
+		[[nodiscard]] std::basic_string_view<tchar> RightView(index_type nCount) const {
+			index_type iBegin = ((index_type)this->size() < nCount) ? 0 : (index_type)this->size()-nCount;
+			return std::basic_string_view<tchar>{this}.substr(iBegin, nCount);
 		}
 
 		TString SpanIncluding(const tchar* pszCharSet) const {
@@ -270,14 +285,21 @@ namespace gtl {
 			return str;
 		}
 
-		void Trim()														{ TrimLeft(); TrimRight(); }
+		void Trim()														{ gtl::Trim(); }
 		void TrimRight()												{ gtl::TrimRight(*this); }
-		void TrimRight(tchar chTarget)									{ tchar szTrim[] = { chTarget, 0, }; gtl::TrimRight(*this, szTrim); }
+		void TrimRight(tchar chTarget)									{ gtl::TrimRight(*this, chTarget); }
 		void TrimRight(const tchar* pszTargets)							{ gtl::TrimRight(*this, pszTargets); }
 		void TrimLeft()													{ gtl::TrimLeft(*this); }
-		void TrimLeft(tchar chTarget)									{ tchar szTrim[] = { chTarget, 0, }; gtl::TrimLeft(*this, szTrim); }
+		void TrimLeft(tchar chTarget)									{ gtl::TrimLeft(*this, chTarget); }
 		void TrimLeft(const tchar* pszTargets)							{ gtl::TrimLeft(*this, pszTargets); }
 
+		[[nodiscard]] std::basic_string_view<tchar> TrimView()								const { return gtl::TrimView((std::basic_string_view<tchar>)*this); }
+		[[nodiscard]] std::basic_string_view<tchar> TrimRightView()							const { return gtl::TrimRightView((std::basic_string_view<tchar>)*this); }
+		[[nodiscard]] std::basic_string_view<tchar> TrimRightView(tchar chTarget)			const { return gtl::TrimRightView((std::basic_string_view<tchar>)*this, chTarget); }
+		[[nodiscard]] std::basic_string_view<tchar> TrimRightView(const tchar* pszTargets)	const { return gtl::TrimRightView((std::basic_string_view<tchar>)*this, pszTargets); }
+		[[nodiscard]] std::basic_string_view<tchar> TrimLeftView()							const { return gtl::TrimLeftView((std::basic_string_view<tchar>)*this); }
+		[[nodiscard]] std::basic_string_view<tchar> TrimLeftView(tchar chTarget)			const { return gtl::TrimLeftView((std::basic_string_view<tchar>)*this, chTarget); }
+		[[nodiscard]] std::basic_string_view<tchar> TrimLeftView(const tchar* pszTargets)	const { return gtl::TrimLeftView((std::basic_string_view<tchar>)*this, pszTargets); }
 
 		index_type Replace(tchar chOld, tchar chNew) {
 			index_type nReplaced = 0;
@@ -340,24 +362,10 @@ namespace gtl {
 			return nToReplace;
 		}
 		index_type Remove(tchar chRemove) {
-			index_type nOrg = this->size();
-			std::array<tchar, 2> szRemove {chRemove, 0};
-			*this = SpanExcluding(szRemove.data());
-			index_type nNew = this->size();
-			return nOrg-nNew;
-			//tchar* pos1 = this->data();
-			//tchar* pos2 = this->data();
-			//index_type nReplaced = 0;
-			//while (*pos2) {
-			//	if (*pos2 == chRemove) {
-			//		*pos2++;
-			//		nReplaced++;
-			//	} else {
-			//		if (nReplaced)
-			//			*pos1++ = *pos2++;
-			//	}
-			//}
-			//return nReplaced;
+			auto nNewLen = tszrmchar(this->data(), this->size(), chRemove);
+			if (nNewLen != this->size())
+				this->resize(nNewLen);
+			return this->size();
 		}
 		index_type Insert(index_type index, tchar ch) {
 			return this->insert(index, ch).size();
@@ -413,27 +421,11 @@ namespace gtl {
 			return this->data();
 		}
 		size_type ReleaseBuffer() {	// reserve(), data() 함수를 사용해서 버퍼를 가져온 다음, 버퍼에 데이터를 보낸 다음, 크기 다시 설정. capacity()에 따라서 마지막 문자가 잘릴 수 있음.
-			const tchar* p = *this;
-			const auto nCapacity = this->capacity();
-			if (!p || !nCapacity)
+			if (!this->data() || !this->capacity())
 				return 0;
-			//auto& _My_data = this->_Get_data();
-			size_type nNewLen = 0;
-			if constexpr (std::is_same_v<tchar, wchar_t> || std::is_same_v<tchar, char16_t>) {
-				nNewLen = wcsnlen(p, nCapacity);
-			} else if constexpr (std::is_same_v<tchar, char> || std::is_same_v<tchar, char8_t>) {
-				nNewLen = strnlen(p, nCapacity);
-			} else {
-				for (const tchar* pos = p; *pos && (nNewLen < nCapacity); pos++, nNewLen++)
-					;
-			}
-
-			//#ifdef _DEBUG
-			//	if (nNewLen == nCapacity)
-			//		throw std::overflow_error(GTL__FUNCSIG "String Length Overflowed.");
-			//#endif
+			size_type nNewLen = tszlen(this->data(), this->size());
 			this->resize(nNewLen, 0);
-			return this->length();
+			return this->size();
 		}
 
 	};	// TString

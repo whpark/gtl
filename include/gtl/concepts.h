@@ -38,6 +38,9 @@ namespace gtl::concepts {
 	concept string_elem_utf = is_one_of_v<std::remove_cvref_t<tchar>, char8_t, char16_t, char32_t>;
 
 
+
+	// todo: std::size(array) returns including nullterminating string.
+
 	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
 	template < typename tcontainer >
 	concept string_buffer_fixed =

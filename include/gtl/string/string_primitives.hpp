@@ -19,7 +19,8 @@ namespace gtl {
 	//-----------------------------------------------------------------------------
 	/// @brief  misc. GetSpaceString()
 	/// @return " \r\t\n"
-	template < gtlc::string_elem tchar > [[nodiscard]] constexpr const tchar* GetSpaceString() {
+	/// 
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr std::basic_string_view<tchar> GetSpaceString() {
 		if constexpr (std::is_same_v<tchar, char>) { return _A(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, char8_t>) { return _u8(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, char16_t>) { return _u(SPACE_STRING); }
@@ -28,55 +29,105 @@ namespace gtl {
 		else if constexpr (std::is_same_v<tchar, uint16_t>) { return (uint16_t*)_u(SPACE_STRING); }
 		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
+	//template < gtlc::string_elem tchar > [[nodiscard]] constexpr std::basic_string_view<tchar> GetSpaceString();
+	//template <> [[nodiscard]] constexpr std::basic_string_view<char>     GetSpaceString() { return SPACE_STRING; }
+	//template <> [[nodiscard]] constexpr std::basic_string_view<char8_t>  GetSpaceString() { return _u8(SPACE_STRING); }
+	//template <> [[nodiscard]] constexpr std::basic_string_view<char16_t> GetSpaceString() { return _u(SPACE_STRING); }
+	//template <> [[nodiscard]] constexpr std::basic_string_view<char32_t> GetSpaceString() { return _U(SPACE_STRING); }
+	//template <> [[nodiscard]] constexpr std::basic_string_view<wchar_t>  GetSpaceString() { return _W(SPACE_STRING); }
+
 
 	constexpr static inline bool is_space(int const c) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
 
 
 	//-----------------------------------------------------------------------------
-	/// @brief TrimLeft, TrimRight, Trim
-	/// @tparam tchar 
-	/// @param str : string
-	/// @param pszTrim : chars to trim
-	template < gtlc::string_elem tchar > void TrimLeft(basic_string_t<tchar>& str)	{
-		TrimLeft(str, GetSpaceString<tchar>());
-	}
-	template < gtlc::string_elem tchar > void TrimRight(basic_string_t<tchar>& str)	{
-		TrimRight(str, GetSpaceString<tchar>());
-	}
-	template < gtlc::string_elem tchar > void Trim(basic_string_t<tchar>& str) {
-		Trim(str, GetSpaceString<tchar>());
-	}
-
-	template < gtlc::string_elem tchar > void TrimRight(basic_string_t<tchar>& str, const tchar* pszTrim) {
-		str.erase(str.begin() + (str.find_last_not_of(pszTrim) + 1), str.end());
-	}
-	template < gtlc::string_elem tchar > void TrimLeft(basic_string_t<tchar>& str, const tchar* pszTrim) {
-		auto pos = str.find_first_not_of(pszTrim);
+	// Trim
+	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str, std::basic_string_view<tchar> svTrim) {
+		auto pos = str.find_first_not_of(svTrim);
 		if (pos == str.npos)
 			str.clear();
 		else
 			str.erase(str.begin(), str.begin()+pos);
 	}
-	template < gtlc::string_elem tchar > void Trim(basic_string_t<tchar>& str, const tchar* pszTrim) {
-		TrimRight(str, pszTrim);
-		TrimLeft(str, pszTrim);
+	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str, std::basic_string_view<tchar> svTrim) {
+		str.erase(str.begin() + (str.find_last_not_of(svTrim) + 1), str.end());
+	}
+	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str, std::basic_string_view<tchar> svTrim) {
+		TrimRight(str, svTrim);
+		TrimLeft(str, svTrim);
 	}
 
-	template < gtlc::string_elem tchar > void TrimRight(basic_string_t<tchar>& str, const tchar cTrim) {
-		str.erase(str.begin() + (str.find_last_not_of(cTrim) + 1), str.end());
-	}
-	template < gtlc::string_elem tchar > void TrimLeft(basic_string_t<tchar>& str, const tchar cTrim) {
+	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str, tchar const cTrim) {
 		auto pos = str.find_first_not_of(cTrim);
 		if (pos == str.npos)
 			str.clear();
 		else
 			str.erase(str.begin(), str.begin()+pos);
 	}
-	template < gtlc::string_elem tchar > void Trim(basic_string_t<tchar>& str, const tchar cTrim) {
+	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str, tchar const cTrim) {
+		str.erase(str.begin() + (str.find_last_not_of(cTrim) + 1), str.end());
+	}
+	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str, tchar const cTrim) {
 		TrimRight(str, cTrim);
 		TrimLeft(str, cTrim);
 	}
 
+	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str)	{
+		TrimLeft(str, GetSpaceString<tchar>());
+	}
+	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str)	{
+		TrimRight(str, GetSpaceString<tchar>());
+	}
+	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str) {
+		Trim(str, GetSpaceString<tchar>());
+	}
+
+
+	// Trim-View
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svTrim) {
+		if (auto pos = sv.find_first_not_of(svTrim); pos != sv.npos)
+			return { sv.begin()+pos, sv.end() };
+		else
+			return {};
+	}
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svTrim) {
+		return { sv.begin(), sv.begin() + (sv.find_last_not_of(svTrim)+1) };
+	}
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svTrim) {
+		return TrimRightView(TrimLeftView(sv, svTrim), svTrim);
+	}
+
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv, tchar const cTrim) {
+		if (auto pos = sv.find_first_not_of(cTrim); pos != sv.npos)
+			return { sv.begin()+pos, sv.end() };
+		else
+			return {};
+	}
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv, tchar const cTrim) {
+		return { sv.begin(), sv.begin() + (sv.find_last_not_of(cTrim)+1) };
+	}
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv, tchar const cTrim) {
+		return TrimRightView(TrimLeftView(sv, cTrim), cTrim);
+	}
+
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv) {
+		return TrimLeftView(sv, GetSpaceString<tchar>());
+	}
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv) {
+		return TrimRightView(sv, GetSpaceString<tchar>());
+	}
+	template < gtlc::string_elem tchar >
+	std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv) {
+		return TrimView(sv, GetSpaceString<tchar>());
+	}
 
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */) { if ((c >= 'A') && (c <= 'Z')) return c - 'A' + 'a'; return c; }
@@ -112,7 +163,7 @@ namespace gtl {
 				if (!*pos)
 					return pos-psz;
 			}
-			return SIZE_MAX;
+			return pszMax-psz;	// max size
 		}
 	}
 	template < gtlc::string_elem tchar >
@@ -130,8 +181,6 @@ namespace gtl {
 		return tszlen(std::data(v), std::size(v));
 	}
 
-
-	// todo : documents...
 
 	/// <summary>
 	/// tszcpy : utf8/16/32/wchar_t ver. of strcpy_s
@@ -225,7 +274,7 @@ namespace gtl {
 		if (!pszDest or !sizeDest)
 			return EINVAL;
 		tchar* pos = pszDest;
-		auto sizeSrc = std::size(svSrc);
+		auto sizeSrc = tszlen(svSrc);
 		if (sizeDest <= sizeSrc) {
 			*pos = 0;
 			return ERANGE;
@@ -607,7 +656,7 @@ namespace gtl {
 	}
 	template < gtlc::string_buffer_fixed tstring_buf >
 	std::remove_cvref_t<decltype(tstring_buf{}[0])>* tszrev(tstring_buf& buf) {
-		std::reverse(std::data(buf), std::data(buf)+tszlen(buf, std::size(buf)));
+		std::reverse(std::data(buf), std::data(buf)+tszlen(buf));
 		return std::data(buf);
 	}
 
@@ -615,21 +664,21 @@ namespace gtl {
 	tchar const* tszsearch(tchar const* psz, tchar c) {
 		if (!psz)
 			return nullptr;
-		auto const* const end = psz + tszlen(psz);
-		auto const* p = std::search(psz, end, c);
-		if (p == end)
-			return nullptr;
-		return p;
+		for (tchar const* pos = psz; *pos; pos++) {
+			if (*pos == c)
+				return pos;
+		}
+		return nullptr;
 	}
 	template < gtlc::string_elem tchar >
 	tchar* tszsearch(tchar* psz, tchar c) {
 		if (!psz)
 			return nullptr;
-		auto* const end = psz + tszlen(psz);
-		auto* p = std::search(psz, end, c);
-		if (p == end)
-			return nullptr;
-		return p;
+		for (tchar* pos = psz; *pos; pos++) {
+			if (*pos == c)
+				return pos;
+		}
+		return nullptr;
 	}
 	template < gtlc::string_elem tchar >
 	tchar const* tszsearch(tchar const* psz, tchar const* pszSub) {
@@ -653,6 +702,98 @@ namespace gtl {
 			return nullptr;
 		return p;
 	}
+
+
+	template < gtlc::string_elem tchar >
+	constexpr [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar const* const pszEnd, tchar c) {
+		if (!psz)
+			return nullptr;
+		auto* p = std::search(psz, pszEnd, c);
+		if (p == pszEnd)
+			return nullptr;
+		return p;
+	}
+	template < gtlc::string_elem tchar >
+	constexpr [[nodiscard]] tchar* tszsearch(tchar* psz, tchar const* const pszEnd, tchar c) {
+		if (!psz)
+			return nullptr;
+		auto* p = std::search(psz, pszEnd, c);
+		if (p == pszEnd)
+			return nullptr;
+		return p;
+	}
+	template < gtlc::string_elem tchar >
+	constexpr [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar const* const pszEnd, tchar const* pszSub, tchar const* const pszSubEnd) {
+		if (!psz || !pszSub)
+			return nullptr;
+		auto* p = std::search(psz, pszEnd, pszSub, pszSubEnd);
+		if (p == pszEnd)
+			return nullptr;
+		return p;
+	}
+	template < gtlc::string_elem tchar >
+	constexpr [[nodiscard]] tchar* tszsearch(tchar* psz, tchar const* const pszEnd, tchar* pszSub, tchar const* const pszSubEnd) {
+		if (!psz || !pszSub)
+			return nullptr;
+		auto* p = std::search(psz, pszEnd, pszSub, pszSubEnd);
+		if (p == pszEnd)
+			return nullptr;
+		return p;
+	}
+
+
+	/// @brief  tszsearch_oneof
+	/// @param psz    : string
+	/// @param pszSet : chars to find
+	/// @return position of found char.
+	template < gtlc::string_elem tchar >
+	GTL_DEPR_SEC tchar* tszsearch_oneof(tchar* psz, tchar const * const pszSet) {
+		for (; *psz; psz++) {
+			if (tszsearch(pszSet, *psz))
+				return psz;
+		}
+		return nullptr;
+	}
+	template < gtlc::string_elem tchar >
+	GTL_DEPR_SEC tchar const* tszsearch_oneof(tchar const* psz, tchar const* const pszSet) {
+		for (; *psz; psz++) {
+			if (tszsearch(pszSet, *psz))
+				return psz;
+		}
+		return nullptr;
+	}
+	template < gtlc::string_elem tchar >
+	constexpr tchar* tszsearch_oneof(tchar* psz, tchar* pszEnd, tchar const* const pszSet, tchar const* const pszSetEnd) {
+		if (!psz || !pszSet)
+			return nullptr;
+		for (; (psz < pszEnd) and *psz; psz++) {
+			if (tszsearch(pszSet, pszSetEnd, *psz))
+				return psz;
+		}
+		return nullptr;
+	}
+	template < gtlc::string_elem tchar >
+	constexpr tchar const* tszsearch_oneof(tchar const* psz, tchar const* pszEnd, tchar const* const pszSet, tchar const* const pszSetEnd) {
+		if (!psz || !pszSet)
+			return nullptr;
+		for (; (psz < pszEnd) and *psz; psz++) {
+			if (tszsearch(pszSet, pszSetEnd, *psz))
+				return psz;
+		}
+		return nullptr;
+	}
+
+	template < gtlc::string_elem tchar >
+	constexpr tchar const* tszsearch_oneof(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svSet) {
+		tchar const* psz = sv.data();
+		tchar const* pszEnd = sv.data() + sv.size();
+		for (; (psz < pszEnd) and *psz; psz++) {
+			if (tszsearch(svSet, *psz))
+				return psz;
+		}
+		return nullptr;
+	}
+
 
 	namespace internal {
 		template < typename tvalue, int tsize >
@@ -906,28 +1047,6 @@ namespace gtl {
 		return CompareStringContainingNumbers<tchar, true>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB);
 	}
 
-
-
-	/// @brief  tszsearch_oneof
-	/// @param psz    : string
-	/// @param pszSet : chars to find
-	/// @return position of found char.
-	template < gtlc::string_elem tchar >
-	tchar* tszsearch_oneof(tchar* psz, tchar const * const pszSet) {
-		for (; *psz; psz++) {
-			if (tszsearch(pszSet, *psz))
-				return psz;
-		}
-		return nullptr;
-	}
-	template < gtlc::string_elem tchar >
-	tchar const* tszsearch_oneof(tchar const* psz, tchar const* const pszSet) {
-		for (; *psz; psz++) {
-			if (tszsearch(pszSet, *psz))
-				return psz;
-		}
-		return nullptr;
-	}
 
 
 	/// @brief tszto_number

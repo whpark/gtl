@@ -113,8 +113,11 @@ TEST(gtl_string, tszlen) {
 		auto const* v0 = std::data(buf0);
 		auto const* v1 = std::data(buf1);
 		auto const* v2 = std::data(buf2);
+		auto s0 = std::size(buf0);
 		auto s1 = std::size(buf1);
 		auto s2 = std::size(buf2);
+
+		EXPECT_EQ(std::size("ABCDEF"), 7);
 	}
 
 	//tszlen
@@ -623,7 +626,7 @@ TEST(gtl_string, tszto) {
 
 	char16_t sz[30];
 	char16_t szS[]{u"가나다라마바사"};
-	tszcpy(sz, std::basic_string_view{szS, szS+std::size(szS)});
+	tszcpy(sz, std::basic_string_view{szS});
 	static_assert(std::size(szS) == 7+1);
 
 	EXPECT_TRUE(CompareStringContainingNumbers(u""sv, u""sv) == 0);

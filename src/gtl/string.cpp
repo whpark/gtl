@@ -100,7 +100,6 @@ namespace gtl {
 	}
 #else
 	std::string ConvUTF16_MBCS(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		// todo : to be tested.
 		std::string str;
 		if (svFrom.empty())
 			return str;
@@ -147,7 +146,6 @@ namespace gtl {
 		return str;
 	}
 	std::u16string ConvMBCS_UTF16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		// todo : to be tested.
 		std::u16string str;
 		if (svFrom.empty())
 			return str;

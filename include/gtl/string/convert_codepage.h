@@ -286,8 +286,8 @@ namespace gtl {
 
 	/// @brief Converts Codepage (Unicode <-> MBCS ...)
 	template < gtlc::string_elem tchar1, gtlc::string_elem tchar2 >
-	basic_string_t<tchar2> ToString(std::basic_string_view<tchar1> str, S_CODEPAGE_OPTION codepage = {}) {
-		basic_string_t<tchar2> result;
+	std::basic_string<tchar2> ToString(std::basic_string_view<tchar1> str, S_CODEPAGE_OPTION codepage = {}) {
+		std::basic_string<tchar2> result;
 		if constexpr (std::is_same_v<tchar2, char>) {
 			result = ToStringA(str, codepage);
 		} else if constexpr (std::is_same_v<tchar2, wchar_t>) {

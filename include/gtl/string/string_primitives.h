@@ -42,11 +42,6 @@
 namespace gtl {
 #pragma pack(push, 8)
 
-	//-----------------------------------------------------------------------------
-	/// @brief pre-defines : basic_string_t
-	template < gtlc::string_elem tchar, class ttraits = std::char_traits<tchar>, class tallocator = std::allocator<tchar> >
-	using basic_string_t = std::basic_string<tchar, ttraits, tallocator>;
-
 
 #if 0	// NOT available. Template Argument Deduction for Function Argument is NOT, YET!
 	template < gtlc::string_elem tchar >
@@ -114,12 +109,12 @@ namespace gtl {
 	//-----------------------------------------------------------------------------
 	/// @brief  misc. GetSpaceString()
 	/// @return " \r\t\n"
-	template < gtlc::string_elem tchar > [[nodiscard]] constexpr tchar const* GetSpaceString();
-	constexpr inline [[nodiscard]] char const*		GetSpaceStringA()				{ return GetSpaceString<char>(); }
-	constexpr inline [[nodiscard]] char8_t const*	GetSpaceStringU8()				{ return GetSpaceString<char8_t>(); }
-	constexpr inline [[nodiscard]] char16_t const*	GetSpaceStringU16()				{ return GetSpaceString<char16_t>(); }
-	constexpr inline [[nodiscard]] char32_t const*	GetSpaceStringU32()				{ return GetSpaceString<char32_t>(); }
-	constexpr inline [[nodiscard]] wchar_t const*	GetSpaceStringW()				{ return GetSpaceString<wchar_t>(); }
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr std::basic_string_view<tchar> GetSpaceString();
+	constexpr inline [[nodiscard]] std::basic_string_view<char>     GetSpaceStringA()				{ return GetSpaceString<char>(); }
+	constexpr inline [[nodiscard]] std::basic_string_view<char8_t>  GetSpaceStringU8()				{ return GetSpaceString<char8_t>(); }
+	constexpr inline [[nodiscard]] std::basic_string_view<char16_t> GetSpaceStringU16()				{ return GetSpaceString<char16_t>(); }
+	constexpr inline [[nodiscard]] std::basic_string_view<char32_t> GetSpaceStringU32()				{ return GetSpaceString<char32_t>(); }
+	constexpr inline [[nodiscard]] std::basic_string_view<wchar_t>  GetSpaceStringW()				{ return GetSpaceString<wchar_t>(); }
 
 	constexpr static inline [[nodiscard]] bool is_space(int const c);
 
@@ -129,15 +124,32 @@ namespace gtl {
 	/// @tparam tchar 
 	/// @param str : string
 	/// @param pszTrim : chars to trim
-	template < gtlc::string_elem tchar > void TrimRight(basic_string_t<tchar>& str, const tchar* pszTrim);
-	template < gtlc::string_elem tchar > void TrimLeft(basic_string_t<tchar>& str, const tchar* pszTrim);
-	template < gtlc::string_elem tchar > void Trim(basic_string_t<tchar>& str, const tchar* pszTrim);
-	template < gtlc::string_elem tchar > void TrimRight(basic_string_t<tchar>& str, const tchar cTrim);
-	template < gtlc::string_elem tchar > void TrimLeft(basic_string_t<tchar>& str, const tchar cTrim);
-	template < gtlc::string_elem tchar > void Trim(basic_string_t<tchar>& str, const tchar cTrim);
-	template < gtlc::string_elem tchar > void TrimLeft(basic_string_t<tchar>& str);
-	template < gtlc::string_elem tchar > void TrimRight(basic_string_t<tchar>& str);
-	template < gtlc::string_elem tchar > void Trim(basic_string_t<tchar>& str);
+	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str,			std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str,			std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str,				std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str,			tchar const cTrim);
+	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str,			tchar const cTrim);
+	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str,				tchar const cTrim);
+	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str);
+	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str);
+	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str);
+
+
+	//-----------------------------------------------------------------------------
+	/// @brief TrimLeftView, TrimRightView, TrimView
+	/// @tparam tchar 
+	/// @param str : string
+	/// @param pszTrim : chars to trim
+	/// @return Trimmed string_view
+	template < gtlc::string_elem tchar > [[nodiscard]]        std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv,	std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv,	std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv,		std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv,	tchar const cTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv,	tchar const cTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv,		tchar const cTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv);
 
 
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
@@ -252,14 +264,37 @@ namespace gtl {
 	template < gtlc::string_buffer_fixed tstring_buf >	errno_t tszlwr(tstring_buf& buf);
 	template < gtlc::string_elem tchar >			 	errno_t tszlwr(tchar* const& psz, size_t size);
 
+
 	//template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar* tszrev(tchar* psz);
-	template < gtlc::string_elem tchar >			  [[nodiscard]] tchar* tszrev(tchar* psz, tchar const* const pszEnd);
+	template < gtlc::string_elem tchar > 			  [[nodiscard]] tchar* tszrev(tchar* psz, tchar const* const pszEnd);
 	template < gtlc::string_buffer_fixed tstring_buf > std::remove_cvref_t<decltype(tstring_buf{}[0])>* tszrev(tstring_buf& buf);
 
 	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar c);
 	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar* tszsearch(tchar* psz, tchar c);
 	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar const* pszSub);
 	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar* tszsearch(tchar* psz, tchar* pszSub);
+
+	template < gtlc::string_elem tchar > constexpr [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar const* const pszEnd, tchar c);
+	template < gtlc::string_elem tchar > constexpr [[nodiscard]] tchar* tszsearch(tchar* psz, tchar const* const pszEnd, tchar c);
+	template < gtlc::string_elem tchar > constexpr [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar const* const pszEnd, tchar const* pszSub, tchar const* const pszSubEnd);
+	template < gtlc::string_elem tchar > constexpr [[nodiscard]] tchar* tszsearch(tchar* psz, tchar const* const pszEnd, tchar* pszSub, tchar const* const pszSubEnd);
+
+
+	/// @brief  tszsearch_oneof
+	/// @param psz    : string
+	/// @param pszSet : chars to find
+	/// @return position of found char.
+	template < gtlc::string_elem tchar >
+	GTL_DEPR_SEC tchar* tszsearch_oneof(tchar* psz, tchar const * const pszSet);
+	template < gtlc::string_elem tchar >
+	GTL_DEPR_SEC tchar const* tszsearch_oneof(tchar const* psz, tchar const* const pszSet);
+
+	template < gtlc::string_elem tchar >
+	constexpr tchar* tszsearch_oneof(tchar* psz, tchar* pszEnd, tchar const * const pszSet, tchar const* const pszSetEnd);
+	template < gtlc::string_elem tchar >
+	constexpr tchar const* tszsearch_oneof(tchar const* psz, tchar const* pszEnd, tchar const * const pszSet, tchar const* const pszSetEnd);
+	template < gtlc::string_elem tchar >
+	constexpr tchar const* tszsearch_oneof(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svSet);
 
 
 	/// <summary>
@@ -300,17 +335,6 @@ namespace gtl {
 	constexpr inline int tdszicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
 	template < gtlc::string_elem tchar >
 	constexpr inline int tdszicmp(std::basic_string<tchar> const& strA, std::basic_string<tchar> const& strB);
-
-
-
-	/// @brief  tszsearch_oneof
-	/// @param psz    : string
-	/// @param pszSet : chars to find
-	/// @return position of found char.
-	template < gtlc::string_elem tchar >
-	tchar* tszsearch_oneof(tchar* psz, tchar const * const pszSet);
-	template < gtlc::string_elem tchar >
-	tchar const* tszsearch_oneof(tchar const* psz, tchar const* const pszSet);
 
 
 	/// @brief tszto_number

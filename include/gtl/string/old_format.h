@@ -101,8 +101,8 @@ namespace gtl::old_format {
 	}
 
 	template < gtlc::string_elem tchar >
-	basic_string_t<tchar> TFormatV(tchar const* pszFormat, va_list argList) {
-		basic_string_t<tchar> str;
+	std::basic_string<tchar> TFormatV(tchar const* pszFormat, va_list argList) {
+		std::basic_string<tchar> str;
 		int len = tsz_vsnprintf(nullptr, 0, pszFormat, argList);
 		if (len < 0)
 			throw std::invalid_argument(GTL__FUNCSIG "formatting error");
@@ -116,8 +116,8 @@ namespace gtl::old_format {
 #endif
 
 	template < gtlc::string_elem tchar, typename ... Args/*, ENABLE_IF(std::is_integral_v<tchar>)*/ >
-	basic_string_t<tchar> TFormat(tchar const* pszFormat, Args&& ... args) {
-		basic_string_t<tchar> str;
+	std::basic_string<tchar> TFormat(tchar const* pszFormat, Args&& ... args) {
+		std::basic_string<tchar> str;
 		int len = tsz_snprintf(nullptr, 0, pszFormat, args ...);
 		if (len < 0)
 			throw std::invalid_argument(GTL__FUNCSIG "formatting error");
@@ -131,7 +131,7 @@ namespace gtl::old_format {
 
 
 	template < gtlc::string_elem tchar, typename tchar2 = tchar >
-	tchar2 const* FilterStringTypeToCSTR(basic_string_t<tchar2> const& str) {
+	tchar2 const* FilterStringTypeToCSTR(std::basic_string<tchar2> const& str) {
 		static_assert(std::is_same_v<tchar, tchar2>, "Check String Type...");
 		return str.c_str();
 	}
@@ -148,15 +148,15 @@ namespace gtl::old_format {
 	}
 
 	template < gtlc::string_elem tchar, typename ... Args >
-	basic_string_t<tchar> TFFormat(tchar const* pszFormat, Args&& ... args) {
+	std::basic_string<tchar> TFFormat(tchar const* pszFormat, Args&& ... args) {
 		return TFormat(pszFormat, FilterStringTypeToCSTR<tchar>(args)...);
 	}
 
 	// for Wrong Paramters
 
-	template < typename ... Args > [[nodiscard]] basic_string_t<char>		format(char const* pszFormat, Args&& ... args)		{ return TFFormat(pszFormat, args ...); }
-	template < typename ... Args > [[nodiscard]] basic_string_t<wchar_t>	format(wchar_t const* pszFormat, Args&& ... args)	{ return TFFormat(pszFormat, args ...); }
-	template < typename ... Args > [[nodiscard]] basic_string_t<char8_t>	format(char8_t const* pszFormat, Args&& ... args)	{ return TFFormat(pszFormat, args ...); }
+	template < typename ... Args > [[nodiscard]] std::basic_string<char>	format(char const* pszFormat, Args&& ... args)		{ return TFFormat(pszFormat, args ...); }
+	template < typename ... Args > [[nodiscard]] std::basic_string<wchar_t>	format(wchar_t const* pszFormat, Args&& ... args)	{ return TFFormat(pszFormat, args ...); }
+	template < typename ... Args > [[nodiscard]] std::basic_string<char8_t>	format(char8_t const* pszFormat, Args&& ... args)	{ return TFFormat(pszFormat, args ...); }
 	//template < typename ... Args > [[nodiscard]] TString<char>				Format(char const* pszFormat, Args&& ... args)		{ return TString<char>(TFFormat(pszFormat, args ...)); }
 	//template < typename ... Args > [[nodiscard]] TString<wchar_t>			Format(wchar_t const* pszFormat, Args&& ... args)	{ return TString<wchar_t>(TFFormat(pszFormat, args ...)); }
 	//template < typename ... Args > [[nodiscard]] TString<char8_t>			Format(char8_t const* pszFormat, Args&& ... args)	{ return TString<char8_t>(TFFormat(pszFormat, args ...)); }
