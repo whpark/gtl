@@ -700,6 +700,7 @@ TEST(gtl_string, etc) {
 
 	char16_t buf[64] {u"0123456789"};
 	tszrev(buf);
+
 	EXPECT_TRUE(buf == u"9876543210"sv);
 
 }

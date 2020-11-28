@@ -269,6 +269,7 @@ namespace gtl {
 	template < gtlc::string_elem tchar > 			  [[nodiscard]] tchar* tszrev(tchar* psz, tchar const* const pszEnd);
 	template < gtlc::string_buffer_fixed tstring_buf > std::remove_cvref_t<decltype(tstring_buf{}[0])>* tszrev(tstring_buf& buf);
 
+#if 0     // use string_view, or stl
 	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar c);
 	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar* tszsearch(tchar* psz, tchar c);
 	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar const* pszSub);
@@ -295,7 +296,7 @@ namespace gtl {
 	constexpr tchar const* tszsearch_oneof(tchar const* psz, tchar const* pszEnd, tchar const * const pszSet, tchar const* const pszSetEnd);
 	template < gtlc::string_elem tchar >
 	constexpr tchar const* tszsearch_oneof(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svSet);
-
+#endif
 
 	/// <summary>
 	/// digit contants to integral type value.

@@ -28,9 +28,9 @@ TEST(gtl_string, TString) {
 	str = u8"나라😊가나다";
 	EXPECT_TRUE(str == u"나라😊가나다"sv);
 
-	EXPECT_TRUE(2 == str.Find(u"😊"));
+	EXPECT_TRUE(2 == str.find(u"😊"));
 
-	EXPECT_TRUE(1 == str.FindOneOf(u"다라"));
+	EXPECT_TRUE(1 == str.find_first_of(u"다라"));
 
 	str += u"  \r\n \t\t   \r\n";
 	str = u"  \r\n \t\t   \r\n" + str;

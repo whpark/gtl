@@ -660,6 +660,7 @@ namespace gtl {
 		return std::data(buf);
 	}
 
+#if 0
 	template < gtlc::string_elem tchar >
 	tchar const* tszsearch(tchar const* psz, tchar c) {
 		if (!psz)
@@ -793,7 +794,7 @@ namespace gtl {
 		}
 		return nullptr;
 	}
-
+#endif
 
 	namespace internal {
 		template < typename tvalue, int tsize >

@@ -67,7 +67,7 @@ namespace gtl {
 		/// @param pszOther 
 		template < gtlc::string_elem tchar_other >
 		GTL_DEPR_SEC explicit TString(tchar_other const*& pszOther) {
-#pragma warning(disable:4996)
+#pragma warning(suppress:4996)
 			*this = pszOther;
 		}
 
@@ -98,7 +98,7 @@ namespace gtl {
 	public:
 
 		// returns psz
-		operator tchar const*() const					{ return this->c_str(); }
+		//operator tchar const*() const					{ return this->c_str(); }
 
 		// returns string_view
 		operator std::basic_string_view<tchar>() const {
@@ -267,6 +267,7 @@ namespace gtl {
 						str += *sz;
 				}
 			}
+			std::string st;
 			return str;
 		}
 
@@ -321,7 +322,7 @@ namespace gtl {
 			index_type nLenNew = pszNew ? tszlen(pszNew) : 0;
 			index_type nToReplace = 0;
 
-			const tchar* pszStart = this->c_str();
+			const tchar* pszStart = this->data();
 			const tchar* pszEnd = pszStart + this->size();
 			const tchar* pszEndSearch = pszEnd-nLenOld+1;
 
@@ -377,25 +378,25 @@ namespace gtl {
 			return this->erase(index, nCount).size();
 		}
 
-		[[nodiscard]] index_type Find(tchar ch, index_type nStart = 0) const {
-			return this->find(ch, nStart);
-		}
-		[[nodiscard]] index_type Find(const tchar* psz, index_type nStart = 0) const {
-			return this->find(psz, nStart);
-		}
-		[[nodiscard]] index_type ReverseFind(tchar ch, index_type nStart = base_t::npos) const {
-			return this->rfind(ch, nStart);
-		}
-		[[nodiscard]] index_type ReverseFind(const tchar* psz, index_type nStart = base_t::npos) const {
-			return this->rfind(psz, nStart);
-		}
-		[[nodiscard]] index_type FindOneOf(const tchar* pszCharSet, index_type nStart = 0) const {
-			const tchar* head = this->c_str();
-			const tchar* pos = tszsearch_oneof(head+nStart, pszCharSet);
-			if (pos)
-				return (pos - head)+nStart;
-			return this->npos;
-		}
+		//[[nodiscard]] index_type Find(tchar ch, index_type nStart = 0) const {
+		//	return this->find(ch, nStart);
+		//}
+		//[[nodiscard]] index_type Find(const tchar* psz, index_type nStart = 0) const {
+		//	return this->find(psz, nStart);
+		//}
+		//[[nodiscard]] index_type ReverseFind(tchar ch, index_type nStart = base_t::npos) const {
+		//	return this->rfind(ch, nStart);
+		//}
+		//[[nodiscard]] index_type ReverseFind(const tchar* psz, index_type nStart = base_t::npos) const {
+		//	return this->rfind(psz, nStart);
+		//}
+		//[[nodiscard]] index_type FindOneOf(const tchar* pszCharSet, index_type nStart = 0) const {
+		//	const tchar* head = this->data();
+		//	const tchar* pos = tszsearch_oneof(head+nStart, pszCharSet);
+		//	if (pos)
+		//		return (pos - head)+nStart;
+		//	return this->npos;
+		//}
 
 		//// simple formatting
 		//template < typename ... Args >
