@@ -168,24 +168,29 @@ namespace gtl {
 #endif
 
 
-	//template < typename tcontainer >
-	//constexpr inline std::remove_cvref_t<decltype(tcontainer{}[0])> const* data(tcontainer const& v) {
-	//	if constexpr (std::is_array_v<tcontainer>) {
-	//		return &v[0];
-	//	}
-	//	else {
-	//		return v.data();
-	//	}
-	//}
-	//template < typename tcontainer >
-	//constexpr inline std::remove_cvref_t<decltype(tcontainer{}[0])> * data(tcontainer& v) {
-	//	if constexpr (std::is_array_v<tcontainer>) {
-	//		return &v[0];
-	//	}
-	//	else {
-	//		return v.data();
-	//	}
-	//}
+// Round
+	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
+	constexpr inline [[nodiscard]] T_DEST Round(T_SOURCE v) {
+		//return T_DEST(std::round(v));
+		return T_DEST(v+0.5*(v<0?-1:1));
+	}
+	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
+	constexpr inline [[nodiscard]] T_DEST Round(T_SOURCE v, T_SOURCE place) {
+		if constexpr (std::is_floating_point_v<T_DEST>) {
+			return std::round(v/place/10)*place*10;
+		}
+		//return T_DEST(T_DEST(std::round(v/place/10))*place*10);
+		return T_DEST(T_DEST(v/place/10+0.5*(v<0?-1:1))*place*10);
+	}
+	// 실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.
+	template < typename T_DEST, typename T_SOURCE >
+	constexpr inline [[nodiscard]] T_DEST RoundOr(T_SOURCE v2) {
+		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {
+			return Round<T_DEST, T_SOURCE>(v2);
+		} else {
+			return (T_DEST)v2;
+		}
+	}
 
 
 }
