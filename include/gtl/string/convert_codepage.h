@@ -48,7 +48,7 @@ namespace gtl {
 	}; };
 
 	template <typename tchar>	constexpr inline static uint32_t const eCODEPAGE_DEFAULT = eCODEPAGE::Default;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char> = eCODEPAGE::KO_KR_949;
+	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char> = eCODEPAGE::Default;
 	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char8_t> = eCODEPAGE::UTF8;
 	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char16_t> = eCODEPAGE::UTF16;
 	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char32_t> = eCODEPAGE::UTF32;

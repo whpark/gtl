@@ -23,23 +23,51 @@ namespace gtl::concepts {
 	concept arithmetic = std::is_arithmetic_v<T>;
 
 
+	/// @brief trivially copyable
+	template < typename T >
+	concept trivially_copyable = std::is_trivially_copyable_v<T>;
+
+
 	/// @brief variadic template check version of 'std::is_same_v<t, t2>'
 	template < typename tchar, typename ... ttypes >
-	concept is_one_of_v = (std::is_same_v<tchar, ttypes> || ...);
+	concept is_one_of = (std::is_same_v<tchar, ttypes> || ...);
 
 
+	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
+	template < typename tcontainer, typename type >
+	concept linear_buffer_container =
+		requires (tcontainer v) {
+			{ v[0] }			-> std::convertible_to<type>;
+			{ std::data(v) }	-> std::convertible_to<type const*>;
+			{ std::size(v) }	-> std::convertible_to<size_t>;
+		};
+
+
+	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
+	template < typename tcontainer, typename type >
+	concept container =
+		requires (tcontainer v) {
+			{ v[0] }			-> std::convertible_to<type>;
+			{ std::size(v) }	-> std::convertible_to<size_t>;
+			v.begin();
+			v.end();
+		};
+
+
+#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
 	/// @brief type for string (uint16_t for KSSM (Korean Johab)
 	template < typename tchar >
-	concept string_elem = is_one_of_v<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t, uint16_t>;	// uint16_t for KSSM (Johab)
-
-
-	/// @brief type for unicode string.
+	concept string_elem = is_one_of<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t, uint16_t>;	// uint16_t for KSSM (Johab)
+#else
+	/// @brief type for string
 	template < typename tchar >
-	concept string_elem_utf = is_one_of_v<std::remove_cvref_t<tchar>, char8_t, char16_t, char32_t>;
+	concept string_elem = is_one_of<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t>;
+#endif
 
+	/// @brief type for utf (unicode transformation format) string.
+	template < typename tchar >
+	concept string_elem_utf = is_one_of<std::remove_cvref_t<tchar>, char8_t, char16_t, char32_t>;
 
-
-	// todo: std::size(array) returns including nullterminating string.
 
 	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
 	template < typename tcontainer >

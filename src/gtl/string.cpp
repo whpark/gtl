@@ -58,7 +58,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(RSIZE_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
@@ -80,13 +80,12 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(RSIZE_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
 		auto* pszFrom = (char const*)svFrom.data();
-		// todo : test return value is size or length?
 		auto n = MultiByteToWideChar(codepage.from, 0, pszFrom, (int)svFrom.size(), nullptr, 0);
 		if (n <= 0)
 			return str;
@@ -104,7 +103,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(RSIZE_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
@@ -150,7 +149,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(RSIZE_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
 
@@ -199,7 +198,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
@@ -222,7 +221,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
@@ -247,7 +246,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
@@ -313,7 +312,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
@@ -404,7 +403,7 @@ namespace gtl {
 		if (svFrom.size() <= 0)
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
@@ -468,7 +467,7 @@ namespace gtl {
 		if (svFrom.size() <= 0)
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
@@ -505,7 +504,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
@@ -568,7 +567,7 @@ namespace gtl {
 		if (svFrom.empty())
 			return str;
 
-		if (svFrom.size() > static_cast<size_t>(INT_MAX)) {
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
 			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
 		}
