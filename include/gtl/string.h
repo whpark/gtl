@@ -71,7 +71,7 @@ namespace gtl {
 			*this = pszOther;
 		}
 
-		template < gtlc::string_buffer_fixed tstring_buf_other >
+		template < gtlc::contiguous_string_container tstring_buf_other >
 		requires (!std::is_same_v< std::remove_cvref_t<decltype(tstring_buf_other{}[0])>, std::remove_cvref_t<tchar>>)
 		explicit TString(tstring_buf_other const& buf) {
 			*this = buf;
@@ -132,7 +132,7 @@ namespace gtl {
 			*this = ToString<tchar_other, tchar>(sv);
 			return *this;
 		}
-		template < gtlc::string_buffer_fixed tstring_buf_other >
+		template < gtlc::contiguous_string_container tstring_buf_other >
 		requires (!std::is_same_v< std::remove_cvref_t<decltype(tstring_buf_other{}[0]) >, std::remove_cvref_t<tchar>>)
 		TString& operator = (tstring_buf_other const& buf) {
 			std::basic_string_view sv{std::data(buf), tszlen(buf)};

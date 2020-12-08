@@ -21,12 +21,10 @@
 
 namespace gtl {
 
-	GTL_DATA int eGTLDefaultCodepage_g = GTL_DEFAULT_CODEPAGE;
-
-	constexpr static bool const IsUTF8SigChar(char c) { return (c & 0b1100'0000) == 0b1000'0000; }
+	GTL_DATA eCODEPAGE eGTLDefaultCodepage_g = static_cast<eCODEPAGE>(GTL_DEFAULT_CODEPAGE);
 
 	template < typename tchar >
-	inline [[nodiscard]] std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, uint32_t eCodepage) {
+	inline [[nodiscard]] std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, eCODEPAGE eCodepage) {
 		if (eCODEPAGE_OTHER_ENDIAN<tchar> != eCodepage) {
 			[[likely]]
 			return {};
@@ -40,7 +38,7 @@ namespace gtl {
 	}
 
 	template < typename tchar, template < typename, typename ... tstr_args> typename tstr, typename ... tstr_args >
-	inline bool CheckAndConvertEndian(tstr<tchar, tstr_args...>& str, uint32_t eCodepage) {
+	inline bool CheckAndConvertEndian(tstr<tchar, tstr_args...>& str, eCODEPAGE eCodepage) {
 		if (eCODEPAGE_OTHER_ENDIAN<tchar> != eCodepage) {
 			[[likely]]
 			return false;
@@ -679,6 +677,8 @@ namespace gtl {
 			const char c1 = str[iPos];
 			const char c2 = iPos+1 < str.size() ? str[iPos+1] : 0;
 			const char c3 = iPos+2 < str.size() ? str[iPos+2] : 0;
+
+			auto IsUTF8SigChar = [](char c) -> bool { return (c & 0b1100'0000) == 0b1000'0000; };
 
 			if (c1 && 0b1000'0000) {
 				bMSB = true;

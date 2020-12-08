@@ -35,10 +35,10 @@ namespace gtl::concepts {
 
 	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
 	template < typename tcontainer, typename type >
-	concept linear_buffer_container =
+	concept contiguous_container =
 		requires (tcontainer v) {
 			{ v[0] }			-> std::convertible_to<type>;
-			{ std::data(v) }	-> std::convertible_to<type const*>;
+			{ std::data(v) }	-> std::convertible_to<std::remove_cvref_t<type> const *>;
 			{ std::size(v) }	-> std::convertible_to<size_t>;
 		};
 
@@ -54,15 +54,13 @@ namespace gtl::concepts {
 		};
 
 
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
 	/// @brief type for string (uint16_t for KSSM (Korean Johab)
 	template < typename tchar >
-	concept string_elem = is_one_of<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t, uint16_t>;	// uint16_t for KSSM (Johab)
-#else
-	/// @brief type for string
-	template < typename tchar >
-	concept string_elem = is_one_of<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t>;
+	concept string_elem = is_one_of<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t
+#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
+		, uint16_t	// uint16_t for KSSM (Johab)
 #endif
+	>;
 
 	/// @brief type for utf (unicode transformation format) string.
 	template < typename tchar >
@@ -71,29 +69,17 @@ namespace gtl::concepts {
 
 	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
 	template < typename tcontainer >
-	concept string_buffer_fixed =
+	concept contiguous_string_container =
 		string_elem<std::remove_cvref_t<decltype(tcontainer{}[0])>>
 		and
-		(
-			(	// bounded array of tchar
-				std::is_bounded_array_v<tcontainer>
-				and requires (tcontainer v) {
-					{ v[0] }		-> std::convertible_to<std::remove_reference_t<decltype(v[0])>>;
-				}
-			)
-			or requires ( tcontainer v ) {
-				// general container of tchar
-				{ v[0] }		-> std::convertible_to<std::remove_reference_t<decltype(v[0])>>;
-				{ v.data() }	-> std::convertible_to<std::remove_reference_t<decltype(v[0])>*>;
-				{ v.size() }	-> std::convertible_to<size_t>;
-			}
-		);
+		contiguous_container<tcontainer, std::remove_cvref_t<decltype(tcontainer{}[0])>>;
+
 
 	/// @brief type for string buffer with type constraints
 	template < typename tcontainer, typename tchar >
 	concept string_buffer_fixed_c = 
 		(std::is_same_v<std::remove_cvref_t<typename tcontainer::value_type>, tchar> or std::is_same_v<std::remove_cvref_t<decltype(tcontainer()[0])>, tchar>)
-		and string_buffer_fixed<tcontainer>;
+		and contiguous_string_container<tcontainer>;
 
 
 }

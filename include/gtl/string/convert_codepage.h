@@ -22,8 +22,9 @@ namespace gtl {
 
 	//------------------------------------------------------------------------------------------
 	/// @brief Converts Codepage (Unicode <-> MBCS ...)
-	struct eCODEPAGE { enum : uint32_t {
-		Default = 0xFFFF'FFFF,	// CP_OEMCP
+	enum class eCODEPAGE : int {
+		DEFAULT = -1,
+		//MBCS = 0,
 
 		UCS2LE = 1200,
 		UCS2BE = 1201,
@@ -43,45 +44,75 @@ namespace gtl {
 		UTF32 = (std::endian::native == std::endian::little) ? UTF32LE : UTF32BE,
 		_UTF32_other = (UTF32 == UTF32BE) ? UTF32LE : UTF32BE,
 
+
+	//------------------------
+
+		ACP = 0,
+
 		KO_KR_949 = 949,
+#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
 		KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
-	}; };
+#endif
 
-	template <typename tchar>	constexpr inline static uint32_t const eCODEPAGE_DEFAULT = eCODEPAGE::Default;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char> = eCODEPAGE::Default;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char8_t> = eCODEPAGE::UTF8;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char16_t> = eCODEPAGE::UTF16;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<char32_t> = eCODEPAGE::UTF32;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_DEFAULT<wchar_t> = eCODEPAGE::UCS2;
 
-	template <typename tchar>	constexpr inline static uint32_t const eCODEPAGE_OTHER_ENDIAN = eCODEPAGE::Default;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_OTHER_ENDIAN<char16_t> = eCODEPAGE::_UTF16_other;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_OTHER_ENDIAN<char32_t> = eCODEPAGE::_UTF32_other;
-	template <>					constexpr inline static uint32_t const eCODEPAGE_OTHER_ENDIAN<wchar_t> = eCODEPAGE::_UCS2_other;
+		//... your codepages, here.
+
+
+	};
+
+
+	template <typename tchar>	constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT = eCODEPAGE::DEFAULT;
+	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<char> = eCODEPAGE::DEFAULT;
+	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<char8_t> = eCODEPAGE::UTF8;
+	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<char16_t> = eCODEPAGE::UTF16;
+	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<char32_t> = eCODEPAGE::UTF32;
+	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<wchar_t> =
+		sizeof(wchar_t) == sizeof(char16_t) ? eCODEPAGE::UCS2LE : (sizeof(wchar_t) == sizeof(char32_t) ? eCODEPAGE::UTF32: eCODEPAGE::DEFAULT);
+
+	template <typename tchar>	constexpr inline eCODEPAGE const eCODEPAGE_OTHER_ENDIAN = eCODEPAGE::DEFAULT;
+	template <>					constexpr inline eCODEPAGE const eCODEPAGE_OTHER_ENDIAN<char16_t> = eCODEPAGE::_UTF16_other;
+	template <>					constexpr inline eCODEPAGE const eCODEPAGE_OTHER_ENDIAN<char32_t> = eCODEPAGE::_UTF32_other;
+	template <>					constexpr inline eCODEPAGE const eCODEPAGE_OTHER_ENDIAN<wchar_t> = eCODEPAGE::_UCS2_other;
 
 
 	/// @brief default codepage for MBCS (windows)
 	/// you can set this value for your region.
-	GTL_DATA extern int eGTLDefaultCodepage_g;
+	GTL_DATA extern eCODEPAGE eGTLDefaultCodepage_g;
+
+
+	constexpr static inline [[nodiscard]] std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {
+		using namespace std::literals;
+		switch (eCodepage) {
+		case eCODEPAGE::DEFAULT : return {};
+		case eCODEPAGE::UTF8 : return "\xEF\xBB\xBF"sv;
+		case eCODEPAGE::UCS2LE : return "\xFF\xFE"sv;
+		case eCODEPAGE::UCS2BE : return "\xFE\xFF"sv;
+		case eCODEPAGE::UTF32LE : return "\xFF\xFE\x00\x00"sv;
+		case eCODEPAGE::UTF32BE : return "\x00\x00\xFE\xFF"sv;
+		}
+		return {};
+	}
+
+
 
 	struct S_CODEPAGE_OPTION {
-		uint32_t from {eCODEPAGE::Default};
-		uint32_t to {eCODEPAGE::Default};
+		eCODEPAGE from {eCODEPAGE::DEFAULT};
+		eCODEPAGE to {eCODEPAGE::DEFAULT};
 
 		// no constructors. for designated initializer...
-		template < typename tchar_from > uint32_t From() const { return GetCodepage<tchar_from>(from); }
-		template < typename tchar_to >	 uint32_t To() const   { return GetCodepage<tchar_to>(to); }
+		template < typename tchar_from > eCODEPAGE From() const { return GetCodepage<tchar_from>(from); }
+		template < typename tchar_to >	 eCODEPAGE To() const   { return GetCodepage<tchar_to>(to); }
 
 	private:
 		template < typename tchar >
-		constexpr inline static uint32_t GetCodepage(uint32_t codepage) {
-			if (codepage == eCODEPAGE::Default) {	// wrong or default value
+		constexpr inline static eCODEPAGE GetCodepage(eCODEPAGE codepage) {
+			if (codepage == eCODEPAGE::DEFAULT) {	// wrong or default value
 				if constexpr (std::is_same_v<tchar, char>) {
 					std::numbers::pi;
 					return eGTLDefaultCodepage_g;
 				}
 				else {
-					if (eCODEPAGE_DEFAULT<tchar> != eCODEPAGE::Default)
+					if (eCODEPAGE_DEFAULT<tchar> != eCODEPAGE::DEFAULT)
 						return eCODEPAGE_DEFAULT<tchar>;
 				}
 			}

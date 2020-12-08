@@ -170,7 +170,7 @@ namespace gtl {
 	template < gtlc::string_elem tchar >				constexpr		 [[nodiscard]] GTL_DEPR_SEC size_t tszlen(tchar const*const& psz);
 	template < gtlc::string_elem tchar >				constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax);
 	template < gtlc::string_elem tchar >				constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf);
-	template < gtlc::string_buffer_fixed tstring_buf >	constexpr inline [[nodiscard]] size_t tszlen(tstring_buf const& v);
+	template < gtlc::contiguous_string_container tstring_buf >	constexpr inline [[nodiscard]] size_t tszlen(tstring_buf const& v);
 
 	// todo : documents...
 
@@ -259,15 +259,15 @@ namespace gtl {
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tszicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tsznicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount);
 
-	template < gtlc::string_buffer_fixed tstring_buf >	errno_t tszupr(tstring_buf& buf);
+	template < gtlc::contiguous_string_container tstring_buf >	errno_t tszupr(tstring_buf& buf);
 	template < gtlc::string_elem tchar >			 	errno_t tszupr(tchar* const psz, size_t size);
-	template < gtlc::string_buffer_fixed tstring_buf >	errno_t tszlwr(tstring_buf& buf);
+	template < gtlc::contiguous_string_container tstring_buf >	errno_t tszlwr(tstring_buf& buf);
 	template < gtlc::string_elem tchar >			 	errno_t tszlwr(tchar* const& psz, size_t size);
 
 
 	//template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar* tszrev(tchar* psz);
 	template < gtlc::string_elem tchar > 			  [[nodiscard]] tchar* tszrev(tchar* psz, tchar const* const pszEnd);
-	template < gtlc::string_buffer_fixed tstring_buf > std::remove_cvref_t<decltype(tstring_buf{}[0])>* tszrev(tstring_buf& buf);
+	template < gtlc::contiguous_string_container tstring_buf > std::remove_cvref_t<decltype(tstring_buf{}[0])>* tszrev(tstring_buf& buf);
 
 #if 0     // use string_view, or stl
 	template < gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] tchar const* tszsearch(tchar const* psz, tchar c);

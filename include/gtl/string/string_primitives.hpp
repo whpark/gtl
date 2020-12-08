@@ -176,7 +176,7 @@ namespace gtl {
 	constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf) {
 		return tszlen(psz, psz + sizeOfBuf);
 	}
-	template < gtlc::string_buffer_fixed tstring_buf >
+	template < gtlc::contiguous_string_container tstring_buf >
 	constexpr inline [[nodiscard]] size_t tszlen(tstring_buf const& v) {
 		return tszlen(std::data(v), std::size(v));
 	}
@@ -584,7 +584,7 @@ namespace gtl {
 	}
 
 
-	template < gtlc::string_buffer_fixed tstring_buf >
+	template < gtlc::contiguous_string_container tstring_buf >
 	errno_t tszupr(tstring_buf& buf) {
 		if (!std::data(buf))
 			return EINVAL;
@@ -612,7 +612,7 @@ namespace gtl {
 		return 0;
 	}
 
-	template < gtlc::string_buffer_fixed tstring_buf >
+	template < gtlc::contiguous_string_container tstring_buf >
 	errno_t tszlwr(tstring_buf& buf) {
 		if (!std::data(buf))
 			return EINVAL;
@@ -654,7 +654,7 @@ namespace gtl {
 		std::reverse(psz, pszEnd);
 		return psz;
 	}
-	template < gtlc::string_buffer_fixed tstring_buf >
+	template < gtlc::contiguous_string_container tstring_buf >
 	std::remove_cvref_t<decltype(tstring_buf{}[0])>* tszrev(tstring_buf& buf) {
 		std::reverse(std::data(buf), std::data(buf)+tszlen(buf));
 		return std::data(buf);

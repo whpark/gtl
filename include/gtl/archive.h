@@ -26,19 +26,6 @@ namespace gtl {
 	//-----------------------------------------------------------------------------
 	//
 
-	constexpr static inline std::string_view GetCodepageBOM(int eCodepage /*eCODEPAGE*/ ) {
-		switch (eCodepage) {
-		case eCODEPAGE::Default : return {};
-		case eCODEPAGE::UTF8 : return "\xEF\xBB\xBF";
-		case eCODEPAGE::UCS2LE : return "\xFF\xFE";
-		case eCODEPAGE::UCS2BE : return "\xFE\xFF";
-		case eCODEPAGE::UTF32LE : return "\xFF\xFE\x00\x00";
-		case eCODEPAGE::UTF32BE : return "\x00\x00\xFE\xFF";
-		}
-		return {};
-	}
-
-
 	/// @brief TArchive : class for file io.
 	///   i) Reads line by line for text file.
 	///  ii) UTF Encoding/Decoding. ByteSwapping...
@@ -49,10 +36,10 @@ namespace gtl {
 	template < typename tstream,
 		bool bSWAP_BYTE_ORDER = false,
 		bool bSTORE = std::is_base_of_v<std::ostream, tstream>,
-		bool bLOAD = std::is_base_of_v<std::istream, tstream>,
-		size_t PROCESSING_BUFFER_SIZE = 4096
+		bool bLOAD = std::is_base_of_v<std::istream, tstream>//,
+		//size_t PROCESSING_BUFFER_SIZE = 4096
 	>
-	class TArchive : public tstream {
+	class TArchive {
 
 	#define CHECK_ARCHIVE_LOADABLE\
 		if constexpr (bSTORE && bLOAD) { if (!IsLoad()) { throw std::ios_base::failure(GTL__FUNCSIG "NOT an archive for loading!"); } }
@@ -62,21 +49,21 @@ namespace gtl {
 
 	protected:
 		tstream& m_stream;
-		eCODEPAGE m_eCodepage{ eCODEPAGE::Default };
+		eCODEPAGE m_eCodepage{ eCODEPAGE::UTF8 };
 	public:
-		const bool m_bStore;
+		bool const m_bStore;
 
 	public:
 		TArchive() = delete;
 		TArchive(const TArchive&) = delete;
 		TArchive(TArchive&&) = default;
-		TArchive(tstream & stream) requires ((bSTORE && !bLOAD) || (!bSTORE && bLOAD))
+		explicit TArchive(tstream& stream) requires ((bSTORE && !bLOAD) || (!bSTORE && bLOAD))
 			: m_stream{ stream }, m_bStore{ bSTORE }
 		{
 		}
 
-		TArchive(tstream & stream, bool bStore) requires (bSTORE && bLOAD)
-			: m_stream{ stream }, m_bStore(bStore)
+		TArchive(tstream& stream, bool bStore) requires (bSTORE && bLOAD)
+			: m_stream{ stream }, m_bStore{ bStore }
 		{
 		}
 
@@ -90,7 +77,7 @@ namespace gtl {
 
 		/// @brief tells its loading or storing.
 		/// @return 
-		bool IsStore() const {
+		bool IsStoring() const {
 			if constexpr (bSTORE && bLOAD) {
 				return m_bStore;
 			}
@@ -98,7 +85,7 @@ namespace gtl {
 				return bSTORE;
 			}
 		}
-		bool IsLoad() const {
+		bool IsLoading() const {
 			if constexpr (bSTORE && bLOAD) {
 				return !m_bStore;
 			}
@@ -114,31 +101,33 @@ namespace gtl {
 
 
 		// todo : ....... Write/Read 정리. 2020.12.02
-
 	public:
 		/// @brief Write byte buffer
-		void Write(void const* data, std::streamsize size) requires (bSTORE) {
+		inline void Write(void const* data, std::streamsize size) requires (bSTORE) {
 			CHECK_ARCHIVE_STORABLE;
 			m_stream.write((std::ostream::char_type const*)data, size);
 		}
 		/// @brief Write byte buffer
 		template < gtlc::trivially_copyable TYPE > requires (bSTORE and !bSWAP_BYTE_ORDER)	// some structs can contain integral values which needs to be swapped byte ordering.
-		void Write(TYPE const& v) {
+		inline void Write(TYPE const& v) {
+			CHECK_ARCHIVE_STORABLE;
 			Write(&v, sizeof(v));
 		}
-		/// @brief Write byte buffer
-		[[nodiscard]] bool WriteAndVerify(void const* data, std::streamsize size) requires (bSTORE) {
-			CHECK_ARCHIVE_STORABLE;
-			auto pos0 = m_stream.tellp();
-			Write(data, size);
-			auto pos1 = m_stream.tellp();
-			return (pos1 - pos0 == size);
-		}
+		///// @brief Write byte buffer
+		//[[nodiscard]] bool WriteAndVerify(void const* data, std::streamsize size) requires (bSTORE) {
+		//	CHECK_ARCHIVE_STORABLE;
+		//	auto pos0 = m_stream.tellp();
+		//	Write(data, size);
+		//	auto pos1 = m_stream.tellp();
+		//	return (pos1 - pos0 == size);
+		//}
 
+
+	public:
 		//---------------------------------------------------------------------
 		// Read byte buffer
 		template < typename T > requires (bLOADING)
-		std::streamsize Read(uint8_t* data, std::streamsize size) {
+		inline std::streamsize Read(void* data, std::streamsize size) {
 			CHECK_ARCHIVE_LOADABLE;
 			auto pos0 = m_stream.tellg();
 			if (m_stream.read((std::istream::char_type*)data, size)) {
@@ -153,18 +142,61 @@ namespace gtl {
 			return -1;
 		}
 		template < gtlc::trivially_copyable TYPE > requires (bLOADING and !bSWAP_BYTE_ORDER)	// some structs can contain integral values which needs to be swapped byte ordering.
-		std::streamsize Read(TYPE & v) {
+		inline std::streamsize Read(TYPE& v) {
 			return Read(&v, sizeof(v));
+		}
+
+
+	protected:
+		/// @brief Write Ints Swaps byte-order if (bSWAP_BYTE_ORDER)
+		/// @param container 
+		/// @param nCount 
+		template < std::integral T_INT, int PROCESSING_BUFFER_SIZE = 4096 > requires (bSTORE)
+		void WriteInts(T_INT const* data, std::streamsize nCount) {
+			CHECK_ARCHIVE_STORABLE;
+			if constexpr (bSWAP_BYTE_ORDER and (sizeof(T_INT) > 1)) {
+				WriteBultKintsSwapByte<T_INT, PROCESSING_BUFFER_SIZE>(data, nCount);
+			}
+			else {
+				Write(data, nCount*sizeof(T_INT), true);
+			}
+		}
+		template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bSTORE)
+		inline void WriteInts(tcontainer const& container) {
+			WriteInts(std::data(container), std::size(container));
+		}
+
+		/// @brief Read Ints. Swaps byte-order if (bSWAP_BYTE_ORDER)
+		/// @param container ints.
+		/// @param nCount count. (NOT size in bytes but count in item)
+		/// @return nCount if OK,  or -1 if failed.
+		template < std::integral T_INT > requires (bLOAD)
+		std::streamsize ReadInts(T_INT* data, std::streamsize nCount) {
+			CHECK_ARCHIVE_LOADABLE;
+			auto nRead = Read(data, nCount*sizeof(T_INT));
+			if (nRead <= 0)
+				return nRead;
+			std::streamsize nReadCount = nRead / sizeof(T_INT);
+			if constexpr (bSWAP_BYTE_ORDER && sizeof(T_INT) > 1) {
+				for (std::streamsize i = 0; i < nReadCount; i++) {
+					SwapByteOrder(data[i]);
+				}
+			}
+			return nReadCount;
+		}
+		template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bLOAD)
+		inline std::streamsize ReadInts(tcontainer& container) {
+			return ReadInts(std::data(container), std::size(container));
 		}
 
 
 		/// @brief Write Ints Swaps byte-order if (bSWAP_BYTE_ORDER)
 		/// @param container 
 		/// @param nCount 
-		template < std::integral T_INT > requires (bSTORE)
-		void WriteInts(T_INT const* data, std::streamsize nCount) {
+		template < std::integral T_INT, int PROCESSING_BUFFER_SIZE = 4096 > requires (bSTORE)
+		void WriteIntsSwapByte(T_INT const* data, std::streamsize nCount) {
 			CHECK_ARCHIVE_STORABLE;
-			if constexpr (bSWAP_BYTE_ORDER and (sizeof(T_INT) > 1)) {
+			if constexpr (sizeof(T_INT) > 1)) {
 				while (nCount >= 0) {
 					std::array<T_INT, PROCESSING_BUFFER_SIZE/sizeof(T_INT)> buffer;
 					std::streamsize nToWrite = std::min(nCount, buffer.size());
@@ -180,9 +212,9 @@ namespace gtl {
 				Write(data, nCount*sizeof(T_INT), true);
 			}
 		}
-		template < std::integral T_INT, gtlc::linear_buffer_container<T_INT> tcontainer > requires (bSTORE)
-		void WriteInts(tcontainer const& container) {
-			WriteInts(container.data(), container.size());
+		template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bSTORE)
+		inline void WriteIntsSwapByte(tcontainer const& container) {
+			WriteIntsSwapByte(std::data(container), std::size(container));
 		}
 
 
@@ -191,24 +223,26 @@ namespace gtl {
 		/// @param nCount count. (NOT size in bytes but count in item)
 		/// @return 
 		template < std::integral T_INT > requires (bLOAD)
-		std::streamsize ReadInts(T_INT* data, std::streamsize nCount) {
+		std::streamsize ReadIntsSwapByte(T_INT* data, std::streamsize nCount) {
 			CHECK_ARCHIVE_LOADABLE;
 			auto nRead = Read(data, nCount*sizeof(T_INT));
 			if (nRead <= 0)
 				return nRead;
 			std::streamsize nReadCount = nRead / sizeof(T_INT);
-			if constexpr (bSWAP_BYTE_ORDER && sizeof(T_INT) > 1) {
+			if constexpr (sizeof(T_INT) > 1) {
 				for (std::streamsize i = 0; i < nReadCount; i++) {
 					SwapByteOrder(data[i]);
 				}
 			}
 			return nReadCount;
 		}
-		template < std::integral T_INT, gtlc::linear_buffer_container<T_INT> tcontainer > requires (bLOAD)
-		std::streamsize ReadInts(tcontainer& container) {
-			return ReadInts(std::data(container), std::size(container));
+		template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bLOAD)
+		inline std::streamsize ReadIntsSwapByte(tcontainer& container) {
+			return ReadIntsSwapByte(std::data(container), std::size(container));
 		}
 
+
+	public:
 		template < typename T >
 		constexpr bool IsBulkIOCapable() {
 			if constexpr (!std::is_trivially_copyable_v<T>) {
@@ -219,16 +253,17 @@ namespace gtl {
 				return true;
 			}
 
-			if constexpr (std::is_floating_point_v<T> || (sizeof(T) == 1)) {
+			if constexpr (std::is_floating_point_v<T> or (sizeof(T) == 1)) {
 				return true;
 			}
 
 			return false;
 		}
 
+
 		//---------------------------------------------------------------------
 		// operator >>, <<, &
-		template < gtlc::trivially_copyable TYPE > requires (bSTORE and (!bSWAP_BYTE_ORDER or !std::is_class_v<TYPE>))
+		template < gtlc::trivially_copyable TYPE > requires (bSTORE and IsBulkIOCapable<TYPE>())
 		TArchive& operator << (TYPE const& v) {
 			CHECK_ARCHIVE_STORABLE;
 			if constexpr (bSWAP_BYTE_ORDER and std::is_integral_v<TYPE> and (sizeof(TYPE) > 1)) {
@@ -240,7 +275,7 @@ namespace gtl {
 			}
 			return *this;
 		};
-		template < gtlc::trivially_copyable TYPE > requires (bLOAD and (!bSWAP_BYTE_ORDER or !std::is_class_v<TYPE>))
+		template < gtlc::trivially_copyable TYPE > requires (bLOAD and IsBulkIOCapable<TYPE>())
 		TArchive& operator >> (TYPE& v) {
 			CHECK_ARCHIVE_LOADABLE;
 			std::streamsize nRead = Read(&v, sizeof(v));
@@ -251,7 +286,7 @@ namespace gtl {
 			}
 			return *this;
 		};
-		template < typename TYPE >
+		template < typename TYPE > requires (IsBulkIOCapable<TYPE>())
 		TArchive& operator & (TYPE& v) {
 			if constexpr (bSTORE && bLOAD) {
 				if (IsStore())
@@ -276,21 +311,20 @@ namespace gtl {
 
 		//---------------------------------------------------------------------
 		// Write BOM
-		void WriteCodepageBOM(int eCodepage) requires (bSTORE) {
+		void WriteCodepageBOM(eCODEPAGE eCodepage) requires (bSTORE) {
 			CHECK_ARCHIVE_STORABLE;
-			if (eCodepage == eCODEPAGE::Default) {
+			if (eCodepage == eCODEPAGE::DEFAULT) {
 				eCodepage = eCODEPAGE::UTF8;
 			}
-			auto sv = GetCodepageBOM(eCodepage);
+			std::string_view sv = GetCodepageBOM(eCodepage);
 			if (sv.size() > 0)
 				Write(sv.data(), sv.size());
 			SetDefaultCodepage(eCodepage);
 		};
 		//---------------------------------------------------------------------
 		// Read BOM
-		int ReadCodepageBOM(int eDefaultCodepage = eCODEPAGE::UTF8) requires (bLOAD) {
+		eCODEPAGE ReadCodepageBOM(int eDefaultCodepage = eCODEPAGE::UTF8) requires (bLOAD) {
 			CHECK_ARCHIVE_LOADABLE;
-			auto pos = m_stream.tellg();
 			unsigned char c = 0;
 
 			auto get = [](tstream& stream) -> std::optional<char> {
@@ -316,90 +350,117 @@ namespace gtl {
 			};
 
 			constexpr static std::vector<std::pair<std::string_view, int>> const codepages{
-				{GetCodepageBOM(eCODEPAGE::UTF32BE), eCODEPAGE::UTF32BE},	// BOM Length...
+				{GetCodepageBOM(eCODEPAGE::UTF32BE), eCODEPAGE::UTF32BE},	// in BOM Length order ...
 				{GetCodepageBOM(eCODEPAGE::UTF32LE), eCODEPAGE::UTF32LE},
 				{GetCodepageBOM(eCODEPAGE::UTF16BE), eCODEPAGE::UTF16BE},
 				{GetCodepageBOM(eCODEPAGE::UTF16LE), eCODEPAGE::UTF16LE},
 				{GetCodepageBOM(eCODEPAGE::UTF8), eCODEPAGE::UTF8},
 			};
 
-			for (auto const& cp : codepages) {
-				if (peek(m_stream, cp.first)) {
-					SetDefaultCodepage(cp.second);
-					return cp.second;
+			for (auto const& [sv, codepage] : codepages) {
+				if (peek(m_stream, sv)) {
+					SetDefaultCodepage(codepage);
+					return codepage;
 				}
 			}
 
-			return (bool)m_stream;
+			SetDefaultCodepage(eDefaultCodepage);
+
+			return eDefaultCodepage;
 		};
 
 
 		//---------------------------------------------------------------------
 		// Read / Write String
 		template < typename tchar > requires (bLOAD)
-		bool ReadString(std::basic_string<tchar>& str, tchar cDelimiter = '\n', bool bTrimCR = true) {
-			CHECK_ARCHIVE_STORABLE;
+		std::optional<std::basic_string<tchar>> ReadString(tchar cDelimiter = '\n', bool bTrimCR = true) {
+			str.clear();
+			CHECK_ARCHIVE_LOADABLE;
+
 			bool bResult = false;
 			auto eCodepage = GetCodepage();
-			switch (eCodepage) {
-			case eCHAR_ENCODING::AUTO :
-			case eCHAR_ENCODING::MBCS :
-			case eCHAR_ENCODING::UTF8 :
+			switch ((int)eCodepage) {
+			default :
+			case eCODEPAGE::DEFAULT :
+			case eCODEPAGE::ACP :
 				{
-					std::basic_string<char> strA;
-
-					bResult = std::getline(m_stream, strA, (char)cDelimiter).good();
-					if (!bResult && !strA.empty() && m_stream.eof())	// 마지막 라인
-						bResult = true;
-					if (bTrimCR)
-						TrimRight(strA, '\r');
-					if ( (eCodepage == eCHAR_ENCODING::MBCS) || (eCodepage == eCHAR_ENCODING::AUTO) )
-						ConvCodepage_Move(str, std::move(strA), GetDefaultCodepage());
-					else
-						ConvCodepage_Move(str, std::move((std::basic_string<char8_t>&)strA), GetDefaultCodepage());
+					if constexpr (std::is_same_v<tchar, char>) {
+						bResult = std::getline(m_stream, str, cDelimiter).good();
+					} else {
+						std::basic_string<char> strLine;
+						bResult = std::getline(m_stream, strLine, cDelimiter).good();
+						str = ToString<tchar>(strLine, {.from = GetDefaultCodepage()});
+					}
 				}
 				break;
-			case eCHAR_ENCODING::UNICODE_LITTLE_ENDIAN :
-			case eCHAR_ENCODING::UNICODE_BIG_ENDIAN :
+			case eCODEPAGE::UTF8 :
 				{
-					std::basic_string<wchar_t> strW;
-					wchar_t c;
-					auto eCharByteOrder = (eCodepage == eCHAR_ENCODING::UNICODE_LITTLE_ENDIAN) ? std::endian::little : std::endian::big;
-					bool bForceSwapByteOrder = (std::endian::native != eCharByteOrder);
-					while (Read(&c, sizeof(c)) > 0) {
-						bResult = true;
-						if (bForceSwapByteOrder)
-							SwapByteOrder(c);
-						if (c == cDelimiter)
-							break;
-						strW += c;
-						if (strW.size() >= strW.max_size()) {
-							throw std::ios_base::failure(GTL__FUNCSIG "stringlength is too long");
-							bResult = false;
-							break;
+					if constexpr (std::is_same_v<tchar, char8_t>) {
+						bResult = std::getline(m_stream, str, cDelimiter).good();
+					} else {
+						std::basic_string<char8_t> strLine;
+						bResult = std::getline(m_stream, strLine, cDelimiter).good();
+						S_CODEPAGE_OPTION option{.to = std::is_same_v<tchar, char> ? GetDefaultCodepage() : eCODEPAGE::DEFAULT};
+						str = ToString<tchar>(strLine, option);
+					}
+				}
+				break;
+
+			case eCODEPAGE::UTF16LE :
+			case eCODEPAGE::UTF16BE :
+				{
+					if constexpr (sizeof(tchar) == sizeof(char16_t)) {	// char16_t, wchar_t, uint16_t
+						auto eStreamByteOrder = (eCodepage == eCODEPAGE::UTF16LE) ? std::endian::little : std::endian::big;
+						bool bForceSwapByteOrder = (std::endian::native != eStreamByteOrder) xor bSWAP_BYTE_ORDER;
+						if (bForceSwapByteOrder) [[unlikely]] {
+							bResult = std::getline(m_stream, str, GetByteSwap<char16_t>(cDelimiter)).good();
+							for (auto& c : str)
+								ByteSwap(c);
+						}
+						else [[likely]] {
+							bResult = std::getline(m_stream, str, cDelimiter).good();
 						}
 					}
-					if (bTrimCR)
-						TrimRight(strW, L'\r');
-					ConvCodepage_Move(str, std::move(strW), GetDefaultCodepage());
+					else {
+						if (auto r = ReadString<char16_t>(cDelimiter, bTrimCR); r) {
+							S_CODEPAGE_OPTION option{.to = std::is_same_v<tchar, char> ? GetDefaultCodepage() : eCODEPAGE::DEFAULT};
+							return ToString(*r, option);
+						}
+						else {
+							return {};
+						}
+					}
 				}
 				break;
+
+				// todo : 2020.12.08. UTF32
+
 			}
 
+			if (!bResult and !str.empty() and m_stream.eof())	// 마지막 라인
+				bResult = true;
+			if (bTrimCR)
+				TrimRight(str, '\r');
 			return bResult;
 		};
 
-		template < typename tchar > requires (bSTORE)
-		void TWriteString(const std::basic_string_view<tchar>& str) {
+		inline std::optional<std::string>		ReadStringA(char cDelimiter = '\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u8string>		ReadStringU8(char8_t cDelimiter = u8'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char8_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u16string>	ReadStringU16(char16_t cDelimiter = u'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char16_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u32string>	ReadStringU32(char32_t cDelimiter = U'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char32_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::wstring>		ReadStringW(wchar_t cDelimiter = L'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<wchar_t>(cDelimiter, bTrimCR); }
+
+		template < typename tchar, bool bWriteNewLine = false > requires (bSTORE)
+		void TWriteString(std::basic_string_view<tchar> sv) {
 			CHECK_ARCHIVE_STORABLE;
 
-			auto write_string = [&](auto ch, int eCodepage, bool bForceSwapByteOrder) {
-				std::streamsize nWritten = 0;
-				if constexpr (std::is_same_v<tchar, decltype(ch)>) {
-					WriteInts(str.data(), str.size(), bForceSwapByteOrder);
+			auto write_string = [&] <typename tchar_other> (eCODEPAGE eCodepage, bool bForceSwapByteOrder) {
+				std::streamsize nWritten {};
+				if constexpr (std::is_same_v<std::remove_cvref_t<tchar>, std::remove_cvref_t<tchar_other>>) {
+					WriteInts(sv.data(), sv.size(), bForceSwapByteOrder);
 				} else {
 					std::basic_string<decltype(ch)> strDest;
-					ConvCodepage(strDest, str, eCodepage);
+					ConvCodepage(strDest, sv, eCodepage);
 					WriteInts(strDest.data(), strDest.size(), bForceSwapByteOrder);
 				}
 			};
@@ -420,6 +481,10 @@ namespace gtl {
 			case eCHAR_ENCODING::UTF8 :
 				write_string(char8_t(0), eCodepage, false);
 				break;
+			}
+
+			if constexpr (bWriteNewLine) {
+				WriteNewLine();
 			}
 		};
 		void WriteNewLine() requires (bSTORE) {
@@ -443,19 +508,29 @@ namespace gtl {
 			}
 		};
 
-										void WriteString(const std::string_view& str)						requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(str); }
-										void WriteString(const std::wstring_view& str)						requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t>(str); }
-										void WriteString(const std::u8string_view& str)						requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(str); }
-										void WriteStringNL(const std::string_view& str)						requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(str);		WriteNewLine(); }
-										void WriteStringNL(const std::wstring_view& str)					requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t>(str);	WriteNewLine(); }
-										void WriteStringNL(const std::u8string_view& str)					requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(str);	WriteNewLine(); }
-
-		template < typename ... Args >	void WriteString(const std::string_view& str, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(Format(str.data(), args ...)); }
-		template < typename ... Args >	void WriteString(const std::wstring_view& str, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t>(Format(str.data(), args ...)); }
-		template < typename ... Args >	void WriteString(const std::u8string_view& str, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(Format(str.data(), args ...)); }
-		template < typename ... Args >	void WriteStringNL(const std::string_view& str, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(Format(str.data(), args ...));	WriteNewLine(); }
-		template < typename ... Args >	void WriteStringNL(const std::wstring_view& str, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t>(Format(str.data(), args ...)); WriteNewLine(); }
-		template < typename ... Args >	void WriteStringNL(const std::u8string_view& str, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(Format(str.data(), args ...)); WriteNewLine(); }
+#if defined(__cpp_lib_format)
+		template < typename ... Args >	void WriteString(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteString(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char, true>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t, true>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t, true>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t, true>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t, true>(std::format(sv, std::forward<Args>(args) ...)); }
+#else
+		template < typename ... Args >	void WriteString(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteString(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >	void WriteStringNL(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
+#endif
 
 
 		//---------------------------------------------------------------------
