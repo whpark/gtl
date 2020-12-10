@@ -168,6 +168,7 @@
     <ClInclude Include="..\..\include\gtl\config_gtl.h" />
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\string\HangeulCodeMap.h" />
+    <ClInclude Include="..\..\include\gtl\string\latin_charset.h" />
     <ClInclude Include="..\..\include\gtl\string\string_primitives.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="HangeulCodeMapKSSM_UTF16.cpp" />
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp" />
+    <ClCompile Include="latin_charset.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

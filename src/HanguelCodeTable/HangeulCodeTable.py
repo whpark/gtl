@@ -77,7 +77,7 @@ fOutHeader.write(
                 '\n'
                 '\n'
                 '#include "gtl/_lib_gtl.h"\n\n'
-                'namespace gtl::KSSM {\n'
+                'namespace gtl::charset::KSSM {\n'
                 '#pragma pack(push, 8)\n'
                 '\n'
                 '\n'
@@ -94,7 +94,7 @@ fOutHeader.write(
                 '\tGTL_DATA extern std::map<uint16_t, char16_t> const mapKSSMtoUTF16_g;\n'
                 '\n'
                 '#pragma pack(pop)\n'
-                '}\t// namespace gtl::KSSM\n'
+                '}\t// namespace gtl::charset::KSSM\n'
                 '\n\n'
                 '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
                 )
@@ -120,7 +120,7 @@ fOutHeader.flush()
 #                '#include <cstdint>\n'
 #                '#include <array>\n\n'
 #                '#include "gtl/string/' + pathOutH + '"\n\n\n'
-#                'namespace gtl::KSSM {\n\n\n'
+#                'namespace gtl::charset::KSSM {\n\n\n'
 #                '\t' + strLineSeperator
 #                )
 
@@ -169,7 +169,7 @@ fOutImpl.write( '#include "pch.h"\n\n'
                 '#include <cstdint>\n'
                 '#include <array>\n\n'
                 '#include "gtl/string/' + pathOutH + '"\n\n\n'
-                'namespace gtl::KSSM {\n\n\n'
+                'namespace gtl::charset::KSSM {\n\n\n'
                 '\t' + strLineSeperator
                 )
 
@@ -196,7 +196,7 @@ for code in codes :
 fOutImpl.write('\n\t} };\n')
 fOutImpl.write('\n\n')
 
-fOutImpl.write('}\t// namespace gtl::KSSM\n\n'
+fOutImpl.write('}\t// namespace gtl::charset::KSSM\n\n'
                '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
                )
 fOutImpl.flush()
@@ -220,7 +220,7 @@ fOutImpl.write( '#include "pch.h"\n\n'
                 '#include <cstdint>\n'
                 '#include <array>\n\n'
                 '#include "gtl/string/' + pathOutH + '"\n\n\n'
-                'namespace gtl::KSSM {\n\n\n'
+                'namespace gtl::charset::KSSM {\n\n\n'
                 '\t' + strLineSeperator
                 )
 
@@ -247,7 +247,7 @@ for code in codes :
 fOutImpl.write('\n\t} };\n')
 fOutImpl.write('\n\n')
 
-fOutImpl.write('}\t// namespace gtl::KSSM\n\n'
+fOutImpl.write('}\t// namespace gtl::charset::KSSM\n\n'
                '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
                )
 

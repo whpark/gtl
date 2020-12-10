@@ -17,7 +17,7 @@
 
 #include "gtl/_lib_gtl.h"
 
-namespace gtl::KSSM {
+namespace gtl::charset::KSSM {
 #pragma pack(push, 8)
 
 
@@ -25,7 +25,7 @@ namespace gtl::KSSM {
 	GTL_DATA extern std::map<uint16_t, char16_t> const mapKSSMtoUTF16_g;
 
 #pragma pack(pop)
-}	// namespace gtl::KSSM
+}	// namespace gtl::charset::KSSM
 
 
 #endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM

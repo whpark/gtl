@@ -183,7 +183,7 @@ namespace gtl {
 	///  ERANGE : if sizeDest is smaller
 	template < gtlc::string_elem tchar >
 	constexpr		 GTL_DEPR_SEC errno_t tszcpy(tchar* const& pszDest, size_t sizeDest, tchar const*const& pszSrc);
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline GTL_DEPR_SEC errno_t tszcpy(tstring_buf& szDest, tchar const* const& pszSrc);
 
 
@@ -203,37 +203,37 @@ namespace gtl {
 	template < gtlc::string_elem tchar >
 	constexpr errno_t tszcpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
 
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string_view<tchar> svSrc);
 
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string<tchar> const& strSrc);
 
 	// tszncpy
 	template < gtlc::string_elem tchar >
 	constexpr		 errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszncpy(tstring_buf& szDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
 
 	// tszncpy (sv)
 	template < gtlc::string_elem tchar >
 	constexpr		 errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string<tchar> const& svSrc, size_t nCount = _TRUNCATE);
 
 	// tszcat
 	template < gtlc::string_elem tchar >
 	constexpr		 GTL_DEPR_SEC errno_t tszcat(tchar* pszDest, size_t sizeDest, tchar const* pszSrc);
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline GTL_DEPR_SEC errno_t tszcat(tstring_buf& szDest, tchar const* pszSrc);
 
 	template < gtlc::string_elem tchar >
 	constexpr		 errno_t tszcat(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string_view<tchar> svSrc);
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string<tchar> const& strSrc);
 
 
@@ -245,7 +245,7 @@ namespace gtl {
 	constexpr GTL_DEPR_SEC	size_t tszrmchar(tchar* const& psz, tchar chRemove);
 	template < gtlc::string_elem tchar >
 	constexpr size_t tszrmchar(tchar* const psz, tchar const* const pszMax, tchar chRemove);
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline size_t tszrmchar(tstring_buf &sz, tchar chRemove);
 
 

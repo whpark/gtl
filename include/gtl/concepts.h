@@ -34,8 +34,18 @@ namespace gtl::concepts {
 
 
 	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
-	template < typename tcontainer, typename type >
+	template < typename tcontainer >
 	concept contiguous_container =
+		requires (tcontainer v) {
+			v[0];
+			std::data(v);
+			std::size(v);
+		};
+
+
+	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
+	template < typename tcontainer, typename type >
+	concept contiguous_type_container =
 		requires (tcontainer v) {
 			{ v[0] }			-> std::convertible_to<type>;
 			{ std::data(v) }	-> std::convertible_to<std::remove_cvref_t<type> const *>;
@@ -67,19 +77,34 @@ namespace gtl::concepts {
 	concept string_elem_utf = is_one_of<std::remove_cvref_t<tchar>, char8_t, char16_t, char32_t>;
 
 
-	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
+	///// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
+	//template < typename tcontainer >
+	//concept contiguous_string_container = 
+	//	string_elem<std::remove_cvref_t<decltype(tcontainer{}[0])>>
+	//	and
+	//	contiguous_container<tcontainer>;
 	template < typename tcontainer >
-	concept contiguous_string_container =
+	concept contiguous_string_container = 
 		string_elem<std::remove_cvref_t<decltype(tcontainer{}[0])>>
 		and
-		contiguous_container<tcontainer, std::remove_cvref_t<decltype(tcontainer{}[0])>>;
+		(
+			requires (tcontainer v) {
+				v[0];
+				{ std::data(v) } -> std::convertible_to<std::remove_cvref_t<decltype(v[0])> const*>;
+				{ std::size(v) } -> std::convertible_to<size_t>;
+			}
+			or
+			std::is_array_v<tcontainer>
+
+		);
 
 
 	/// @brief type for string buffer with type constraints
 	template < typename tcontainer, typename tchar >
-	concept string_buffer_fixed_c = 
+	concept contiguous_type_string_container = 
 		(std::is_same_v<std::remove_cvref_t<typename tcontainer::value_type>, tchar> or std::is_same_v<std::remove_cvref_t<decltype(tcontainer()[0])>, tchar>)
-		and contiguous_string_container<tcontainer>;
+		and
+		contiguous_string_container<tcontainer>;
 
 
 }

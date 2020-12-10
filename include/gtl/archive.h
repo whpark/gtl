@@ -19,6 +19,8 @@
 #include "concepts.h"
 #include "string.h"
 
+#if 0
+
 namespace gtl {
 #pragma pack(push, 8)
 
@@ -337,8 +339,8 @@ namespace gtl {
 			auto peek = [](tstream& stream, std::string_view sv) -> bool {
 				auto pos = stream.tellg();
 				bool bMatch {true};
-				while (c : sv) {
-					if (auto ci = get(stream, ci); ci == c) {
+				for (auto c : sv) {
+					if (auto ci = get(stream); ci == c) {
 						bMatch = false;
 						break;
 					}
@@ -349,7 +351,7 @@ namespace gtl {
 				return false;
 			};
 
-			constexpr static std::vector<std::pair<std::string_view, int>> const codepages{
+			constexpr static std::vector<std::pair<std::string_view, eCODEPAGE>> const codepages{
 				{GetCodepageBOM(eCODEPAGE::UTF32BE), eCODEPAGE::UTF32BE},	// in BOM Length order ...
 				{GetCodepageBOM(eCODEPAGE::UTF32LE), eCODEPAGE::UTF32LE},
 				{GetCodepageBOM(eCODEPAGE::UTF16BE), eCODEPAGE::UTF16BE},
@@ -411,9 +413,9 @@ namespace gtl {
 				{
 					if constexpr (sizeof(tchar) == sizeof(char16_t)) {	// char16_t, wchar_t, uint16_t
 						auto eStreamByteOrder = (eCodepage == eCODEPAGE::UTF16LE) ? std::endian::little : std::endian::big;
-						bool bForceSwapByteOrder = (std::endian::native != eStreamByteOrder) xor bSWAP_BYTE_ORDER;
-						if (bForceSwapByteOrder) [[unlikely]] {
-							bResult = std::getline(m_stream, str, GetByteSwap<char16_t>(cDelimiter)).good();
+						bool bSwapByteOrder = (std::endian::native != eStreamByteOrder) xor bSWAP_BYTE_ORDER;
+						if (bSwapByteOrder) [[unlikely]] {
+							bResult = std::getline<char16_t>(m_stream, str, GetByteSwap<char16_t>(cDelimiter)).good();
 							for (auto& c : str)
 								ByteSwap(c);
 						}
@@ -1009,3 +1011,6 @@ namespace gtl {
 
 #pragma pack(pop)
 }	// namespace gtl;
+
+
+#endif	 // temp

@@ -191,7 +191,7 @@ TEST(gtl_string, tszcpy) {
 
 	// tszcpy from string_view
 	{
-		constexpr bool b = gtlc::string_buffer_fixed_c<std::basic_string_view<char>, char>;
+		constexpr bool b = gtlc::contiguous_type_string_container<std::basic_string_view<char>, char>;
 
 		char16_t buf[32] {};
 		EXPECT_TRUE(  0 == tszcpy(buf, std::size(buf), u"가나다라마바사"sv));

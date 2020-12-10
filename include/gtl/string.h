@@ -271,18 +271,26 @@ namespace gtl {
 			return str;
 		}
 
-		void MakeUpper()												{ std::transform(this->begin(), this->end(), std::toupper); /*for (auto& ch : *this) ch = toupper(ch);*/ }
-		void MakeLower()												{ std::transform(this->begin(), this->end(), std::tolower); /*for (auto& ch : *this) ch = tolower(ch);*/ }
-		void MakeReverse()												{ std::reverse(this->begin(), this->end()); }
+		void MakeUpper()				{ for (auto& ch : *this) ch = std::toupper(ch); }
+		void MakeLower()				{ for (auto& ch : *this) ch = std::tolower(ch); }
+		void MakeReverse()				{ std::reverse(this->begin(), this->end()); }
 
 		[[nodiscard]] std::basic_string<tchar> GetUpper() const {
-			std::basic_string<tchar> str(this->size(), 0);
-			std::transform(this->begin(), this->end(), str.begin(), std::toupper);
+			auto l = this->size();
+			std::basic_string<tchar> str(l, 0);
+			for (size_t i = 0; i < l; i++)
+				str[i] = ToUpper(this->at(i));
+			//static std::locale loc {fmt::format("en_US.UTF-16", (int)eCODEPAGE_DEFAULT<tchar>)};
+			//std::transform(this->begin(), this->end(), str.begin(), [&](tchar c) -> tchar { return std::toupper<tchar>(c, loc); });
 			return str;
 		}
 		[[nodiscard]] std::basic_string<tchar> GetLower() const {
-			std::basic_string<tchar> str(this->size(), 0);
-			std::transform(this->begin(), this->end(), str.begin(), std::tolower);
+			auto l = this->size();
+			std::basic_string<tchar> str(l, 0);
+			for (size_t i = 0; i < l; i++)
+				str[i] = ToLower(this->at(i));
+			//static std::locale loc {fmt::format("en_US.UTF-16", (int)eCODEPAGE_DEFAULT<tchar>)};
+			//std::transform(this->begin(), this->end(), str.begin(), [&](tchar c) -> tchar { return std::tolower<tchar>(c, loc); });
 			return str;
 		}
 

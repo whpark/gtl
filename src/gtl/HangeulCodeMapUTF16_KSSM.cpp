@@ -19,7 +19,7 @@
 #include "gtl/string/HangeulCodeMap.h"
 
 
-namespace gtl::KSSM {
+namespace gtl::charset::KSSM {
 
 
 	//------------------------------------------------------------------------------------------------
@@ -1431,6 +1431,6 @@ namespace gtl::KSSM {
 	} };
 
 
-}	// namespace gtl::KSSM
+}	// namespace gtl::charset::KSSM
 
 #endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM

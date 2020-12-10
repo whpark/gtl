@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////
 //
 // string_primitives.hpp : inline functions (Don't include this header file directly!)
 //
@@ -12,6 +12,7 @@
 #ifndef GTL_HEADER__BASIC_STRING_IMPL
 #define GTL_HEADER__BASIC_STRING_IMPL
 
+#include "latin_charset.h"
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -129,16 +130,177 @@ namespace gtl {
 		return TrimView(sv, GetSpaceString<tchar>());
 	}
 
+
+#if 0
+	constexpr char32_t sz[] = 
+		U"Àà Áá Ǎǎ Ãã Ȧȧ Ââ Ää Åå Āā Ąą Ăă Ćć Ĉĉ Čč Ċċ Çç Ďď Ḑḑ Éé Ěě Ēē Èè Ęę Ẽẽ Ėė Êê "
+		U"Ëë Ĝĝ Ǵǵ Ǧǧ Ģģ Ğğ Ȟȟ Ĥĥ Īī Įį Íí Ǐǐ Ïï Ĩĩ İi Îî Ɨɨ Iı Ĵĵ Ǩǩ Ḱḱ Ķķ Ĺĺ Ļļ Łł "
+		U"Ḿḿ Ňň Ńń Ññ Ņņ Õõ Ǒǒ Öö Őő Óó Òò Øø Ōō Ǫǫ Řř Ŕŕ Ȓȓ Şş Śś Šš Șș Ŝŝ Ťť Țț Ŧŧ "
+		U"Ŭŭ Üü Ūū Ǔǔ Ųų Ůů Űű Ũũ Úú Ùù Ṽṽ Ẃẃ Ẋẋ Ȳȳ Ỹỹ Ÿÿ Ýý Žž Źź";
+#endif
+
+	namespace charset {
+		template < gtlc::string_elem tchar >
+		struct S_ULPair { tchar cUpper, cLower; };
+
+		constexpr static inline S_ULPair<char16_t> latin1_diff { 0xC0, 0xE0  /* ('À' 'à') */ };
+		constexpr static inline S_ULPair<char16_t> latin1_exception1 { 0x00D7, 0x00F7 }; // ×, ÷
+		constexpr static inline S_ULPair<char16_t> latin1_exception2 { 0x039c, 0x00b5 }; // µ, Μ : 743
+		constexpr static inline S_ULPair<char16_t> latin1_exception3 { 0x0178, 0x00ff }; // ÿ, Ÿ : 121
+
+
+		template < typename tchar >
+		struct S_MAP_TABLE {
+			std::pair<tchar, tchar> const range;
+			std::map<tchar, tchar> const& map;
+		};
+
+		static inline std::array<S_MAP_TABLE<char16_t>, 4> mapUL16 { {
+			//{ rangeUL_latin1_g,			mapUL_latin1_g},
+			{ rangeUL_latin_extended_g, mapUL_latin_extended_g },
+			{ rangeUL_other1_g,			mapUL_other1_g },
+			{ rangeUL_other2_g,			mapUL_other2_g },
+			{ rangeUL_other3_g,			mapUL_other3_g },
+		} };
+
+		static inline std::array<S_MAP_TABLE<char16_t>, 5> mapLU16 { {
+			{ rangeLU_latin1_g,			mapLU_latin1_g},
+			{ rangeLU_latin_extended_g, mapLU_latin_extended_g },
+			{ rangeLU_other1_g,			mapLU_other1_g },
+			{ rangeLU_other2_g,			mapLU_other2_g },
+			{ rangeLU_other3_g,			mapLU_other3_g },
+		} };
+
+		static inline std::array<S_MAP_TABLE<char32_t>, 3> mapUL32 { {
+			{ rangeUL_other4_g,			mapUL_other4_g },
+			{ rangeUL_other5_g,			mapUL_other5_g },
+			{ rangeUL_other6_g,			mapUL_other6_g },
+		} };
+
+		static inline std::array<S_MAP_TABLE<char32_t>, 3> mapLU32 { {
+			{ rangeLU_other4_g,			mapLU_other4_g },
+			{ rangeLU_other5_g,			mapLU_other5_g },
+			{ rangeLU_other6_g,			mapLU_other6_g },
+		} };
+
+	}
+
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */) { if ((c >= 'A') && (c <= 'Z')) return c - 'A' + 'a'; return c; }
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */) { if ((c >= 'a') && (c <= 'z')) return c - 'a' + 'A'; return c; }
-	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c/* Locale Irrelavant */) { if ((c >= 'A') && (c <= 'Z')) c += 'a' - 'A'; }
-	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c/* Locale Irrelavant */) { if ((c >= 'a') && (c <= 'z')) c -= 'a' - 'A'; }
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '9'); }
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c/* Locale Irrelavant */) { return (c >= '0') && (c <= '7'); }
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c/* Locale Irrelavant */) { return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F')); }
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsSpace(tchar const c/* Locale Irrelavant */) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsNotSpace(tchar const c/* Locale Irrelavant */) { return !IsSpace(c); }
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c) {
+		if (c < 'A')
+			return c;
+
+		if (c <= 'Z')
+			return c - 'A' + 'a';
+
+		using namespace gtl::charset;
+
+		if constexpr (sizeof(tchar) >= sizeof(char16_t)) {
+			// Latin-1
+			if (c < rangeUL_latin1_g.first)
+				return c;
+			if (c < rangeUL_latin1_g.second) {
+				if (c != latin1_exception1.cUpper)
+					return c + latin1_diff.cLower - latin1_diff.cUpper;
+				return c;
+			}
+			// Latin Extended, others
+			for (auto const& [range, map] : mapUL16) {
+				if (c < range.first)
+					return c;
+				if (c < range.second) {
+					if (auto iter = map.find(c); iter != map.end()) {
+						return iter->second;
+					}
+					return c;
+				}
+			}
+		}
+
+		if constexpr (sizeof(tchar) >= sizeof(char32_t)) {
+			for (auto const& [range, map] : mapUL32) {
+				if (c < range.first)
+					return c;
+				if (c < range.second) {
+					if (auto iter = map.find(c); iter != map.end()) {
+						return iter->second;
+					}
+					return c;
+				}
+			}
+		}
+		return c;
+	}
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToUpper(tchar c) {
+		if (c < 'a')
+			return c;
+		if (c <= 'z')
+			return c - 'a' + 'A';
+
+		using namespace gtl::charset;
+
+		if constexpr (sizeof(tchar) >= sizeof(char16_t)) {
+			//// Latin-1
+			//if (c < rangeLU_latin1_g.first) {
+			//	if (c == latin1_exception2.cLower)		// { 0x039c, 0x00b5 }; // µ, Μ : 743
+			//		return latin1_exception2.cUpper;
+			//	return c;
+			//}
+			//if (c < rangeLU_latin1_g.second) {
+			//	if (c == latin1_exception3.cLower)		// { 0x0178, 0x00ff }; // ÿ, Ÿ : 121
+			//		return latin1_exception3.cUpper;
+			//	if (c != latin1_exception1.cLower)
+			//		return c - latin1_diff.cLower + latin1_diff.cUpper;
+			//	return c;
+			//}
+			// Latin Extended, others
+			for (auto const& [range, map] : mapLU16) {
+				if (c < range.first)
+					return c;
+				if (c < range.second) {
+					if (auto iter = map.find(c); iter != map.end()) {
+						return iter->second;
+					}
+					return c;
+				}
+			}
+		}
+
+		if constexpr (sizeof(tchar) >= sizeof(char32_t)) {
+			for (auto const& [range, map] : mapLU32) {
+				if (c < range.first)
+					return c;
+				if (c < range.second) {
+					if (auto iter = map.find(c); iter != map.end()) {
+						return iter->second;
+					}
+					return c;
+				}
+			}
+		}
+		return c;
+	}
+	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c) {
+		c = ToLower(c);
+	}
+	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c) {
+		c = ToUpper(c);
+	}
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c) {
+		return (c >= '0') && (c <= '9');
+	}
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c) {
+		return (c >= '0') && (c <= '7');
+	}
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c) {
+		return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F'));
+	}
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsSpace(tchar const c) {
+		return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' ');
+	}
+	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsNotSpace(tchar const c) {
+		return !IsSpace(c);
+	}
 
 
 
@@ -212,7 +374,7 @@ namespace gtl {
 		pszDest[0] = 0;
 		return ERANGE;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline GTL_DEPR_SEC errno_t tszcpy(tstring_buf& szDest, tchar const* const& pszSrc) {
 #pragma warning(suppress:4996)
 		return tszcpy(std::data(szDest), std::size(szDest), pszSrc);
@@ -247,13 +409,13 @@ namespace gtl {
 		return 0;
 	}
 
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string_view<tchar> svSrc) {
 		tchar* const pszDest = std::data(szDest);
 		size_t sizeDest = std::size(szDest);
 		return tszcpy(pszDest, sizeDest, svSrc);
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string<tchar> const& strSrc) {
 		tchar* const pszDest = std::data(szDest);
 		size_t sizeDest = std::size(szDest);
@@ -261,7 +423,7 @@ namespace gtl {
 
 	}
 
-#if 0	// any type <- any type.... �ʹ� ���� �ɼ�.
+#if 0	// any type <- any type.... 너무 많은 옵션.
 	template < gtlc::string_buffer_fixed tcontainer1, gtlc::string_buffer_fixed tcontainer2 >
 	requires requires (tcontainer1 t1, tcontainer2 t2) {
 		requires std::is_same_v<std::remove_cvref_t<decltype(t1[0])>, std::remove_cvref_t<decltype(t2[0])> >
@@ -316,7 +478,7 @@ namespace gtl {
 		*pos = 0;	// null terminator
 		return 0;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszncpy(tstring_buf &szDest, tchar const* pszSrc, size_t nCount) {
 		return tszncpy(std::data(szDest), std::size(szDest), pszSrc, nCount);
 	}
@@ -346,11 +508,11 @@ namespace gtl {
 		*pos = 0;	// null terminator
 		return 0;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string_view<tchar> svSrc, size_t nCount) {
 		return tszncpy(std::data(szDest), std::size(szDest), svSrc, nCount);
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string<tchar> const& strSrc, size_t nCount) {
 		return tszncpy(std::data(szDest), std::size(szDest), std::basic_string_view<tchar>{strSrc}, nCount);
 	}
@@ -379,7 +541,7 @@ namespace gtl {
 		pszDest[0] = 0;
 		return ERANGE;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline GTL_DEPR_SEC errno_t tszcat(tstring_buf &szDest, tchar const* pszSrc) {
 #pragma warning(suppress:4996)
 		return tszcat(std::data(szDest), std::size(szDest), pszSrc);
@@ -407,11 +569,11 @@ namespace gtl {
 		*pos = 0;
 		return 0;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string_view<tchar> svSrc) {
 		return tszcat(std::data(szDest), std::size(szDest), svSrc);
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string<tchar> const& strSrc) {
 		return tszcat(std::data(szDest), std::size(szDest), std::basic_string_view{strSrc.data(), strSrc.size()});
 	}
@@ -462,7 +624,7 @@ namespace gtl {
 		}
 		return pos - psz;
 	}
-	template < gtlc::string_elem tchar, gtlc::string_buffer_fixed_c<tchar> tstring_buf >
+	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
 	constexpr inline size_t tszrmchar(tstring_buf &sz, tchar chRemove) {
 		return tszrmchar(std::data(sz), std::data(sz) + std::size(sz), chRemove);
 	}
