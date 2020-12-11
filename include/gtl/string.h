@@ -224,50 +224,49 @@ namespace gtl {
 		}
 
 		[[nodiscard]] std::basic_string_view<tchar> MidView(index_type iBegin) const {
-			return std::basic_string_view<tchar>{this}.substr(iBegin, this->size() - iBegin);
+			return std::basic_string_view<tchar>{*this}.substr(iBegin, this->size() - iBegin);
 		}
 		[[nodiscard]] std::basic_string_view<tchar> MidView(index_type iBegin, index_type nCount) const {
-			return std::basic_string_view<tchar>{this}.substr(iBegin, nCount);
+			return std::basic_string_view<tchar>{*this}.substr(iBegin, nCount);
 		}
 		[[nodiscard]] std::basic_string_view<tchar> LeftView(index_type nCount) const {
-			return std::basic_string_view<tchar>{this}.substr(0, nCount);
+			return std::basic_string_view<tchar>{*this}.substr(0, nCount);
 		}
 		[[nodiscard]] std::basic_string_view<tchar> RightView(index_type nCount) const {
 			index_type iBegin = ((index_type)this->size() < nCount) ? 0 : (index_type)this->size()-nCount;
-			return std::basic_string_view<tchar>{this}.substr(iBegin, nCount);
+			return std::basic_string_view<tchar>{*this}.substr(iBegin, nCount);
 		}
 
-		TString SpanIncluding(const tchar* pszCharSet) const {
+		[[nodiscard]] TString SpanIncluding(std::basic_string_view<tchar> svCharSet) const {
 			TString str;
 			index_type n {0};
-			for (const tchar* sz = *this; sz && *sz; sz++) {
-				if (tszsearch(pszCharSet, *sz))
+			for (tchar c : *this) {
+				if (svCharSet.find(c) != this->npos)
 					n++;
 			}
 			if (n) {
 				str.reserve(n);
-				for (const tchar* sz = *this; sz && *sz; sz++) {
-					if (tszsearch(pszCharSet, *sz))
-						str += *sz;
+				for (tchar c : *this) {
+					if (svCharSet.find(c) != this->npos)
+						str += c;
 				}
 			}
 			return str;
 		}
-		TString SpanExcluding(const tchar* pszCharSet) const {
+		[[nodiscard]] TString SpanExcluding(std::basic_string_view<tchar> svCharSet) const {
 			TString str;
 			index_type n {0};
-			for (const tchar* sz = *this; sz && *sz; sz++) {
-				if (!tszsearch(pszCharSet, (int)*sz))
+			for (tchar c : *this) {
+				if (svCharSet.find(c) == this->npos)
 					n++;
 			}
 			if (n) {
 				str.reserve(n);
-				for (const tchar* sz = *this; sz && *sz; sz++) {
-					if (!tszsearch(pszCharSet, *sz))
-						str += *sz;
+				for (tchar c : *this) {
+					if (svCharSet.find(c) == this->npos)
+						str += c;
 				}
 			}
-			std::string st;
 			return str;
 		}
 
@@ -291,6 +290,12 @@ namespace gtl {
 				str[i] = ToLower(this->at(i));
 			//static std::locale loc {fmt::format("en_US.UTF-16", (int)eCODEPAGE_DEFAULT<tchar>)};
 			//std::transform(this->begin(), this->end(), str.begin(), [&](tchar c) -> tchar { return std::tolower<tchar>(c, loc); });
+			return str;
+		}
+		[[nodiscard]] std::basic_string<tchar> GetReverse() const {
+			std::basic_string<tchar> str;
+			str.resize(this->size());
+			std::reverse_copy(this->begin(), this->end(), str.begin());
 			return str;
 		}
 
@@ -323,20 +328,20 @@ namespace gtl {
 			//std::replace(this->begin(), this->end(), chOld, chNew);
 		}
 		// no recursive Replace.
-		index_type Replace(const tchar* pszOld, const tchar* pszNew) {
-			if (!pszOld || !tszlen(pszOld))
+		index_type Replace(std::basic_string_view<tchar> svOld, std::basic_string_view<tchar> svNew) {
+			if (svOld.empty())
 				return 0;
-			index_type nLenOld = tszlen(pszOld);
-			index_type nLenNew = pszNew ? tszlen(pszNew) : 0;
+			index_type nLenOld = svOld.size();
+			index_type nLenNew = svNew.size();
 			index_type nToReplace = 0;
 
-			const tchar* pszStart = this->data();
-			const tchar* pszEnd = pszStart + this->size();
-			const tchar* pszEndSearch = pszEnd-nLenOld+1;
+			tchar const* pszStart = this->data();
+			tchar const* pszEnd = pszStart + this->size();
+			tchar const* pszEndSearch = pszEnd-nLenOld+1;
 
 			// 먼저 몇 개 바꿔야 되는지 찾고
-			for (const tchar* psz = pszStart; psz < pszEndSearch; psz++) {
-				if (tszncmp(psz, pszOld, nLenOld) == 0) {
+			for (tchar const* psz = pszStart; psz < pszEndSearch; psz++) {
+				if (tszncmp({psz, pszEnd}, svOld, nLenOld) == 0) {
 					psz += nLenOld-1;
 					nToReplace++;
 				}
@@ -352,9 +357,9 @@ namespace gtl {
 				tchar* pszReplaced = strReplaced.data();
 				const tchar* psz = pszStart;
 				for (; nLeft && psz < pszEndSearch; psz++) {
-					if (tszncmp(psz, pszOld, nLenOld) == 0) {
+					if (tszncmp({psz, pszEnd}, svOld, nLenOld) == 0) {
 						if (nLenNew) {
-							memcpy(pszReplaced, pszNew, nLenNew*sizeof(tchar));	// funcion tszncpy() appends NULL. we don't need NULL to be copied into dest.
+							memcpy(pszReplaced, svNew.data(), nLenNew*sizeof(tchar));	// funcion tszncpy() appends NULL. don't need NULL to be copied into dest.
 							pszReplaced += nLenNew;
 						}
 						psz += nLenOld-1;
@@ -371,7 +376,7 @@ namespace gtl {
 			return nToReplace;
 		}
 		index_type Remove(tchar chRemove) {
-			auto nNewLen = tszrmchar(this->data(), this->size(), chRemove);
+			auto nNewLen = tszrmchar(this->data(), this->data()+this->size(), chRemove);
 			if (nNewLen != this->size())
 				this->resize(nNewLen);
 			return this->size();
