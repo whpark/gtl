@@ -28,6 +28,11 @@ namespace gtl::concepts {
 	concept trivially_copyable = std::is_trivially_copyable_v<T>;
 
 
+	/// @brief array or std::array
+	template < typename tarray >
+	concept is_array = std::is_array_v<tarray> or std::convertible_to<tarray, std::array<typename tarray::value_type, tarray{}.size()>>;
+
+
 	/// @brief variadic template check version of 'std::is_same_v<t, t2>'
 	template < typename tchar, typename ... ttypes >
 	concept is_one_of = (std::is_same_v<tchar, ttypes> || ...);

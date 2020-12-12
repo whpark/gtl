@@ -60,6 +60,49 @@ namespace gtl {
 
 	};
 
+	struct eCODEPAGE_ {
+		enum : int {
+			DEFAULT = -1,
+			//MBCS = 0,
+
+			UCS2LE = 1200,
+			UCS2BE = 1201,
+			UCS2 = (std::endian::native == std::endian::little) ? UCS2LE : UCS2BE,
+			_UCS2_other = (UCS2 == UCS2BE) ? UCS2LE : UCS2BE,
+
+			UTF7 = 65000,
+			UTF8 = 65001,
+
+			UTF16LE = UCS2LE,
+			UTF16BE = UCS2BE,
+			UTF16 = (std::endian::native == std::endian::little) ? UTF16LE : UTF16BE,
+			_UTF16_other = (UTF16 == UTF16BE) ? UTF16LE : UTF16BE,
+
+			UTF32LE = 12000,
+			UTF32BE = 12001,
+			UTF32 = (std::endian::native == std::endian::little) ? UTF32LE : UTF32BE,
+			_UTF32_other = (UTF32 == UTF32BE) ? UTF32LE : UTF32BE,
+
+
+		//------------------------
+
+			ACP = 0,
+
+			KO_KR_949 = 949,
+	#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
+			KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
+	#endif
+
+
+			//... your codepages, here.
+
+
+		};
+
+	private :
+		int value_{DEFAULT};
+	};
+
 
 	template <typename tchar>	constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT = eCODEPAGE::DEFAULT;
 	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<char> = eCODEPAGE::DEFAULT;

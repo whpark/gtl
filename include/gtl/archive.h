@@ -19,7 +19,7 @@
 #include "concepts.h"
 #include "string.h"
 
-#if 0
+#if 1
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -102,32 +102,48 @@ namespace gtl {
 		using is_loading_t = std::bool_constant<bLOAD>;
 
 
-		// todo : ....... Write/Read 정리. 2020.12.02
 	public:
 		/// @brief Write byte buffer
 		inline void Write(void const* data, std::streamsize size) requires (bSTORE) {
 			CHECK_ARCHIVE_STORABLE;
 			m_stream.write((std::ostream::char_type const*)data, size);
 		}
-		/// @brief Write byte buffer
-		template < gtlc::trivially_copyable TYPE > requires (bSTORE and !bSWAP_BYTE_ORDER)	// some structs can contain integral values which needs to be swapped byte ordering.
+		/// @brief Write an object.
+		/// @param TYPE trivially_copyable objects. (when bSWAP_BYTE_ORDER is true, only integral or floating point value and their array  can be serialized.)
+		template < gtlc::trivially_copyable TYPE > requires (bSTORE)
 		inline void Write(TYPE const& v) {
 			CHECK_ARCHIVE_STORABLE;
-			Write(&v, sizeof(v));
+			if constexpr (bSWAP_BYTE_ORDER) {
+				if constexpr (gtlc::is_array<TYPE>) {
+					if constexpr (std::is_integral_v < std::remove_cvref_t<decltype(TYPE{}[0]) >> ) {
+						this->WriteInts(std::data(v), std::size(v));
+					}
+					else if constexpr (std::is_floating_point_v < std::remove_cvref_t<decltype(TYPE{}[0]) >> ) {
+						this->Write(std::data(v), sizeof(v));
+					}
+					else {
+						static_assert(false, "Object Type cannot be Serialized directly.");
+					}
+				}
+				else if constexpr (std::is_integral_v<TYPE>) {
+					this->WriteInts(&v, 1);
+				}
+				else if constexpr (std::is_floating_point_v<TYPE>) {
+					this->Write(&v, sizeof(v));
+				}
+				else {
+					static_assert(false, "Object Type cannot be Serialized directly.");
+				}
+			} else {
+				Write(&v, sizeof(v));
+			}
+			return *this;
 		}
-		///// @brief Write byte buffer
-		//[[nodiscard]] bool WriteAndVerify(void const* data, std::streamsize size) requires (bSTORE) {
-		//	CHECK_ARCHIVE_STORABLE;
-		//	auto pos0 = m_stream.tellp();
-		//	Write(data, size);
-		//	auto pos1 = m_stream.tellp();
-		//	return (pos1 - pos0 == size);
-		//}
 
 
 	public:
-		//---------------------------------------------------------------------
-		// Read byte buffer
+		
+		/// @brief Read byte buffer
 		template < typename T > requires (bLOADING)
 		inline std::streamsize Read(void* data, std::streamsize size) {
 			CHECK_ARCHIVE_LOADABLE;
@@ -143,9 +159,36 @@ namespace gtl {
 			}
 			return -1;
 		}
-		template < gtlc::trivially_copyable TYPE > requires (bLOADING and !bSWAP_BYTE_ORDER)	// some structs can contain integral values which needs to be swapped byte ordering.
+		/// @brief Write an object.
+		/// @param TYPE trivially_copyable objects. (when bSWAP_BYTE_ORDER is true, only integral or floating point value and their array  can be serialized.)
+		template < gtlc::trivially_copyable TYPE > requires (bLOADING)
 		inline std::streamsize Read(TYPE& v) {
-			return Read(&v, sizeof(v));
+			CHECK_ARCHIVE_LOADABLE;
+			if constexpr (bSWAP_BYTE_ORDER) {
+				if constexpr (gtlc::is_array<TYPE>) {
+					if constexpr (std::is_integral_v < std::remove_cvref_t<decltype(TYPE{}[0]) >> ) {
+						this->ReadInts(std::data(v), std::size(v));
+					}
+					else if constexpr (std::is_floating_point_v < std::remove_cvref_t<decltype(TYPE{}[0]) >> ) {
+						this->Read(std::data(v), sizeof(v));
+					}
+					else {
+						static_assert(false, "Object Type cannot be Serialized directly.");
+					}
+				}
+				else if constexpr (std::is_integral_v<TYPE>) {
+					this->ReadInts(&v, 1);
+				}
+				else if constexpr (std::is_floating_point_v<TYPE>) {
+					this->Read(&v, sizeof(v));
+				}
+				else {
+					static_assert(false, "Object Type cannot be Serialized directly.");
+				}
+			} else {
+				Read(&v, sizeof(v));
+			}
+			return *this;
 		}
 
 
@@ -157,16 +200,17 @@ namespace gtl {
 		void WriteInts(T_INT const* data, std::streamsize nCount) {
 			CHECK_ARCHIVE_STORABLE;
 			if constexpr (bSWAP_BYTE_ORDER and (sizeof(T_INT) > 1)) {
-				WriteBultKintsSwapByte<T_INT, PROCESSING_BUFFER_SIZE>(data, nCount);
+				WriteIntsSwapByte<T_INT, PROCESSING_BUFFER_SIZE>(data, nCount);
 			}
 			else {
-				Write(data, nCount*sizeof(T_INT), true);
+				Write(data, nCount*sizeof(T_INT));
 			}
 		}
-		template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bSTORE)
-		inline void WriteInts(tcontainer const& container) {
-			WriteInts(std::data(container), std::size(container));
-		}
+		// .... 사용법 헷갈림. 삭제.
+		//template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bSTORE)
+		//inline void WriteInts(tcontainer const& container) {
+		//	WriteInts(std::data(container), std::size(container));
+		//}
 
 		/// @brief Read Ints. Swaps byte-order if (bSWAP_BYTE_ORDER)
 		/// @param container ints.
@@ -186,10 +230,11 @@ namespace gtl {
 			}
 			return nReadCount;
 		}
-		template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bLOAD)
-		inline std::streamsize ReadInts(tcontainer& container) {
-			return ReadInts(std::data(container), std::size(container));
-		}
+		// .... 사용법 헷갈림. 삭제.
+		//template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bLOAD)
+		//inline std::streamsize ReadInts(tcontainer& container) {
+		//	return ReadInts(std::data(container), std::size(container));
+		//}
 
 
 		/// @brief Write Ints Swaps byte-order if (bSWAP_BYTE_ORDER)
@@ -214,10 +259,6 @@ namespace gtl {
 				Write(data, nCount*sizeof(T_INT), true);
 			}
 		}
-		template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bSTORE)
-		inline void WriteIntsSwapByte(tcontainer const& container) {
-			WriteIntsSwapByte(std::data(container), std::size(container));
-		}
 
 
 		/// @brief Read Ints. Swaps byte-order if (bSWAP_BYTE_ORDER)
@@ -238,57 +279,23 @@ namespace gtl {
 			}
 			return nReadCount;
 		}
-		template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bLOAD)
-		inline std::streamsize ReadIntsSwapByte(tcontainer& container) {
-			return ReadIntsSwapByte(std::data(container), std::size(container));
-		}
 
 
 	public:
-		template < typename T >
-		constexpr bool IsBulkIOCapable() {
-			if constexpr (!std::is_trivially_copyable_v<T>) {
-				return false;
-			}
-
-			if constexpr (!bSWAP_BYTE_ORDER) {
-				return true;
-			}
-
-			if constexpr (std::is_floating_point_v<T> or (sizeof(T) == 1)) {
-				return true;
-			}
-
-			return false;
-		}
-
 
 		//---------------------------------------------------------------------
 		// operator >>, <<, &
-		template < gtlc::trivially_copyable TYPE > requires (bSTORE and IsBulkIOCapable<TYPE>())
+		template < gtlc::trivially_copyable TYPE > requires (bSTORE)
 		TArchive& operator << (TYPE const& v) {
-			CHECK_ARCHIVE_STORABLE;
-			if constexpr (bSWAP_BYTE_ORDER and std::is_integral_v<TYPE> and (sizeof(TYPE) > 1)) {
-				TYPE v2 = GetSwapByteOrder(v);
-				Write(&v2, sizeof(v2), true);
-			}
-			else {
-				Write(&v, sizeof(v), true);
-			}
+			Write(v);
 			return *this;
 		};
-		template < gtlc::trivially_copyable TYPE > requires (bLOAD and IsBulkIOCapable<TYPE>())
+		template < gtlc::trivially_copyable TYPE > requires (bLOAD)
 		TArchive& operator >> (TYPE& v) {
-			CHECK_ARCHIVE_LOADABLE;
-			std::streamsize nRead = Read(&v, sizeof(v));
-			if (nRead < (std::streamsize)sizeof(v))
-				throw std::ios_base::failure(GTL__FUNCSIG "unexpected EOF");
-			if constexpr (bSWAP_BYTE_ORDER and std::is_integral_v<TYPE> and (sizeof(TYPE) > 1)) {
-				ByteSwap(v);
-			}
+			Read(v);
 			return *this;
 		};
-		template < typename TYPE > requires (IsBulkIOCapable<TYPE>())
+		template < typename TYPE >
 		TArchive& operator & (TYPE& v) {
 			if constexpr (bSTORE && bLOAD) {
 				if (IsStore())
@@ -304,15 +311,19 @@ namespace gtl {
 				return *this;
 			}
 		};
-		//template < gtlc::trivially_copyable TYPE > requires (bSTORE)
-		//TArchive& operator & (TYPE const& v) {
-		//	CHECK_ARCHIVE_STORABLE;
-		//	return *this << v;
-		//};
+		template < typename TYPE > requires (bSTORE)
+		TArchive& operator & (TYPE const& v) {
+			if constexpr (bSTORE and bLOAD) {
+				if (!IsStoring())
+					throw std::ios_base::failure(GTL__FUNCSIG "Stream is NOT for storing.");
+			}
+			return *this << v;
+		};
 
 
 		//---------------------------------------------------------------------
-		// Write BOM
+
+		/// @brief Write BOM
 		void WriteCodepageBOM(eCODEPAGE eCodepage) requires (bSTORE) {
 			CHECK_ARCHIVE_STORABLE;
 			if (eCodepage == eCODEPAGE::DEFAULT) {
@@ -323,9 +334,9 @@ namespace gtl {
 				Write(sv.data(), sv.size());
 			SetDefaultCodepage(eCodepage);
 		};
-		//---------------------------------------------------------------------
-		// Read BOM
-		eCODEPAGE ReadCodepageBOM(int eDefaultCodepage = eCODEPAGE::UTF8) requires (bLOAD) {
+
+		/// @brief Read BOM
+		eCODEPAGE ReadCodepageBOM(eCODEPAGE eDefaultCodepage = eCODEPAGE::UTF8) requires (bLOAD) {
 			CHECK_ARCHIVE_LOADABLE;
 			unsigned char c = 0;
 
@@ -372,8 +383,7 @@ namespace gtl {
 		};
 
 
-		//---------------------------------------------------------------------
-		// Read / Write String
+		/// @brief Read / Write String
 		template < typename tchar > requires (bLOAD)
 		std::optional<std::basic_string<tchar>> ReadString(tchar cDelimiter = '\n', bool bTrimCR = true) {
 			str.clear();
@@ -435,7 +445,32 @@ namespace gtl {
 				}
 				break;
 
-				// todo : 2020.12.08. UTF32
+			case eCODEPAGE::UTF32LE :
+			case eCODEPAGE::UTF32BE :
+				{
+					if constexpr (sizeof(tchar) == sizeof(char32_t)) {	// char32_t
+						auto eStreamByteOrder = (eCodepage == eCODEPAGE::UTF32LE) ? std::endian::little : std::endian::big;
+						bool bSwapByteOrder = (std::endian::native != eStreamByteOrder) xor bSWAP_BYTE_ORDER;
+						if (bSwapByteOrder) [[unlikely]] {
+							bResult = std::getline<char32_t>(m_stream, str, GetByteSwap<char32_t>(cDelimiter)).good();
+							for (auto& c : str)
+								ByteSwap(c);
+						}
+						else [[likely]] {
+							bResult = std::getline(m_stream, str, cDelimiter).good();
+						}
+					}
+					else {
+						if (auto r = ReadString<char32_t>(cDelimiter, bTrimCR); r) {
+							S_CODEPAGE_OPTION option{.to = std::is_same_v<tchar, char> ? GetDefaultCodepage() : eCODEPAGE::DEFAULT};
+							return ToString(*r, option);
+						}
+						else {
+							return {};
+						}
+					}
+				}
+				break;
 
 			}
 
@@ -452,6 +487,9 @@ namespace gtl {
 		inline std::optional<std::u32string>	ReadStringU32(char32_t cDelimiter = U'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char32_t>(cDelimiter, bTrimCR); }
 		inline std::optional<std::wstring>		ReadStringW(wchar_t cDelimiter = L'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<wchar_t>(cDelimiter, bTrimCR); }
 
+		// todo : 2020.12.12.
+
+		/// @brief Read / Write String
 		template < typename tchar, bool bWriteNewLine = false > requires (bSTORE)
 		void TWriteString(std::basic_string_view<tchar> sv) {
 			CHECK_ARCHIVE_STORABLE;
