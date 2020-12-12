@@ -64,12 +64,12 @@ namespace gtl {
 
 		for (auto const& [sv, codepage] : codepages) {
 			if (peek(stream, sv)) {
-				//SetDefaultCodepage(codepage);
+				//SetCodepage(codepage);
 				return codepage;
 			}
 		}
 
-		//SetDefaultCodepage(eDefaultCodepage);
+		//SetCodepage(eDefaultCodepage);
 
 		return eDefaultCodepage;
 	};
@@ -85,7 +85,7 @@ TEST(gtl_string, TArchive) {
 		gtl::CStringU16 strFilename = dir.path().filename().generic_u16string();
 		strFilename.MakeLower();
 		auto str2 = strFilename.GetUpper();
-		std::basic_regex<wchar_t> re{LR"xx(.*\.BOM\.CXX)xx"};
+		std::basic_regex<wchar_t> re{LR"xx(.*\.BOM\.CXX$)xx"};
 		if (!std::regex_match((std::wstring&)strFilename, re))
 			continue;
 		//if (!strFilename.ends_with(u".bom.cxx"sv))
