@@ -37,8 +37,8 @@ namespace gtl {
 	/// @tparam bLOAD : is a loading stream
 	template < typename tstream,
 		bool bSWAP_BYTE_ORDER = false,
-		bool bSTORE = std::is_base_of_v<std::ostream, tstream>,
-		bool bLOAD = std::is_base_of_v<std::istream, tstream>//,
+		bool bSTORE = std::is_base_of_v<std::basic_ostream<typename tstream::char_type>, tstream>,
+		bool bLOAD = std::is_base_of_v<std::basic_istream<typename tstream::char_type>, tstream>//,
 		//size_t PROCESSING_BUFFER_SIZE = 4096
 	>
 	class TArchive {
@@ -71,8 +71,8 @@ namespace gtl {
 
 	public:
 		/// @brief Set/Get Codepage.
-		int SetCodepage(int eCodepage) { return std::exchange(eCodepage_, eCodepage); }
-		int GetCodepage() const { return eCodepage_; }
+		eCODEPAGE SetCodepage(eCODEPAGE eCodepage) { return std::exchange(eCodepage_, eCodepage); }
+		eCODEPAGE GetCodepage() const { return eCodepage_; }
 
 		// 
 		constexpr bool IsSwapByteOrder() const { return bSWAP_BYTE_ORDER; }	// 'Get'SwapByteOrder  라고 이름을 바꾸면 안됨..... 헷갈림
@@ -340,18 +340,19 @@ namespace gtl {
 			CHECK_ARCHIVE_LOADABLE;
 			unsigned char c = 0;
 
-			auto get = [](tstream& stream) -> std::optional<char> {
-				char c{};
-				static_assert(sizeof(c) == sizeof(typename tstream::char_type));
-				if (stream.get((typename tstream::char_type&)c))
-					return c;
-				return {};
-			};
 			auto peek = [](tstream& stream, std::string_view sv) -> bool {
+				std::ifstream s;
 				auto pos = stream.tellg();
 				bool bMatch {true};
 				for (auto c : sv) {
-					if (auto ci = get(stream); ci == c) {
+					char ci{};
+					if (!stream.get(ci)) {
+						if (stream.eof())
+							stream.clear(std::ios_base::eofbit);
+						bMatch = false;
+						break;
+					}
+					if (ci != c) {
 						bMatch = false;
 						break;
 					}
@@ -362,13 +363,13 @@ namespace gtl {
 				return false;
 			};
 
-			constexpr static std::vector<std::pair<std::string_view, eCODEPAGE>> const codepages{
+			constexpr static std::array<std::pair<std::string_view, eCODEPAGE>, 5> const codepages{{
 				{GetCodepageBOM(eCODEPAGE::UTF32BE), eCODEPAGE::UTF32BE},	// in BOM Length order ...
 				{GetCodepageBOM(eCODEPAGE::UTF32LE), eCODEPAGE::UTF32LE},
 				{GetCodepageBOM(eCODEPAGE::UTF16BE), eCODEPAGE::UTF16BE},
 				{GetCodepageBOM(eCODEPAGE::UTF16LE), eCODEPAGE::UTF16LE},
 				{GetCodepageBOM(eCODEPAGE::UTF8), eCODEPAGE::UTF8},
-			};
+			}};
 
 			for (auto const& [sv, codepage] : codepages) {
 				if (peek(stream_, sv)) {
@@ -382,110 +383,107 @@ namespace gtl {
 			return eDefaultCodepage;
 		};
 
+	protected:
+		template < typename tchar > requires (bLOAD)
+		std::optional<std::basic_string<tchar>> GetLine(tchar cDelimiter, tchar cDelimiter2 = 0) {
+			std::basic_string<tchar> str;
 
+			static_assert(gtlc::is_one_of<tstream::char_type, char, char8_t>);
+
+			if (!stream_)
+				return {};
+
+			for (tchar c{}; stream_.read((char*)&c, sizeof(c)); ) {
+				if (c == cDelimiter)
+					break;
+				str += c;
+			}
+
+			if (str.empty() && stream_.eof())
+				return {};
+
+			if (cDelimiter2 and !str.empty() and *str.rbegin() == cDelimiter2)
+				str.resize(str.size()-1);
+
+			return str;
+		}
+
+		template < eCODEPAGE eCodepage, typename tchar > requires (bLOAD)
+		inline std::optional<std::basic_string<tchar>> ReadLine(tchar cDelimiter = '\n', bool bTrimCR = true) {
+			using tchar_codepage = typename char_type_from<eCodepage>::char_type;
+			if constexpr (std::is_same_v<std::remove_cvref_t<tchar>, tchar_codepage>
+				or (std::is_same_v<std::remove_cvref_t<tchar>, wchar_t> and (sizeof(tchar) == sizeof(tchar_codepage)))
+				)
+			{
+				bool bSwapStreamByteOrder = (sizeof(tchar) >= 2) and (eCodepage == eCODEPAGE_OTHER_ENDIAN<tchar>);
+				bool bSwapByteOrder = bSwapStreamByteOrder xor bSWAP_BYTE_ORDER;
+				if (bSwapByteOrder) [[unlikely]] {
+					if (auto r = GetLine<tchar>(GetByteSwap<tchar>(cDelimiter), bTrimCR ? GetByteSwap<tchar>('\r') : tchar{}); r) {
+						for (auto& c : r.value())
+							ByteSwap(c);
+						return r;
+					}
+					else {
+						return {};
+					}
+				}
+				else [[likely]] {
+					return GetLine<tchar>(cDelimiter, bTrimCR ? (tchar)'\r' : tchar{});
+				}
+			}
+			else {
+				if (auto r = ReadLine<eCodepage, tchar_codepage>((tchar_codepage)cDelimiter, bTrimCR); r) {
+					S_CODEPAGE_OPTION option{
+						.from = std::is_same_v<tchar_codepage, char> ? eCodepage_ : eCODEPAGE::DEFAULT,
+						.to = std::is_same_v<tchar, char> ? eMBCS_Codepage_g : eCODEPAGE::DEFAULT
+					};
+					return ((TString<tchar_codepage>&)*r).ToString<tchar>(option);
+				}
+				else {
+					return {};
+				}
+			}
+		}
+
+	public:
 		/// @brief Read / Write String
 		template < typename tchar > requires (bLOAD)
-		std::optional<std::basic_string<tchar>> ReadString(tchar cDelimiter = '\n', bool bTrimCR = true) {
-			std::basic_string<tchar> str;
+		std::optional<std::basic_string<tchar>> ReadLine(tchar cDelimiter = '\n', bool bTrimCR = true) {
 			CHECK_ARCHIVE_LOADABLE;
 
-			bool bResult = false;
-			auto const eCodepage = eCodepage_;
-			switch (eCodepage) {
+			switch (eCodepage_) {
+
 			default :
 			case eCODEPAGE::DEFAULT :
-			case eCODEPAGE::ACP :
-				{
-					if constexpr (std::is_same_v<tchar, char>) {
-						bResult = std::getline(stream_, str, cDelimiter).good();
-					} else {
-						std::basic_string<char> strLine;
-						bResult = std::getline(stream_, strLine, cDelimiter).good();
-						str = ToString<tchar>(strLine, {.from = eGTLDefaultCodepage_g});
-					}
-				}
+				return ReadLine<eCODEPAGE::DEFAULT, tchar>(cDelimiter, bTrimCR);
 				break;
+
 			case eCODEPAGE::UTF8 :
-				{
-					if constexpr (std::is_same_v<tchar, char8_t>) {
-						bResult = std::getline(stream_, str, cDelimiter).good();
-					} else {
-						std::basic_string<char8_t> strLine;
-						bResult = std::getline(stream_, strLine, cDelimiter).good();
-						S_CODEPAGE_OPTION option{.to = std::is_same_v<tchar, char> ? eGTLDefaultCodepage_g : eCODEPAGE::DEFAULT};
-						str = ToString<tchar>(strLine, option);
-					}
-				}
+				return ReadLine<eCODEPAGE::UTF8, tchar>(cDelimiter, bTrimCR);
 				break;
 
 			case eCODEPAGE::UTF16LE :
+				return ReadLine<eCODEPAGE::UTF16LE, tchar>(cDelimiter, bTrimCR);
+				break;
 			case eCODEPAGE::UTF16BE :
-				{
-					if constexpr (sizeof(tchar) == sizeof(char16_t)) {	// char16_t, wchar_t, uint16_t
-						auto eStreamByteOrder = (eCodepage == eCODEPAGE::UTF16LE) ? std::endian::little : std::endian::big;
-						bool bSwapByteOrder = (std::endian::native != eStreamByteOrder) xor bSWAP_BYTE_ORDER;
-						if (bSwapByteOrder) [[unlikely]] {
-							bResult = std::getline<char16_t>(stream_, str, GetByteSwap<char16_t>(cDelimiter)).good();
-							for (auto& c : str)
-								ByteSwap(c);
-						}
-						else [[likely]] {
-							bResult = std::getline(stream_, str, cDelimiter).good();
-						}
-					}
-					else {
-						if (auto r = ReadString<char16_t>(cDelimiter, bTrimCR); r) {
-							S_CODEPAGE_OPTION option{.to = std::is_same_v<tchar, char> ? eGTLDefaultCodepage_g : eCODEPAGE::DEFAULT};
-							return ToString(*r, option);
-						}
-						else {
-							return {};
-						}
-					}
-				}
+				return ReadLine<eCODEPAGE::UTF16BE, tchar>(cDelimiter, bTrimCR);
 				break;
 
 			case eCODEPAGE::UTF32LE :
+				return ReadLine<eCODEPAGE::UTF32LE, tchar>(cDelimiter, bTrimCR);
+				break;
 			case eCODEPAGE::UTF32BE :
-				{
-					if constexpr (sizeof(tchar) == sizeof(char32_t)) {	// char32_t
-						auto eStreamByteOrder = (eCodepage == eCODEPAGE::UTF32LE) ? std::endian::little : std::endian::big;
-						bool bSwapByteOrder = (std::endian::native != eStreamByteOrder) xor bSWAP_BYTE_ORDER;
-						if (bSwapByteOrder) [[unlikely]] {
-							bResult = std::getline<char32_t>(stream_, str, GetByteSwap<char32_t>(cDelimiter)).good();
-							for (auto& c : str)
-								ByteSwap(c);
-						}
-						else [[likely]] {
-							bResult = std::getline(stream_, str, cDelimiter).good();
-						}
-					}
-					else {
-						if (auto r = ReadString<char32_t>(cDelimiter, bTrimCR); r) {
-							S_CODEPAGE_OPTION option{.to = std::is_same_v<tchar, char> ? eGTLDefaultCodepage_g : eCODEPAGE::DEFAULT};
-							return ToString(*r, option);
-						}
-						else {
-							return {};
-						}
-					}
-				}
+				return ReadLine<eCODEPAGE::UTF32BE, tchar>(cDelimiter, bTrimCR);
 				break;
 
 			}
-
-			if (!bResult and !str.empty() and stream_.eof())	// 마지막 라인
-				bResult = true;
-			if (bTrimCR)
-				TrimRight(str, '\r');
-			return bResult;
 		};
 
-		inline std::optional<std::string>		ReadStringA(char cDelimiter = '\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char>(cDelimiter, bTrimCR); }
-		inline std::optional<std::u8string>		ReadStringU8(char8_t cDelimiter = u8'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char8_t>(cDelimiter, bTrimCR); }
-		inline std::optional<std::u16string>	ReadStringU16(char16_t cDelimiter = u'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char16_t>(cDelimiter, bTrimCR); }
-		inline std::optional<std::u32string>	ReadStringU32(char32_t cDelimiter = U'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<char32_t>(cDelimiter, bTrimCR); }
-		inline std::optional<std::wstring>		ReadStringW(wchar_t cDelimiter = L'\n', bool bTrimCR = true) requires (bLOAD) { return ReadString<wchar_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::string>		ReadLineA(char cDelimiter = '\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u8string>		ReadLineU8(char8_t cDelimiter = u8'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char8_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u16string>	ReadLineU16(char16_t cDelimiter = u'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char16_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u32string>	ReadLineU32(char32_t cDelimiter = U'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char32_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::wstring>		ReadLineW(wchar_t cDelimiter = L'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<wchar_t>(cDelimiter, bTrimCR); }
 
 		// todo : 2020.12.12.
 

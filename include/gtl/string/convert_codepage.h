@@ -23,19 +23,14 @@ namespace gtl {
 	//------------------------------------------------------------------------------------------
 	/// @brief Converts Codepage (Unicode <-> MBCS ...)
 	enum class eCODEPAGE : int {
-		DEFAULT = -1,
-		//MBCS = 0,
-
-		UCS2LE = 1200,
-		UCS2BE = 1201,
-		UCS2 = (std::endian::native == std::endian::little) ? UCS2LE : UCS2BE,
-		_UCS2_other = (UCS2 == UCS2BE) ? UCS2LE : UCS2BE,
+		DEFAULT__OR_USE_MBCS_CODEPAGE = 0,	// Default or use MBCS Codepage (eCODEPAGE eMBCS_Codepage_g;)
+		DEFAULT = 0,
 
 		UTF7 = 65000,
 		UTF8 = 65001,
 
-		UTF16LE = UCS2LE,
-		UTF16BE = UCS2BE,
+		UTF16LE = 1200,
+		UTF16BE = 1201,
 		UTF16 = (std::endian::native == std::endian::little) ? UTF16LE : UTF16BE,
 		_UTF16_other = (UTF16 == UTF16BE) ? UTF16LE : UTF16BE,
 
@@ -44,10 +39,13 @@ namespace gtl {
 		UTF32 = (std::endian::native == std::endian::little) ? UTF32LE : UTF32BE,
 		_UTF32_other = (UTF32 == UTF32BE) ? UTF32LE : UTF32BE,
 
+		UCS2LE = sizeof(wchar_t) == sizeof(char16_t) ? UTF16LE : UTF32LE,
+		UCS2BE = sizeof(wchar_t) == sizeof(char16_t) ? UTF16BE : UTF32BE,
+		UCS2 = (std::endian::native == std::endian::little) ? UCS2LE : UCS2BE,
+		_UCS2_other = (UCS2 == UCS2BE) ? UCS2LE : UCS2BE,
+
 
 	//------------------------
-
-		ACP = 0,
 
 		KO_KR_949 = 949,
 #if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
@@ -60,6 +58,7 @@ namespace gtl {
 
 	};
 
+#if 0
 	struct eCODEPAGE_ {
 		enum : int {
 			DEFAULT = -1,
@@ -102,7 +101,7 @@ namespace gtl {
 	private :
 		int value_{DEFAULT};
 	};
-
+#endif
 
 	template <typename tchar>	constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT = eCODEPAGE::DEFAULT;
 	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<char> = eCODEPAGE::DEFAULT;
@@ -118,9 +117,31 @@ namespace gtl {
 	template <>					constexpr inline eCODEPAGE const eCODEPAGE_OTHER_ENDIAN<wchar_t> = eCODEPAGE::_UCS2_other;
 
 
+	template < eCODEPAGE eCodepage > struct char_type_from {
+		using char_type = char;
+	};
+
+	template <> struct char_type_from<eCODEPAGE::UTF8> {
+		using char_type = char8_t;
+	};
+	template <> struct char_type_from<eCODEPAGE::UTF16LE> {
+		using char_type = char16_t;
+	};
+	template <> struct char_type_from<eCODEPAGE::UTF16BE> {
+		using char_type = char16_t;
+	};
+	template <> struct char_type_from<eCODEPAGE::UTF32LE> {
+		using char_type = char32_t;
+	};
+	template <> struct char_type_from<eCODEPAGE::UTF32BE> {
+		using char_type = char32_t;
+	};
+
+
+
 	/// @brief default codepage for MBCS (windows)
 	/// you can set this value for your region.
-	GTL_DATA extern eCODEPAGE eGTLDefaultCodepage_g;
+	GTL_DATA extern eCODEPAGE eMBCS_Codepage_g;
 
 
 	constexpr static inline [[nodiscard]] std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {
@@ -149,10 +170,9 @@ namespace gtl {
 	private:
 		template < typename tchar >
 		constexpr inline static eCODEPAGE GetCodepage(eCODEPAGE codepage) {
-			if (codepage == eCODEPAGE::DEFAULT) {	// wrong or default value
+			if (codepage == eCODEPAGE::DEFAULT__OR_USE_MBCS_CODEPAGE) {	// wrong or default value
 				if constexpr (std::is_same_v<tchar, char>) {
-					std::numbers::pi;
-					return eGTLDefaultCodepage_g;
+					return eMBCS_Codepage_g;
 				}
 				else {
 					if (eCODEPAGE_DEFAULT<tchar> != eCODEPAGE::DEFAULT)
@@ -221,6 +241,7 @@ namespace gtl {
 		/// @return same container with char??_t
 		template < typename tchar, template <typename tchar, typename ... tstr_args> typename tstr, typename ... tstr_args >
 		auto WideAsCharXX(tstr<tchar, tstr_args...>& str) {
+			// todo : check copy or ...?
 			if constexpr (sizeof(tchar) == sizeof(char8_t)) {
 				return (tstr<char8_t>)(tstr<char8_t>&)str;
 			}

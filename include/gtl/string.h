@@ -59,7 +59,7 @@ namespace gtl {
 		/// @brief Constructor from other codepage (string)
 		/// @param strOther : string
 		template < gtlc::string_elem tchar_other >
-		explicit TString(TString<tchar_other> const& strOther) : base_t(ToString<tchar_other, tchar>(strOther)) {
+		explicit TString(TString<tchar_other> const& strOther) : base_t(gtl::ToString<tchar_other, tchar>(strOther)) {
 		}
 
 
@@ -83,10 +83,10 @@ namespace gtl {
 		/// @param B 
 		//template < gtlc::string_elem tchar_other, template <typename> typename tstr_view >
 		//	requires (std::is_convertible_v<tstr_view<tchar_other>, std::basic_string_view<tchar_other> >)
-		//TString(tstr_view<tchar_other> B) : base_t(ToString<tchar_other, tchar>(B)) {
+		//TString(tstr_view<tchar_other> B) : base_t(gtl::ToString<tchar_other, tchar>(B)) {
 		//}
 		template < gtlc::string_elem tchar_other >
-		TString(std::basic_string_view<tchar_other> sv) : base_t(ToString<tchar_other, tchar>(sv)) {
+		TString(std::basic_string_view<tchar_other> sv) : base_t(gtl::ToString<tchar_other, tchar>(sv)) {
 		}
 
 		//tchar* Attach(tchar* psz, size_type nBufferSize);
@@ -108,6 +108,15 @@ namespace gtl {
 		// operator []
 		using base_t::operator[];
 
+		template < typename tchar_other >
+		std::basic_string<tchar_other> tostring(S_CODEPAGE_OPTION codepage) {
+			return gtl::ToString<tchar, tchar_other>(*this, codepage);
+		}
+		template < typename tchar_other >
+		TString<tchar_other> ToString(S_CODEPAGE_OPTION codepage) {
+			return gtl::ToString<tchar, tchar_other>(*this, codepage);
+		}
+
 		//---------------------------------------------------------------------
 		// oeprator =
 		using base_t::operator = ;
@@ -118,46 +127,47 @@ namespace gtl {
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
 		TString& operator = (std::basic_string<tchar_other> const& str) {
-			*this = ToString<tchar_other, tchar>(str);
+			*this = gtl::ToString<tchar_other, tchar>(str);
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
 		GTL_DEPR_SEC TString& operator = (tchar_other const*& psz) {
-			*this = ToString<tchar_other, tchar>(psz);
+			*this = gtl::ToString<tchar_other, tchar>(psz);
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other >
 		TString& operator = (std::basic_string_view<tchar_other> sv) {
-			*this = ToString<tchar_other, tchar>(sv);
+			*this = gtl::ToString<tchar_other, tchar>(sv);
 			return *this;
 		}
 		template < gtlc::contiguous_string_container tstring_buf_other >
 		requires (!std::is_same_v< std::remove_cvref_t<decltype(tstring_buf_other{}[0]) >, std::remove_cvref_t<tchar>>)
 		TString& operator = (tstring_buf_other const& buf) {
 			std::basic_string_view sv{std::data(buf), tszlen(buf)};
-			*this = ToString<std::remove_cvref_t<decltype(tstring_buf_other{}[0])>, tchar>(sv);
+			*this = gtl::ToString<std::remove_cvref_t<decltype(tstring_buf_other{}[0])>, tchar>(sv);
 			return *this;
 		}
 
 		//---------------------------------------------------------------------
 		// operator +=
+		// todo : test
 		using base_t::operator +=;
-		TString& operator += (const TString& B) {
+		TString& operator += (TString const& B) {
 			base_t::operator += (B);
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other >
-		TString& operator += (const std::basic_string<tchar_other>& B) {
+		TString& operator += (std::basic_string<tchar_other> const& B) {
 			if constexpr (std::is_same_v<tchar, tchar_other>) {
 				base_t::operator += (B);
 			} else {
-				operator += ( ((const TString<tchar_other>&)B).ToString<tchar>() );
+				operator += ( ((TString<tchar_other> const&)B).ToString<tchar>() );
 			}
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other >
-		TString& operator += (const tchar_other* psz) {
+		GTL_DEPR_SEC TString& operator += (tchar_other const* psz) {
 			operator += (std::basic_string<tchar_other>(psz));
 			return *this;
 		}
@@ -170,6 +180,7 @@ namespace gtl {
 		//---------------------------------------------------------------------
 		// operator +
 		// operand 둘 중 하나는 TString 이라야 함.
+		// todo : 정리. char8_t, char16_t, char32_t ...
 		friend TString operator + (const TString& A, const TString<char>& B)				{ return TString(A) += B; }
 		friend TString operator + (const TString& A, const std::basic_string<char>& B)		{ return TString(A) += B; }
 		friend TString operator + (const TString& A, const char B)							{ return TString(A) += B; }
@@ -196,6 +207,10 @@ namespace gtl {
 		inline int Compare(std::basic_string_view<tchar_other> sv)	const { return tszcmp<tchar>((std::basic_string_view<tchar>)*this, TString<tchar>(sv)); }
 		template < typename tchar_other >
 		int CompareNoCase(std::basic_string_view<tchar_other> sv)	const { return tszicmp<tchar>((std::basic_string_view<tchar>)*this, TString<tchar>(sv)); }
+		template < typename tchar_other >
+		inline int Compare(std::basic_string<tchar_other> const& str)	const { return tszcmp<tchar>((std::basic_string_view<tchar>)*this, TString<tchar>(str)); }
+		template < typename tchar_other >
+		int CompareNoCase(std::basic_string<tchar_other> const& str)	const { return tszicmp<tchar>((std::basic_string_view<tchar>)*this, TString<tchar>(str)); }
 
 		//---------------------------------------------------------------------
 		// operator ==, !=, <, >, <=, >=, 필요 없음. basic_string 으로 대체

@@ -21,7 +21,7 @@
 
 namespace gtl {
 
-	GTL_DATA eCODEPAGE eGTLDefaultCodepage_g = static_cast<eCODEPAGE>(GTL_DEFAULT_CODEPAGE);
+	GTL_DATA eCODEPAGE eMBCS_Codepage_g = static_cast<eCODEPAGE>(GTL_DEFAULT_CODEPAGE);
 
 	template < typename tchar >
 	inline [[nodiscard]] std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, eCODEPAGE eCodepage) {
