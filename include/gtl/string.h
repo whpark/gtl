@@ -54,6 +54,8 @@ namespace gtl {
 		TString(TString const& B) = default;
 		TString(TString&& B) = default;
 		TString(std::basic_string<tchar> const& B) : std::basic_string<tchar>(B) {}
+		TString(std::basic_string<tchar>&& B) : std::basic_string<tchar>(std::move(B)) {}
+		TString(std::basic_string_view<tchar> B) : std::basic_string<tchar>(B) {}
 
 
 		/// @brief Constructor from other codepage (string)
@@ -65,38 +67,21 @@ namespace gtl {
 
 		/// @brief Constructor from other codepage (psz)
 		/// @param pszOther 
-		template < gtlc::string_elem tchar_other >
-		GTL_DEPR_SEC explicit TString(tchar_other const*& pszOther) {
+		template < gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
+		GTL_DEPR_SEC explicit TString(tchar_other const* pszOther) {
 #pragma warning(suppress:4996)
 			*this = pszOther;
 		}
 
-		template < gtlc::contiguous_string_container tstring_buf_other >
-		requires (!std::is_same_v< std::remove_cvref_t<decltype(tstring_buf_other{}[0])>, std::remove_cvref_t<tchar>>)
-		explicit TString(tstring_buf_other const& buf) {
-			*this = buf;
+		/// @brief Constructor from other codepage
+		/// @param 
+		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
+		requires (!std::is_same_v< tchar, tchar_other >)
+		explicit TString(tstring_buf const& b) : base_t(gtl::ToString<tchar_other, tchar>(b)) {
 		}
 
-
-		/// @brief Constructor from string_view<tchar_other>
-		/// @tparam  
-		/// @param B 
-		//template < gtlc::string_elem tchar_other, template <typename> typename tstr_view >
-		//	requires (std::is_convertible_v<tstr_view<tchar_other>, std::basic_string_view<tchar_other> >)
-		//TString(tstr_view<tchar_other> B) : base_t(gtl::ToString<tchar_other, tchar>(B)) {
-		//}
-		template < gtlc::string_elem tchar_other >
-		TString(std::basic_string_view<tchar_other> sv) : base_t(gtl::ToString<tchar_other, tchar>(sv)) {
-		}
-
-		//tchar* Attach(tchar* psz, size_type nBufferSize);
-		//tchar* Detach();
-		void Init(size_type nMinLen = 0) {
-			this->resize(nMinLen, 0);
-		}
 
 	public:
-
 		// returns psz
 		//operator tchar const*() const					{ return this->c_str(); }
 
@@ -108,22 +93,15 @@ namespace gtl {
 		// operator []
 		using base_t::operator[];
 
-		template < typename tchar_other >
-		std::basic_string<tchar_other> tostring(S_CODEPAGE_OPTION codepage) {
-			return gtl::ToString<tchar, tchar_other>(*this, codepage);
-		}
-		template < typename tchar_other >
-		TString<tchar_other> ToString(S_CODEPAGE_OPTION codepage) {
-			return gtl::ToString<tchar, tchar_other>(*this, codepage);
-		}
-
 		//---------------------------------------------------------------------
-		// oeprator =
+		/// @brief oeprator =
 		using base_t::operator = ;
 		TString& operator = (TString const&) = default;
 		TString& operator = (TString&&) = default;
+		TString& operator = (std::basic_string<tchar> const& b) { base_t::operator = (b); return *this; }
+		TString& operator = (std::basic_string<tchar>&& b) { base_t::operator = (std::move(b)); return *this; }
 
-		// operator = ( char??_t type conversion)
+		/// @brief operator = ( char??_t type conversion)
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
 		TString& operator = (std::basic_string<tchar_other> const& str) {
@@ -132,7 +110,7 @@ namespace gtl {
 		}
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
-		GTL_DEPR_SEC TString& operator = (tchar_other const*& psz) {
+		GTL_DEPR_SEC TString& operator = (tchar_other const* const& psz) {
 			*this = gtl::ToString<tchar_other, tchar>(psz);
 			return *this;
 		}
@@ -141,60 +119,139 @@ namespace gtl {
 			*this = gtl::ToString<tchar_other, tchar>(sv);
 			return *this;
 		}
-		template < gtlc::contiguous_string_container tstring_buf_other >
-		requires (!std::is_same_v< std::remove_cvref_t<decltype(tstring_buf_other{}[0]) >, std::remove_cvref_t<tchar>>)
-		TString& operator = (tstring_buf_other const& buf) {
+		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
+		requires (!std::is_same_v< tchar, tchar_other> )
+		TString& operator = (tstring_buf const& buf) {
 			std::basic_string_view sv{std::data(buf), tszlen(buf)};
-			*this = gtl::ToString<std::remove_cvref_t<decltype(tstring_buf_other{}[0])>, tchar>(sv);
+			*this = gtl::ToString<tchar_other, tchar>(sv);
 			return *this;
 		}
 
+
 		//---------------------------------------------------------------------
-		// operator +=
-		// todo : test
-		using base_t::operator +=;
-		TString& operator += (TString const& B) {
-			base_t::operator += (B);
-			return *this;
+		/// @brief Convert Codepage
+		template < typename tchar_other >
+		std::basic_string<tchar_other> to_string(S_CODEPAGE_OPTION codepage = {}) const {
+			return gtl::ToString<tchar, tchar_other>(*this, codepage);
 		}
-		template < gtlc::string_elem tchar_other >
-		TString& operator += (std::basic_string<tchar_other> const& B) {
+		template < typename tchar_other >
+		TString<tchar_other> ToString(S_CODEPAGE_OPTION codepage = {}) const {
+			return (TString<tchar_other>&)gtl::ToString<tchar, tchar_other>(*this, codepage);
+		}
+
+		//---------------------------------------------------------------------
+		/// @brief operator += ...
+		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
+		inline TString operator += (tstring_buf const& b) {
 			if constexpr (std::is_same_v<tchar, tchar_other>) {
-				base_t::operator += (B);
-			} else {
-				operator += ( ((TString<tchar_other> const&)B).ToString<tchar>() );
+				return ((std::basic_string<tchar>&)*this) += b;
 			}
+			else {
+				return ((std::basic_string<tchar>&)*this) += gtl::ToString<tchar_other, tchar>(/*std::basic_string_view<tchar_other>(*/b);
+			}
+		}
+		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
+		GTL_DEPR_SEC inline TString& operator += (tchar_other const* const& psz) {
+			operator += (std::basic_string_view<tchar_other>(psz));
 			return *this;
 		}
-		template < gtlc::string_elem tchar_other >
-		GTL_DEPR_SEC TString& operator += (tchar_other const* psz) {
-			operator += (std::basic_string<tchar_other>(psz));
-			return *this;
-		}
-		template < gtlc::string_elem tchar_other >
-		TString& operator += (tchar_other ch) {
-			operator += (std::basic_string<tchar_other>(1, ch));
+		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
+		inline TString& operator += (tchar_other const c) {
+			operator += (std::basic_string_view<tchar_other>(&c, &c+1));
 			return *this;
 		}
 
 		//---------------------------------------------------------------------
-		// operator +
-		// operand 둘 중 하나는 TString 이라야 함.
-		// todo : 정리. char8_t, char16_t, char32_t ...
-		friend TString operator + (const TString& A, const TString<char>& B)				{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const std::basic_string<char>& B)		{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const char B)							{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const char* B)							{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const TString<wchar_t>& B)				{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const std::basic_string<wchar_t>& B)	{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const wchar_t B)						{ return TString(A) += B; }
-		friend TString operator + (const TString& A, const wchar_t* B)						{ return TString(A) += B; }
-		friend TString operator + (const std::basic_string<char>& A,	const TString& B)	{ return TString(A) += B; }
-		friend TString operator + (const char A,						const TString& B)	{ return TString(A) += B; }
-		friend TString operator + (const char* A,						const TString& B)	{ return TString(A) += B; }
-		friend TString operator + (const std::basic_string<wchar_t>& A,	const TString& B)	{ return TString(A) += B; }
-		friend TString operator + (const wchar_t A,						const TString& B)	{ return TString(A) += B; }
-		friend TString operator + (const wchar_t* A,					const TString& B)	{ return TString(A) += B; }
+		/// @brief operator + ... (which needs codepage conversion)
+		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
+		requires (!std::is_same_v<tchar, tchar_other>)
+		friend inline [[nodiscard]] TString operator + (TString const& a, tstring_buf const& b) {
+			return (std::basic_string<tchar> const&)a + gtl::ToString<tchar_other, tchar>(b);
+		}
+		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
+		requires (!std::is_same_v<tchar, tchar_other>)
+		friend inline [[nodiscard]] TString&& operator + (TString&& a, tstring_buf const& b) {
+			a += gtl::ToString<tchar_other, tchar>(b);
+			return std::move(a);
+		}
+
+		///// @brief operator + (move) ...
+		//friend inline [[nodiscard]] TString&& operator + (TString&& a, TString const& b) {
+		//	a += b;
+		//	return std::move(a);
+		//}
+		//template < gtlc::string_elem tchar_other >
+		//friend inline [[nodiscard]] TString&& operator + (TString&& a, TString<tchar_other> const& b) {
+		//	a += b.ToString<tchar>();
+		//	return std::move(a);
+		//}
+		//template < gtlc::string_elem tchar_other >
+		//friend [[nodiscard]] TString&& operator + (TString&& a, std::basic_string<tchar_other> const& b) {
+		//	if constexpr (std::is_same_v<tchar, tchar_other>) {
+		//		a += b;
+		//	} else {
+		//		a += gtl::ToString<tchar_other, tchar>(b);
+		//	}
+		//	return std::move(a);
+		//}
+		//template < gtlc::string_elem tchar_other >
+		//friend inline [[nodiscard]] TString&& operator + (TString&& a, std::basic_string_view<tchar_other> b)	{
+		//	if constexpr (std::is_same_v<tchar, tchar_other>) {
+		//		a += b;
+		//	} else {
+		//		a += gtl::ToString<tchar_other, tchar>(b);
+		//	}
+		//	return std::move(a);
+		//}
+		//template < gtlc::string_elem tchar_other >
+		//friend inline [[nodiscard]] TString&& operator + (TString&& a, tchar_other const b) {
+		//	a += std::basic_string_view<tchar_other>(b);
+		//	return std::move(a);
+		//}
+		//template < gtlc::string_elem tchar_other >
+		//GTL_DEPR_SEC friend inline [[nodiscard]] TString&& operator + (TString&& a, tchar_other const* const& b) {
+		//	a += std::basic_string_view<tchar_other>(b);
+		//	return std::move(a);
+		//}
+
+	protected:
+		template < gtlc::string_elem tchar1, gtlc::string_elem tchar2, typename tcontainer >
+		requires ( (std::is_same_v<tchar1, std::remove_cvref_t<decltype(tcontainer{}[0])>>) )
+		static TString<tchar1> Add(tcontainer const& a, TString<tchar2> const& b) {
+			if constexpr (std::is_same_v<tchar1, tchar2>) {
+				std::basic_string<tchar1> str;
+				static auto m = str.max_size();
+				auto const size_a = std::size(a);
+				if ( (size_a >= m) or (b.size() >= m-size_a) )
+					throw std::invalid_argument(GTL__FUNCSIG "too long a string.");
+				auto n = size_a + b.size();
+				str.reserve(n);
+				str.append(a);
+				str.append(b);
+				return str;
+			}
+			else {
+				return Add<tchar1, tchar1, tcontainer>(a, gtl::ToString<tchar2, tchar1>(b));
+			}
+		}
+
+	public:
+		//---------------------------------------------------------------------
+		/// @brief operator ... +
+		// TString<tchar_other> 로 하면 동작 안함. friend 함수의 인자에 하나라도 class와 동일한 인자가 있어야 하나?....
+		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
+		requires (!std::is_base_of_v<TString<tchar_other>, tstring_buf>)
+		friend inline [[nodiscard]] TString<tchar_other> operator + (tstring_buf const& a, TString const& b) {
+			return TString::Add<tchar_other, tchar>(a, b);
+		}
+		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
+		GTL_DEPR_SEC friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const* const& a, TString const& b) {
+			return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>(a), b);
+		}
+		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
+		friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const a, TString const& b) {
+			return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>{&a, &a+1}, b);
+		}
 
 		//---------------------------------------------------------------------
 		// Compare
@@ -218,7 +275,7 @@ namespace gtl {
 		//---------------------------------------------------------------------
 		// ToNumber
 		template < gtlc::arithmetic T_NUMBER >
-		T_NUMBER ToNumber(tchar const** pszEnd = nullptr, int radix = 0) {
+		T_NUMBER ToNumber(tchar const** pszEnd = nullptr, int radix = 0) const {
 			return tszto_number<tchar, T_NUMBER>(*this, pszEnd, radix);
 		}
 
@@ -289,29 +346,29 @@ namespace gtl {
 		void MakeLower()				{ for (auto& ch : *this) ch = std::tolower(ch); }
 		void MakeReverse()				{ std::reverse(this->begin(), this->end()); }
 
-		[[nodiscard]] std::basic_string<tchar> GetUpper() const {
+		[[nodiscard]] TString GetUpper() const {
 			auto l = this->size();
 			std::basic_string<tchar> str(l, 0);
 			for (size_t i = 0; i < l; i++)
 				str[i] = ToUpper(this->at(i));
 			//static std::locale loc {fmt::format("en_US.UTF-16", (int)eCODEPAGE_DEFAULT<tchar>)};
 			//std::transform(this->begin(), this->end(), str.begin(), [&](tchar c) -> tchar { return std::toupper<tchar>(c, loc); });
-			return str;
+			return (TString&)str;
 		}
-		[[nodiscard]] std::basic_string<tchar> GetLower() const {
+		[[nodiscard]] TString GetLower() const {
 			auto l = this->size();
 			std::basic_string<tchar> str(l, 0);
 			for (size_t i = 0; i < l; i++)
 				str[i] = ToLower(this->at(i));
 			//static std::locale loc {fmt::format("en_US.UTF-16", (int)eCODEPAGE_DEFAULT<tchar>)};
 			//std::transform(this->begin(), this->end(), str.begin(), [&](tchar c) -> tchar { return std::tolower<tchar>(c, loc); });
-			return str;
+			return (TString&)str;
 		}
-		[[nodiscard]] std::basic_string<tchar> GetReverse() const {
+		[[nodiscard]] TString GetReverse() const {
 			std::basic_string<tchar> str;
 			str.resize(this->size());
 			std::reverse_copy(this->begin(), this->end(), str.begin());
-			return str;
+			return (TString&)str;
 		}
 
 		void Trim()														{ gtl::Trim(); }
@@ -342,13 +399,32 @@ namespace gtl {
 			// or
 			//std::replace(this->begin(), this->end(), chOld, chNew);
 		}
-		// no recursive Replace.
+		TString GetReplaced(tchar chOld, tchar chNew) const {
+			std::basic_string<tchar> str;
+			str.resize(this->size());
+			std::replace_copy(this->begin(), this->end(), str.begin(), chOld, chNew);
+			return str;
+		}
+
+		/// @brief no recursive Replace.
 		index_type Replace(std::basic_string_view<tchar> svOld, std::basic_string_view<tchar> svNew) {
+			int nReplaced {};
+			if (auto r = GetReplaced(svOld, svNew, &nReplaced); r) {
+				*this = std::move(*r);
+			}
+			return nReplaced;
+		}
+
+		/// @brief no recursive Replace.
+		/// @return replaced str. if no replace occur, returns empty
+		std::optional<TString> GetReplaced(std::basic_string_view<tchar> svOld, std::basic_string_view<tchar> svNew, int* pnReplaced = nullptr) const {
 			if (svOld.empty())
-				return 0;
+				return {};
 			index_type nLenOld = svOld.size();
 			index_type nLenNew = svNew.size();
-			index_type nToReplace = 0;
+			int nToReplace {};
+			if (pnReplaced)
+				*pnReplaced = 0;
 
 			tchar const* pszStart = this->data();
 			tchar const* pszEnd = pszStart + this->size();
@@ -362,12 +438,15 @@ namespace gtl {
 				}
 			}
 			if (!nToReplace)
-				return 0;
+				return {};
+
+			if (pnReplaced)
+				*pnReplaced = nToReplace;
 
 			index_type nLeft = nToReplace;
 			size_type nLen = this->size() + (nLenNew - nLenOld) * nToReplace;
-			if(nLen) {
-				TString strReplaced;
+			TString strReplaced;
+			if (nLen) {
 				strReplaced.resize(nLen);
 				tchar* pszReplaced = strReplaced.data();
 				const tchar* psz = pszStart;
@@ -385,11 +464,10 @@ namespace gtl {
 				}
 				// copy rest... (including NULL terminating char)
 				memcpy(pszReplaced, psz, (pszEnd - psz + 1)*sizeof(tchar));
-				*this = std::move(strReplaced);
-			} else
-				this->clear();
-			return nToReplace;
+			}
+			return strReplaced;
 		}
+
 		index_type Remove(tchar chRemove) {
 			auto nNewLen = tszrmchar(this->data(), this->data()+this->size(), chRemove);
 			if (nNewLen != this->size())
@@ -426,36 +504,194 @@ namespace gtl {
 		//	return this->npos;
 		//}
 
-		//// simple formatting
-		//template < typename ... Args >
-		//TString& Format(tchar const* pszFormat, Args&& ... args) {
-		//	return *this = gtl::old_printf::Format(pszFormat, std::forward<Args>(args)...);
-		//}
 
-		//// to do : to be tested
-		//void FormatV(const tchar* pszFormat, va_list argList) {
-		//	return *this = gtl::FormatV(pszFormat, argList);
-		//}
+		/// @brief fmt::format
+		template < typename S, typename ... Args >
+		TString& Format(S const& format_str, Args&& ... args) {
+			*this = std::move(fmt::format(format_str, std::forward<Args>(args)...));
+			return *this;
+		}
 
 
-	//	bool LoadString(UINT nID);
-
-		[[nodiscard]] tchar* GetBuffer(size_type nNewLen) {
-			if (nNewLen > this->size()) {
-				//if (bKeepOriginal && (nNewLen > this->capacity()))
-				//	this->reserve(nNewLen);
-				//else
-				this->resize(nNewLen);
+	protected:
+		template < typename treturn >
+		[[nodiscard]] std::vector<treturn> TSplit(std::function<bool(tchar)> func) const {
+			std::vector<treturn> r;
+			r.clear();
+			if (this->empty())
+				return r;
+			tchar const* pos = this->data();
+			tchar const* end = this->data() + this->size();
+			tchar const* s = this->data();
+			for (; pos < end; pos++) {
+				if (!func(*pos))
+					continue;
+				r.emplace_back(s, pos);
+				s = pos+1;
 			}
+			r.emplace_back(s, end);
+
+			return r;
+		}
+
+	public:
+		/// @brief Split string into...
+		[[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> svDelimiters) const {
+			return TSplit<std::basic_string<tchar>>([svDelimiters](tchar c) -> bool { return svDelimiters.find(c) != svDelimiters.npos; });
+		}
+		[[nodiscard]] inline std::vector<std::basic_string<tchar>> Split(tchar cDelimiter) const {
+			return TSplit<std::basic_string<tchar>>([cDelimiter](tchar c) -> bool { return cDelimiter == c; });
+		}
+		[[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> svDelimiters) const {
+			return TSplit<std::basic_string_view<tchar>>([svDelimiters](tchar c) -> bool { return svDelimiters.find(c) != svDelimiters.npos; });
+		}
+		[[nodiscard]] inline std::vector<std::basic_string_view<tchar>> SplitView(tchar cDelimiter) const {
+			return TSplit<std::basic_string_view<tchar>>([cDelimiter](tchar c) -> bool { return cDelimiter == c; });
+		}
+
+
+
+	public:
+		//static std::optional<TString> TranslateEscapeCharacters(std::basic_string_view<tchar> sv, tchar** ppszEnd = nullptr, tchar cAuxilaryTerminating = 0) {
+		//	size_t nCount = 0;
+		//	const tchar* pos{};
+		//	const tchar* const end = sv.end();//sv.data() + sv.size();
+		//	// first, check and count number of bytes to be translated into
+		//	for (pos = sv.data(); (pos < end) and *pos and (*pos != cAuxilaryTerminating); pos++) {
+		//		if (*pos == (tchar)'\\') {
+		//			if (!*++pos)
+		//				return {};
+
+		//			if (*pos == (tchar)'x') { // Hexa ASCII Code
+		//				if ( (pos+2 < end) and IsXdigit(pos[1]) and IsXdigit(pos[2])) {
+		//					nCount++;
+		//					pos += 2;
+		//				} else {
+		//					return {};
+		//				}
+		//			} else if (*pos == (tchar)'u') { // Hexa ASCII Code
+		//				if ( (pos+4 < end) and IsXdigit(pos[1]) and IsXdigit(pos[2]) and IsXdigit(pos[3]) and IsXdigit(pos[4])) {
+		//					nCount++;
+		//					pos += 4;
+		//				} else {
+		//					return {};
+		//				}
+		//			} else if (IsODigit(pos[0])) {		// Octal ASCII Code
+		//				tchar* pszEnd = NULL;
+		//				tsztoi({pos, end}, &pszEnd, 8);
+		//				if (pszEnd and pos < pszEnd) {
+		//					pos = pszEnd-1;
+		//				} else
+		//					return {};
+		//				nCount++;
+		//			} else {
+		//				nCount++;
+		//			}
+		//		} else {
+		//			nCount++;
+		//		}
+		//	}
+
+		//	if (!pszResult) {
+		//		nSize = nCount;
+		//		return TRUE;
+		//	}
+
+		//	if (nSize < nCount)
+		//		return FALSE;
+
+		//	pszResult[nCount] = 0;
+		//	TCHAR szDigits[8];
+		//	for (pos = szSRC; *pos && (*pos != cAdditionalTerminating); pos++) {
+		//		if (*pos == _T('\\')) {
+		//			pos++;
+
+		//			if (*pos == _T('x')) {				// Hexa ASCII Code
+		//				szDigits[0] = pos[1];
+		//				szDigits[1] = pos[2];
+		//				szDigits[2] = 0;
+		//				if (sizeof(TCHAR) == sizeof(wchar_t))
+		//					*pszResult++ = (BYTE)wcstoul((const wchar_t*)szDigits, NULL, 16);
+		//				else 
+		//					*pszResult++ = (BYTE)strtoul((const char*)szDigits, NULL, 16);
+		//				pos += 2;
+		//			} else if (*pos == _T('u')) {				// Hexa ASCII Code
+		//				szDigits[0] = pos[1];
+		//				szDigits[1] = pos[2];
+		//				szDigits[2] = pos[3];
+		//				szDigits[3] = pos[4];
+		//				szDigits[4] = 0;
+		//				if (sizeof(TCHAR) == sizeof(wchar_t))
+		//					*pszResult++ = (TCHAR)wcstoul((const wchar_t*)szDigits, NULL, 16);
+		//				else 
+		//					*pszResult++ = (TCHAR)strtoul((const char*)szDigits, NULL, 16);
+		//				pos += 4;
+		//			} else if (__isodigit(pos[0])) {		// Octal ASCII Code
+		//				TCHAR szDigits[4];
+		//				szDigits[0] = pos[0];
+		//				szDigits[1] = pos[1];
+		//				szDigits[2] = pos[2];
+		//				szDigits[3] = 0;
+		//				TCHAR* pszEnd = NULL;
+		//				if (sizeof(TCHAR) == sizeof(wchar_t))
+		//					*pszResult++ = (BYTE)wcstoul((const wchar_t*)szDigits, (wchar_t**)&pszEnd, 8);
+		//				else 
+		//					*pszResult++ = (BYTE)strtoul((const char*)szDigits, (char**)&pszEnd, 8);
+		//				if (pszEnd) {
+		//					pos += pszEnd-szDigits;
+		//					pos--;
+		//				} else
+		//					return FALSE;
+
+		//			} else {
+		//				const static struct {
+		//					TCHAR cEscape;
+		//					TCHAR cValue;
+		//				} escapes[] = {
+		//					{ _T('a'), _T('\a') },
+		//					{ _T('b'), _T('\b') },
+		//					{ _T('f'), _T('\f') },
+		//					{ _T('n'), _T('\n') },
+		//					{ _T('r'), _T('\r') },
+		//					{ _T('t'), _T('\t') },
+		//					{ _T('v'), _T('\v') },
+		//				};
+
+		//				TCHAR cValue = *pos;
+		//				for (__uint i = 0; i < countof(escapes); i++) {
+		//					if (escapes[i].cEscape != *pos)
+		//						continue;
+		//					cValue = escapes[i].cValue;
+		//					break;
+		//				}
+		//				*pszResult++ = cValue;
+		//			}
+		//		} else {
+		//			*pszResult++ = *pos;
+		//		}
+		//	}
+
+		//	if (ppszEnd)
+		//		*ppszEnd = (TCHAR*)pos;
+
+		//	return TRUE;
+		//}
+
+
+		/// @brief Manual Buffer Manage
+		[[nodiscard]] tchar* GetBuffer(size_type nNewLen) {
+			this->resize(nNewLen);
 			return this->data();
 		}
-		size_type ReleaseBuffer() {	// reserve(), data() 함수를 사용해서 버퍼를 가져온 다음, 버퍼에 데이터를 보낸 다음, 크기 다시 설정. capacity()에 따라서 마지막 문자가 잘릴 수 있음.
-			if (!this->data() || !this->capacity())
+		/// @brief Manual Buffer Manage
+		size_type ReleaseBuffer() {	// reserve(), data() 함수를 사용해서 버퍼를 가져온 다음, 버퍼에 데이터를 보낸 다음, 크기 다시 설정.
+			if (!this->data() || !this->size())
 				return 0;
 			size_type nNewLen = tszlen(this->data(), this->size());
 			this->resize(nNewLen, 0);
 			return this->size();
 		}
+
 
 	};	// TString
 

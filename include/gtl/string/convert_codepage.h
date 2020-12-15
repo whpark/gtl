@@ -381,20 +381,41 @@ namespace gtl {
 
 	/// @brief Converts Codepage (Unicode <-> MBCS ...)
 	template < gtlc::string_elem tchar1, gtlc::string_elem tchar2 >
-	std::basic_string<tchar2> ToString(std::basic_string_view<tchar1> str, S_CODEPAGE_OPTION codepage = {}) {
+	std::basic_string<tchar2> ToString(std::basic_string_view<tchar1> sv, S_CODEPAGE_OPTION codepage = {}) {
 		std::basic_string<tchar2> result;
 		if constexpr (std::is_same_v<tchar2, char>) {
-			result = ToStringA(str, codepage);
+			result = ToStringA(sv, codepage);
 		} else if constexpr (std::is_same_v<tchar2, wchar_t>) {
-			result = ToStringW(str, codepage);
+			result = ToStringW(sv, codepage);
 		} else if constexpr (std::is_same_v<tchar2, char8_t>) {
-			result = ToStringU8(str, codepage);
+			result = ToStringU8(sv, codepage);
 		} else if constexpr (std::is_same_v<tchar2, char16_t>) {
-			result = ToStringU16(str, codepage);
+			result = ToStringU16(sv, codepage);
 		} else if constexpr (std::is_same_v<tchar2, char32_t>) {
-			result = ToStringU32(str, codepage);
+			result = ToStringU32(sv, codepage);
 		}
 		return result;
+	}
+	template < gtlc::string_elem tchar1, gtlc::string_elem tchar2 >
+	std::basic_string<tchar2> ToStringMove(std::basic_string<tchar1>&& str, S_CODEPAGE_OPTION codepage = {}) {
+		if constexpr (std::is_same_v<tchar1, tchar2> and !std::is_same_v<tchar1, char>) {
+			return move(str);
+		}
+		else {
+			std::basic_string<tchar2> result;
+			if constexpr (std::is_same_v<tchar2, char>) {
+				result = ToStringA(str, codepage);
+			} else if constexpr (std::is_same_v<tchar2, wchar_t>) {
+				result = ToStringW(str, codepage);
+			} else if constexpr (std::is_same_v<tchar2, char8_t>) {
+				result = ToStringU8(str, codepage);
+			} else if constexpr (std::is_same_v<tchar2, char16_t>) {
+				result = ToStringU16(str, codepage);
+			} else if constexpr (std::is_same_v<tchar2, char32_t>) {
+				result = ToStringU32(str, codepage);
+			}
+			return result;
+		}
 	}
 	/// @brief Converts Codepage (Unicode <-> MBCS ...)
 	template < gtlc::string_elem tchar1, gtlc::string_elem tchar2 >

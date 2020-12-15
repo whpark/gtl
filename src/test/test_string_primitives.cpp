@@ -292,13 +292,12 @@ TEST(gtl_string, tszncpy) {
 TEST(gtl_string, tszcat) {
 	{
 		std::vector<char16_t> buf;
-		SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 		EXPECT_TRUE(EINVAL == tszcat(buf.data(), 1, u"가나다라마바사"));
-		SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 		EXPECT_TRUE(EINVAL == tszcat(buf, (char16_t*)nullptr));
-		SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 		buf.resize(32);
-		SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
+	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 		EXPECT_TRUE(EINVAL == tszcat(buf.data(), -1, u"가나다"));
 
 		EXPECT_TRUE(         0 == tszcat(buf, u"가나다라마바사"sv));
@@ -651,7 +650,7 @@ TEST(gtl_string, tszto) {
 	auto a3 = gtl::tsztoi("12345");
 	CString str;
 	str = "12345";
-	auto a4 = gtl::tsztoi(CString("12345"));
+	auto a4 = gtl::tsztoi(CString("12345"sv));
 	//auto aa = overload{
 	//	[]() { std::cout << "()" << std::endl; },
 	//	[](int) { std::cout << "(int)" << std::endl; },

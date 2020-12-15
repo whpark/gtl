@@ -8,6 +8,8 @@
 using namespace std::literals;
 using namespace gtl::literals;
 
+#define	SUPPRESS_DEPRECATED_WARNING _Pragma ("warning(suppress:4996)")
+
 namespace gtl {
 
 	template < typename tchar, typename _Traits >
@@ -55,7 +57,7 @@ TEST(gtl_string, TString_Trim) {
 	str = u8"나라😊가나다";
 
 	str += u"  \r\n \t\t   \r\n";
-	str = u"  \r\n \t\t   \r\n" + str;
+	str = u"  \r\n \t\t   \r\n"sv + str;
 
 	EXPECT_TRUE(str.TrimLeftView() ==                        u"나라😊가나다" u"  \r\n \t\t   \r\n");
 	EXPECT_TRUE(str.TrimRightView() == u"  \r\n \t\t   \r\n" u"나라😊가나다");
@@ -98,8 +100,8 @@ TEST(gtl_string, TString_Upper_Lower) {
 		EXPECT_TRUE(str1.size() == 1);
 		EXPECT_TRUE(str2.size() == 1);
 
-		CStringU16 str1L = str1.GetLower();
-		CStringU16 str2U = str2.GetUpper();
+		CStringU16 str1L { str1.GetLower() };
+		CStringU16 str2U { str2.GetUpper() };
 		EXPECT_TRUE(str1L == str2);
 		EXPECT_TRUE(str2U == str1);
 
@@ -109,9 +111,9 @@ TEST(gtl_string, TString_Upper_Lower) {
 
 
 TEST(gtl_string, TString_etc) {
-	using namespace gtl;
+	//using namespace gtl;
 
-	CStringU16 str;
+	gtl::CStringU16 str;
 
 	str = u"ABCDEFGHIJKLMNOPQUST";
 
@@ -133,7 +135,7 @@ TEST(gtl_string, TString_etc) {
 	EXPECT_TRUE(str.SpanExcluding(u"OKLBA"sv) == u"CDEFGHIJMNPQUST"sv);
 	EXPECT_TRUE(str.SpanIncluding(u"OKLBA"sv) == u"ABKLO"sv);
 
-	CStringU16 strR = str.GetReverse();
+	gtl::CStringU16 strR = str.GetReverse();
 	EXPECT_TRUE(strR == u"TSUQPONMLKJIHGFEDCBA"sv);
 	strR.MakeReverse();
 	EXPECT_TRUE(strR == str);
@@ -148,17 +150,206 @@ TEST(gtl_string, TString_etc) {
 	str.Replace(u"ABC", u"*ABC*");
 	EXPECT_TRUE(str == u"*ABC*D*ABC**ABC*D*ABC**ABC*D*ABC*"sv);
 
+	auto r = str.GetReplaced(u"*ABC*", u"ABC");
+	EXPECT_TRUE(r);
+	EXPECT_TRUE(r.value_or(u""s) == u"ABCDABCABCDABCABCDABC"sv);
+	r = str.GetReplaced(u"가나다", u"");
+	EXPECT_TRUE(!r);
+	r = str.GetReplaced(u"*ABC*D*ABC**ABC*D*ABC**ABC*D*ABC*"sv, u"");
+	EXPECT_TRUE(r);
+	EXPECT_TRUE(r->empty());
+
+
 	str.Remove('D');
 	EXPECT_TRUE(str == u"*ABC**ABC**ABC**ABC**ABC**ABC*"sv);
 
+	{
+		auto * buf = str.GetBuffer(32);
+		buf[0] = u'가';
+		buf[1] = u'나';
+		buf[2] = u'다';
+		buf[3] = u'라';
+		buf[4] = u'마';
+		buf[5] = 0;
+		str.ReleaseBuffer();
+		EXPECT_TRUE(str == u"가나다라마"sv);
+	}
 
-	auto * buf = str.GetBuffer(32);
-	buf[0] = u'가';
-	buf[1] = u'나';
-	buf[2] = u'다';
-	buf[3] = u'라';
-	buf[4] = u'마';
-	buf[5] = 0;
-	str.ReleaseBuffer();
-	EXPECT_TRUE(str == u"가나다라마"sv);
+
+	{
+		auto* buf = str.GetBuffer(15);
+		for (int i = 0; i < str.size(); i++) {
+			buf[i] = '0'+i;
+		}
+		std::basic_string<char16_t> p {buf, buf+str.size()};
+		str.ReleaseBuffer();
+		EXPECT_TRUE(str == p);
+	}
+
+	{
+
+		str.clear();
+		str.reserve(32);
+		str += 'a';
+		str += u'가';
+		str += U'나';
+		str += L'다';
+		str += u"라";
+		str += u"마"s;
+		str += u"바"sv;
+SUPPRESS_DEPRECATED_WARNING
+		str += u"사"s.c_str();	// NOT Secure
+		str += "아";
+		str += u"자차";
+		str += U"카";
+		str += u8"타";
+SUPPRESS_DEPRECATED_WARNING
+		str += u8"파하"s.c_str();	// NOT Secure
+		EXPECT_TRUE(str == u"a가나다라마바사아자차카타파하"sv);
+
+		str += str;
+		EXPECT_TRUE(str == u"a가나다라마바사아자차카타파하a가나다라마바사아자차카타파하"sv);
+
+
+		str = u"ABCDEF\n";
+		str += u"가나다\n"sv;
+		str += L"마바사\n"sv;
+		str += u8"아자차\n"sv;
+		str += U"아자차\n"sv;
+		EXPECT_TRUE(str == u"ABCDEF\n가나다\n마바사\n아자차\n아자차\n"sv);
+
+		str.clear();
+		str = str + u"ABCDEF\n";
+		str = str + u"ABCDEF\n"s;
+		str = str + u"ABCDEF\n"s.c_str();	// NOT Secure
+		EXPECT_TRUE(str == u"ABCDEF\nABCDEF\nABCDEF\n");
+
+		str = u"ABCDEF\n";
+		gtl::CStringU16 str2 = str + L"가나다\n"sv + u8"마바사\n"sv + U"아자차\n"sv;
+		EXPECT_TRUE(str2 == u"ABCDEF\n가나다\n마바사\n아자차\n"sv);
+
+		gtl::CStringU16 str3;
+		str3 = str + str2;
+		str3 = u"가나다\n"sv + str3;
+		str3 = U"마바사\n"sv + str3;
+		str3 = "아자차\n"sv + str3;
+		EXPECT_TRUE(str3 == u"아자차\n마바사\n가나다\nABCDEF\nABCDEF\n가나다\n마바사\n아자차\n"sv);
+
+		str = u"가나다\n";
+		str += u"라마바\n"sv;
+		str += "라마바\n"sv;
+		str += str3;
+SUPPRESS_DEPRECATED_WARNING
+		str += str3.c_str();	// NOT Secure
+
+SUPPRESS_DEPRECATED_WARNING
+		str += "가나다\n"s.c_str();	// NOT Secure
+
+		str = u"가나다\n"sv;
+		str = u'A' + gtl::TString(u"가나다"s);
+		EXPECT_TRUE(str == u"A가나다"sv);
+		str = L'가' + gtl::TString(u"가나다"s);
+		EXPECT_TRUE(str == u"가가나다"sv);
+
+		str = u"가나다"sv;
+		gtl::CStringA strA { "가"sv};
+		auto strA1 = "가" + str + u"도레미";
+		auto strA2 = "가"s + str + U"마바사";
+		auto strA3 = "가"sv + str + "솔라시";
+		auto strA4 = strA + str;
+SUPPRESS_DEPRECATED_WARNING
+		auto strA5 = "가"s.c_str() + str;	// NOT Secure
+		EXPECT_TRUE(strA1 == "가가나다도레미"sv);
+		EXPECT_TRUE(strA2 == "가가나다마바사"sv);
+		EXPECT_TRUE(strA3 == "가가나다솔라시"sv);
+		EXPECT_TRUE(strA4 == "가가나다"sv);
+		EXPECT_TRUE(strA5 == "가가나다"sv);
+
+		auto strAc1 = 'A' + str;
+		EXPECT_TRUE(strAc1 == "A가나다"sv);
+
+	}
+
+
+	{
+		str = u"\t가나\t다라\t마바\t";
+		auto r = str.SplitView(u'\t');
+		EXPECT_TRUE(r.size() == 5);
+		if (r.size() >= 5) {
+			EXPECT_TRUE(r[0] == u""sv);
+			EXPECT_TRUE(r[1] == u"가나"sv);
+			EXPECT_TRUE(r[2] == u"다라"sv);
+			EXPECT_TRUE(r[3] == u"마바"sv);
+			EXPECT_TRUE(r[4] == u""sv);
+		}
+	}
+
+	{
+		str = u"\t가나\t다라\t마바";
+		auto r = str.SplitView(u'\t');
+		EXPECT_TRUE(r.size() == 4);
+		if (r.size() >= 4) {
+			EXPECT_TRUE(r[0] == u""sv);
+			EXPECT_TRUE(r[1] == u"가나"sv);
+			EXPECT_TRUE(r[2] == u"다라"sv);
+			EXPECT_TRUE(r[3] == u"마바"sv);
+		}
+	}
+
+	{
+		str = u"\t가나\t다라\t마바\t";
+		auto r = str.Split(u'\t');
+		EXPECT_TRUE(r.size() == 5);
+		if (r.size() >= 5) {
+			EXPECT_TRUE(r[0] == u""sv);
+			EXPECT_TRUE(r[1] == u"가나"sv);
+			EXPECT_TRUE(r[2] == u"다라"sv);
+			EXPECT_TRUE(r[3] == u"마바"sv);
+			EXPECT_TRUE(r[4] == u""sv);
+		}
+	}
+
+	{
+		str = u"\t가나\t다라\t마바";
+		auto r = str.Split(u'\t');
+		EXPECT_TRUE(r.size() == 4);
+		if (r.size() >= 4) {
+			EXPECT_TRUE(r[0] == u""sv);
+			EXPECT_TRUE(r[1] == u"가나"sv);
+			EXPECT_TRUE(r[2] == u"다라"sv);
+			EXPECT_TRUE(r[3] == u"마바"sv);
+		}
+	}
+
+	{
+		str = u"\t가나\t\t\t다라\t마바";
+		auto r = str.Split(u'\t');
+		EXPECT_TRUE(r.size() == 6);
+		if (r.size() >= 6) {
+			EXPECT_TRUE(r[0] == u""sv);
+			EXPECT_TRUE(r[1] == u"가나"sv);
+			EXPECT_TRUE(r[2] == u""sv);
+			EXPECT_TRUE(r[3] == u""sv);
+			EXPECT_TRUE(r[4] == u"다라"sv);
+			EXPECT_TRUE(r[5] == u"마바"sv);
+		}
+	}
+
+	// fmt::format
+	{
+		str = u"AB"sv;
+		str.Format(u"{}, {}, {}", 1, 2, str);
+		EXPECT_TRUE(str == u"1, 2, AB"sv);
+
+	}
+
+	// fmt::format
+	{
+		str = u"AB"sv;
+		str.Format(u"{2}, {1}, {0}", 1, 2, str);
+		EXPECT_TRUE(str == u"AB, 2, 1"sv);
+
+	}
+
+
 }

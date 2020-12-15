@@ -313,7 +313,7 @@ namespace gtl {
 	/// <returns>number value. (no overflow checked)</returns>
 	template < std::integral tvalue = int, gtlc::string_elem tchar >			[[nodiscard]]		 tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar** ppszStopped = nullptr, int radix = 0, int cSplitter = 0);
 	template < std::integral tvalue = int, gtlc::string_elem tchar >			[[nodiscard]] inline tvalue tsztoi(std::basic_string<tchar> const& str, tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < std::integral tvalue = int, gtlc::string_elem tchar >			[[nodiscard]] inline tvalue tsztoi(tchar const*& psz, tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
+	template < std::integral tvalue = int, gtlc::string_elem tchar > GTL_DEPR_SEC [[nodiscard]] inline tvalue tsztoi(tchar const* const& psz, tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 	template < std::integral tvalue = int, gtlc::string_elem tchar, int size >	[[nodiscard]] inline tvalue tsztoi(tchar const (&sz)[size], tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 	template < std::floating_point tvalue = double, gtlc::string_elem tchar = char16_t >

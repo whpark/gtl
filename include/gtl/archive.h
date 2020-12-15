@@ -485,7 +485,7 @@ namespace gtl {
 		inline std::optional<std::u32string>	ReadLineU32(char32_t cDelimiter = U'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char32_t>(cDelimiter, bTrimCR); }
 		inline std::optional<std::wstring>		ReadLineW(wchar_t cDelimiter = L'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<wchar_t>(cDelimiter, bTrimCR); }
 
-		// todo : 2020.12.12.
+		// todo : 2020.12.15.
 
 		///// @brief Read / Write String
 		//template < typename tchar, bool bWriteNewLine = false > requires (bSTORE)
@@ -546,18 +546,6 @@ namespace gtl {
 		//	}
 		//};
 
-#if defined(__cpp_lib_format)
-		template < typename ... Args >	void WriteString(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteString(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char, true>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t, true>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t, true>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t, true>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t, true>(std::format(sv, std::forward<Args>(args) ...)); }
-#else
 		template < typename ... Args >	void WriteString(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(fmt::format(sv, std::forward<Args>(args) ...)); }
 		template < typename ... Args >	void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
 		template < typename ... Args >	void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
@@ -568,7 +556,6 @@ namespace gtl {
 		template < typename ... Args >	void WriteStringNL(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
 		template < typename ... Args >	void WriteStringNL(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
 		template < typename ... Args >	void WriteStringNL(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
-#endif
 
 
 		//---------------------------------------------------------------------

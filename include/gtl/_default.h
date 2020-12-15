@@ -56,6 +56,7 @@
 #include <string_view>
 #if defined(__cpp_lib_format)
 #	include <format>
+#	define fmt std
 #else
 #	define FMT_HEADER_ONLY
 #	include <fmt/format.h>
