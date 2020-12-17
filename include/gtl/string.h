@@ -25,6 +25,11 @@
 #include "concepts.h"
 #include "string/string_primitives.h"
 #include "string/convert_codepage.h"
+#include "string/string_misc.h"
+
+#include "string/string_primitives.hpp"
+#include "string/string_misc.hpp"
+
 //#include "string/convert_codepage_kssm.h"
 //#include "string/old_format.h"
 
@@ -407,17 +412,24 @@ namespace gtl {
 		}
 
 		/// @brief no recursive Replace.
-		index_type Replace(std::basic_string_view<tchar> svOld, std::basic_string_view<tchar> svNew) {
+		int Replace(std::basic_string_view<tchar> svOld, std::basic_string_view<tchar> svNew) {
 			int nReplaced {};
-			if (auto r = GetReplaced(svOld, svNew, &nReplaced); r) {
+			if (auto r = GetReplacedOpt(svOld, svNew, &nReplaced); r) {
 				*this = std::move(*r);
 			}
 			return nReplaced;
 		}
 
 		/// @brief no recursive Replace.
+		TString GetReplaced(std::basic_string_view<tchar> svOld, std::basic_string_view<tchar> svNew, int* pnReplaced = nullptr) const {
+			auto r = GetReplacedOpt(svOld, svNew, pnReplaced);
+			return r.value_or(*this);
+		}
+
+
+		/// @brief no recursive Replace.
 		/// @return replaced str. if no replace occur, returns empty
-		std::optional<TString> GetReplaced(std::basic_string_view<tchar> svOld, std::basic_string_view<tchar> svNew, int* pnReplaced = nullptr) const {
+		std::optional<TString> GetReplacedOpt(std::basic_string_view<tchar> svOld, std::basic_string_view<tchar> svNew, int* pnReplaced = nullptr) const {
 			if (svOld.empty())
 				return {};
 			index_type nLenOld = svOld.size();
@@ -468,6 +480,7 @@ namespace gtl {
 			return strReplaced;
 		}
 
+	public:
 		index_type Remove(tchar chRemove) {
 			auto nNewLen = tszrmchar(this->data(), this->data()+this->size(), chRemove);
 			if (nNewLen != this->size())
@@ -505,6 +518,7 @@ namespace gtl {
 		//}
 
 
+	public:
 		/// @brief fmt::format
 		template < typename S, typename ... Args >
 		TString& Format(S const& format_str, Args&& ... args) {
@@ -513,40 +527,19 @@ namespace gtl {
 		}
 
 
-	protected:
-		template < typename treturn >
-		[[nodiscard]] std::vector<treturn> TSplit(std::function<bool(tchar)> func) const {
-			std::vector<treturn> r;
-			r.clear();
-			if (this->empty())
-				return r;
-			tchar const* pos = this->data();
-			tchar const* end = this->data() + this->size();
-			tchar const* s = this->data();
-			for (; pos < end; pos++) {
-				if (!func(*pos))
-					continue;
-				r.emplace_back(s, pos);
-				s = pos+1;
-			}
-			r.emplace_back(s, end);
-
-			return r;
-		}
-
 	public:
 		/// @brief Split string into...
-		[[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> svDelimiters) const {
-			return TSplit<std::basic_string<tchar>>([svDelimiters](tchar c) -> bool { return svDelimiters.find(c) != svDelimiters.npos; });
+		[[nodiscard]] std::vector<TString> Split(std::basic_string_view<tchar> svDelimiters) const {
+			return gtl::internal::TSplit<tchar, TString>(*this, [svDelimiters](tchar c) -> bool { return svDelimiters.find(c) != svDelimiters.npos; });
 		}
-		[[nodiscard]] inline std::vector<std::basic_string<tchar>> Split(tchar cDelimiter) const {
-			return TSplit<std::basic_string<tchar>>([cDelimiter](tchar c) -> bool { return cDelimiter == c; });
+		[[nodiscard]] inline std::vector<TString> Split(tchar cDelimiter) const {
+			return gtl::internal::TSplit<tchar, TString>(*this, [cDelimiter](tchar c) -> bool { return cDelimiter == c; });
 		}
 		[[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> svDelimiters) const {
-			return TSplit<std::basic_string_view<tchar>>([svDelimiters](tchar c) -> bool { return svDelimiters.find(c) != svDelimiters.npos; });
+			return gtl::internal::TSplit<tchar, std::basic_string_view<tchar>>(*this, [svDelimiters](tchar c) -> bool { return svDelimiters.find(c) != svDelimiters.npos; });
 		}
 		[[nodiscard]] inline std::vector<std::basic_string_view<tchar>> SplitView(tchar cDelimiter) const {
-			return TSplit<std::basic_string_view<tchar>>([cDelimiter](tchar c) -> bool { return cDelimiter == c; });
+			return gtl::internal::TSplit<tchar, std::basic_string_view<tchar>>(*this, [cDelimiter](tchar c) -> bool { return cDelimiter == c; });
 		}
 
 

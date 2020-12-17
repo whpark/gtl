@@ -169,6 +169,8 @@
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\string\HangeulCodeMap.h" />
     <ClInclude Include="..\..\include\gtl\string\latin_charset.h" />
+    <ClInclude Include="..\..\include\gtl\string\string_misc.h" />
+    <ClInclude Include="..\..\include\gtl\string\string_misc.hpp" />
     <ClInclude Include="..\..\include\gtl\string\string_primitives.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h" />

@@ -144,7 +144,7 @@ namespace gtl {
 	public:
 		
 		/// @brief Read byte buffer
-		template < typename T > requires (bLOADING)
+		template < typename T > requires (bLOAD)
 		inline std::streamsize Read(void* data, std::streamsize size) {
 			CHECK_ARCHIVE_LOADABLE;
 			auto pos0 = stream_.tellg();
@@ -161,7 +161,7 @@ namespace gtl {
 		}
 		/// @brief Write an object.
 		/// @param TYPE trivially_copyable objects. (when bSWAP_BYTE_ORDER is true, only integral or floating point value and their array  can be serialized.)
-		template < gtlc::trivially_copyable TYPE > requires (bLOADING)
+		template < gtlc::trivially_copyable TYPE > requires (bLOAD)
 		inline std::streamsize Read(TYPE& v) {
 			CHECK_ARCHIVE_LOADABLE;
 			if constexpr (bSWAP_BYTE_ORDER) {

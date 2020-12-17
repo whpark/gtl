@@ -150,12 +150,12 @@ TEST(gtl_string, TString_etc) {
 	str.Replace(u"ABC", u"*ABC*");
 	EXPECT_TRUE(str == u"*ABC*D*ABC**ABC*D*ABC**ABC*D*ABC*"sv);
 
-	auto r = str.GetReplaced(u"*ABC*", u"ABC");
+	auto r = str.GetReplacedOpt(u"*ABC*", u"ABC");
 	EXPECT_TRUE(r);
 	EXPECT_TRUE(r.value_or(u""s) == u"ABCDABCABCDABCABCDABC"sv);
-	r = str.GetReplaced(u"가나다", u"");
+	r = str.GetReplacedOpt(u"가나다", u"");
 	EXPECT_TRUE(!r);
-	r = str.GetReplaced(u"*ABC*D*ABC**ABC*D*ABC**ABC*D*ABC*"sv, u"");
+	r = str.GetReplacedOpt(u"*ABC*D*ABC**ABC*D*ABC**ABC*D*ABC*"sv, u"");
 	EXPECT_TRUE(r);
 	EXPECT_TRUE(r->empty());
 
@@ -349,6 +349,26 @@ SUPPRESS_DEPRECATED_WARNING
 		str.Format(u"{2}, {1}, {0}", 1, 2, str);
 		EXPECT_TRUE(str == u"AB, 2, 1"sv);
 
+	}
+
+
+	// Escape Sequence
+
+
+	{
+		static_assert(L"\101"sv == L"A"sv);
+		static_assert(L"\1011"sv == L"A1"sv);
+		static_assert(L"\x000041"sv == L"A"sv);
+		EXPECT_TRUE(u"\u0000"s != u""sv);
+		EXPECT_TRUE(u"\u0000"sv != u""s);
+		static_assert(u"\0"sv != u""sv);
+
+		auto const r = gtl::TranslateEscapeSequence(uR"xx(\101)xx"sv);
+		EXPECT_TRUE(r);
+		if (r) {
+			EXPECT_TRUE(*r == u"A"sv);
+		}
+		//static_assert(gtl::TranslateEscapeSequence(uR"xx()xx"sv) == u""sv);
 	}
 
 

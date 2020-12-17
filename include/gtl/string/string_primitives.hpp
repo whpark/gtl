@@ -12,297 +12,10 @@
 #ifndef GTL_HEADER__BASIC_STRING_IMPL
 #define GTL_HEADER__BASIC_STRING_IMPL
 
-#include "latin_charset.h"
+//#include "latin_charset.h"
 
 namespace gtl {
 #pragma pack(push, 8)
-
-	//-----------------------------------------------------------------------------
-	/// @brief  misc. GetSpaceString()
-	/// @return " \r\t\n"
-	/// 
-	template < gtlc::string_elem tchar > [[nodiscard]] constexpr std::basic_string_view<tchar> GetSpaceString() {
-		if constexpr (std::is_same_v<tchar, char>) { return _A(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, char8_t>) { return _u8(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, char16_t>) { return _u(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, char32_t>) { return _U(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, wchar_t>) { return _W(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, uint16_t>) { return (uint16_t*)_u(SPACE_STRING); }
-		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
-	}
-	//template < gtlc::string_elem tchar > [[nodiscard]] constexpr std::basic_string_view<tchar> GetSpaceString();
-	//template <> [[nodiscard]] constexpr std::basic_string_view<char>     GetSpaceString() { return SPACE_STRING; }
-	//template <> [[nodiscard]] constexpr std::basic_string_view<char8_t>  GetSpaceString() { return _u8(SPACE_STRING); }
-	//template <> [[nodiscard]] constexpr std::basic_string_view<char16_t> GetSpaceString() { return _u(SPACE_STRING); }
-	//template <> [[nodiscard]] constexpr std::basic_string_view<char32_t> GetSpaceString() { return _U(SPACE_STRING); }
-	//template <> [[nodiscard]] constexpr std::basic_string_view<wchar_t>  GetSpaceString() { return _W(SPACE_STRING); }
-
-
-	constexpr static inline bool is_space(int const c) { return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' '); }
-
-
-	//-----------------------------------------------------------------------------
-	// Trim
-	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str, std::basic_string_view<tchar> svTrim) {
-		auto pos = str.find_first_not_of(svTrim);
-		if (pos == str.npos)
-			str.clear();
-		else
-			str.erase(str.begin(), str.begin()+pos);
-	}
-	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str, std::basic_string_view<tchar> svTrim) {
-		str.erase(str.begin() + (str.find_last_not_of(svTrim) + 1), str.end());
-	}
-	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str, std::basic_string_view<tchar> svTrim) {
-		TrimRight(str, svTrim);
-		TrimLeft(str, svTrim);
-	}
-
-	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str, tchar const cTrim) {
-		auto pos = str.find_first_not_of(cTrim);
-		if (pos == str.npos)
-			str.clear();
-		else
-			str.erase(str.begin(), str.begin()+pos);
-	}
-	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str, tchar const cTrim) {
-		str.erase(str.begin() + (str.find_last_not_of(cTrim) + 1), str.end());
-	}
-	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str, tchar const cTrim) {
-		TrimRight(str, cTrim);
-		TrimLeft(str, cTrim);
-	}
-
-	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str)	{
-		TrimLeft(str, GetSpaceString<tchar>());
-	}
-	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str)	{
-		TrimRight(str, GetSpaceString<tchar>());
-	}
-	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str) {
-		Trim(str, GetSpaceString<tchar>());
-	}
-
-
-	// Trim-View
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svTrim) {
-		if (auto pos = sv.find_first_not_of(svTrim); pos != sv.npos)
-			return { sv.begin()+pos, sv.end() };
-		else
-			return {};
-	}
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svTrim) {
-		return { sv.begin(), sv.begin() + (sv.find_last_not_of(svTrim)+1) };
-	}
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svTrim) {
-		return TrimRightView(TrimLeftView(sv, svTrim), svTrim);
-	}
-
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv, tchar const cTrim) {
-		if (auto pos = sv.find_first_not_of(cTrim); pos != sv.npos)
-			return { sv.begin()+pos, sv.end() };
-		else
-			return {};
-	}
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv, tchar const cTrim) {
-		return { sv.begin(), sv.begin() + (sv.find_last_not_of(cTrim)+1) };
-	}
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv, tchar const cTrim) {
-		return TrimRightView(TrimLeftView(sv, cTrim), cTrim);
-	}
-
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv) {
-		return TrimLeftView(sv, GetSpaceString<tchar>());
-	}
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv) {
-		return TrimRightView(sv, GetSpaceString<tchar>());
-	}
-	template < gtlc::string_elem tchar >
-	std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv) {
-		return TrimView(sv, GetSpaceString<tchar>());
-	}
-
-
-#if 0
-	constexpr char32_t sz[] = 
-		U"Àà Áá Ǎǎ Ãã Ȧȧ Ââ Ää Åå Āā Ąą Ăă Ćć Ĉĉ Čč Ċċ Çç Ďď Ḑḑ Éé Ěě Ēē Èè Ęę Ẽẽ Ėė Êê "
-		U"Ëë Ĝĝ Ǵǵ Ǧǧ Ģģ Ğğ Ȟȟ Ĥĥ Īī Įį Íí Ǐǐ Ïï Ĩĩ İi Îî Ɨɨ Iı Ĵĵ Ǩǩ Ḱḱ Ķķ Ĺĺ Ļļ Łł "
-		U"Ḿḿ Ňň Ńń Ññ Ņņ Õõ Ǒǒ Öö Őő Óó Òò Øø Ōō Ǫǫ Řř Ŕŕ Ȓȓ Şş Śś Šš Șș Ŝŝ Ťť Țț Ŧŧ "
-		U"Ŭŭ Üü Ūū Ǔǔ Ųų Ůů Űű Ũũ Úú Ùù Ṽṽ Ẃẃ Ẋẋ Ȳȳ Ỹỹ Ÿÿ Ýý Žž Źź";
-#endif
-
-	namespace charset {
-		template < gtlc::string_elem tchar >
-		struct S_ULPair { tchar cUpper, cLower; };
-
-		constexpr static inline S_ULPair<char16_t> latin1_diff { 0xC0, 0xE0  /* ('À' 'à') */ };
-		constexpr static inline S_ULPair<char16_t> latin1_exception1 { 0x00D7, 0x00F7 }; // ×, ÷
-		constexpr static inline S_ULPair<char16_t> latin1_exception2 { 0x039c, 0x00b5 }; // µ, Μ : 743
-		constexpr static inline S_ULPair<char16_t> latin1_exception3 { 0x0178, 0x00ff }; // ÿ, Ÿ : 121
-
-
-		template < typename tchar >
-		struct S_MAP_TABLE {
-			std::pair<tchar, tchar> const range;
-			std::map<tchar, tchar> const& map;
-		};
-
-		static inline std::array<S_MAP_TABLE<char16_t>, 4> mapUL16 { {
-			//{ rangeUL_latin1_g,			mapUL_latin1_g},
-			{ rangeUL_latin_extended_g, mapUL_latin_extended_g },
-			{ rangeUL_other1_g,			mapUL_other1_g },
-			{ rangeUL_other2_g,			mapUL_other2_g },
-			{ rangeUL_other3_g,			mapUL_other3_g },
-		} };
-
-		static inline std::array<S_MAP_TABLE<char16_t>, 5> mapLU16 { {
-			{ rangeLU_latin1_g,			mapLU_latin1_g},
-			{ rangeLU_latin_extended_g, mapLU_latin_extended_g },
-			{ rangeLU_other1_g,			mapLU_other1_g },
-			{ rangeLU_other2_g,			mapLU_other2_g },
-			{ rangeLU_other3_g,			mapLU_other3_g },
-		} };
-
-		static inline std::array<S_MAP_TABLE<char32_t>, 3> mapUL32 { {
-			{ rangeUL_other4_g,			mapUL_other4_g },
-			{ rangeUL_other5_g,			mapUL_other5_g },
-			{ rangeUL_other6_g,			mapUL_other6_g },
-		} };
-
-		static inline std::array<S_MAP_TABLE<char32_t>, 3> mapLU32 { {
-			{ rangeLU_other4_g,			mapLU_other4_g },
-			{ rangeLU_other5_g,			mapLU_other5_g },
-			{ rangeLU_other6_g,			mapLU_other6_g },
-		} };
-
-	}
-
-	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c) {
-		if (c < 'A')
-			return c;
-
-		if (c <= 'Z')
-			return c - 'A' + 'a';
-
-		using namespace gtl::charset;
-
-		if constexpr (sizeof(tchar) >= sizeof(char16_t)) {
-			// Latin-1
-			if (c < rangeUL_latin1_g.first)
-				return c;
-			if (c < rangeUL_latin1_g.second) {
-				if (c != latin1_exception1.cUpper)
-					return c + latin1_diff.cLower - latin1_diff.cUpper;
-				return c;
-			}
-			// Latin Extended, others
-			for (auto const& [range, map] : mapUL16) {
-				if (c < range.first)
-					return c;
-				if (c < range.second) {
-					if (auto iter = map.find(c); iter != map.end()) {
-						return iter->second;
-					}
-					return c;
-				}
-			}
-		}
-
-		if constexpr (sizeof(tchar) >= sizeof(char32_t)) {
-			for (auto const& [range, map] : mapUL32) {
-				if (c < range.first)
-					return c;
-				if (c < range.second) {
-					if (auto iter = map.find(c); iter != map.end()) {
-						return iter->second;
-					}
-					return c;
-				}
-			}
-		}
-		return c;
-	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToUpper(tchar c) {
-		if (c < 'a')
-			return c;
-		if (c <= 'z')
-			return c - 'a' + 'A';
-
-		using namespace gtl::charset;
-
-		if constexpr (sizeof(tchar) >= sizeof(char16_t)) {
-			//// Latin-1
-			//if (c < rangeLU_latin1_g.first) {
-			//	if (c == latin1_exception2.cLower)		// { 0x039c, 0x00b5 }; // µ, Μ : 743
-			//		return latin1_exception2.cUpper;
-			//	return c;
-			//}
-			//if (c < rangeLU_latin1_g.second) {
-			//	if (c == latin1_exception3.cLower)		// { 0x0178, 0x00ff }; // ÿ, Ÿ : 121
-			//		return latin1_exception3.cUpper;
-			//	if (c != latin1_exception1.cLower)
-			//		return c - latin1_diff.cLower + latin1_diff.cUpper;
-			//	return c;
-			//}
-			// Latin Extended, others
-			for (auto const& [range, map] : mapLU16) {
-				if (c < range.first)
-					return c;
-				if (c < range.second) {
-					if (auto iter = map.find(c); iter != map.end()) {
-						return iter->second;
-					}
-					return c;
-				}
-			}
-		}
-
-		if constexpr (sizeof(tchar) >= sizeof(char32_t)) {
-			for (auto const& [range, map] : mapLU32) {
-				if (c < range.first)
-					return c;
-				if (c < range.second) {
-					if (auto iter = map.find(c); iter != map.end()) {
-						return iter->second;
-					}
-					return c;
-				}
-			}
-		}
-		return c;
-	}
-	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c) {
-		c = ToLower(c);
-	}
-	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c) {
-		c = ToUpper(c);
-	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c) {
-		return (c >= '0') && (c <= '9');
-	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c) {
-		return (c >= '0') && (c <= '7');
-	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c) {
-		return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F'));
-	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsSpace(tchar const c) {
-		return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' ');
-	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsNotSpace(tchar const c) {
-		return !IsSpace(c);
-	}
-
-
 
 	/// @brief  tszlen (string length). you cannot input string literal. you don't need tszlen("testlen");. ==> just call "testlen"sv.size();
 	/// @param psz : null terminating char_t* var. (no string literals)
@@ -976,6 +689,21 @@ namespace gtl {
 	}
 
 
+	/// @brief tszto_number
+	/// @param psz 
+	/// @param pszEnd 
+	/// @param radix 
+	/// @return number
+	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
+	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped, int radix, int cSplitter) {
+		if constexpr (std::is_integral_v<tvalue>) {
+			return tsztoi<tvalue>(psz, pszEnd, pszStopped, radix, cSplitter);
+		} else {
+			return tsztod<tvalue>(psz, pszEnd, pszStopped, cSplitter);
+		}
+	}
+
+
 	/// <summary>
 	/// digit contants to integral type value.
 	///  - radix detecting (c++ notation)
@@ -990,7 +718,7 @@ namespace gtl {
 	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
 	/// <returns>number value. (no overflow checked)</returns>
 	template < std::integral tvalue, gtlc::string_elem tchar>
-	[[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar** ppszStopped, int radix, int cSplitter) {
+	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar** ppszStopped, int radix, int cSplitter) {
 		if (svNumberString.empty())
 			return {};
 
@@ -998,7 +726,7 @@ namespace gtl {
 		tchar const* const pszEnd = svNumberString.data() + svNumberString.size();
 
 		// skip white space
-		while ((psz < pszEnd) && is_space(*psz))
+		while ((psz < pszEnd) && IsSpace(*psz))
 			psz++;
 
 		if (psz >= pszEnd)
@@ -1012,7 +740,7 @@ namespace gtl {
 			psz++;
 
 		// skip white space
-		while ((psz < pszEnd) && is_space(*psz))
+		while ((psz < pszEnd) && IsSpace(*psz))
 			psz++;
 
 		// skip white space
@@ -1063,18 +791,17 @@ namespace gtl {
 	}
 
 	template < std::integral tvalue, gtlc::string_elem tchar >
-	inline tvalue tsztoi(std::basic_string<tchar> const& str, tchar** ppszStopped, int radix, tchar cSplitter) {
+	inline [[nodiscard]] tvalue tsztoi(std::basic_string<tchar> const& str, tchar** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>((std::basic_string_view<tchar>)str, ppszStopped, radix, cSplitter);
 	}
 	template < std::integral tvalue, gtlc::string_elem tchar >
-	GTL_DEPR_SEC inline tvalue tsztoi(tchar const* const& psz, tchar** ppszStopped, int radix, tchar cSplitter) {
+	GTL_DEPR_SEC inline [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz + tszlen(psz) }, ppszStopped, radix, cSplitter);
 	}
 	template < std::integral tvalue, gtlc::string_elem tchar, int size >
-	inline tvalue tsztoi(tchar const (&sz)[size], tchar** ppszStopped, int radix, tchar cSplitter) {
+	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ sz, sz + tszlen(sz, size) }, ppszStopped, radix, cSplitter);
 	}
-
 
 
 	template < std::floating_point tvalue, gtlc::string_elem tchar >
@@ -1083,7 +810,7 @@ namespace gtl {
 			return {};
 
 		// skip white space
-		while ((psz < pszEnd) && is_space(*psz))
+		while ((psz < pszEnd) && IsSpace(*psz))
 			psz++;
 
 		// Check sign (+/-)
@@ -1167,7 +894,7 @@ namespace gtl {
 			str.reserve(16);
 			tchar const* pos = sv.data();
 			tchar const* end = sv.data() + sv.size();
-			while (pos < end && is_space(*pos))
+			while (pos < end && IsSpace(*pos))
 				pos++;
 			for (; pos < end; pos++) {
 				static_assert(std::is_unsigned_v<tchar>);
@@ -1188,128 +915,6 @@ namespace gtl {
 		return tsztod<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz+tszlen(psz) }, ppszStopped);
 	}
 
-
-	/// @brief Compare strings (containing numbers)
-	template < gtlc::string_elem tchar, bool bIgnoreCase >
-	constexpr int CompareStringContainingNumbers(const tchar* pszA, const tchar* pszB);
-
-	template < gtlc::string_elem tchar >
-	constexpr inline int tdszcmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB) {
-		return CompareStringContainingNumbers<tchar, false>(svA, svB);
-	}
-	template < gtlc::string_elem tchar >
-	constexpr inline int tdszcmp(std::basic_string<tchar> const& strA, std::basic_string<tchar> const& strB) {
-		return CompareStringContainingNumbers<tchar, false>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB);
-	}
-	template < gtlc::string_elem tchar >
-	constexpr inline int tdszicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB) {
-		return CompareStringContainingNumbers<tchar, true>(svA, svB);
-	}
-	template < gtlc::string_elem tchar >
-	constexpr inline int tdszicmp(std::basic_string<tchar> const& strA, std::basic_string<tchar> const& strB) {
-		return CompareStringContainingNumbers<tchar, true>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB);
-	}
-
-
-
-	/// @brief tszto_number
-	/// @param psz 
-	/// @param pszEnd 
-	/// @param radix 
-	/// @return number
-	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
-	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped, int radix, int cSplitter) {
-		if constexpr (std::is_integral_v<tvalue>) {
-			return tsztoi<tvalue>(psz, pszEnd, pszStopped, radix, cSplitter);
-		} else {
-			return tsztod<tvalue>(psz, pszEnd, pszStopped, cSplitter);
-		}
-	}
-
-
-	/// @brief Compare two Strings. according to number (only for '0'-'9' are taken as number. no '-' sign, neither '.' for floating point 
-	///  ex)
-	///      "123" > "65"         // 123 > 65
-	///      "abc123" > "abc6"    // 123 > 65 ("abc" == "abc")
-	///      "-100" > "-125"      // '-' is just taken as part of string. ===> 100 > 125
-	///      "00001" < "0000003"  // 1 < 3
-	///      "01" < "001"         // if same (1 == 1) ===> longer gets winner.
-	/// @param pszA
-	/// @param pszB
-	/// @return 
-	template < gtlc::string_elem tchar, bool bIgnoreCase >
-	constexpr int/*std::strong_ordering*/ CompareStringContainingNumbers(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB) {
-		tchar const* pszA				= svA.data();
-		tchar const* const pszAend	= svA.data() + svA.size();
-		tchar const* pszB				= svB.data();
-		tchar const* const pszBend	= svB.data() + svB.size();
-
-		for (; (pszA < pszAend) && (pszB < pszBend); pszA++, pszB++) {
-			if (IsDigit(*pszA) && IsDigit(*pszB)) {	// for numbers
-				tchar const* const pszAs {pszA};
-				tchar const* const pszBs {pszB};
-
-				// skip '0'
-				auto Skip0 = [](tchar const*& psz, tchar const* const pszEnd) {
-					for ( ; (psz < pszEnd) and ('0' == *psz); psz++)
-						;
-				};
-				Skip0(pszA, pszAend);
-				Skip0(pszB, pszBend);
-
-				// Count Digit Length
-				auto CountDigitLength = [](tchar const*& psz, tchar const* const pszEnd) -> int {
-					int nDigit{};
-					for (; (psz + nDigit < pszEnd) and IsDigit(psz[nDigit]); nDigit++)
-						;
-					return nDigit;
-				};
-				int const nDigitA = CountDigitLength(pszA, pszAend);
-				int const nDigitB = CountDigitLength(pszB, pszBend);
-
-				// Compare digit length
-				if (auto diff = nDigitA - nDigitB; diff)
-					return diff;
-
-				if (nDigitA == 0) {
-					continue;
-				}
-				for (int nDigit {nDigitA}; (nDigit > 0); pszA++, pszB++, nDigit--) {
-					if (*pszA == *pszB)
-						continue;
-					return *pszA - *pszB;
-				}
-				if (auto diff = (pszA-pszAs) - (pszB-pszBs); diff)
-					return (int)diff;
-				pszA--;
-				pszB--;
-			} else {
-				tchar cA = *pszA;
-				tchar cB = *pszB;
-				if constexpr (bIgnoreCase) { cA = (tchar)ToLower(cA); cB = (tchar)ToLower(cB); }
-				auto r = cA - cB;
-				if (r == 0)
-					continue;
-				return r;
-			}
-		}
-		if (pszA < pszAend)
-			return *pszA;
-		else if (pszB < pszBend)
-			return -*pszB;
-
-		return 0;
-	}
-	template < gtlc::string_elem tchar >
-	constexpr int CompareStringContainingNumbers(std::basic_string<tchar> const& strA, std::basic_string<tchar> const& strB, bool bIgnoreCase) {
-		return bIgnoreCase
-			? CompareStringContainingNumbers<tchar, true>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB)
-			: CompareStringContainingNumbers<tchar, false>((std::basic_string_view<tchar>)strA, (std::basic_string_view<tchar>)strB);
-	}
-	//template < gtlc::string_elem tchar, bool bIgnoreCase >
-	//constexpr inline int/*std::strong_ordering*/ CompareStringContainingNumbers(tchar const* pszA, tchar const* pszB) {
-	//	return CompareStringContainingNumbers<tchar, bIgnoreCase>({pszA, pszA+tszlen(pszA)}, {pszB, pszB+tszlen(pszB)});
-	//}
 
 #pragma pack(pop)
 };	// namespace gtl;
