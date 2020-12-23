@@ -13,6 +13,7 @@
 
 #include "gtl/string/string_primitives.h"
 #include "gtl/string/convert_codepage.h"
+#include "gtl/string/convert_utf.h"
 #include "gtl/string/convert_codepage_kssm.h"
 #include "gtl/string/HangeulCodeMap.h"
 #include "gtl/string/old_format.h"
@@ -367,11 +368,11 @@ namespace gtl {
 				str.push_back(pos[0]);
 			}
 			else if ((pos[0] & 0b1110'0000) == 0b1100'0000) {	// 0~0x7ff
-				str.push_back(((pos[0] & uc::mask_6bit) << 6) | (pos[1] & uc::mask_6bit));
+				str.push_back(((pos[0] & uc::bitmask_6bit) << 6) | (pos[1] & uc::bitmask_6bit));
 				pos += 1;
 			}
 			else if ((pos[0] & 0b1111'0000) == 0b1110'0000) {	// ~0xffff
-				str.push_back(((pos[0] & uc::mask_4bit) << 12) | ((pos[1] & uc::mask_6bit) << 6) | (pos[2] & uc::mask_6bit));
+				str.push_back(((pos[0] & uc::bitmask_4bit) << 12) | ((pos[1] & uc::bitmask_6bit) << 6) | (pos[2] & uc::bitmask_6bit));
 				pos += 2;
 			}
 			else if ((pos[0] & 0b1111'1000) == 0b1111'0000) {	// ~0x10'ffff
@@ -379,8 +380,8 @@ namespace gtl {
 				constexpr static uint16_t const preH = uc::fSurrogateW1.first - (0x1'0000u >> uc::nBitSurrogate);
 				constexpr static uint16_t const preL = uc::fSurrogateW2.first;
 
-				str.push_back(preH + (uint16_t)( ((pos[0] & uc::mask_3bit) << 8) | ((pos[1] & uc::mask_6bit) << 2) | ((pos[2]>> 4) & 0b0011) ));
-				str.push_back(preL + (uint16_t)( ((pos[2] & uc::mask_4bit) << 6) | (pos[3] & uc::mask_6bit)) );
+				str.push_back(preH + (uint16_t)( ((pos[0] & uc::bitmask_3bit) << 8) | ((pos[1] & uc::bitmask_6bit) << 2) | ((pos[2]>> 4) & 0b0011) ));
+				str.push_back(preL + (uint16_t)( ((pos[2] & uc::bitmask_4bit) << 6) | (pos[3] & uc::bitmask_6bit)) );
 				pos += 3;
 			}
 			else {
@@ -509,7 +510,7 @@ namespace gtl {
 
 		// check endian, Convert
 		auto strOther = CheckAndConvertEndian(svFrom, codepage.from);
-		if (strOther) { [[unlikely]] svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
+		if (strOther) [[unlikely]] { svFrom = strOther.value(); } //svFrom = strOther.value_or(svFrom);
 
 		size_t nOutputLen = 0;
 		for (auto c : svFrom) {

@@ -782,7 +782,7 @@ namespace gtl {
 			value = value*radix + v;	// no overflow-check
 		}
 		if (bMinus)
-			value = -value;
+			value = 0-value;	// not just '-value' but '0-value' to suppress warning.
 
 		if (ppszStopped)
 			*ppszStopped = const_cast<tchar*>(psz);

@@ -9,15 +9,15 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="gtl">
       <UniqueIdentifier>{bb137d0e-c84f-4f04-b9ad-704c012b54fa}</UniqueIdentifier>
     </Filter>
     <Filter Include="gtl\string">
       <UniqueIdentifier>{274b09f8-32d2-4d7c-89db-fd8f70a3d21f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gtl\Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +79,9 @@
       <Filter>gtl\string</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\string\string_misc.hpp">
+      <Filter>gtl\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\string\convert_utf.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,34 +10,23 @@
 
 #pragma once
 
+#if 1
 #ifndef GTL_HEADER__STRING_UTF_STRING_VIEW
 #define GTL_HEADER__STRING_UTF_STRING_VIEW
 
-#include "string_primitives.h"
-
 #include <experimental/generator>
+
+#include "string_primitives.h"
+#include "convert_utf.h"
 
 namespace gtl {
 #pragma pack(push, 8)
 
 
-	/// <summary>
-	/// constants for utf conversion
-	/// </summary>
-	namespace utf_const {
-		constexpr static inline uint8_t const mask_3bit = 0b0000'0111;
-		constexpr static inline uint8_t const mask_4bit = 0b0000'1111;
-		constexpr static inline uint8_t const mask_6bit = 0b0011'1111;
-		constexpr static inline std::pair const fSurrogateW1{ (char16_t)0xd800u, (char16_t)0xdbffu };	// 0xd800u ~ 0xdbffu;
-		constexpr static inline std::pair const fSurrogateW2{ (char16_t)0xdc00u, (char16_t)0xdfffu };	// 0xd800u ~ 0xdbffu;
-		constexpr static inline int const nBitSurrogate{ 10 };
-	}
-
 	//--------------------------------------------------------------------------------------------------------------------------------
-	/// <summary>
-	/// char32_t character from utf8/16 string. (yet, NOT having std::generator...)
-	///   someday, upgrate to std::generator std::generator<tchar_return_t> ...
-	/// </summary>
+	// someday, upgrate to std::generator std::generator<tchar_return_t> ...
+
+	/// @brief char32_t from utf8/16 string. (yet, NOT having std::generator...)
 	template < gtlc::string_elem_utf tchar >
 	class utf_string_view {
 	public:
@@ -222,3 +211,6 @@ namespace gtl {
 }
 
 #endif // GTL_HEADER__STRING_UTF_STRING_VIEW
+
+
+#endif

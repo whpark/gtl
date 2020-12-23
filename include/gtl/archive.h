@@ -154,7 +154,7 @@ namespace gtl {
 				auto nRead = pos1 - pos0;
 				return nRead;
 #else
-				return (m_stream.tellg() - pos0);
+				return (stream_.tellg() - pos0);
 #endif
 			}
 			return -1;

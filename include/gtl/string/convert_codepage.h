@@ -423,60 +423,60 @@ namespace gtl {
 		strTo = ToString<tchar1, tchar2>(strFrom);
 	}
 
-	//-------------------------------------------------------------
-	// experimental
-	//
-	template < gtlc::string_elem_utf tchar_return, gtlc::string_elem_utf tchar >
-	requires ( (sizeof(tchar) != sizeof(tchar_return)) && (sizeof(tchar) != sizeof(char32_t)) )
-	std::experimental::generator<tchar_return> StringSequence(utf_string_view<tchar> sv) {
-		using usv = utf_string_view<tchar>;
-		if constexpr (sizeof(tchar_return) == sizeof(char8_t)) {
-			for (auto const c : sv) {
-				if (c <= 0x7f) {
-					co_yield c;
-				}
-				else if (c <= 0x7ff) {
-					co_yield 0xc0 + (c >> 6);
-					co_yield 0x80 + (c & usv::bitmask_6bit);
-				}
-				else if (c <= 0xffff) {
-					co_yield 0xe0 + (c >> 12);
-					co_yield 0x80 + ((c >> 6) & usv::bitmask_6bit);
-					co_yield 0x80 + ((c >> 0) & usv::bitmask_6bit);
-				}
-				else if (c <= 0x10'ffff) {
-					co_yield 0xf0 + (c >> 18);
-					co_yield 0x80 + ((c >> 12) & usv::bitmask_6bit);
-					co_yield 0x80 + ((c >> 6) & usv::bitmask_6bit);
-					co_yield 0x80 + ((c >> 0) & usv::bitmask_6bit);
-				}
-				else
-					throw std::invalid_argument{ GTL__FUNCSIG "no utf" };
-			}
-		}
-		else if constexpr (sizeof(tchar_return) == sizeof(char16_t)) {
-			for (auto const c : sv) {
-				if (c <= 0xffff) {
-					[[likely]]
-					co_yield c;
-				}
-				else if ((0x1'0000 <= c) && (c <= 0x10'ffff)) {
-					constexpr auto const preH = usv::fSurrogateW1.first - 0x1'0000;
-					co_yield preH + (c >> 10);
-					constexpr auto const preL = usv::fSurrogateW2.first;
-					co_yield preL + (c & 0b0011'1111);
-				}
-				else
-					co_yield c;
-			}
-		}
-		else if constexpr (sizeof(tchar_return) == sizeof(char32_t)) {
-			for (auto const c : sv) {
-				co_yield c;
-			}
-		}
-		co_return;
-	}
+	////-------------------------------------------------------------
+	//// experimental
+	////
+	//template < gtlc::string_elem_utf tchar_return, gtlc::string_elem_utf tchar >
+	//requires ( (sizeof(tchar) != sizeof(tchar_return)) && (sizeof(tchar) != sizeof(char32_t)) )
+	//std::experimental::generator<tchar_return> StringSequence(utf_string_view<tchar> sv) {
+	//	using usv = utf_string_view<tchar>;
+	//	if constexpr (sizeof(tchar_return) == sizeof(char8_t)) {
+	//		for (auto const c : sv) {
+	//			if (c <= 0x7f) {
+	//				co_yield c;
+	//			}
+	//			else if (c <= 0x7ff) {
+	//				co_yield 0xc0 + (c >> 6);
+	//				co_yield 0x80 + (c & usv::bitmask_6bit);
+	//			}
+	//			else if (c <= 0xffff) {
+	//				co_yield 0xe0 + (c >> 12);
+	//				co_yield 0x80 + ((c >> 6) & usv::bitmask_6bit);
+	//				co_yield 0x80 + ((c >> 0) & usv::bitmask_6bit);
+	//			}
+	//			else if (c <= 0x10'ffff) {
+	//				co_yield 0xf0 + (c >> 18);
+	//				co_yield 0x80 + ((c >> 12) & usv::bitmask_6bit);
+	//				co_yield 0x80 + ((c >> 6) & usv::bitmask_6bit);
+	//				co_yield 0x80 + ((c >> 0) & usv::bitmask_6bit);
+	//			}
+	//			else
+	//				throw std::invalid_argument{ GTL__FUNCSIG "no utf" };
+	//		}
+	//	}
+	//	else if constexpr (sizeof(tchar_return) == sizeof(char16_t)) {
+	//		for (auto const c : sv) {
+	//			if (c <= 0xffff) {
+	//				[[likely]]
+	//				co_yield c;
+	//			}
+	//			else if ((0x1'0000 <= c) && (c <= 0x10'ffff)) {
+	//				constexpr auto const preH = usv::fSurrogateW1.first - 0x1'0000;
+	//				co_yield preH + (c >> 10);
+	//				constexpr auto const preL = usv::fSurrogateW2.first;
+	//				co_yield preL + (c & 0b0011'1111);
+	//			}
+	//			else
+	//				co_yield c;
+	//		}
+	//	}
+	//	else if constexpr (sizeof(tchar_return) == sizeof(char32_t)) {
+	//		for (auto const c : sv) {
+	//			co_yield c;
+	//		}
+	//	}
+	//	co_return;
+	//}
 
 
 	//template < typename > requires(false)

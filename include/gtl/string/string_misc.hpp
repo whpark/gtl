@@ -493,6 +493,8 @@ namespace gtl {
 			}
 
 			pos = pHexEnd-1;
+			
+			return true;
 		}
 	}
 
