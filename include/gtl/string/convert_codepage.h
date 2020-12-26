@@ -15,7 +15,7 @@
 #include <experimental/generator>
 
 #include "string_primitives.h"
-#include "utf_string_view.h"
+#include "utf_char_view.h"
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -428,8 +428,8 @@ namespace gtl {
 	////
 	//template < gtlc::string_elem_utf tchar_return, gtlc::string_elem_utf tchar >
 	//requires ( (sizeof(tchar) != sizeof(tchar_return)) && (sizeof(tchar) != sizeof(char32_t)) )
-	//std::experimental::generator<tchar_return> StringSequence(utf_string_view<tchar> sv) {
-	//	using usv = utf_string_view<tchar>;
+	//std::experimental::generator<tchar_return> StringSequence(utf_char_view<tchar> sv) {
+	//	using usv = utf_char_view<tchar>;
 	//	if constexpr (sizeof(tchar_return) == sizeof(char8_t)) {
 	//		for (auto const c : sv) {
 	//			if (c <= 0x7f) {

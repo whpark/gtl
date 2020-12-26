@@ -1,13 +1,18 @@
 ﻿#include "benchmark/benchmark.h"
 
 #include "gtl/gtl.h"
-
+#include "gtl/string/utf_char_view.h"
 
 using namespace std::literals;
 using namespace gtl::literals;
 
-#define TEST_STRING "asdfasdf가나다라마adrg바sfdgdh사아자차카타dd파하긎긣꿳fghs뎓뫓멙뻍😊❤✔"
-//#define TEST_STRING "asdfasdfaskdfjaklsjgflak;sdfjaskl;dfjnvakls;dfnvja;slfvnlikasjf"
+
+
+constexpr std::array<std::u8string_view, 3> TEST_STRING = { {
+		u8"가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하"sv,
+		u8"asdfasdf가나다라마adrg바sfdgdh사아자차카타dd파하긎긣꿳fghs뎓뫓멙뻍😊❤✔"sv,
+		u8"asdfasdfaskdfjaklsjgflak;sdfjaskl;dfjnvakls;dfnvja;slfvnlikasjf"sv
+	} };
 
 namespace gtl {
 	template < typename tchar >
@@ -37,15 +42,18 @@ namespace gtl {
 	}
 };
 
+namespace uc = gtl::utf_const;
+
+
 static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) {
 
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
 
+	std::u8string_view svFrom { TEST_STRING[state.range(0)] };
 	for (auto _ : state) {
 		std::u32string str;
-		std::u8string_view svFrom { _u8(TEST_STRING) };
 
 		//if (svFrom.empty())
 		//	return str;
@@ -56,71 +64,17 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 		}
 
 		size_t nOutputLen = 0;
-		auto const* pszEnd = svFrom.data() + svFrom.size();
-		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
-			auto const c = psz[0];
-
-			if (c <= 0x7f)
-				;
-			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
-				if ( (psz+1 >= pszEnd)
-					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-			}
-			else if ((c & 0b1111'0000) == 0b1110'0000) {	// ~0x7ff
-				if ((psz+2 >= pszEnd)
-					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
-					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-			}
-			else if ((c & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
-				if ((psz+3 >= pszEnd)
-					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
-					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
-					|| ((*++psz & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-			}
-			else {
-				throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-			}
-
-			nOutputLen++;
+		auto const* const end = svFrom.data() + svFrom.size();
+		for (auto const* pos = svFrom.data(); pos < end; ) {
+			gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
 		}
 
 		if (nOutputLen <= 0)
 			continue;
-
 		str.reserve(nOutputLen);
-		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
-			constexpr uint8_t mask_3bits { 0b0000'0111 };
-			constexpr uint8_t mask_4bits { 0b0000'1111 };
-			constexpr uint8_t mask_6bits { 0b0011'1111 };
 
-			auto const c { *psz };
-
-			char32_t v{};
-			if (c <= 0x7f)
-				v = c;
-			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
-				v = ((char32_t)*psz & mask_6bits) << 6;
-				v |= (char32_t)*++psz & mask_6bits;
-			}
-			else if ((c & 0b1111'0000) == 0b1110'0000) {	// ~0x7ff
-				v = ((char32_t)*psz & mask_4bits) << 12;
-				v |= ((char32_t)*++psz & mask_6bits) << 6;
-				v |= (*++psz & mask_6bits);
-			}
-			else if ((c & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
-				v = ((char32_t)*psz & mask_3bits) << 18;
-				v |= ((char32_t)*++psz & mask_6bits) << 12;
-				v |= ((char32_t)*++psz & mask_6bits) << 6;
-				v |= (*++psz & mask_6bits);
-			}
-
-			str.push_back(v);
+		for (auto const* pos = svFrom.data(); pos < end; ) {
+			gtl::internal::UTFCharConverter<char32_t, char8_t, true, false>(pos, end, str);
 		}
 
 		// check endian, Convert
@@ -132,7 +86,6 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 #pragma warning(pop)
 
 }
-BENCHMARK(StringCodepageConv_U8toU32_CountAndConvert);
 
 
 static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state) {
@@ -140,9 +93,9 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
+	std::u8string_view svFrom { TEST_STRING[state.range(0)] };
 	for (auto _ : state) {
 		std::u32string str;
-		std::u8string_view svFrom { _u8(TEST_STRING) };
 
 		//if (svFrom.empty())
 		//	return str;
@@ -153,53 +106,17 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 		}
 
 		size_t nOutputLen = svFrom.size();
-		auto const* pszEnd = svFrom.data() + svFrom.size();
+		auto const* const end = svFrom.data() + svFrom.size();
+		//for (auto const* pos = svFrom.data(); pos < end; ) {
+		//	gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
+		//}
+
 		if (nOutputLen <= 0)
 			continue;
-
 		str.reserve(nOutputLen);
-		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
-			constexpr uint8_t mask_3bits { 0b0000'0111 };
-			constexpr uint8_t mask_4bits { 0b0000'1111 };
-			constexpr uint8_t mask_6bits { 0b0011'1111 };
 
-			auto const c { *psz };
-
-			char32_t v{};
-			if (c <= 0x7f)
-				v = c;
-			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
-				if ( (psz+1 >= pszEnd)
-					|| ((psz[1] & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-				v = ((char32_t)*psz & mask_6bits) << 6;
-				v |= (char32_t)*++psz & mask_6bits;
-			}
-			else if ((c & 0b1111'0000) == 0b1110'0000) {	// ~0x7ff
-				if ((psz+2 >= pszEnd)
-					|| ((psz[1] & 0b1100'0000) != 0b1000'0000)
-					|| ((psz[2] & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-				v = ((char32_t)*psz & mask_4bits) << 12;
-				v |= ((char32_t)*++psz & mask_6bits) << 6;
-				v |= (*++psz & mask_6bits);
-			}
-			else if ((c & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
-				if ((psz+3 >= pszEnd)
-					|| ((psz[1] & 0b1100'0000) != 0b1000'0000)
-					|| ((psz[2] & 0b1100'0000) != 0b1000'0000)
-					|| ((psz[3] & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-				v = ((char32_t)*psz & mask_3bits) << 18;
-				v |= ((char32_t)*++psz & mask_6bits) << 12;
-				v |= ((char32_t)*++psz & mask_6bits) << 6;
-				v |= (*++psz & mask_6bits);
-			}
-
-			str.push_back(v);
+		for (auto const* pos = svFrom.data(); pos < end; ) {
+			gtl::internal::UTFCharConverter<char32_t, char8_t, true, true>(pos, end, str);
 		}
 		str.shrink_to_fit();
 
@@ -211,16 +128,15 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 #pragma warning(pop)
 
 }
-BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvert);
 
 static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::State& state) {
 
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
+	std::u8string_view svFrom { TEST_STRING[state.range(0)] };
 	for (auto _ : state) {
 		std::u32string str;
-		std::u8string_view svFrom { _u8(TEST_STRING) };
 
 		//if (svFrom.empty())
 		//	return str;
@@ -231,53 +147,17 @@ static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::Stat
 		}
 
 		size_t nOutputLen = svFrom.size();
-		auto const* pszEnd = svFrom.data() + svFrom.size();
+		auto const* const end = svFrom.data() + svFrom.size();
+		//for (auto const* pos = svFrom.data(); pos < end; ) {
+		//	gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
+		//}
+
 		if (nOutputLen <= 0)
 			continue;
-
 		str.reserve(nOutputLen);
-		for (auto const* psz = svFrom.data(); psz < pszEnd; psz++) {
-			constexpr uint8_t mask_3bits { 0b0000'0111 };
-			constexpr uint8_t mask_4bits { 0b0000'1111 };
-			constexpr uint8_t mask_6bits { 0b0011'1111 };
 
-			auto const c { *psz };
-
-			char32_t v{};
-			if (c <= 0x7f)
-				v = c;
-			else if ((c & 0b1110'0000) == 0b1100'0000) {	// 0~0x7f
-				if ( (psz+1 >= pszEnd)
-					|| ((psz[1] & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-				v = ((char32_t)*psz & mask_6bits) << 6;
-				v |= (char32_t)*++psz & mask_6bits;
-			}
-			else if ((c & 0b1111'0000) == 0b1110'0000) {	// ~0x7ff
-				if ((psz+2 >= pszEnd)
-					|| ((psz[1] & 0b1100'0000) != 0b1000'0000)
-					|| ((psz[2] & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-				v = ((char32_t)*psz & mask_4bits) << 12;
-				v |= ((char32_t)*++psz & mask_6bits) << 6;
-				v |= (*++psz & mask_6bits);
-			}
-			else if ((c & 0b1111'1000) == 0b1111'0000) {	// ~0xffff
-				if ((psz+3 >= pszEnd)
-					|| ((psz[1] & 0b1100'0000) != 0b1000'0000)
-					|| ((psz[2] & 0b1100'0000) != 0b1000'0000)
-					|| ((psz[3] & 0b1100'0000) != 0b1000'0000)
-					)
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
-				v = ((char32_t)*psz & mask_3bits) << 18;
-				v |= ((char32_t)*++psz & mask_6bits) << 12;
-				v |= ((char32_t)*++psz & mask_6bits) << 6;
-				v |= (*++psz & mask_6bits);
-			}
-
-			str.push_back(v);
+		for (auto const* pos = svFrom.data(); pos < end; ) {
+			gtl::internal::UTFCharConverter<char32_t, char8_t, true, true>(pos, end, str);
 		}
 
 		// check endian, Convert
@@ -289,4 +169,42 @@ static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::Stat
 
 }
 
-BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvertNoShrink);
+
+static void StringCodepageConv_U8toU32_coroutine(benchmark::State& state) {
+
+#pragma warning(push)
+#pragma warning(disable: 4566)
+
+	std::u8string_view svFrom { TEST_STRING[state.range(0)] };
+	for (auto _ : state) {
+		std::u32string str;
+
+		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
+			[[unlikely]]
+			throw std::invalid_argument{ GTL__FUNCSIG "string is too long." };
+		}
+
+		str.reserve(svFrom.size());
+		for (auto c : gtl::SeqUTF<char32_t, char8_t>(svFrom)) {
+			str.push_back(c);
+		}
+
+		// check endian, Convert
+		gtl::CheckAndConvertEndian(str, gtl::eCODEPAGE::DEFAULT);
+
+	}
+
+#pragma warning(pop)
+
+}
+
+BENCHMARK(StringCodepageConv_U8toU32_CountAndConvert)->Arg(0)->Arg(1)->Arg(2);
+BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvert)->Arg(0)->Arg(1)->Arg(2);
+BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvertNoShrink)->Arg(0)->Arg(1)->Arg(2);
+//BENCHMARK(StringCodepageConv_U8toU32_coroutine)->Arg(0)->Arg(1)->Arg(2);
+
+
+
+
+//=====================================================================================================
+

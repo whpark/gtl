@@ -177,7 +177,7 @@
     <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h" />
     <ClInclude Include="..\..\include\gtl\string\old_format.h" />
     <ClInclude Include="..\..\include\gtl\string\string_primitives.hpp" />
-    <ClInclude Include="..\..\include\gtl\string\utf_string_view.h" />
+    <ClInclude Include="..\..\include\gtl\string\utf_char_view.h" />
     <ClInclude Include="..\..\include\gtl\_default.h" />
     <ClInclude Include="..\..\include\gtl\string.h" />
     <ClInclude Include="..\..\include\gtl\__lib.h" />

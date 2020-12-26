@@ -57,9 +57,6 @@
     <ClInclude Include="..\..\include\gtl\config_gtl.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\string\utf_string_view.h">
-      <Filter>gtl\string</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\string\string_primitives.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
@@ -82,6 +79,9 @@
       <Filter>gtl\string</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\string\convert_utf.h">
+      <Filter>gtl\string</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\string\utf_char_view.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
   </ItemGroup>
