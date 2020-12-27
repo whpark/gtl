@@ -237,7 +237,7 @@ namespace gtl {
 		//}
 
 
-		/// @brief Write Ints Swaps byte-order if (bSWAP_BYTE_ORDER)
+		/// @brief Write Ints Swaps byte-order
 		/// @param container 
 		/// @param nCount 
 		template < std::integral T_INT, int PROCESSING_BUFFER_SIZE = 4096 > requires (bSTORE)
@@ -261,7 +261,7 @@ namespace gtl {
 		}
 
 
-		/// @brief Read Ints. Swaps byte-order if (bSWAP_BYTE_ORDER)
+		/// @brief Read Ints. Swaps byte-order
 		/// @param container ints.
 		/// @param nCount count. (NOT size in bytes but count in item)
 		/// @return 
@@ -485,7 +485,57 @@ namespace gtl {
 		inline std::optional<std::u32string>	ReadLineU32(char32_t cDelimiter = U'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char32_t>(cDelimiter, bTrimCR); }
 		inline std::optional<std::wstring>		ReadLineW(wchar_t cDelimiter = L'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<wchar_t>(cDelimiter, bTrimCR); }
 
+	public:
 		// todo : 2020.12.15.
+		template < eCODEPAGE eCodepage, typename tchar > requires (bSTORE)
+		void WriteLine(std::basic_string_view<tchar> sv, tchar cDelimiter = '\n', bool bAddCR = true) {
+			CHECK_ARCHIVE_STORABLE;
+
+			using tchar_codepage = typename char_type_from<eCodepage>::char_type;
+			static tchar cr {'\r'};
+			if constexpr (std::is_same_v<std::remove_cvref_t<tchar>, tchar_codepage>
+				or (std::is_same_v<std::remove_cvref_t<tchar>, wchar_t> and (sizeof(tchar) == sizeof(tchar_codepage)))
+				)
+			{
+				constexpr bool bSwapStreamByteOrder = (sizeof(tchar) >= 2) and (eCodepage == eCODEPAGE_OTHER_ENDIAN<tchar>);
+				constexpr bool bSwapByteOrder = bSwapStreamByteOrder xor bSWAP_BYTE_ORDER;
+				if constexpr (bSwapByteOrder) {
+					WriteIntsSwapByte<tchar_codepage>(sv.data(), sv.size());
+					if (cDelimiter != 0) [[likely]] {
+						if (bAddCR) [[likely]] {
+							WriteIntsSwapByte<tchar_codepage>(&cr, 1);
+						}
+						WriteIntsSwapByte<tchar_codepage>(&cDelimiter, 1);
+					}
+				}
+				else {
+					Write(sv.data(), sv.size()*sizeof(tchar));
+					if (cDelimiter) [[likely]] {
+						if (bAddCR) [[likely]] {
+							Write(&cr, sizeof(cr));
+						}
+						Write(&cDelimiter, sizeof(cDelimiter));
+					}
+				}
+			}
+			else {
+				S_CODEPAGE_OPTION codepage{
+					.from = std::is_same_v<tchar, char> ? eMBCS_Codepage_g : eCODEPAGE::DEFAULT,
+					.to = eCodepage
+				};
+				auto str = ToString<tchar_codepage, tchar, false>(sv, codepage);
+				WriteInts<tchar_codepage>(str.data(), str.size());
+				if (cDelimiter != 0) [[likely]] {
+					if (bAddCR) [[likely]] {
+						WriteInts<tchar_codepage>(&cr, 1);
+					}
+					WriteInts<tchar_codepage>(&cDelimiter, 1);
+				}
+			}
+
+		}
+
+	public:
 
 		///// @brief Read / Write String
 		//template < typename tchar, bool bWriteNewLine = false > requires (bSTORE)

@@ -79,8 +79,45 @@ namespace gtl::concepts {
 
 	/// @brief type for utf (unicode transformation format) string.
 	template < typename tchar >
-	concept string_elem_utf = is_one_of<std::remove_cvref_t<tchar>, char8_t, char16_t, char32_t>;
+	concept string_elem_utf = is_one_of<std::remove_cvref_t<tchar>, char8_t, char16_t, char32_t, wchar_t>;
 
+
+
+	/// @brief wchar_t to charXX_t
+	template < string_elem tchar >
+	struct wide_as_utf {
+		using type = tchar;
+	};
+	template <>
+	struct wide_as_utf<wchar_t> {
+		using type = std::conditional_t<
+				sizeof(wchar_t) == sizeof(char16_t),
+					char16_t,
+					std::conditional_t<sizeof(wchar_t) == sizeof(char32_t), char32_t, char>
+				>;
+	};
+	template < string_elem tchar >
+	using wide_as_utf_t = typename wide_as_utf<tchar>::type;
+
+	/// @brief charXX_t to wchar_t
+	template < string_elem tchar >
+	struct utf_as_wide {
+		using type = tchar;
+	};
+	template <>
+	struct utf_as_wide< wide_as_utf_t<wchar_t> > {
+		using type = wchar_t;
+	};
+	template < string_elem tchar >
+	using utf_as_wide_t = typename utf_as_wide<tchar>::type;
+
+
+	/// @brief check if the type is same. (ex, char16_t == wchar_t for windows)
+	template < typename tchar1, typename tchar2 >
+	concept is_same_utf = (
+		std::is_same_v<tchar1, tchar2>
+		or (std::is_same_v<wide_as_utf_t<tchar1>, wide_as_utf_t<tchar2>>)
+		);
 
 	///// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
 	//template < typename tcontainer >

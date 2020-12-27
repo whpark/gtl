@@ -64,8 +64,9 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 		}
 
 		size_t nOutputLen = 0;
-		auto const* const end = svFrom.data() + svFrom.size();
-		for (auto const* pos = svFrom.data(); pos < end; ) {
+		auto const* pos = svFrom.data();
+		auto const* const end = pos + svFrom.size();
+		while (pos < end) {
 			gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
 		}
 
@@ -73,7 +74,8 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 			continue;
 		str.reserve(nOutputLen);
 
-		for (auto const* pos = svFrom.data(); pos < end; ) {
+		pos = svFrom.data();
+		while (pos < end) {
 			gtl::internal::UTFCharConverter<char32_t, char8_t, true, false>(pos, end, str);
 		}
 
@@ -106,7 +108,8 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 		}
 
 		size_t nOutputLen = svFrom.size();
-		auto const* const end = svFrom.data() + svFrom.size();
+		auto const* pos = svFrom.data();
+		auto const* const end = pos + svFrom.size();
 		//for (auto const* pos = svFrom.data(); pos < end; ) {
 		//	gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
 		//}
@@ -115,7 +118,8 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 			continue;
 		str.reserve(nOutputLen);
 
-		for (auto const* pos = svFrom.data(); pos < end; ) {
+		pos = svFrom.data();
+		while (pos < end) {
 			gtl::internal::UTFCharConverter<char32_t, char8_t, true, true>(pos, end, str);
 		}
 		str.shrink_to_fit();
@@ -147,8 +151,9 @@ static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::Stat
 		}
 
 		size_t nOutputLen = svFrom.size();
-		auto const* const end = svFrom.data() + svFrom.size();
-		//for (auto const* pos = svFrom.data(); pos < end; ) {
+		auto const* pos = svFrom.data();
+		auto const* const end = pos + svFrom.size();
+		//for (pos < end; ) {
 		//	gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
 		//}
 
@@ -156,7 +161,8 @@ static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::Stat
 			continue;
 		str.reserve(nOutputLen);
 
-		for (auto const* pos = svFrom.data(); pos < end; ) {
+		pos = svFrom.data();
+		while (pos < end) {
 			gtl::internal::UTFCharConverter<char32_t, char8_t, true, true>(pos, end, str);
 		}
 
@@ -201,7 +207,7 @@ static void StringCodepageConv_U8toU32_coroutine(benchmark::State& state) {
 BENCHMARK(StringCodepageConv_U8toU32_CountAndConvert)->Arg(0)->Arg(1)->Arg(2);
 BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvert)->Arg(0)->Arg(1)->Arg(2);
 BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvertNoShrink)->Arg(0)->Arg(1)->Arg(2);
-//BENCHMARK(StringCodepageConv_U8toU32_coroutine)->Arg(0)->Arg(1)->Arg(2);
+BENCHMARK(StringCodepageConv_U8toU32_coroutine)->Arg(0)->Arg(1)->Arg(2);
 
 
 

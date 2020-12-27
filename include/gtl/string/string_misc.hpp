@@ -477,7 +477,7 @@ namespace gtl {
 				if (v <= 0xffff) {
 					str += (char16_t)v;
 				} else {
-					str += gtl::ToString<char32_t, tchar>(std::basic_string_view<char32_t>{&v, &v+1});
+					str += gtl::ToString<tchar>(std::basic_string_view<char32_t>{&v, &v+1});
 				}
 			}
 			else if constexpr (gtlc::is_one_of<tchar, char32_t>) {

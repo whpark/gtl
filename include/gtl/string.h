@@ -66,7 +66,7 @@ namespace gtl {
 		/// @brief Constructor from other codepage (string)
 		/// @param strOther : string
 		template < gtlc::string_elem tchar_other >
-		explicit TString(TString<tchar_other> const& strOther) : base_t(gtl::ToString<tchar_other, tchar>(strOther)) {
+		explicit TString(TString<tchar_other> const& strOther) : base_t(gtl::ToString<tchar, tchar_other>(strOther)) {
 		}
 
 
@@ -82,7 +82,7 @@ namespace gtl {
 		/// @param 
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_same_v< tchar, tchar_other >)
-		explicit TString(tstring_buf const& b) : base_t(gtl::ToString<tchar_other, tchar>(b)) {
+		explicit TString(tstring_buf const& b) : base_t(gtl::ToString<tchar, tchar_other>(b)) {
 		}
 
 
@@ -94,6 +94,26 @@ namespace gtl {
 		operator std::basic_string_view<tchar>() const {
 			return { this->data(), this->data() + this->size() };
 		}
+
+		//operator std::wstring_view() const requires (gtlc::is_same_utf<tchar, wchar_t>) {
+		//	return { (wchar_t const*)this->data(), (wchar_t const*)this->data() + this->size() };
+		//}
+		//operator std::u16string_view() const requires (gtlc::is_same_utf<tchar, char16_t>) {
+		//	return { (char16_t const*)this->data(), (char16_t const*)this->data() + this->size() };
+		//}
+		//operator std::u32string_view() const requires (gtlc::is_same_utf<tchar, char32_t>) {
+		//	return { (char32_t const*)this->data(), (char32_t const*)this->data() + this->size() };
+		//}
+
+		//operator std::wstring& () requires (gtlc::is_same_utf<tchar, wchar_t>) {
+		//	return reinterpret_cast<std::wstring&>(*this);
+		//}
+		//operator std::u16string& () requires (gtlc::is_same_utf<tchar, char16_t>) {
+		//	return reinterpret_cast<std::u16string&>(*this);
+		//}
+		//operator std::u32string& () requires (gtlc::is_same_utf<tchar, char32_t>) {
+		//	return reinterpret_cast<std::u32string&>(*this);
+		//}
 
 		// operator []
 		using base_t::operator[];
@@ -110,25 +130,25 @@ namespace gtl {
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
 		TString& operator = (std::basic_string<tchar_other> const& str) {
-			*this = gtl::ToString<tchar_other, tchar>(str);
+			*this = gtl::ToString<tchar, tchar_other>(str);
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
 		GTL_DEPR_SEC TString& operator = (tchar_other const* const& psz) {
-			*this = gtl::ToString<tchar_other, tchar>(psz);
+			*this = gtl::ToString<tchar, tchar_other>(psz);
 			return *this;
 		}
 		template < gtlc::string_elem tchar_other >
 		TString& operator = (std::basic_string_view<tchar_other> sv) {
-			*this = gtl::ToString<tchar_other, tchar>(sv);
+			*this = gtl::ToString<tchar, tchar_other>(sv);
 			return *this;
 		}
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_same_v< tchar, tchar_other> )
 		TString& operator = (tstring_buf const& buf) {
 			std::basic_string_view sv{std::data(buf), tszlen(buf)};
-			*this = gtl::ToString<tchar_other, tchar>(sv);
+			*this = gtl::ToString<tchar, tchar_other>(sv);
 			return *this;
 		}
 
@@ -137,11 +157,11 @@ namespace gtl {
 		/// @brief Convert Codepage
 		template < typename tchar_other >
 		std::basic_string<tchar_other> to_string(S_CODEPAGE_OPTION codepage = {}) const {
-			return gtl::ToString<tchar, tchar_other>(*this, codepage);
+			return gtl::ToString<tchar_other, tchar>(*this, codepage);
 		}
-		template < typename tchar_other >
+		template < typename tchar_other, bool bCOUNT_FIRST = true >
 		TString<tchar_other> ToString(S_CODEPAGE_OPTION codepage = {}) const {
-			return (TString<tchar_other>&)gtl::ToString<tchar, tchar_other>(*this, codepage);
+			return (TString<tchar_other>&)gtl::ToString<tchar_other, tchar>(*this, codepage);
 		}
 
 		//---------------------------------------------------------------------
@@ -152,7 +172,7 @@ namespace gtl {
 				return ((std::basic_string<tchar>&)*this) += b;
 			}
 			else {
-				return ((std::basic_string<tchar>&)*this) += gtl::ToString<tchar_other, tchar>(/*std::basic_string_view<tchar_other>(*/b);
+				return ((std::basic_string<tchar>&)*this) += gtl::ToString<tchar, tchar_other>(/*std::basic_string_view<tchar_other>(*/b);
 			}
 		}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
@@ -171,12 +191,12 @@ namespace gtl {
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_same_v<tchar, tchar_other>)
 		friend inline [[nodiscard]] TString operator + (TString const& a, tstring_buf const& b) {
-			return (std::basic_string<tchar> const&)a + gtl::ToString<tchar_other, tchar>(b);
+			return (std::basic_string<tchar> const&)a + gtl::ToString<tchar, tchar_other>(b);
 		}
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_same_v<tchar, tchar_other>)
 		friend inline [[nodiscard]] TString&& operator + (TString&& a, tstring_buf const& b) {
-			a += gtl::ToString<tchar_other, tchar>(b);
+			a += gtl::ToString<tchar, tchar_other>(b);
 			return std::move(a);
 		}
 
@@ -195,7 +215,7 @@ namespace gtl {
 		//	if constexpr (std::is_same_v<tchar, tchar_other>) {
 		//		a += b;
 		//	} else {
-		//		a += gtl::ToString<tchar_other, tchar>(b);
+		//		a += gtl::ToString<tchar, tchar_other>(b);
 		//	}
 		//	return std::move(a);
 		//}
@@ -204,7 +224,7 @@ namespace gtl {
 		//	if constexpr (std::is_same_v<tchar, tchar_other>) {
 		//		a += b;
 		//	} else {
-		//		a += gtl::ToString<tchar_other, tchar>(b);
+		//		a += gtl::ToString<tchar, tchar_other>(b);
 		//	}
 		//	return std::move(a);
 		//}
@@ -236,7 +256,7 @@ namespace gtl {
 				return str;
 			}
 			else {
-				return Add<tchar1, tchar1, tcontainer>(a, gtl::ToString<tchar2, tchar1>(b));
+				return Add<tchar1, tchar1, tcontainer>(a, gtl::ToString<tchar1, tchar2>(b));
 			}
 		}
 
