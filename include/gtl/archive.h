@@ -364,11 +364,11 @@ namespace gtl {
 			};
 
 			constexpr static std::array<std::pair<std::string_view, eCODEPAGE>, 5> const codepages{{
-				{GetCodepageBOM(eCODEPAGE::UTF32BE), eCODEPAGE::UTF32BE},	// in BOM Length order ...
-				{GetCodepageBOM(eCODEPAGE::UTF32LE), eCODEPAGE::UTF32LE},
-				{GetCodepageBOM(eCODEPAGE::UTF16BE), eCODEPAGE::UTF16BE},
-				{GetCodepageBOM(eCODEPAGE::UTF16LE), eCODEPAGE::UTF16LE},
 				{GetCodepageBOM(eCODEPAGE::UTF8), eCODEPAGE::UTF8},
+				{GetCodepageBOM(eCODEPAGE::UTF32LE), eCODEPAGE::UTF32LE},	// UTF32LE must precede UTF16LE
+				{GetCodepageBOM(eCODEPAGE::UTF16LE), eCODEPAGE::UTF16LE},
+				{GetCodepageBOM(eCODEPAGE::UTF16BE), eCODEPAGE::UTF16BE},
+				{GetCodepageBOM(eCODEPAGE::UTF32BE), eCODEPAGE::UTF32BE},
 			}};
 
 			for (auto const& [sv, codepage] : codepages) {
@@ -486,7 +486,6 @@ namespace gtl {
 		inline std::optional<std::wstring>		ReadLineW(wchar_t cDelimiter = L'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<wchar_t>(cDelimiter, bTrimCR); }
 
 	public:
-		// todo : 2020.12.15.
 		template < eCODEPAGE eCodepage, typename tchar > requires (bSTORE)
 		void WriteLine(std::basic_string_view<tchar> sv, tchar cDelimiter = '\n', bool bAddCR = true) {
 			CHECK_ARCHIVE_STORABLE;

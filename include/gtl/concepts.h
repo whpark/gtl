@@ -85,11 +85,11 @@ namespace gtl::concepts {
 
 	/// @brief wchar_t to charXX_t
 	template < string_elem tchar >
-	struct wide_as_utf {
+	struct as_utf {
 		using type = tchar;
 	};
 	template <>
-	struct wide_as_utf<wchar_t> {
+	struct as_utf<wchar_t> {
 		using type = std::conditional_t<
 				sizeof(wchar_t) == sizeof(char16_t),
 					char16_t,
@@ -97,26 +97,26 @@ namespace gtl::concepts {
 				>;
 	};
 	template < string_elem tchar >
-	using wide_as_utf_t = typename wide_as_utf<tchar>::type;
+	using as_utf_t = typename as_utf<tchar>::type;
 
 	/// @brief charXX_t to wchar_t
 	template < string_elem tchar >
-	struct utf_as_wide {
+	struct as_wide {
 		using type = tchar;
 	};
 	template <>
-	struct utf_as_wide< wide_as_utf_t<wchar_t> > {
+	struct as_wide< as_utf_t<wchar_t> > {
 		using type = wchar_t;
 	};
 	template < string_elem tchar >
-	using utf_as_wide_t = typename utf_as_wide<tchar>::type;
+	using as_wide_t = typename as_wide<tchar>::type;
 
 
 	/// @brief check if the type is same. (ex, char16_t == wchar_t for windows)
 	template < typename tchar1, typename tchar2 >
 	concept is_same_utf = (
 		std::is_same_v<tchar1, tchar2>
-		or (std::is_same_v<wide_as_utf_t<tchar1>, wide_as_utf_t<tchar2>>)
+		or (std::is_same_v<as_utf_t<tchar1>, as_utf_t<tchar2>>)
 		);
 
 	///// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...

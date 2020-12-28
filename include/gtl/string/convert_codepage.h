@@ -4,6 +4,7 @@
 //
 // PWH
 // 2020.11.13.
+// 2020.12.28. 
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -149,8 +150,8 @@ namespace gtl {
 		switch (eCodepage) {
 		case eCODEPAGE::DEFAULT : return {};
 		case eCODEPAGE::UTF8 : return "\xEF\xBB\xBF"sv;
-		case eCODEPAGE::UCS2LE : return "\xFF\xFE"sv;
-		case eCODEPAGE::UCS2BE : return "\xFE\xFF"sv;
+		case eCODEPAGE::UTF16LE : return "\xFF\xFE"sv;
+		case eCODEPAGE::UTF16BE : return "\xFE\xFF"sv;
 		case eCODEPAGE::UTF32LE : return "\xFF\xFE\x00\x00"sv;
 		case eCODEPAGE::UTF32BE : return "\x00\x00\xFE\xFF"sv;
 		}
@@ -254,29 +255,31 @@ namespace gtl {
 		/// @tparam tchar 
 		/// @param str : basic_string or basic_string_view. (or whatever )
 		/// @return same container with char??_t
-		template < typename tchar = wchar_t, template <typename tchar, typename ... tstr_args> typename tstr, typename ... tstr_args >
-		tstr< gtlc::utf_as_wide_t<tchar>, tstr_args ... >& WideAsCharXX(tstr<tchar, tstr_args...>& str) {
-			return (tstr< gtlc::utf_as_wide_t<tchar>, tstr_args ... >&) str;
-			//// todo : check copy or ...?
-			//if constexpr (sizeof(tchar) == sizeof(char8_t)) {
-			//	return (tstr<char8_t>)(tstr<char8_t>&)str;
-			//}
-			//else if constexpr (sizeof(tchar) == sizeof(char16_t)) {
-			//	return (tstr<char16_t>)(tstr<char16_t>&)str;
-			//}
-			//else if constexpr (sizeof(tchar) == sizeof(char32_t)) {
-			//	return (tstr<char32_t>)(tstr<char32_t>&)str;
-			//}
+		template < typename tchar >
+		std::basic_string<gtlc::as_utf_t<tchar>>& ReinterpretAsUTF(std::basic_string<tchar>& str) {
+			return reinterpret_cast<std::basic_string<gtlc::as_utf_t<tchar>>&>(str);
+		}
+		template < typename tchar >
+		std::basic_string<gtlc::as_utf_t<tchar>> const& ReinterpretAsUTF(std::basic_string<tchar> const& str) {
+			return reinterpret_cast<std::basic_string<gtlc::as_utf_t<tchar>> const&>(str);
+		}
+		template < typename tchar >
+		std::basic_string_view<gtlc::as_utf_t<tchar>>& ReinterpretAsUTF(std::basic_string_view<tchar>& sv) {
+			return reinterpret_cast<std::basic_string_view<gtlc::as_utf_t<tchar>>&>(sv);
 		}
 
 		/// @brief static type cast (char16_t/char32_t string/string_view) -> char16_t/char32_t string/string_view. (according to its size), NO code conversion.
 		template < gtlc::string_elem tchar>
-		std::basic_string_view<gtlc::utf_as_wide_t<tchar>>& CharXXAsWide(std::basic_string_view<tchar>& sv) {
-			return reinterpret_cast<std::basic_string_view<gtlc::utf_as_wide_t<tchar>>&>(sv);
+		std::basic_string_view<gtlc::as_wide_t<tchar>>& ReinterpretAsWide(std::basic_string_view<tchar>& sv) {
+			return reinterpret_cast<std::basic_string_view<gtlc::as_wide_t<tchar>>&>(sv);
 		}
 		template < gtlc::string_elem tchar>
-		std::basic_string<gtlc::utf_as_wide_t<tchar>>& CharXXAsWide(std::basic_string<tchar>& str) {
-			return reinterpret_cast<std::basic_string<gtlc::utf_as_wide_t<tchar>>&>(str);
+		std::basic_string_view<gtlc::as_wide_t<tchar>> const& ReinterpretAsWide(std::basic_string_view<tchar> const& sv) {
+			return reinterpret_cast<std::basic_string_view<gtlc::as_wide_t<tchar>> const&>(sv);
+		}
+		template < gtlc::string_elem tchar>
+		std::basic_string<gtlc::as_wide_t<tchar>>& ReinterpretAsWide(std::basic_string<tchar>& str) {
+			return reinterpret_cast<std::basic_string<gtlc::as_wide_t<tchar>>&>(str);
 		}
 
 		template < gtlc::string_elem tchar >
@@ -304,7 +307,7 @@ namespace gtl {
 		}
 	}
 	std::string ToStringA(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
-		return ToStringA(internal::WideAsCharXX(svFrom), codepage);
+		return ToStringA(internal::ReinterpretAsUTF(svFrom), codepage);
 	}
 	std::string ToStringA(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		auto str = ToUTFString<wchar_t, char8_t, false>(svFrom, { .from = codepage.from });
@@ -343,7 +346,7 @@ namespace gtl {
 		return ToUTFString<char8_t, wchar_t>(str, { .to = codepage.to });
 	}
 	std::u8string ToStringU8(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
-		return ToStringU8(internal::WideAsCharXX(svFrom), codepage);
+		return ToStringU8(internal::ReinterpretAsUTF(svFrom), codepage);
 	}
 	std::u8string ToStringU8(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		//if (codepage.from == codepage.to) 
@@ -368,7 +371,7 @@ namespace gtl {
 		}
 	}
 	std::u16string ToStringU16(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
-		return ToStringU16(internal::WideAsCharXX(svFrom), codepage);
+		return ToStringU16(internal::ReinterpretAsUTF(svFrom), codepage);
 	}
 	std::u16string ToStringU16(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		return ToUTFString<char16_t, char8_t>(svFrom, codepage);
@@ -394,7 +397,7 @@ namespace gtl {
 		return ToUTFString<char32_t, wchar_t>(str, { .to = codepage.to });
 	}
 	std::u32string ToStringU32(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
-		return ToStringU32(internal::WideAsCharXX(svFrom), codepage);
+		return ToStringU32(internal::ReinterpretAsUTF(svFrom), codepage);
 	}
 	std::u32string ToStringU32(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		return ToUTFString<char32_t, char8_t>(svFrom, codepage);
@@ -413,50 +416,6 @@ namespace gtl {
 		}
 		return str;
 	}
-
-	///// @brief Converts Codepage (Unicode <-> MBCS ...)
-	//template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from >
-	//inline [[nodiscard]] std::basic_string<tchar_to> ToString(std::basic_string_view<tchar_from> sv, S_CODEPAGE_OPTION codepage = {}) {
-	//	std::basic_string<tchar_to> result;
-	//	if constexpr (std::is_same_v<tchar_to, char>) {
-	//		result = ToStringA(sv, codepage);
-	//	} else if constexpr (std::is_same_v<tchar_to, wchar_t>) {
-	//		result = ToStringW(sv, codepage);
-	//	} else if constexpr (std::is_same_v<tchar_to, char8_t>) {
-	//		result = ToStringU8(sv, codepage);
-	//	} else if constexpr (std::is_same_v<tchar_to, char16_t>) {
-	//		result = ToStringU16(sv, codepage);
-	//	} else if constexpr (std::is_same_v<tchar_to, char32_t>) {
-	//		result = ToStringU32(sv, codepage);
-	//	}
-	//	return result;
-	//}
-	//template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from >
-	//inline [[nodiscard]] std::basic_string<tchar_to> ToStringMove(std::basic_string<tchar_from>&& str, S_CODEPAGE_OPTION codepage = {}) {
-	//	if constexpr (std::is_same_v<tchar_to, tchar_from> and !std::is_same_v<tchar_from, char>) {
-	//		return move(str);
-	//	}
-	//	else {
-	//		std::basic_string<tchar_to> result;
-	//		if constexpr (std::is_same_v<tchar_to, char>) {
-	//			result = ToStringA(str, codepage);
-	//		} else if constexpr (std::is_same_v<tchar_to, wchar_t>) {
-	//			result = ToStringW(str, codepage);
-	//		} else if constexpr (std::is_same_v<tchar_to, char8_t>) {
-	//			result = ToStringU8(str, codepage);
-	//		} else if constexpr (std::is_same_v<tchar_to, char16_t>) {
-	//			result = ToStringU16(str, codepage);
-	//		} else if constexpr (std::is_same_v<tchar_to, char32_t>) {
-	//			result = ToStringU32(str, codepage);
-	//		}
-	//		return result;
-	//	}
-	//}
-	///// @brief Converts Codepage (Unicode <-> MBCS ...)
-	//template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from >
-	//inline void ToString(std::basic_string_view<tchar_from> strFrom, std::basic_string<tchar_to>& strTo, S_CODEPAGE_OPTION codepage = {}) {
-	//	strTo = ToString<tchar_to, tchar_from>(strFrom);
-	//}
 
 
 	namespace internal {
@@ -492,7 +451,6 @@ namespace gtl {
 			return true;
 		}
 	}
-
 
 
 	/// @brief Convert Codepage (from -> to) ex, wstring -> u32string, u8string -> string, u16string -> string, string -> u16string...

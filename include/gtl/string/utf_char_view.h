@@ -1,11 +1,12 @@
 
 //////////////////////////////////////////////////////////////////////
 //
-// utf_char_view.h : utf8/16/32 string view. composing 'each' character (returning char32_t or char16_t)
+// utf_char_view.h : UTF 8/16/32 Characters one by one. (from any utf string.)
 //
 // PWH
 // 2020.11.17.
-// 2020.12.25. tchar_return for char8_t, char16_t, and char32_t
+// 2020.12.25. tchar_to for char8_t, char16_t, and char32_t
+// 2020.12.28. 1st refactoring.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -15,23 +16,21 @@
 #ifndef GTL_HEADER__STRING_UTF_STRING_VIEW
 #define GTL_HEADER__STRING_UTF_STRING_VIEW
 
-#include <experimental/generator>
-
 #include "string_primitives.h"
 #include "convert_utf.h"
 
 namespace gtl {
 #pragma pack(push, 8)
 
-	/// @brief char32_t from utf8/16 string. (yet, NOT having std::generator...)
-	template < gtlc::string_elem_utf tchar_return, gtlc::string_elem_utf tchar, bool bCheckError = true >
+	/// @brief UTF 8/16/32 Characters one by one. (from any utf string.)
+	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bCheckError = true >
 	class utf_char_view {
 	protected:
-		std::basic_string_view<tchar> sv_;
+		std::basic_string_view<tchar_from> const sv_;
 	public:
-		utf_char_view(std::basic_string_view<tchar> sv) : sv_{sv} { }
-		utf_char_view(std::basic_string<tchar> const& str) : sv_{str} { }
-		utf_char_view() = default;
+		utf_char_view(std::basic_string_view<tchar_from> sv) : sv_{sv} { }
+		utf_char_view(std::basic_string<tchar_from> const& str) : sv_{str} { }
+		utf_char_view() = delete;
 		utf_char_view(utf_char_view const&) = default;
 		utf_char_view(utf_char_view&&) = default;
 
@@ -40,19 +39,17 @@ namespace gtl {
 	public:
 		class iterator {
 		private:
-			tchar const* position_;
-			tchar const* const end_;
-			//int diff_to_next_{};		// 
-			//tchar_return code_{};
-			std::basic_string<tchar_return> buffer_;
+			tchar_from const* position_;
+			tchar_from const* const end_;
+			std::basic_string<tchar_to> buffer_;
 			size_t buf_index_{};
 		public:
-			iterator(tchar const* position, tchar const* const end) : position_(position), end_(end) {
-				if constexpr (sizeof(tchar) != sizeof(char32_t)) {
+			iterator(tchar_from const* position, tchar_from const* const end) : position_(position), end_(end) {
+				if constexpr (sizeof(tchar_from) != sizeof(char32_t)) {
 					if (position_ >= end_) {
 						buf_index_ = -1;
 					} else {
-						gtl::internal::UTFCharConverter<tchar_return, tchar, true, bCheckError>(position_, end_, buffer_);
+						gtl::internal::UTFCharConverter<tchar_to, tchar_from, true, bCheckError>(position_, end_, buffer_);
 						buf_index_ = 0;
 					}
 				}
@@ -66,7 +63,7 @@ namespace gtl {
 				return (position_ != b.position_) or (buf_index_ != b.buf_index_);
 			}
 			iterator& operator++ () {
-				if constexpr (std::is_same_v<tchar_return, tchar>) {
+				if constexpr (std::is_same_v<tchar_to, tchar_from>) {
 					position_++;
 				}
 				else {
@@ -75,15 +72,15 @@ namespace gtl {
 							buf_index_ = -1;
 						} else {
 							buffer_.clear();
-							gtl::internal::UTFCharConverter<tchar_return, tchar, true, bCheckError>(position_, end_, buffer_);
+							gtl::internal::UTFCharConverter<tchar_to, tchar_from, true, bCheckError>(position_, end_, buffer_);
 							buf_index_ = 0;
 						}
 					}
 				}
 				return *this;
 			}
-			tchar_return const& operator* () const {
-				if constexpr (std::is_same_v<tchar_return, tchar>) {
+			tchar_to const& operator* () const {
+				if constexpr (std::is_same_v<tchar_to, tchar_from>) {
 					return *position_;
 				}
 				else {
@@ -93,18 +90,18 @@ namespace gtl {
 		};
 
 	public:
-		iterator begin() {
+		iterator begin() const {
 			return iterator{ sv_.data(), sv_.data() + sv_.size() };
 		}
-		iterator end() {
+		iterator end() const {
 			return iterator{ sv_.data() + sv_.size(), sv_.data() + sv_.size() };
 		}
 
-		size_t CountOutputLength() {
+		size_t CountOutputLength() const {
 			size_t count{};
 			auto const* const end = sv_.data() + sv_.end();
 			for (auto const* pos = sv_.data(); pos < end; ) {
-				internal::UTFCharConverter<tchar_return, tchar, false, false>(pos, end, count);
+				internal::UTFCharConverter<tchar_to, tchar_from, false, false>(pos, end, count);
 			}
 			return count;
 		}
