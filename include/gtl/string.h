@@ -542,7 +542,7 @@ namespace gtl {
 		/// @brief fmt::format
 		template < typename S, typename ... Args >
 		TString& Format(S const& format_str, Args&& ... args) {
-			*this = std::move(fmt::format(format_str, std::forward<Args>(args)...));
+			*this = std::move(fmt::format<S, Args...>(format_str, std::forward<Args>(args)...));
 			return *this;
 		}
 
@@ -561,134 +561,6 @@ namespace gtl {
 		[[nodiscard]] inline std::vector<std::basic_string_view<tchar>> SplitView(tchar cDelimiter) const {
 			return gtl::internal::TSplit<tchar, std::basic_string_view<tchar>>(*this, [cDelimiter](tchar c) -> bool { return cDelimiter == c; });
 		}
-
-
-
-	public:
-		//static std::optional<TString> TranslateEscapeCharacters(std::basic_string_view<tchar> sv, tchar** ppszEnd = nullptr, tchar cAuxilaryTerminating = 0) {
-		//	size_t nCount = 0;
-		//	const tchar* pos{};
-		//	const tchar* const end = sv.end();//sv.data() + sv.size();
-		//	// first, check and count number of bytes to be translated into
-		//	for (pos = sv.data(); (pos < end) and *pos and (*pos != cAuxilaryTerminating); pos++) {
-		//		if (*pos == (tchar)'\\') {
-		//			if (!*++pos)
-		//				return {};
-
-		//			if (*pos == (tchar)'x') { // Hexa ASCII Code
-		//				if ( (pos+2 < end) and IsXdigit(pos[1]) and IsXdigit(pos[2])) {
-		//					nCount++;
-		//					pos += 2;
-		//				} else {
-		//					return {};
-		//				}
-		//			} else if (*pos == (tchar)'u') { // Hexa ASCII Code
-		//				if ( (pos+4 < end) and IsXdigit(pos[1]) and IsXdigit(pos[2]) and IsXdigit(pos[3]) and IsXdigit(pos[4])) {
-		//					nCount++;
-		//					pos += 4;
-		//				} else {
-		//					return {};
-		//				}
-		//			} else if (IsODigit(pos[0])) {		// Octal ASCII Code
-		//				tchar* pszEnd = NULL;
-		//				tsztoi({pos, end}, &pszEnd, 8);
-		//				if (pszEnd and pos < pszEnd) {
-		//					pos = pszEnd-1;
-		//				} else
-		//					return {};
-		//				nCount++;
-		//			} else {
-		//				nCount++;
-		//			}
-		//		} else {
-		//			nCount++;
-		//		}
-		//	}
-
-		//	if (!pszResult) {
-		//		nSize = nCount;
-		//		return TRUE;
-		//	}
-
-		//	if (nSize < nCount)
-		//		return FALSE;
-
-		//	pszResult[nCount] = 0;
-		//	TCHAR szDigits[8];
-		//	for (pos = szSRC; *pos && (*pos != cAdditionalTerminating); pos++) {
-		//		if (*pos == _T('\\')) {
-		//			pos++;
-
-		//			if (*pos == _T('x')) {				// Hexa ASCII Code
-		//				szDigits[0] = pos[1];
-		//				szDigits[1] = pos[2];
-		//				szDigits[2] = 0;
-		//				if (sizeof(TCHAR) == sizeof(wchar_t))
-		//					*pszResult++ = (BYTE)wcstoul((const wchar_t*)szDigits, NULL, 16);
-		//				else 
-		//					*pszResult++ = (BYTE)strtoul((const char*)szDigits, NULL, 16);
-		//				pos += 2;
-		//			} else if (*pos == _T('u')) {				// Hexa ASCII Code
-		//				szDigits[0] = pos[1];
-		//				szDigits[1] = pos[2];
-		//				szDigits[2] = pos[3];
-		//				szDigits[3] = pos[4];
-		//				szDigits[4] = 0;
-		//				if (sizeof(TCHAR) == sizeof(wchar_t))
-		//					*pszResult++ = (TCHAR)wcstoul((const wchar_t*)szDigits, NULL, 16);
-		//				else 
-		//					*pszResult++ = (TCHAR)strtoul((const char*)szDigits, NULL, 16);
-		//				pos += 4;
-		//			} else if (__isodigit(pos[0])) {		// Octal ASCII Code
-		//				TCHAR szDigits[4];
-		//				szDigits[0] = pos[0];
-		//				szDigits[1] = pos[1];
-		//				szDigits[2] = pos[2];
-		//				szDigits[3] = 0;
-		//				TCHAR* pszEnd = NULL;
-		//				if (sizeof(TCHAR) == sizeof(wchar_t))
-		//					*pszResult++ = (BYTE)wcstoul((const wchar_t*)szDigits, (wchar_t**)&pszEnd, 8);
-		//				else 
-		//					*pszResult++ = (BYTE)strtoul((const char*)szDigits, (char**)&pszEnd, 8);
-		//				if (pszEnd) {
-		//					pos += pszEnd-szDigits;
-		//					pos--;
-		//				} else
-		//					return FALSE;
-
-		//			} else {
-		//				const static struct {
-		//					TCHAR cEscape;
-		//					TCHAR cValue;
-		//				} escapes[] = {
-		//					{ _T('a'), _T('\a') },
-		//					{ _T('b'), _T('\b') },
-		//					{ _T('f'), _T('\f') },
-		//					{ _T('n'), _T('\n') },
-		//					{ _T('r'), _T('\r') },
-		//					{ _T('t'), _T('\t') },
-		//					{ _T('v'), _T('\v') },
-		//				};
-
-		//				TCHAR cValue = *pos;
-		//				for (__uint i = 0; i < countof(escapes); i++) {
-		//					if (escapes[i].cEscape != *pos)
-		//						continue;
-		//					cValue = escapes[i].cValue;
-		//					break;
-		//				}
-		//				*pszResult++ = cValue;
-		//			}
-		//		} else {
-		//			*pszResult++ = *pos;
-		//		}
-		//	}
-
-		//	if (ppszEnd)
-		//		*ppszEnd = (TCHAR*)pos;
-
-		//	return TRUE;
-		//}
 
 
 		/// @brief Manual Buffer Manage
@@ -716,7 +588,7 @@ namespace gtl {
 	using CStringU16 = TString<char16_t>;		// Unicode UTF-16
 	using CStringU32 = TString<char32_t>;		// Unicode UTF-32
 #if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
-	using CStringKSSM = TString<uint16_t>;		// KSSM (codepage 1361)
+	using CKSSMString = TString<uint16_t>;		// KSSM (codepage 1361)
 #endif
 
 

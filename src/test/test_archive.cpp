@@ -17,7 +17,7 @@ auto ReadFile(auto & ar) -> std::vector<gtl::TString<tchar>> {
 	return strs;
 };
 
-TEST(gtl_string, TArchive) {
+TEST(gtl_archive, ReadLine) {
 	using namespace gtl;
 
 	std::vector<std::u8string> const strs {
@@ -41,10 +41,9 @@ TEST(gtl_string, TArchive) {
 		if (!std::regex_match((std::wstring&)strFilename, re))
 			continue;
 
-		std::ifstream stream(dir.path());
-		gtl::TArchive ar(stream);
+		CIFArchive ar(dir.path());
 
-		stream.seekg(0);
+		ar.GetStream().seekg(0);
 		auto codepage = ar.ReadCodepageBOM(gtl::eCODEPAGE::UTF8);
 
 		auto strsA = ReadFile<char>(ar);
@@ -73,8 +72,7 @@ TEST(gtl_string, TArchive) {
 
 
 	{
-		std::ifstream stream(uR"x(.\stream_test\short file.txt)x");
-		TArchive ar(stream);
+		CIFArchive ar(uR"x(.\stream_test\short file.txt)x");
 		ar.ReadCodepageBOM(gtl::eCODEPAGE::DEFAULT__OR_USE_MBCS_CODEPAGE);
 		auto strs = ReadFile<char16_t>(ar);
 
@@ -85,8 +83,7 @@ TEST(gtl_string, TArchive) {
 	}
 
 	{
-		std::ifstream stream(uR"x(.\stream_test\cp949.txt)x");
-		TArchive ar(stream);
+		CIFArchive ar(uR"x(.\stream_test\cp949.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)949);
 		auto strs = ReadFile<wchar_t>(ar);
 
@@ -97,8 +94,7 @@ TEST(gtl_string, TArchive) {
 	}
 
 	{
-		std::ifstream stream(uR"x(.\stream_test\cp949.txt)x");
-		TArchive ar(stream);
+		CIFArchive ar(uR"x(.\stream_test\cp949.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)949);
 		auto strs = ReadFile<char32_t>(ar);
 
@@ -108,7 +104,8 @@ TEST(gtl_string, TArchive) {
 		}
 	}
 
-	if (0) {
+
+	if (not std::filesystem::exists(uR"x(.\stream_test\cp1250.txt)x")) {
 		static std::vector<unsigned char> const na1250 { 0x81, 0x83, 0x88, 0x90, 0x98, 0xA0, 0xAD };
 		static std::vector<unsigned char> const na1251 { 0x98, 0xA0, 0xAD };
 		static std::vector<unsigned char> const na1252 { 0x81, 0x8d, 0x8f, 0x90, 0x9d, 0xA0, 0xAD };
@@ -134,9 +131,28 @@ TEST(gtl_string, TArchive) {
 		}
 	}
 
+	// cp1250 -> char8_t
 	{
-		std::ifstream stream(uR"x(.\stream_test\cp1250.txt)x");
-		TArchive ar(stream);
+		CIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1250);
+		auto strs = ReadFile<char8_t>(ar);
+
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == u8"€‚„…†‡‰Š‹ŚŤŽŹ"sv);
+			EXPECT_TRUE(strs[1] == u8"‘’“”•–—™š›śťžź"sv);
+			EXPECT_TRUE(strs[2] == u8"ˇ˘Ł¤Ą¦§¨©Ş«¬®Ż"sv);
+			EXPECT_TRUE(strs[3] == u8"°±˛ł´µ¶·¸ąş»Ľ˝ľż"sv);
+			EXPECT_TRUE(strs[4] == u8"ŔÁÂĂÄĹĆÇČÉĘËĚÍÎĎ"sv);
+			EXPECT_TRUE(strs[5] == u8"ĐŃŇÓÔŐÖ×ŘŮÚŰÜÝŢß"sv);
+			EXPECT_TRUE(strs[6] == u8"ŕáâăäĺćçčéęëěíîď"sv);
+			EXPECT_TRUE(strs[7] == u8"đńňóôőö÷řůúűüýţ˙"sv);
+		}
+	}
+
+	// cp1250 -> char16_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1250);
 		auto strs = ReadFile<char16_t>(ar);
 
@@ -152,10 +168,64 @@ TEST(gtl_string, TArchive) {
 			EXPECT_TRUE(strs[7] == u"đńňóôőö÷řůúűüýţ˙"sv);
 		}
 	}
-
+	// cp1250 -> char32_t
 	{
-		std::ifstream stream(uR"x(.\stream_test\cp1251.txt)x");
-		TArchive ar(stream);
+		CIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1250);
+		auto strs = ReadFile<char32_t>(ar);
+
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == U"€‚„…†‡‰Š‹ŚŤŽŹ"sv);
+			EXPECT_TRUE(strs[1] == U"‘’“”•–—™š›śťžź"sv);
+			EXPECT_TRUE(strs[2] == U"ˇ˘Ł¤Ą¦§¨©Ş«¬®Ż"sv);
+			EXPECT_TRUE(strs[3] == U"°±˛ł´µ¶·¸ąş»Ľ˝ľż"sv);
+			EXPECT_TRUE(strs[4] == U"ŔÁÂĂÄĹĆÇČÉĘËĚÍÎĎ"sv);
+			EXPECT_TRUE(strs[5] == U"ĐŃŇÓÔŐÖ×ŘŮÚŰÜÝŢß"sv);
+			EXPECT_TRUE(strs[6] == U"ŕáâăäĺćçčéęëěíîď"sv);
+			EXPECT_TRUE(strs[7] == U"đńňóôőö÷řůúűüýţ˙"sv);
+		}
+	}
+	// cp1250 -> wchar_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1250);
+		auto strs = ReadFile<wchar_t>(ar);
+
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == L"€‚„…†‡‰Š‹ŚŤŽŹ"sv);
+			EXPECT_TRUE(strs[1] == L"‘’“”•–—™š›śťžź"sv);
+			EXPECT_TRUE(strs[2] == L"ˇ˘Ł¤Ą¦§¨©Ş«¬®Ż"sv);
+			EXPECT_TRUE(strs[3] == L"°±˛ł´µ¶·¸ąş»Ľ˝ľż"sv);
+			EXPECT_TRUE(strs[4] == L"ŔÁÂĂÄĹĆÇČÉĘËĚÍÎĎ"sv);
+			EXPECT_TRUE(strs[5] == L"ĐŃŇÓÔŐÖ×ŘŮÚŰÜÝŢß"sv);
+			EXPECT_TRUE(strs[6] == L"ŕáâăäĺćçčéęëěíîď"sv);
+			EXPECT_TRUE(strs[7] == L"đńňóôőö÷řůúűüýţ˙"sv);
+		}
+	}
+
+	// cp1251 -> char8_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1251);
+		auto strs = ReadFile<char8_t>(ar);
+
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == u8"ЂЃ‚ѓ„…†‡€‰Љ‹ЊЌЋЏ"sv);
+			EXPECT_TRUE(strs[1] == u8"ђ‘’“”•–—™љ›њќћџ"sv);
+			EXPECT_TRUE(strs[2] == u8"ЎўЈ¤Ґ¦§Ё©Є«¬®Ї"sv);
+			EXPECT_TRUE(strs[3] == u8"°±Ііґµ¶·ё№є»јЅѕї"sv);
+			EXPECT_TRUE(strs[4] == u8"АБВГДЕЖЗИЙКЛМНОП"sv);
+			EXPECT_TRUE(strs[5] == u8"РСТУФХЦЧШЩЪЫЬЭЮЯ"sv);
+			EXPECT_TRUE(strs[6] == u8"абвгдежзийклмноп"sv);
+			EXPECT_TRUE(strs[7] == u8"рстуфхцчшщъыьэюя"sv);
+		}
+	}
+	// cp1251 -> char16_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1251);
 		auto strs = ReadFile<char16_t>(ar);
 
@@ -171,10 +241,64 @@ TEST(gtl_string, TArchive) {
 			EXPECT_TRUE(strs[7] == u"рстуфхцчшщъыьэюя"sv);
 		}
 	}
-
+	// cp1251 -> char32_t
 	{
-		std::ifstream stream(uR"x(.\stream_test\cp1252.txt)x");
-		TArchive ar(stream);
+		CIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1251);
+		auto strs = ReadFile<char32_t>(ar);
+
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == U"ЂЃ‚ѓ„…†‡€‰Љ‹ЊЌЋЏ"sv);
+			EXPECT_TRUE(strs[1] == U"ђ‘’“”•–—™љ›њќћџ"sv);
+			EXPECT_TRUE(strs[2] == U"ЎўЈ¤Ґ¦§Ё©Є«¬®Ї"sv);
+			EXPECT_TRUE(strs[3] == U"°±Ііґµ¶·ё№є»јЅѕї"sv);
+			EXPECT_TRUE(strs[4] == U"АБВГДЕЖЗИЙКЛМНОП"sv);
+			EXPECT_TRUE(strs[5] == U"РСТУФХЦЧШЩЪЫЬЭЮЯ"sv);
+			EXPECT_TRUE(strs[6] == U"абвгдежзийклмноп"sv);
+			EXPECT_TRUE(strs[7] == U"рстуфхцчшщъыьэюя"sv);
+		}
+	}
+	// cp1251 -> wchar_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1251);
+		auto strs = ReadFile<wchar_t>(ar);
+
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == L"ЂЃ‚ѓ„…†‡€‰Љ‹ЊЌЋЏ"sv);
+			EXPECT_TRUE(strs[1] == L"ђ‘’“”•–—™љ›њќћџ"sv);
+			EXPECT_TRUE(strs[2] == L"ЎўЈ¤Ґ¦§Ё©Є«¬®Ї"sv);
+			EXPECT_TRUE(strs[3] == L"°±Ііґµ¶·ё№є»јЅѕї"sv);
+			EXPECT_TRUE(strs[4] == L"АБВГДЕЖЗИЙКЛМНОП"sv);
+			EXPECT_TRUE(strs[5] == L"РСТУФХЦЧШЩЪЫЬЭЮЯ"sv);
+			EXPECT_TRUE(strs[6] == L"абвгдежзийклмноп"sv);
+			EXPECT_TRUE(strs[7] == L"рстуфхцчшщъыьэюя"sv);
+		}
+	}
+
+	// cp1252 -> char8_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1252);
+		auto strs = ReadFile<char8_t>(ar);
+
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == u8"€‚ƒ„…†‡ˆ‰Š‹ŒŽ"sv);
+			EXPECT_TRUE(strs[1] == u8"‘’“”•–—˜™š›œžŸ"sv);
+			EXPECT_TRUE(strs[2] == u8"¡¢£¤¥¦§¨©ª«¬®¯"sv);
+			EXPECT_TRUE(strs[3] == u8"°±²³´µ¶·¸¹º»¼½¾¿"sv);
+			EXPECT_TRUE(strs[4] == u8"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ"sv);
+			EXPECT_TRUE(strs[5] == u8"ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß"sv);
+			EXPECT_TRUE(strs[6] == u8"àáâãäåæçèéêëìíîï"sv);
+			EXPECT_TRUE(strs[7] == u8"ðñòóôõö÷øùúûüýþÿ"sv);
+		}
+	}
+	// cp1252 -> char16_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1252);
 		auto strs = ReadFile<char16_t>(ar);
 
@@ -190,12 +314,63 @@ TEST(gtl_string, TArchive) {
 			EXPECT_TRUE(strs[7] == u"ðñòóôõö÷øùúûüýþÿ"sv);
 		}
 	}
+	// cp1252 -> char32_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1252);
+		auto strs = ReadFile<char32_t>(ar);
 
-	//{
-	//	std::wifstream stream(LR"(Z:\Downloads\z.txt)");
-	//	std::wstring str;
-	//	auto r = std::getline<wchar_t>(stream, str, gtl::GetByteSwap(L'\n'));
-	//	gtl::TArchive arIn(stream);
-	//}
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == U"€‚ƒ„…†‡ˆ‰Š‹ŒŽ"sv);
+			EXPECT_TRUE(strs[1] == U"‘’“”•–—˜™š›œžŸ"sv);
+			EXPECT_TRUE(strs[2] == U"¡¢£¤¥¦§¨©ª«¬®¯"sv);
+			EXPECT_TRUE(strs[3] == U"°±²³´µ¶·¸¹º»¼½¾¿"sv);
+			EXPECT_TRUE(strs[4] == U"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ"sv);
+			EXPECT_TRUE(strs[5] == U"ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß"sv);
+			EXPECT_TRUE(strs[6] == U"àáâãäåæçèéêëìíîï"sv);
+			EXPECT_TRUE(strs[7] == U"ðñòóôõö÷øùúûüýþÿ"sv);
+		}
+	}
+	// cp1252 -> wchar_t
+	{
+		CIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
+		ar.ReadCodepageBOM((eCODEPAGE)1252);
+		auto strs = ReadFile<wchar_t>(ar);
+
+		EXPECT_EQ(strs.size(), 8);
+		if (strs.size() >= 8) {
+			EXPECT_TRUE(strs[0] == L"€‚ƒ„…†‡ˆ‰Š‹ŒŽ"sv);
+			EXPECT_TRUE(strs[1] == L"‘’“”•–—˜™š›œžŸ"sv);
+			EXPECT_TRUE(strs[2] == L"¡¢£¤¥¦§¨©ª«¬®¯"sv);
+			EXPECT_TRUE(strs[3] == L"°±²³´µ¶·¸¹º»¼½¾¿"sv);
+			EXPECT_TRUE(strs[4] == L"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ"sv);
+			EXPECT_TRUE(strs[5] == L"ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß"sv);
+			EXPECT_TRUE(strs[6] == L"àáâãäåæçèéêëìíîï"sv);
+			EXPECT_TRUE(strs[7] == L"ðñòóôõö÷øùúûüýþÿ"sv);
+		}
+	}
+}
+
+TEST(gtl_archive, WriteLine) {
+	using namespace gtl;
+	using namespace std;
+
+	// WriteLine UTF16
+	static vector<variant<u8string, u16string, u32string, wstring, string>> const strs1 { u8"가나다라", u"마바사", U"아자차카", L"타파하", };
+	static vector<variant<u8string, u16string, u32string, wstring, string>> const strs2 { u8"ABCDEF", u"0123456789", U"abcdef", L"0123456789", "ABCDEF012345" };
+	{
+		std::ifstream st;
+		st.close();
+		COFArchive ar(uR"x(.\stream_test\write_line_u16.txt)x");
+		ar.WriteCodepageBOM(eCODEPAGE::UTF16);
+		for (auto const& vstr : strs1) {
+			std::visit([&ar](auto const& str) { ar.WriteLine(str); }, vstr);
+		}
+		for (auto const& vstr : strs2) {
+			std::visit([&ar](auto const& str) { ar.WriteLine(str); }, vstr);
+		}
+	}
+
 
 }

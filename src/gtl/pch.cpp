@@ -2,4 +2,6 @@
 
 #include "pch.h"
 
+#include "boost/json/src.hpp"   // impl
+
 // When you are using pre-compiled headers, this source file is necessary for compilation to succeed.

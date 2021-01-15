@@ -38,8 +38,7 @@ namespace gtl {
 	template < typename tstream,
 		bool bSWAP_BYTE_ORDER = false,
 		bool bSTORE = std::is_base_of_v<std::basic_ostream<typename tstream::char_type>, tstream>,
-		bool bLOAD = std::is_base_of_v<std::basic_istream<typename tstream::char_type>, tstream>//,
-		//size_t PROCESSING_BUFFER_SIZE = 4096
+		bool bLOAD = std::is_base_of_v<std::basic_istream<typename tstream::char_type>, tstream>
 	>
 	class TArchive {
 
@@ -48,7 +47,8 @@ namespace gtl {
 	#define CHECK_ARCHIVE_STORABLE\
 		if constexpr (bSTORE && bLOAD) { if (!IsStoring()) { throw std::ios_base::failure(GTL__FUNCSIG "NOT an archive for storing!"); } }
 
-
+	protected:
+		std::optional<tstream> stream_m;
 	protected:
 		tstream& stream_;
 		eCODEPAGE eCodepage_{ eCODEPAGE::UTF8 };
@@ -68,6 +68,12 @@ namespace gtl {
 			: stream_{ stream }, bStore_{ bStore }
 		{
 		}
+
+		TArchive(std::filesystem::path path, std::ios_base::openmode mode = std::ios_base::binary) : stream_m{tstream{path, std::ios_base::binary|mode}}, stream_(stream_m.value()), bStore_{bSTORE} {}
+		//template < typename tchar >
+		//TArchive(std::basic_string_view<tchar> path, std::ios_base::openmode mode = std::ios_base::binary) : stream_m{path, std::ios_base::binary|mode}, stream_(stream_m.value()) {}
+
+		tstream& GetStream() { return stream_; }
 
 	public:
 		/// @brief Set/Get Codepage.
@@ -112,7 +118,7 @@ namespace gtl {
 		/// @param TYPE trivially_copyable objects. (when bSWAP_BYTE_ORDER is true, only integral or floating point value and their array  can be serialized.)
 		template < gtlc::trivially_copyable TYPE > requires (bSTORE)
 		inline void Write(TYPE const& v) {
-			CHECK_ARCHIVE_STORABLE;
+			//CHECK_ARCHIVE_STORABLE;
 			if constexpr (bSWAP_BYTE_ORDER) {
 				if constexpr (gtlc::is_array<TYPE>) {
 					if constexpr (std::is_integral_v < std::remove_cvref_t<decltype(TYPE{}[0]) >> ) {
@@ -206,7 +212,8 @@ namespace gtl {
 				Write(data, nCount*sizeof(T_INT));
 			}
 		}
-		// .... 사용법 헷갈림. 삭제.
+
+		// .... not a good option. delete.
 		//template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bSTORE)
 		//inline void WriteInts(tcontainer const& container) {
 		//	WriteInts(std::data(container), std::size(container));
@@ -230,7 +237,8 @@ namespace gtl {
 			}
 			return nReadCount;
 		}
-		// .... 사용법 헷갈림. 삭제.
+
+		// .... not a good option. delete.
 		//template < std::integral T_INT, gtlc::contiguous_container<T_INT> tcontainer > requires (bLOAD)
 		//inline std::streamsize ReadInts(tcontainer& container) {
 		//	return ReadInts(std::data(container), std::size(container));
@@ -246,7 +254,7 @@ namespace gtl {
 			if constexpr (sizeof(T_INT) > 1) {
 				while (nCount >= 0) {
 					std::array<T_INT, PROCESSING_BUFFER_SIZE/sizeof(T_INT)> buffer;
-					std::streamsize nToWrite = std::min(nCount, buffer.size());
+					std::streamsize nToWrite = std::min((size_t)nCount, buffer.size());
 					for (std::streamsize i = 0; i < nToWrite; i++) {
 						buffer[i] = GetByteSwap(data[i]);
 					}
@@ -409,15 +417,15 @@ namespace gtl {
 		}
 
 		template < eCODEPAGE eCodepage, typename tchar > requires (bLOAD)
-		inline std::optional<std::basic_string<tchar>> ReadLine(tchar cDelimiter = '\n', bool bTrimCR = true) {
+		inline std::optional<std::basic_string<tchar>> TReadLine(tchar cDelimiter = '\n', bool bTrimCR = true) {
 			using tchar_codepage = typename char_type_from<eCodepage>::char_type;
 			if constexpr (std::is_same_v<std::remove_cvref_t<tchar>, tchar_codepage>
 				or (std::is_same_v<std::remove_cvref_t<tchar>, wchar_t> and (sizeof(tchar) == sizeof(tchar_codepage)))
 				)
 			{
-				bool bSwapStreamByteOrder = (sizeof(tchar) >= 2) and (eCodepage == eCODEPAGE_OTHER_ENDIAN<tchar>);
-				bool bSwapByteOrder = bSwapStreamByteOrder xor bSWAP_BYTE_ORDER;
-				if (bSwapByteOrder) [[unlikely]] {
+				constexpr bool bSwapStreamByteOrder = (sizeof(tchar) >= 2) and (eCodepage == eCODEPAGE_OTHER_ENDIAN<tchar>);
+				constexpr bool bSwapByteOrder = bSwapStreamByteOrder xor bSWAP_BYTE_ORDER;
+				if constexpr (bSwapByteOrder) [[unlikely]] {
 					if (auto r = GetLine<tchar>(GetByteSwap<tchar>(cDelimiter), bTrimCR ? GetByteSwap<tchar>('\r') : tchar{}); r) {
 						for (auto& c : r.value())
 							ByteSwap(c);
@@ -432,7 +440,7 @@ namespace gtl {
 				}
 			}
 			else {
-				if (auto r = ReadLine<eCodepage, tchar_codepage>((tchar_codepage)cDelimiter, bTrimCR); r) {
+				if (auto r = TReadLine<eCodepage, tchar_codepage>((tchar_codepage)cDelimiter, bTrimCR); r) {
 					S_CODEPAGE_OPTION option{
 						.from = std::is_same_v<tchar_codepage, char> ? eCodepage_ : eCODEPAGE::DEFAULT,
 						.to = std::is_same_v<tchar, char> ? eMBCS_Codepage_g : eCODEPAGE::DEFAULT
@@ -453,164 +461,141 @@ namespace gtl {
 
 			switch (eCodepage_) {
 
-			default :
-			case eCODEPAGE::DEFAULT :
-				return ReadLine<eCODEPAGE::DEFAULT, tchar>(cDelimiter, bTrimCR);
-				break;
-
 			case eCODEPAGE::UTF8 :
-				return ReadLine<eCODEPAGE::UTF8, tchar>(cDelimiter, bTrimCR);
+				return TReadLine<eCODEPAGE::UTF8, tchar>(cDelimiter, bTrimCR);
 				break;
 
 			case eCODEPAGE::UTF16LE :
-				return ReadLine<eCODEPAGE::UTF16LE, tchar>(cDelimiter, bTrimCR);
+				return TReadLine<eCODEPAGE::UTF16LE, tchar>(cDelimiter, bTrimCR);
 				break;
 			case eCODEPAGE::UTF16BE :
-				return ReadLine<eCODEPAGE::UTF16BE, tchar>(cDelimiter, bTrimCR);
+				return TReadLine<eCODEPAGE::UTF16BE, tchar>(cDelimiter, bTrimCR);
 				break;
 
 			case eCODEPAGE::UTF32LE :
-				return ReadLine<eCODEPAGE::UTF32LE, tchar>(cDelimiter, bTrimCR);
+				return TReadLine<eCODEPAGE::UTF32LE, tchar>(cDelimiter, bTrimCR);
 				break;
 			case eCODEPAGE::UTF32BE :
-				return ReadLine<eCODEPAGE::UTF32BE, tchar>(cDelimiter, bTrimCR);
+				return TReadLine<eCODEPAGE::UTF32BE, tchar>(cDelimiter, bTrimCR);
+				break;
+
+			case eCODEPAGE::DEFAULT :
+			default :
+				return TReadLine<eCODEPAGE::DEFAULT, tchar>(cDelimiter, bTrimCR);
 				break;
 
 			}
 		};
 
-		inline std::optional<std::string>		ReadLineA(char cDelimiter = '\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char>(cDelimiter, bTrimCR); }
-		inline std::optional<std::u8string>		ReadLineU8(char8_t cDelimiter = u8'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char8_t>(cDelimiter, bTrimCR); }
-		inline std::optional<std::u16string>	ReadLineU16(char16_t cDelimiter = u'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char16_t>(cDelimiter, bTrimCR); }
-		inline std::optional<std::u32string>	ReadLineU32(char32_t cDelimiter = U'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<char32_t>(cDelimiter, bTrimCR); }
-		inline std::optional<std::wstring>		ReadLineW(wchar_t cDelimiter = L'\n', bool bTrimCR = true) requires (bLOAD) { return ReadLine<wchar_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::string>		ReadLineA(char cDelimiter = '\n', bool bTrimCR = true)			requires (bLOAD) { return ReadLine<char>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u8string>		ReadLineU8(char8_t cDelimiter = u8'\n', bool bTrimCR = true)	requires (bLOAD) { return ReadLine<char8_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u16string>	ReadLineU16(char16_t cDelimiter = u'\n', bool bTrimCR = true)	requires (bLOAD) { return ReadLine<char16_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::u32string>	ReadLineU32(char32_t cDelimiter = U'\n', bool bTrimCR = true)	requires (bLOAD) { return ReadLine<char32_t>(cDelimiter, bTrimCR); }
+		inline std::optional<std::wstring>		ReadLineW(wchar_t cDelimiter = L'\n', bool bTrimCR = true)		requires (bLOAD) { return ReadLine<wchar_t>(cDelimiter, bTrimCR); }
 
-	public:
-		template < eCODEPAGE eCodepage, typename tchar > requires (bSTORE)
-		void WriteLine(std::basic_string_view<tchar> sv, tchar cDelimiter = '\n', bool bAddCR = true) {
-			CHECK_ARCHIVE_STORABLE;
-
+	protected:
+		template < eCODEPAGE eCodepage, gtlc::string_elem tchar > requires (bSTORE)
+		void TWriteLine(std::basic_string_view<tchar> sv, tchar cDelimiter = '\n', bool bAddCR = true) {
 			using tchar_codepage = typename char_type_from<eCodepage>::char_type;
-			static tchar cr {'\r'};
-			if constexpr (std::is_same_v<std::remove_cvref_t<tchar>, tchar_codepage>
-				or (std::is_same_v<std::remove_cvref_t<tchar>, wchar_t> and (sizeof(tchar) == sizeof(tchar_codepage)))
-				)
-			{
-				constexpr bool bSwapStreamByteOrder = (sizeof(tchar) >= 2) and (eCodepage == eCODEPAGE_OTHER_ENDIAN<tchar>);
-				constexpr bool bSwapByteOrder = bSwapStreamByteOrder xor bSWAP_BYTE_ORDER;
-				if constexpr (bSwapByteOrder) {
-					WriteIntsSwapByte<tchar_codepage>(sv.data(), sv.size());
-					if (cDelimiter != 0) [[likely]] {
-						if (bAddCR) [[likely]] {
-							WriteIntsSwapByte<tchar_codepage>(&cr, 1);
+			if constexpr (!gtlc::is_same_utf<tchar, tchar_codepage>) {
+				constexpr auto eCodepageNative = eCODEPAGE_DEFAULT<tchar_codepage>;
+				S_CODEPAGE_OPTION codepage{
+					.from = std::is_same_v<tchar, char> ? eMBCS_Codepage_g : eCODEPAGE::DEFAULT,
+					.to = std::is_same_v<tchar_codepage, char> ? eCodepage_ : eCodepageNative
+				};
+				auto str = ToString<tchar_codepage, tchar, false>(sv, codepage);
+				return TWriteLine<eCodepage, tchar_codepage>(str, static_cast<tchar_codepage>(cDelimiter), bAddCR);
+			}
+			else {
+
+				CHECK_ARCHIVE_STORABLE;
+
+				constexpr bool bSwapStreamByteOrder = (eCodepage == eCODEPAGE_OTHER_ENDIAN<tchar>);
+				constexpr bool bSwapByteOrder = (bSwapStreamByteOrder xor bSWAP_BYTE_ORDER);
+				static tchar const cr {'\r'};
+				if constexpr (bSwapByteOrder and (sizeof(tchar) >= 2)) {
+					WriteIntsSwapByte<tchar>(sv.data(), sv.size());
+					if (cDelimiter) {
+						if (bAddCR) {
+							WriteIntsSwapByte<tchar>(&cr, 1);
 						}
-						WriteIntsSwapByte<tchar_codepage>(&cDelimiter, 1);
+						WriteIntsSwapByte<tchar>(&cDelimiter, 1);
 					}
 				}
 				else {
 					Write(sv.data(), sv.size()*sizeof(tchar));
-					if (cDelimiter) [[likely]] {
-						if (bAddCR) [[likely]] {
+					if (cDelimiter) {
+						if (bAddCR) {
 							Write(&cr, sizeof(cr));
 						}
 						Write(&cDelimiter, sizeof(cDelimiter));
 					}
 				}
 			}
-			else {
-				S_CODEPAGE_OPTION codepage{
-					.from = std::is_same_v<tchar, char> ? eMBCS_Codepage_g : eCODEPAGE::DEFAULT,
-					.to = eCodepage
-				};
-				auto str = ToString<tchar_codepage, tchar, false>(sv, codepage);
-				WriteInts<tchar_codepage>(str.data(), str.size());
-				if (cDelimiter != 0) [[likely]] {
-					if (bAddCR) [[likely]] {
-						WriteInts<tchar_codepage>(&cr, 1);
-					}
-					WriteInts<tchar_codepage>(&cDelimiter, 1);
-				}
-			}
 
 		}
 
 	public:
+		/// @brief Read / Write String
+		template < gtlc::string_elem tchar > requires (bSTORE)
+		void TWriteLine(std::basic_string_view<tchar> sv, tchar cDelimiter = '\n', bool bAddCR = true) {
+			CHECK_ARCHIVE_STORABLE;
 
-		///// @brief Read / Write String
-		//template < typename tchar, bool bWriteNewLine = false > requires (bSTORE)
-		//void TWriteString(std::basic_string_view<tchar> sv) {
-		//	CHECK_ARCHIVE_STORABLE;
+			switch (eCodepage_) {
 
-		//	auto write_string = [&] <typename tchar_other> (eCODEPAGE eCodepage, bool bForceSwapByteOrder) {
-		//		std::streamsize nWritten {};
-		//		if constexpr (std::is_same_v<std::remove_cvref_t<tchar>, std::remove_cvref_t<tchar_other>>) {
-		//			WriteInts(sv.data(), sv.size(), bForceSwapByteOrder);
-		//		} else {
-		//			std::basic_string<decltype(ch)> strDest;
-		//			ConvCodepage(strDest, sv, eCodepage);
-		//			WriteInts(strDest.data(), strDest.size(), bForceSwapByteOrder);
-		//		}
-		//	};
+			case eCODEPAGE::UTF8 :
+				return TWriteLine<eCODEPAGE::UTF8, tchar>(sv, cDelimiter, bAddCR);
+				break;
 
-		//	bool bResult = false;
-		//	auto eCodepage = GetCodepage();
-		//	switch (GetCodepage()) {
-		//	case eCHAR_ENCODING::AUTO :
-		//	case eCHAR_ENCODING::MBCS :
-		//		write_string<char>(eCodepage, false);
-		//		break;
-		//	case eCHAR_ENCODING::UNICODE_LITTLE_ENDIAN :
-		//		write_string<char16_t>(eCodepage, std::endian::native != std::endian::little);
-		//		break;
-		//	case eCHAR_ENCODING::UNICODE_BIG_ENDIAN :
-		//		write_string<char16_t>(eCodepage, std::endian::native != std::endian::big);
-		//		break;
-		//	case eCHAR_ENCODING::UTF8 :
-		//		write_string<char8_t>(eCodepage, false);
-		//		break;
-		//	}
+			case eCODEPAGE::UTF16LE :
+				return TWriteLine<eCODEPAGE::UTF16LE, tchar>(sv, cDelimiter, bAddCR);
+				break;
+			case eCODEPAGE::UTF16BE :
+				return TWriteLine<eCODEPAGE::UTF16BE, tchar>(sv, cDelimiter, bAddCR);
+				break;
 
-		//	if constexpr (bWriteNewLine) {
-		//		WriteNewLine();
-		//	}
-		//};
-		//void WriteNewLine() requires (bSTORE) {
-		//	CHECK_ARCHIVE_STORABLE;
+			case eCODEPAGE::UTF32LE :
+				return TWriteLine<eCODEPAGE::UTF32LE, tchar>(sv, cDelimiter, bAddCR);
+				break;
+			case eCODEPAGE::UTF32BE :
+				return TWriteLine<eCODEPAGE::UTF32BE, tchar>(sv, cDelimiter, bAddCR);
+				break;
 
-		//	auto eCodepage = GetCodepage();
-		//	switch (GetCodepage()) {
-		//	case eCHAR_ENCODING::AUTO :
-		//	case eCHAR_ENCODING::MBCS :
-		//		WriteInts<char>("\r\n", 2, false);
-		//		break;
-		//	case eCHAR_ENCODING::UNICODE_LITTLE_ENDIAN :
-		//		WriteInts<wchar_t>(L"\r\n", 2, std::endian::native != std::endian::little);
-		//		break;
-		//	case eCHAR_ENCODING::UNICODE_BIG_ENDIAN :
-		//		WriteInts<wchar_t>(L"\r\n", 2, std::endian::native != std::endian::big);
-		//		break;
-		//	case eCHAR_ENCODING::UTF8 :
-		//		WriteInts<char8_t>(_U8("\r\n"), 2, false);
-		//		break;
-		//	}
-		//};
+			case eCODEPAGE::DEFAULT :
+			default :
+				return TWriteLine<eCODEPAGE::DEFAULT, tchar>(sv, cDelimiter, bAddCR);
+				break;
 
-		template < typename ... Args >	void WriteString(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteString(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char8_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char16_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<char32_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >	void WriteStringNL(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteString<wchar_t, true>(fmt::format(sv, std::forward<Args>(args) ...)); }
+			}
+		};
+
+	public:
+										inline void WriteString(std::string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>    (sv, {}, false); }
+										inline void WriteString(std::u8string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t> (sv, {}, false); }
+										inline void WriteString(std::u16string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(sv, {}, false); }
+										inline void WriteString(std::u32string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(sv, {}, false); }
+										inline void WriteString(std::wstring_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t> (sv, {}, false); }
+										inline void WriteLine(std::string_view sv)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>    (sv); }
+										inline void WriteLine(std::u8string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t> (sv); }
+										inline void WriteLine(std::u16string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(sv); }
+										inline void WriteLine(std::u32string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(sv); }
+										inline void WriteLine(std::wstring_view sv)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t> (sv); }
+		template < typename ... Args >  inline void WriteString(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteLine(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
 
 
 		//---------------------------------------------------------------------
 		// Read / Write Size
 		template < size_t nMinItemSize = 4 > requires (bLOAD)
-		size_t LoadSize() {
+		size_t LoadFlexSize() {
 			static_assert(std::ranges::any_of({1, 2, 4, sizeof(size_t)}, nMinItemSize));
 			CHECK_ARCHIVE_LOADABLE;
 			auto& ar = *this;
@@ -649,7 +634,7 @@ namespace gtl {
 			}
 		}
 		template < size_t nMinItemSize = 4 > requires (bSTORE)
-		TArchive& StoreSize(size_t size) {
+		TArchive& StoreFlexSize(size_t size) {
 			static_assert(std::ranges::any_of({1, 2, 4, sizeof(size_t)}, nMinItemSize));
 			CHECK_ARCHIVE_STORABLE;
 			auto& ar = *this;
@@ -691,6 +676,7 @@ namespace gtl {
 			stream_.flush();
 		}
 		void Close() {
+			stream_.close();
 		}
 
 		//-----------------------------------------------------------------------------
@@ -1075,9 +1061,9 @@ namespace gtl {
 
 	//-------------------------------------------------------------------------
 
-	using XIArchive = TArchive<std::ifstream>;
-	using XOArchive = TArchive<std::ofstream>;
-	using XArchive = TArchive<std::fstream, true, true>;
+	using CIFArchive = TArchive<std::ifstream>;
+	using COFArchive = TArchive<std::ofstream>;
+	using CArchive = TArchive<std::fstream, true, true>;
 
 
 #pragma pack(pop)

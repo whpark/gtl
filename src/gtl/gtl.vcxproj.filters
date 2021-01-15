@@ -84,6 +84,18 @@
     <ClInclude Include="..\..\include\gtl\string\utf_char_view.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\reflection.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\misc.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dynamic.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\json_proxy.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

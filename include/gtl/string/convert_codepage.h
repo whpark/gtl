@@ -15,6 +15,7 @@
 
 #include <experimental/generator>
 
+#include "gtl/misc.h"
 #include "string_primitives.h"
 #include "utf_char_view.h"
 

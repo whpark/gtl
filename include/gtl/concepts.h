@@ -149,6 +149,15 @@ namespace gtl::concepts {
 		contiguous_string_container<tcontainer>;
 
 
+	/// @brief json container. not completed.
+	template < typename tjson >
+	concept json_like_container = requires (tjson j, char const* psz, int index) {
+		// todo : complete json_like_container
+		j[psz];
+		j[index];
+	};
+
+
 }
 
 namespace gtlc = gtl::concepts;
