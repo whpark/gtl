@@ -19,12 +19,6 @@ using namespace std::literals;
 
 namespace gtl {
 
-	template<typename, typename = void>
-	constexpr bool is_type_complete_v = false;
-
-	template<typename T>
-	constexpr bool is_type_complete_v<T, std::void_t<decltype(sizeof(T))>> = true;
-
 
 	struct CTestStruct {
 	public:
@@ -42,7 +36,6 @@ namespace gtl {
 			gtl::internal::pair { "str2"sv, &this_t::str2},
 		};
 
-#if 1
 		template < typename tjson >
 		friend void from_json(tjson const& j, this_t& object) {
 			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s); 
@@ -51,14 +44,6 @@ namespace gtl {
 		friend void to_json(tjson& j, this_t const& object) {
 			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s); 
 		}
-#else
-		friend void from_json(bjson const& j, this_t& object) {
-			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s); 
-		}
-		friend void to_json(bjson& j, this_t const& object) {
-			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s); 
-		}
-#endif
 	};
 
 
@@ -97,35 +82,15 @@ namespace gtl {
 
 
 		// from/to json
-#if 1
 		template < typename tjson >
 		friend void from_json(tjson const& j, this_t& object) {
-			//std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s);
-			{ auto const& pairs = std::get< 0>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 1>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 2>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 3>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 4>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 5>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 6>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 7>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 8>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get< 9>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get<10>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
-			{ auto const& pairs = std::get<11>(this_t::member_s); object.*(pairs.second) = j[pairs.first]; }
+			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s);
 		}
 		template < typename tjson >
 		friend void to_json(tjson& j, this_t const& object) {
 			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s);
 		}
-#else
-		friend void from_json(bjson const& j, this_t& object) {
-			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s);
-		}
-		friend void to_json(bjson& j, this_t const& object) {
-			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s);
-		}
-#endif
+
 	};
 
 
@@ -155,7 +120,7 @@ namespace gtl {
 
 	public:
 		// from/to json
-#if 1
+
 		template < typename tjson > //requires (std::is_base_of_v<base_t, this_t>)//requires (tjson j, this_t obj){ from_json(j, obj); }
 		friend void from_json(tjson const& j, this_t& object) {
 			tjson jb = j["base_t"sv];
@@ -168,16 +133,7 @@ namespace gtl {
 			to_json(jb, (base_t const&)object);
 			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s);
 		}
-#else
-		friend void from_json(bjson const& j, this_t& object) {
-			from_json(j, (base_t&)object);
-			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s);
-		}
-		friend void to_json(bjson& j, this_t const& object) {
-			to_json(j, (base_t const&)object);
-			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s);
-		}
-#endif
+
 	};
 
 }

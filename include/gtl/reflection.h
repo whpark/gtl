@@ -3,11 +3,12 @@
 
 //////////////////////////////////////////////////////////////////////
 //
-// reflection.h: reflection
+// reflection.h: reflection for streaming, dynamic creating (json/archive...)
 //
-// PWH. 2020.01.03.
-//
+// PWH.
+// 2020.01.03.
 // 2021.01.04. member_wise.h -> reflection.h
+// 2021.01.17. json proxy
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -15,19 +16,22 @@
 #include "gtl/_default.h"
 #include "gtl/misc.h"
 #include "gtl/string.h"
+#include "gtl/json_proxy.h"
 
 
 namespace gtl {
 #pragma pack(push, 8)
 
-	#define MW__BEGIN_TBL(THIS_CLASS)\
-		using mw_this_t = THIS_CLASS;\
+	// MW : (M)ember (W)ise
+
+	#define MW__BEGIN_TABLE()\
 		constexpr inline static const std::tuple member_tuple_s {\
 
-	#define MW__ADD_MEMBER(var)\
-			gtl::internal::pair{ (const char*)#var, &mw_this_t::var },
 
-	#define MW__END_TBL()\
+	#define MW__ADD_MEMBER(var)\
+			gtl::internal::pair{ #var##sv, &this_t::var },
+
+	#define MW__END_TABLE()\
 		};\
 
 	#define MW__MEMBER_EX(var, expr)	MW__ADD_MEMBER(var) expr
@@ -65,9 +69,9 @@ namespace gtl {
 	#define MW__MEMBER_31(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_30(__VA_ARGS__))
 	#define MW__MEMBER_32(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_31(__VA_ARGS__))
 
-	#define MW__MEMBERS_F2(N, ...) MW__MEMBER_##N (__VA_ARGS__)
-	#define MW__MEMBERS_F(N, ...) MW__MEMBERS_F2(N, __VA_ARGS__)
-	#define MW__MEMBERS(...)      MW__MEMBERS_F(NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+	#define MW__MEMBERS_O2(N, ...) MW__MEMBER_##N (__VA_ARGS__)
+	#define MW__MEMBERS_O1(N, ...) MW__MEMBERS_O2(N, __VA_ARGS__)
+	#define MW__MEMBERS(...)      MW__MEMBERS_O1(NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
 
 
 	//-----------------------------------------------------------------------------
@@ -75,69 +79,66 @@ namespace gtl {
 	// 
 #define DECL_MEMBER_WISE_BASE(THIS_CLASS)\
 	using mw_base_t = THIS_CLASS;\
-	friend void from_json(nlohmann::json const& j, THIS_CLASS& var) {\
-		std::apply([&var, &j](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, THIS_CLASS::member_tuple_s);\
+	using this_t = THIS_CLASS;\
+	template < typename tjson >\
+	friend void from_json(tjson const& j, this_t& var) {\
+		std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::member_tuple_s);\
 	}\
-	friend void to_json(nlohmann::json& j, THIS_CLASS const& var) {\
-		j.clear();\
-		std::apply([&var, &j](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+	template < typename tjson >\
+	friend void to_json(tjson& j, this_t const& var) {\
+		std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
 	}\
-	template < typename Archive >\
-	friend Archive& operator & (Archive& ar, THIS_CLASS& var) {\
-		std::apply([&var, &ar](auto& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+	template < typename tarchive >\
+	friend tarchive& operator >> (tarchive& ar, this_t& var) {\
+		std::apply([&ar, &var](auto& ... args) { ((ar >> var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
 		return ar;\
 	}\
-	template < typename Archive >\
-	friend Archive& operator & (Archive& ar, THIS_CLASS const& var) {\
-		std::apply([&var, &ar](auto const& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+	template < typename tarchive >\
+	friend tarchive& operator << (tarchive& ar, this_t const& var) {\
+		std::apply([&ar, &var](auto const& ... args) { ((ar << var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
 		return ar;\
 	}\
+	auto operator <=> (this_t const&) const = default;
 
 
 #define DECL_MEMBER_WISE_DERIVED(THIS_CLASS, PARENT_CLASS)\
-	friend void from_json(nlohmann::json const& j, THIS_CLASS& var) {\
-		if constexpr (std::is_same_v<THIS_CLASS, PARENT_CLASS>) {\
-		} else if constexpr (std::is_base_of_v<PARENT_CLASS, THIS_CLASS>) {\
-			from_json(j, (PARENT_CLASS&)var);\
-		}\
-		std::apply([&var, &j](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, THIS_CLASS::member_tuple_s);\
+	using this_t = THIS_CLASS;\
+	using parent_t = PARENT_CLASS;\
+	template < typename tjson >\
+	friend void from_json(tjson const& j, this_t& var) {\
+		from_json(j, (parent_t&)var);\
+		std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::member_tuple_s);\
 	}\
-	friend void to_json(nlohmann::json& j, THIS_CLASS const& var) {\
-		if constexpr (std::is_same_v<THIS_CLASS, PARENT_CLASS>) {\
-			j.clear();\
-		} else if constexpr (std::is_base_of_v<PARENT_CLASS, THIS_CLASS>) {\
-			to_json(j, (PARENT_CLASS const&)var);\
-		}\
-		std::apply([&var, &j](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+	template < typename tjson >\
+	friend void to_json(tjson& j, this_t const& var) {\
+		to_json(j, (parent_t const&)var);\
+		std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, this_t::member_tuple_s);\
 	}\
-	template < typename Archive >\
-	friend Archive& operator & (Archive& ar, THIS_CLASS& var) {\
-		if constexpr (std::is_same_v<THIS_CLASS, PARENT_CLASS>) {\
-		} else if constexpr (std::is_base_of_v<PARENT_CLASS, THIS_CLASS>) {\
-			ar & (PARENT_CLASS&)var;\
-		}\
-		std::apply([&var, &ar](auto& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+	template < typename tarchive >\
+	friend tarchive& operator >> (tarchive& ar, this_t& var) {\
+		ar >> (parent_t&)var;\
+		std::apply([&ar, &var](auto& ... args) { ((ar & var.*(args.second)), ...); }, this_t::member_tuple_s);\
 		return ar;\
 	}\
-	template < typename Archive >\
-	friend Archive& operator & (Archive& ar, THIS_CLASS const& var) {\
-		if constexpr (std::is_same_v<THIS_CLASS, PARENT_CLASS>) {\
-		} else if constexpr (std::is_base_of_v<PARENT_CLASS, THIS_CLASS>) {\
-			ar & (PARENT_CLASS const&)var;\
-		}\
-		std::apply([&var, &ar](auto const& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+	template < typename tarchive >\
+	friend tarchive& operator & (tarchive& ar, this_t const& var) {\
+		ar << (parent_t const&)var;\
+		std::apply([&ar, &var](auto const& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
 		return ar;\
 	}\
+	auto operator <=> (this_t const&) const = default;
 
 
 	//-----------------------------------------------------------------------------
 	// IMemberWiseV : with virtual function
-#define DECL_MEMBER_WISE_VIRTUAL_BASE(THIS_CLASS)\
-	DECL_MEMBER_WISE(THIS_CLASS)\
-	virtual void FromJson(nlohmann::json const& j) { from_json(j, *(THIS_CLASS*)this); }\
-	virtual void ToJson(nlohmann::json& j) const { to_json(j, *(THIS_CLASS*)this); }\
-	virtual bool Compare(THIS_CLASS const& B) const {\
-		if (!dynamic_cast<THIS_CLASS const*>(&B))\
+#define DECL_MEMBER_WISE_BASE_VIRTUAL(THIS_CLASS)\
+	DECL_MEMBER_WISE_BASE(THIS_CLASS)\
+	virtual void FromJson(bjson<> const& j) { from_json(j, *(this_t*)this); }\
+	virtual void ToJson(bjson<>& j) const { to_json(j, *(this_t*)this); }\
+	virtual void FromJson(njson<> const& j) { from_json(j, *(this_t*)this); }\
+	virtual void ToJson(njson<>& j) const { to_json(j, *(this_t*)this); }\
+	virtual bool Compare(this_t const& B) const {\
+		if (!dynamic_cast<this_t const*>(&B))\
 			return false;\
 		return *this == B;\
 	}\
@@ -145,13 +146,17 @@ namespace gtl {
 
 #define DECL_MEMBER_WISE_VIRTUAL_DERIVED(THIS_CLASS, PARENT_CLASS)\
 	DECL_MEMBER_WISE_DERIVED(THIS_CLASS, PARENT_CLASS)\
-	void FromJson(nlohmann::json const& j) override { from_json(j, *(THIS_CLASS*)this); }\
-	void ToJson(nlohmann::json& j) const override { to_json(j, *(THIS_CLASS*)this); }\
+	void FromJson(bjson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }\
+	void ToJson(bjson<>& j) const override { to_json(j, *(THIS_CLASS*)this); }\
+	void FromJson(njson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }\
+	void ToJson(njson<>& j) const override { to_json(j, *(THIS_CLASS*)this); }\
 	bool Compare(typename THIS_CLASS::mw_base_t const& B) const override {\
-		if (!dynamic_cast<THIS_CLASS const*>(&B))\
+		if (!dynamic_cast<this_t const*>(&B))\
 			return false;\
-		return (*this) == (THIS_CLASS const&)B;\
+		return (*this) == (this_t const&)B;\
 	}\
+
+
 
 
 	/// @brief CRTP reflection class. (not good. better to use MACROS)
@@ -160,51 +165,39 @@ namespace gtl {
 	class IMemberWise {
 	public:
 		using mw_base_t = THIS_CLASS;
-		//using mw_this_t = THIS_CLASS;
+		using this_t = THIS_CLASS;
 
-		template < gtlc::json_container tjson >
-		friend void from_json(tjson const& j, THIS_CLASS& var) {
-		#if 0
-			for...(auto& [name, pVar] : THIS_CLASS::member_tuple_s) {
+		template < typename tjson >
+		friend void from_json(tjson const& j, this_t& var) {
+		#if 1
+			std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::member_tuple_s);
+		#else
+			for...(auto& [name, pVar] : this_t::member_tuple_s) {
 				var.*pVar = j[name];
 			}
-		#else
-			std::apply([&var, &j](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, THIS_CLASS::member_tuple_s);
 		#endif
 		}
 
 		template < typename tjson >
-		friend void to_json(tjson& j, THIS_CLASS const& var) {
+		friend void to_json(tjson& j, this_t const& var) {
 			j.clear();
 
-		#if 0
-			for...(auto& [name, pVar] : THIS_CLASS::member_tuple_s) {
+		#if 1
+			std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, this_t::member_tuple_s);
+		#else
+			for...(auto& [name, pVar] : this_t::member_tuple_s) {
 				j[name] = var.*pVar;
 			}
-		#else
-			std::apply([&var, &j](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);
 		#endif
 		}
 		template < typename Archive >
-		friend Archive& operator & (Archive& ar, THIS_CLASS& var) {
-		#if 0
-			for...(auto& [name, pVar] : THIS_CLASS::member_tuple_s) {
-				ar & var.*pVar;
-			}
-		#else
-			std::apply([&var, &ar](auto& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);
-		#endif
+		friend Archive& operator & (Archive& ar, this_t& var) {
+			std::apply([&var, &ar](auto& ... args) { ((ar & var.*(args.second)), ...); }, this_t::member_tuple_s);
 			return ar;
 		}
 		template < typename Archive >
-		friend Archive& operator & (Archive& ar, THIS_CLASS const& var) {
-		#if 0
-			for...(auto const& [name, pVar] : THIS_CLASS::member_tuple_s) {
-				ar & var.*pVar;
-			}
-		#else
-			std::apply([&var, &ar](auto const& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);
-		#endif
+		friend Archive& operator & (Archive& ar, this_t const& var) {
+			std::apply([&var, &ar](auto const& ... args) { ((ar & var.*(args.second)), ...); }, this_t::member_tuple_s);
 			return ar;
 		}
 
@@ -212,75 +205,40 @@ namespace gtl {
 		auto operator <=>(IMemberWise const&) const = default;
 	};
 
-	template < typename PARENT_CLASS, typename THIS_CLASS >
-	class IMemberWiseDerived {
+
+
+	template < typename THIS_CLASS, typename PARENT_CLASS >
+	class IMemberWiseDerived : public PARENT_CLASS {
 	public:
-		//using mw_this_t = THIS_CLASS;
-		//using mw_base_t = typename PARENT_CLASS::base_t;
+		using this_t = THIS_CLASS;
+		using parent_t = PARENT_CLASS;
+		using mw_base_t = typename PARENT_CLASS::mw_base_t;
 
 		// from_json
-		friend void from_json(nlohmann::json const& j, THIS_CLASS& var) {
-			if constexpr (std::is_same_v<THIS_CLASS, PARENT_CLASS>) {
-			} else if constexpr (std::is_base_of_v<PARENT_CLASS, THIS_CLASS>) {
-				from_json(j, (PARENT_CLASS&)var);
-			}
-
-		#if 0
-			for...(auto& [name, pVar] : THIS_CLASS::member_tuple_s) {
-				var.*pVar = j[name];
-			}
-		#else
-			std::apply([&var, &j](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, THIS_CLASS::member_tuple_s);
-		#endif
+		template < typename tjson >
+		friend void from_json(tjson const& j, this_t& var) {
+			from_json(j, (parent_t&)var);
+			std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::member_tuple_s);
 		}
 		// to_json
-		friend void to_json(nlohmann::json& j, THIS_CLASS const& var) {
-			if constexpr (std::is_same_v<THIS_CLASS, PARENT_CLASS>) {
-				j.clear();
-			} else if constexpr (std::is_base_of_v<PARENT_CLASS, THIS_CLASS>) {
-				to_json(j, (PARENT_CLASS const&)var);
-			}
-
-		#if 0
-			for...(auto& [name, pVar] : THIS_CLASS::member_tuple_s) {
-				j[name] = var.*pVar;
-			}
-		#else
-			std::apply([&var, &j](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);
-		#endif
+		template < typename tjson >
+		friend void to_json(tjson& j, this_t const& var) {
+			to_json(j, (parent_t const&)var);
+			std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, this_t::member_tuple_s);
 		}
-		// archive & var
-		template < typename Archive >
-		friend Archive& operator & (Archive& ar, THIS_CLASS& var) {
-			if constexpr (std::is_same_v<THIS_CLASS, PARENT_CLASS>) {
-			} else if constexpr (std::is_base_of_v<PARENT_CLASS, THIS_CLASS>) {
-				ar & (PARENT_CLASS&)var;
-			}
 
-		#if 0
-			for...(auto& [name, pVar] : THIS_CLASS::member_tuple_s) {
-				ar & var.*pVar;
-			}
-		#else
-			std::apply([&var, &ar](auto& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);
-		#endif
+		// archive & var
+		template < typename tarchive >
+		friend tarchive& operator >> (tarchive& ar, this_t& var) {
+			ar >> (parent_t&)var;
+			std::apply([&var, &ar](auto& ... args) { ((ar << var.*(args.second)), ...); }, this_t::member_tuple_s);
 			return ar;
 		}
 		// archive & var
-		template < typename Archive >
-		friend Archive& operator & (Archive& ar, THIS_CLASS const& var) {
-			if constexpr (std::is_same_v<THIS_CLASS, PARENT_CLASS>) {
-			} else if constexpr (std::is_base_of_v<PARENT_CLASS, THIS_CLASS>) {
-				ar & (PARENT_CLASS const&)var;
-			}
-
-		#if 0
-			for...(auto& [name, pVar] : THIS_CLASS::member_tuple_s) {
-				ar & var.*pVar;
-			}
-		#else
-			std::apply([&var, &ar](auto const& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);
-		#endif
+		template < typename tarchive >
+		friend tarchive& operator << (tarchive& ar, this_t const& var) {
+			ar << (parent_t const&)var;
+			std::apply([&var, &ar](auto const& ... args) { ((ar & var.*(args.second)), ...); }, this_t::member_tuple_s);
 			return ar;
 		}
 
@@ -288,17 +246,17 @@ namespace gtl {
 		auto operator <=>(IMemberWiseDerived const&) const = default;
 	};
 
+
 	//-----------------------------------------------------------------------------
 	// IMemberWiseV : with virtual function
 	template < typename THIS_CLASS >
 	class IMemberWiseV : public IMemberWise<THIS_CLASS> {
 	public:
-		virtual void FromJson(nlohmann::json const& j) {
-			from_json(j, *(THIS_CLASS*)this);
-		}
-		virtual void ToJson(nlohmann::json& j) const {
-			to_json(j, *(THIS_CLASS*)this);
-		}
+		virtual void FromJson(bjson<> const& j) { from_json(j, *(THIS_CLASS*)this); }
+		virtual void ToJson(bjson<>& j) const   { to_json(j, *(THIS_CLASS*)this); }
+		virtual void FromJson(njson<> const& j) { from_json(j, *(THIS_CLASS*)this); }
+		virtual void ToJson(njson<>& j) const   { to_json(j, *(THIS_CLASS*)this); }
+
 		virtual bool Compare(THIS_CLASS const& B) const {
 			if (!dynamic_cast<THIS_CLASS const*>(&B))
 				return false;
@@ -308,16 +266,16 @@ namespace gtl {
 	public:
 		auto operator <=>(IMemberWiseV const&) const = default;
 	};
-	template < typename PARENT_CLASS, typename THIS_CLASS >
+
+	template < typename THIS_CLASS, typename PARENT_CLASS >
 	class IMemberWiseDerivedV : public IMemberWiseDerived<PARENT_CLASS, THIS_CLASS> {
 	public:
-		void FromJson(nlohmann::json const& j) override {
-			from_json(j, *(THIS_CLASS*)this);
-		}
-		void ToJson(nlohmann::json& j) const override {
-			to_json(j, *(THIS_CLASS*)this);
-		}
-		bool Compare(typename THIS_CLASS::mw_base_t const& B) const override {
+		void FromJson(bjson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }
+		void ToJson(bjson<>& j) const override   { to_json(j, *(THIS_CLASS*)this); }
+		void FromJson(njson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }
+		void ToJson(njson<>& j) const override   { to_json(j, *(THIS_CLASS*)this); }
+
+		bool Compare(typename PARENT_CLASS::mw_base_t const& B) const override {
 			if (!dynamic_cast<THIS_CLASS const*>(&B))
 				return false;
 			return (*this) == (THIS_CLASS const&)B;
@@ -327,67 +285,6 @@ namespace gtl {
 		auto operator <=>(IMemberWiseDerivedV const&) const = default;
 	};
 
-
-#if 0
-	namespace example {
-
-		namespace CRTP {
-			struct CBase : public IMemberWise<CBase> {
-				int i, j;
-				double d;
-
-				MW__BEGIN_TBL(CBase)
-					MW__MEMBERS(i, j)
-					MW__MEMBERS(d)
-				MW__END_TBL()
-
-			public:
-				auto operator <=> (CBase const&) const = default;
-			};
-
-			struct CDerivedA : public CBase, public IMemberWiseDerived<CBase, CDerivedA> {
-				std::wstring name;
-
-				MW__BEGIN_TBL(CDerivedA)
-					MW__MEMBERS(name)
-				MW__END_TBL()
-
-			public:
-				auto operator <=> (CDerivedA const&) const = default;
-			};
-		};
-
-		namespace MACRO {
-			struct CBase {
-
-				int i, j;
-				double d;
-
-				DECL_MEMBER_WISE_BASE(CBase)
-				MW__BEGIN_TBL(CBase)
-					MW__MEMBERS(i, j)
-					MW__MEMBERS(d)
-				MW__END_TBL()
-
-			public:
-				auto operator <=> (CBase const&) const = default;
-			};
-
-			struct CDerivedA : public CBase {
-				std::wstring name;
-
-				DECL_MEMBER_WISE_DERIVED(CDerivedA, CBase)
-				MW__BEGIN_TBL(CDerivedA)
-					MW__MEMBERS(name)
-				MW__END_TBL()
-
-			public:
-				auto operator <=> (CDerivedA const&) const = default;
-			};
-		}
-
-	}
-#endif
 
 #pragma pack(pop)
 }	// namespace gtl
