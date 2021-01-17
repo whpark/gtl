@@ -116,5 +116,8 @@
     <ClCompile Include="latin_charset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="json_proxy.cpp">
+      <Filter>gtl</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

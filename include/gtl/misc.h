@@ -296,7 +296,9 @@ namespace gtl {
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY)
 	template < std::integral type >
 	[[nodiscard]] inline auto GetByteSwap(type v) {
-		if constexpr (sizeof(v) == sizeof(std::uint16_t)) {
+		if constexpr (sizeof(v) == sizeof(std::uint8_t)) {
+			return v;
+		} else if constexpr (sizeof(v) == sizeof(std::uint16_t)) {
 			return _byteswap_ushort(v);
 		} else if constexpr (sizeof(v) == sizeof(std::uint32_t)) {
 			return _byteswap_ulong(v);
@@ -313,13 +315,23 @@ namespace gtl {
 #else
 	template < std::integral type >
 	[[nodiscard]] inline type GetByteSwap(type const v) {
-		type r{};
-		std::reverse_copy((uint8_t const*)&v, (uint8_t const*)&v+sizeof(v), (uint8_t*)&r);
-		return r;
+		if constexpr (sizeof(v) == 1) {
+			return v;
+		}
+		else {
+			type r{};
+			std::reverse_copy((uint8_t const*)&v, (uint8_t const*)&v+sizeof(v), (uint8_t*)&r);
+			return r;
+		}
 	}
 	template < std::integral type >
 	inline void ByteSwap(type& v) {
-		std::reverse((uint8_t*)&v, (uint8_t*)&v+sizeof(v));
+		if constexpr (sizeof(v) == 1) {
+			return ;
+		}
+		else {
+			std::reverse((uint8_t*)&v, (uint8_t*)&v+sizeof(v));
+		}
 	}
 #endif
 

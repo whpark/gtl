@@ -11,17 +11,37 @@
 
 #pragma once
 
-//#include "gtl/concepts.h"
-#include "gtl/string/convert_codepage.h"
+#include "gtl/config_gtl.h"
+
+
+#if (GTL__BOOST_JSON__AS_STANDALONE)
+#	define BOOST_JSON_STANDALONE
+#	define BOOST_NO_EXCEPTIONS
+#elif (GTL__BOOST_JSON__AS_NESTED_LIB)
+#	define BOOST_JSON_STANDALONE
+#	define BOOST_NO_EXCEPTIONS
+#	ifdef GTL_EXPORTS
+#		define BOOST_JSON_DECL       __declspec(dllexport)
+#		define BOOST_JSON_CLASS_DECL __declspec(dllexport)
+#	else
+#		define BOOST_JSON_DECL       __declspec(dllimport)
+#		define BOOST_JSON_CLASS_DECL __declspec(dllimport)
+#	endif
+#elif (GTL__BOOST_JSON__AS_SHARED_LIB)
+#	define BOOST_JSON_DECL       __declspec(dllimport)
+#	define BOOST_JSON_CLASS_DECL __declspec(dllimport)
+//#	pragma comment(lib, "boost.json.lib")
+#endif
+
 
 // https://www.boost.org/doc/libs/1_75_0/libs/json/doc/html/json/quick_look.html
-#define BOOST_JSON_STANDALONE
-#define BOOST_NO_EXCEPTIONS
 #include "boost/json.hpp"       // decl
-
 
 // https://github.com/nlohmann/json
 #include "nlohmann/json.hpp"
+
+
+#include "gtl/string/convert_codepage.h"
 
 
 // from/to json
@@ -34,8 +54,9 @@ namespace gtl {
 #pragma pack(push, 8)
 
     /// @brief json proxy for boost:json
+	/// for string, converts to utf-8.
+	template < typename json_t = boost::json::value >
     class bjson {
-		using json_t = boost::json::value;
 		std::optional<json_t> j__;
 		json_t& j_;
 	public:
@@ -65,25 +86,25 @@ namespace gtl {
 			return *this;
 		}
 		bjson& operator = (std::string const& str) {
-			j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str));
+			j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(str));
 			return *this;
 		}
-		bjson& operator = (std::string&& str) {
-			j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str));
-			return *this;
-		}
+		//bjson& operator = (std::string&& str) {
+		//	j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(str));
+		//	return *this;
+		//}
 		bjson& operator = (std::string_view sv) {
-			j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv));
+			j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(sv));
 			return *this;
 		}
 		bjson& operator = (std::u8string const& str) {
 			j_ = reinterpret_cast<std::string const&>(str);
 			return *this;
 		}
-		bjson& operator = (std::u8string && str) {
-			j_ = reinterpret_cast<std::string &&>(str);
-			return *this;
-		}
+		//bjson& operator = (std::u8string && str) {
+		//	j_ = reinterpret_cast<std::string &&>(str);
+		//	return *this;
+		//}
 		bjson& operator = (std::u8string_view sv) {
 			j_ = reinterpret_cast<std::string_view&>(sv);
 			return *this;
@@ -118,7 +139,6 @@ namespace gtl {
 			boost::json::object const* pObject = &j_.as_object();
 			return (const_cast<boost::json::object&>(*pObject))[reinterpret_cast<std::string_view&>(svKey)];
 		}
-
 		bjson const operator [] (std::size_t index) const {
 			if (j_.is_null())
 				throw std::invalid_argument{"empty"};
@@ -140,7 +160,8 @@ namespace gtl {
 		operator std::string() const { 
 			// todo : u8 -> ansi
 			auto& jstrU8 = j_.as_string();
-			return std::string{jstrU8.data(), jstrU8.size()};
+			std::u8string_view svU8{(char8_t const*)jstrU8.data(), jstrU8.size()};
+			return ToString<char, char8_t, false>(svU8);
 		}
 		template < typename T >
 			requires (
@@ -157,8 +178,9 @@ namespace gtl {
 	};
 
 
+    /// @brief json proxy for nlohmann:json
+	template < typename json_t = nlohmann::json >
 	class njson {
-		using json_t = nlohmann::json;
 		std::optional<json_t> j__;
 		json_t& j_;
 	public:
@@ -193,25 +215,25 @@ namespace gtl {
 			return *this;
 		}
 		njson& operator = (std::string const& str) {
-			j_ = str;	// todo : covnert to u8string
+			j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(str));
 			return *this;
 		}
-		njson& operator = (std::string&& str) {
-			j_ = str;	// todo : covnert to u8string
-			return *this;
-		}
+		//njson& operator = (std::string&& str) {
+		//	j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(str));
+		//	return *this;
+		//}
 		njson& operator = (std::string_view sv) {
-			j_ = sv;	// todo : covnert to u8string
+			j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(sv));
 			return *this;
 		}
 		njson& operator = (std::u8string const& str) {
 			j_ = reinterpret_cast<std::string const&>(str);
 			return *this;
 		}
-		njson& operator = (std::u8string && str) {
-			j_ = reinterpret_cast<std::string &&>(str);
-			return *this;
-		}
+		//njson& operator = (std::u8string && str) {
+		//	j_ = reinterpret_cast<std::string &&>(str);
+		//	return *this;
+		//}
 		njson& operator = (std::u8string_view sv) {
 			j_ = reinterpret_cast<std::string_view&>(sv);
 			return *this;
@@ -219,11 +241,11 @@ namespace gtl {
 
 
 		njson operator [] (std::string_view svKey) {
-			// todo : convert to u8string
-			return j_[svKey.data()];
+			return j_[reinterpret_cast<std::string&>(gtl::ToString<char8_t>(svKey))];
 		}
 		njson operator [] (std::u8string_view svKey) {
-			return j_[(char const*)svKey.data()];
+			// todo : how to use string_view???
+			return j_[std::string((char const*)svKey.data(), svKey.size())];
 		}
 		njson operator [] (std::size_t index) {
 			return j_[index];
@@ -232,11 +254,10 @@ namespace gtl {
 			return j_[index];
 		}
 		njson const operator [] (std::string_view svKey) const {
-			// todo : convert to u8string
-			return j_[svKey.data()];
+			return j_[reinterpret_cast<std::string&>(gtl::ToString<char8_t>(svKey))];
 		}
 		njson const operator [] (std::u8string_view svKey) const {
-			return j_[(char const*)svKey.data()];
+			return j_[std::string((char const*)svKey.data(), svKey.size())];
 		}
 
 		operator bool() const { return (bool)j_; }
@@ -244,13 +265,12 @@ namespace gtl {
 		operator int64_t() const { return (int64_t)j_; }
 		operator double() const { return (double)j_; }
 		operator std::u8string() const {
-			std::u8string str = reinterpret_cast<std::u8string&>((std::string)j_);
-			return std::move(str);
+			return reinterpret_cast<std::u8string&>((std::string)j_);
 		}
 		operator std::string() const { 
 			// todo : u8 -> ansi
 			std::string str = j_;
-			return str;
+			return ToStringA(reinterpret_cast<std::u8string&>(str));
 		}
 		template < typename T >
 			requires (

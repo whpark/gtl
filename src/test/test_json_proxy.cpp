@@ -4,6 +4,17 @@
 #include "gtl/concepts.h"
 #include "gtl/json_proxy.h"
 
+#if (GTL__BOOST_JSON__AS_STANDALONE)
+
+	#include "boost/json/src.hpp"   // impl
+
+	namespace boost {
+		void throw_exception(std::exception const&) {
+		}
+	}
+
+#endif
+
 using namespace std::literals;
 
 namespace gtl {
@@ -172,48 +183,49 @@ namespace gtl {
 }
 
 
-void boost_json_tester() {
-	{
-		using namespace boost::json;
-		boost::json::object j;
+TEST(json_proxy, basic) {
 
-		j[ "pi" ] = 3.141;                                            // insert a double
-		j[ "happy" ] = true;                                          // insert a bool
-		j[ "name" ] = "Boost";                                        // insert a string
-		j[ "nothing" ] = nullptr;                                     // insert a null
-		j[ "answer" ].emplace_object()["everything"] = 42;            // insert an object with 1 element
-		j[ "list" ] = { 1, 0, 2 };                                    // insert an array with 3 elements
-		j[ "object" ] = { {"currency", "USD"}, {"value", 42.99} };    // insert an object with 2 elements
-	}
-
-
-	{
-		//boost::json::value v;
-		//gtl::bjson j(v);
+	{	// boost::json
 		gtl::bjson j;
 		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
 		j = a;
 
-		std::cout << '\n' << j.json() << '\n';
+		std::cout << '\n' << std::setw(4) << j.json() << '\n';
 
 		gtl::CTestClassDerived b;
 		b = j;
 
-		assert(a == b);
+		EXPECT_EQ(a, b);
 	}
 
 	{
+		// nlohmann::ordered_json
+		gtl::njson<nlohmann::ordered_json> j;
+
+		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
+		j = a;
+
+		std::cout << '\n' << std::setw(4) << j.json() << '\n';
+
+		gtl::CTestClassDerived b;
+		b = j;
+
+		EXPECT_EQ(a, b);
+	}
+
+	{
+		// nlohmann::json
 		gtl::njson j;
 
 		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
 		j = a;
 
-		std::cout << '\n' << j.json() << '\n';
+		std::cout << '\n' << std::setw(4) << j.json() << '\n';
 
 		gtl::CTestClassDerived b;
 		b = j;
 
-		assert(a == b);
+		EXPECT_EQ(a, b);
 	}
 
 }
