@@ -10,6 +10,7 @@
 
 #include "gtl/_default.h"
 #include "gtl/misc.h"
+#include "gtl/reflection.h"
 
 namespace gtl {
 #pragma pack(push, 8)

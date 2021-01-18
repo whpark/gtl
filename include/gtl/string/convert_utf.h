@@ -48,10 +48,10 @@ namespace gtl {
 		/// @param end 
 		/// @param r 
 		template < gtlc::string_elem_utf tchar_to, gtlc::string_elem tchar_from = char8_t,
-			bool bAddChar = true, bool bCheckError = true,
+			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
 		>
-		inline void UTFCharConverter_FromUTF8(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
+		inline bool UTFCharConverter_FromUTF8(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 
 			auto MAS = [&pos] (int i, tchar_to mask, int sh) -> tchar_to {	// MaskAndShift
 				return (((tchar_to)pos[i]) & mask) << sh;
@@ -72,8 +72,12 @@ namespace gtl {
 				if constexpr (bCheckError) {
 					if ((pos + 1 >= end)
 						|| ((pos[1] & 0b1100'0000) != 0b1000'0000)
-						)
-						throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+						) {
+						if constexpr (bThrow) {
+							throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+						}
+						return false;
+					}
 				}
 				if constexpr (bAddChar) {
 					r.push_back( MAS(0, uc::bitmask_6bit, 6) | MAS(1, uc::bitmask_6bit, 6) );
@@ -88,8 +92,12 @@ namespace gtl {
 					if ((pos + 2 >= end)
 						|| ((pos[1] & 0b1100'0000) != 0b1000'0000)
 						|| ((pos[2] & 0b1100'0000) != 0b1000'0000)
-						)
-						throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+						) {
+						if constexpr (bThrow) {
+							throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+						}
+						return false;
+					}
 				}
 				if constexpr (bAddChar) {
 					r.push_back( MAS(0, uc::bitmask_4bit, 12) | MAS(1, uc::bitmask_6bit, 6) | MAS(2, uc::bitmask_6bit, 0) );
@@ -105,8 +113,12 @@ namespace gtl {
 						|| ((pos[1] & 0b1100'0000) != 0b1000'0000)
 						|| ((pos[2] & 0b1100'0000) != 0b1000'0000)
 						|| ((pos[3] & 0b1100'0000) != 0b1000'0000)
-						)
-						throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+						) {
+						if constexpr (bThrow) {
+							throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+						}
+						return false;
+					}
 				}
 				if constexpr (gtlc::is_same_utf<tchar_to, char32_t>) {
 					if constexpr (bAddChar) {
@@ -132,9 +144,14 @@ namespace gtl {
 			}
 			else {
 				if constexpr (bCheckError) {
-					throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+					if constexpr (bThrow) {
+						throw std::invalid_argument{ GTL__FUNCSIG "not a utf-8" };
+					}
+					return false;
 				}
 			}
+
+			return true;
 		}
 
 
@@ -145,10 +162,10 @@ namespace gtl {
 		/// @param end 
 		/// @param r 
 		template < gtlc::string_elem_utf tchar_to, gtlc::string_elem tchar_from = char16_t,
-			bool bAddChar = true, bool bCheckError = true,
+			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
 		>
-		inline void UTFCharConverter_FromUTF16(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
+		inline bool UTFCharConverter_FromUTF16(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 
 			auto MAS = [&pos] (int i, tchar_to mask, int sh) -> tchar_to {	// MaskAndShift
 				return (((tchar_to)pos[i]) & mask) << sh;
@@ -167,7 +184,7 @@ namespace gtl {
 						r++;
 					}
 					pos += 1;
-					return;
+					return true;
 				}
 				else if (c <= 0x07ff) {
 					if constexpr (bAddChar) {
@@ -178,7 +195,7 @@ namespace gtl {
 						r += 2;
 					}
 					pos += 1;
-					return;
+					return true;
 				}
 			}
 			if ( (c < uc::fSurrogateW1.first) or (c > uc::fSurrogateW2.second) ) {
@@ -204,14 +221,18 @@ namespace gtl {
 					static_assert(false);
 				}
 				pos += 1;
-				return;
+				return true;
 			}
 			else if ( (c >= uc::fSurrogateW1.first) and (c <= uc::fSurrogateW1.second) ) {
 				if constexpr (bCheckError) {
 					if (((pos + 1) >= end)
 						|| ((pos[1] < uc::fSurrogateW2.first) || (pos[1] > uc::fSurrogateW2.second))
-						)
-						throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. invalid trailing surrogate" };
+						) {
+						if constexpr (bThrow) {
+							throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. invalid trailing surrogate" };
+						}
+						return false;
+					}
 				}
 				constexpr static uint32_t const pre = 0x1'0000 - ((uc::fSurrogateW1.first << uc::nBitSurrogate) + uc::fSurrogateW2.first);
 				if constexpr (gtlc::is_same_utf<tchar_to, char8_t>) {
@@ -241,9 +262,14 @@ namespace gtl {
 			}
 			else {
 				if constexpr (bCheckError) {
-					throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. invalid surrogate" };
+					if constexpr (bThrow) {
+						throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf16 to utf32. invalid surrogate" };
+					}
+					return false;
 				}
 			}
+
+			return true;
 		}
 
 
@@ -254,10 +280,10 @@ namespace gtl {
 		/// @param end 
 		/// @param r 
 		template < gtlc::string_elem_utf tchar_to, gtlc::string_elem tchar_from = char32_t,
-			bool bAddChar = true, bool bCheckError = true,
+			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
 		>
-		inline void UTFCharConverter_FromUTF32(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
+		inline bool UTFCharConverter_FromUTF32(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 
 			namespace uc = utf_const;
 			auto c = pos[0];
@@ -303,7 +329,10 @@ namespace gtl {
 				}
 				else {
 					if constexpr (bCheckError) {
-						throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf32 to utf16. 0x10FFFFU < c"};
+						if constexpr (bThrow) {
+							throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf32 to utf16. 0x10FFFFU < c"};
+						}
+						return false;
 					}
 				}
 			}
@@ -318,7 +347,10 @@ namespace gtl {
 				}
 				else if (c <= uc::fSurrogateW2.second) {
 					if constexpr (bCheckError) {
-						throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf32 to utf16. 0xD800u <= c <= 0xDFFFu"};
+						if constexpr (bThrow) {
+							throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf32 to utf16. 0xD800u <= c <= 0xDFFFu"};
+						}
+						return false;
 					}
 				}
 				else if (c <= 0xffffu) {
@@ -338,12 +370,17 @@ namespace gtl {
 					}
 				} else {
 					if constexpr (bCheckError) {
-						throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf32 to utf16. 0x10FFFFU < c"};
+						if constexpr (bThrow) {
+							throw std::invalid_argument{ GTL__FUNCSIG "cannot convert string from utf32 to utf16. 0x10FFFFU < c"};
+						}
+						return false;
 					}
 				}
 			}
 
 			pos += 1;
+
+			return true;
 		}
 
 
@@ -354,10 +391,10 @@ namespace gtl {
 		/// @param end 
 		/// @param r 
 		template < gtlc::string_elem_utf tchar_to, gtlc::string_elem tchar_from,
-			bool bAddChar = true, bool bCheckError = true,
+			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, size_t>
 		>
-		inline void UTFCharConverter(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
+		inline bool UTFCharConverter(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 			//if (pos >= end)
 			//	return;
 			namespace uc = utf_const;
@@ -371,17 +408,19 @@ namespace gtl {
 				pos += 1;
 			}
 			else if constexpr (gtlc::is_same_utf<tchar_from, char8_t>) {
-				UTFCharConverter_FromUTF8<tchar_to, tchar_from, bAddChar, bCheckError, treturn>(pos, end, r);
+				return UTFCharConverter_FromUTF8<tchar_to, tchar_from, bAddChar, bCheckError, bThrow, treturn>(pos, end, r);
 			}
 			else if constexpr (gtlc::is_same_utf<tchar_from, char16_t>) {
-				UTFCharConverter_FromUTF16<tchar_to, tchar_from, bAddChar, bCheckError, treturn>(pos, end, r);
+				return UTFCharConverter_FromUTF16<tchar_to, tchar_from, bAddChar, bCheckError, bThrow, treturn>(pos, end, r);
 			}
 			else if constexpr (gtlc::is_same_utf<tchar_from, char32_t>) {
-				UTFCharConverter_FromUTF32<tchar_to, tchar_from, bAddChar, bCheckError, treturn>(pos, end, r);
+				return UTFCharConverter_FromUTF32<tchar_to, tchar_from, bAddChar, bCheckError, bThrow, treturn>(pos, end, r);
 			}
 			else {
 				static_assert(false);
 			}
+
+			return true;
 		}
 
 	}
@@ -391,7 +430,7 @@ namespace gtl {
 	/// @brief UTFn -> UTFn coroutine. (experimental)
 	/// @param svFrom source text
 	/// @return converted text
-	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from >
+	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bThrow = true >
 	std::experimental::generator<tchar_to> SeqUTF(std::basic_string_view<tchar_from> svFrom) {
 		namespace uc = gtl::utf_const;
 
@@ -404,7 +443,13 @@ namespace gtl {
 		auto const* end = pos + svFrom.size();
 		while (pos < end) {
 			std::basic_string<tchar_to> str;
-			internal::UTFCharConverter<tchar_to, tchar_from, true, true>(pos, end, str);
+			if constexpr (bThrow) {
+				internal::UTFCharConverter<tchar_to, tchar_from, true, true, bThrow>(pos, end, str);
+			}
+			else {
+				if (!internal::UTFCharConverter<tchar_to, tchar_from, true, true, bThrow>(pos, end, str))
+					co_return;
+			}
 			for (auto c : str) {
 				co_yield c;
 			}

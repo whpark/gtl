@@ -67,7 +67,7 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 		auto const* pos = svFrom.data();
 		auto const* const end = pos + svFrom.size();
 		while (pos < end) {
-			gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
+			gtl::internal::UTFCharConverter<char32_t, char8_t, false, true, true>(pos, end, nOutputLen);
 		}
 
 		if (nOutputLen <= 0)
@@ -76,7 +76,7 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 
 		pos = svFrom.data();
 		while (pos < end) {
-			gtl::internal::UTFCharConverter<char32_t, char8_t, true, false>(pos, end, str);
+			gtl::internal::UTFCharConverter<char32_t, char8_t, true, false, false>(pos, end, str);
 		}
 
 		// check endian, Convert
@@ -111,7 +111,7 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 		auto const* pos = svFrom.data();
 		auto const* const end = pos + svFrom.size();
 		//for (auto const* pos = svFrom.data(); pos < end; ) {
-		//	gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
+		//	gtl::internal::UTFCharConverter<char32_t, char8_t, false, true, true>(pos, end, nOutputLen);
 		//}
 
 		if (nOutputLen <= 0)
@@ -120,7 +120,7 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 
 		pos = svFrom.data();
 		while (pos < end) {
-			gtl::internal::UTFCharConverter<char32_t, char8_t, true, true>(pos, end, str);
+			gtl::internal::UTFCharConverter<char32_t, char8_t, true, true, true>(pos, end, str);
 		}
 		str.shrink_to_fit();
 
@@ -154,7 +154,7 @@ static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::Stat
 		auto const* pos = svFrom.data();
 		auto const* const end = pos + svFrom.size();
 		//for (pos < end; ) {
-		//	gtl::internal::UTFCharConverter<char32_t, char8_t, false, true>(pos, end, nOutputLen);
+		//	gtl::internal::UTFCharConverter<char32_t, char8_t, false, true, true>(pos, end, nOutputLen);
 		//}
 
 		if (nOutputLen <= 0)
@@ -163,7 +163,7 @@ static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::Stat
 
 		pos = svFrom.data();
 		while (pos < end) {
-			gtl::internal::UTFCharConverter<char32_t, char8_t, true, true>(pos, end, str);
+			gtl::internal::UTFCharConverter<char32_t, char8_t, true, true, true>(pos, end, str);
 		}
 
 		// check endian, Convert

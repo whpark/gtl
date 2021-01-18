@@ -25,46 +25,52 @@ namespace gtl {
 
 	GTL_DATA eCODEPAGE eMBCS_Codepage_g = static_cast<eCODEPAGE>(GTL_DEFAULT_CODEPAGE);
 
-
-
-//#pragma warning(push)
-//#pragma warning(disable: 4996)
-//	std::u32string ConvUTF8_UTF32(std::u8string_view sv) {
-//		std::wstring_convert<std::codecvt<char32_t, char8_t, std::mbstate_t>, char32_t> conversion;
-//		return conversion.from_bytes((char const*)sv.data());
-//	}
-//
-//	std::u8string ConvUTF32_UTF8(std::u32string_view sv) {
-//		std::wstring_convert<std::codecvt<char32_t, char8_t, std::mbstate_t>, char32_t> conversion;
-//		return (std::u8string&)conversion.to_bytes(sv.data());
-//	}
-//#pragma warning(pop)
-
-
 	//-----------------------------------------------------------------------------
-	bool IsUTF8String(std::string_view str, int* pOutputBufferCount, bool* pbIsMSBSet) {
+	bool IsUTF8String(std::string_view sv, size_t* pOutputBufferCount, bool* pbIsMSBSet) {
+#if 1
 		if (pOutputBufferCount)
 			*pOutputBufferCount = 0;
 		if (pbIsMSBSet)
 			*pbIsMSBSet = false;
 
-		if (str.empty())
+		size_t nOutputLen = 0;
+		auto const* pos = sv.data();
+		auto const* const end = sv.data() + sv.size();
+		while (pos < end) {
+			if (!gtl::internal::UTFCharConverter<char32_t, char8_t, false, true, false>((char8_t const*&)pos, (char8_t const*)end, nOutputLen))
+				return false;
+		}
+
+		if (pOutputBufferCount)
+			*pOutputBufferCount = nOutputLen;
+		if (pbIsMSBSet && (nOutputLen != sv.size()))
+			*pbIsMSBSet = true;
+
+		return true;
+
+#else
+		if (pOutputBufferCount)
+			*pOutputBufferCount = 0;
+		if (pbIsMSBSet)
+			*pbIsMSBSet = false;
+
+		if (sv.empty())
 			return false;
 
 		int nOutputBufferCount = 0;
 		bool bMSB = false;
 		bool bUTF8 = true;
-		for (size_t iPos = 0; iPos < (size_t)str.size(); iPos++, nOutputBufferCount++) {
-			const char c = str[iPos];
-			const char c1 = str[iPos];
-			const char c2 = iPos+1 < str.size() ? str[iPos+1] : 0;
-			const char c3 = iPos+2 < str.size() ? str[iPos+2] : 0;
+		for (size_t iPos = 0; iPos < (size_t)sv.size(); iPos++, nOutputBufferCount++) {
+			const char c = sv[iPos];
+			const char c1 = sv[iPos];
+			const char c2 = iPos+1 < sv.size() ? sv[iPos+1] : 0;
+			const char c3 = iPos+2 < sv.size() ? sv[iPos+2] : 0;
 
-			auto IsUTF8SigChar = [](char c) -> bool { return (c & 0b1100'0000) == 0b1000'0000; };
+			auto IsUTF8CharSub = [](char c) -> bool { return (c & 0b1100'0000) == 0b1000'0000; };
 
 			if (c1 && 0b1000'0000) {
 				bMSB = true;
-				if ( ((c1 & 0b1110'0000) == 0b1100'0000) && IsUTF8SigChar(c2) ) {
+				if ( ((c1 & 0b1110'0000) == 0b1100'0000) && IsUTF8CharSub(c2) ) {
 					wchar_t b = ((c1 & 0b0001'1111) << 6) | (c2 & 0b0011'1111);
 					if ( (b >= 0x0080) && (b <= 0x07ff) ) {
 						iPos++;
@@ -72,7 +78,7 @@ namespace gtl {
 						bUTF8 = false;
 						break;
 					}
-				} else if ( ((c1 & 0b1111'0000) == 0b1110'0000) && IsUTF8SigChar(c2) && IsUTF8SigChar(c3) ) {
+				} else if ( ((c1 & 0b1111'0000) == 0b1110'0000) && IsUTF8CharSub(c2) && IsUTF8CharSub(c3) ) {
 					wchar_t b = ((c1 & 0b0000'1111) << 12) | ((c2 & 0b0011'1111) << 6) | (c3 & 0b0011'1111);
 					if ( (b >= 0x0800) && (b <= 0xFFFF) ) {
 						iPos += 2;
@@ -95,6 +101,7 @@ namespace gtl {
 			*pbIsMSBSet = bMSB;
 
 		return bUTF8;
+#endif
 	}
 
 

@@ -250,7 +250,7 @@ namespace gtl {
 	template < bool bCOUNT_FIRST = true> inline std::u32string	ToStringU32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 	template < bool bCOUNT_FIRST = true> inline std::u32string	ToStringU32(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 
-	GTL_API bool IsUTF8String(std::string_view str, int* pOutputBufferCount = nullptr, bool* pbIsMSBSet = nullptr);
+	GTL_API bool IsUTF8String(std::string_view sv, size_t* pOutputBufferCount = nullptr, bool* pbIsMSBSet = nullptr);
 
 
 	namespace internal {
@@ -505,7 +505,7 @@ namespace gtl {
 		auto const* const end = svFrom.data() + svFrom.size();
 		if constexpr (bCOUNT_FIRST) {
 			while (pos < end) {
-				internal::UTFCharConverter<tchar_to, tchar_from, false, true>(pos, end, nOutputLen);
+				internal::UTFCharConverter<tchar_to, tchar_from, false, true, true>(pos, end, nOutputLen);
 			}
 			if (nOutputLen <= 0)
 				return str;
@@ -518,7 +518,7 @@ namespace gtl {
 		str.reserve(nOutputLen);
 		pos = svFrom.data();
 		while (pos < end) {
-			internal::UTFCharConverter<tchar_to, tchar_from, true, false>(pos, end, str);
+			internal::UTFCharConverter<tchar_to, tchar_from, true, false, true>(pos, end, str);
 		}
 
 		// check endian, Convert
@@ -746,6 +746,21 @@ namespace gtl {
 #endif
 
 
+
+#if 0
+#pragma warning(push)
+#pragma warning(disable: 4996)
+	std::u32string ConvUTF8_UTF32(std::u8string_view sv) {
+		std::wstring_convert<std::codecvt<char32_t, char8_t, std::mbstate_t>, char32_t> conversion;
+		return conversion.from_bytes((char const*)sv.data());
+	}
+
+	std::u8string ConvUTF32_UTF8(std::u32string_view sv) {
+		std::wstring_convert<std::codecvt<char32_t, char8_t, std::mbstate_t>, char32_t> conversion;
+		return (std::u8string&)conversion.to_bytes(sv.data());
+	}
+#pragma warning(pop)
+#endif
 
 
 #pragma pack(pop)

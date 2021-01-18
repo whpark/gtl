@@ -23,7 +23,7 @@ namespace gtl {
 #pragma pack(push, 8)
 
 	/// @brief UTF 8/16/32 Characters one by one. (from any utf string.)
-	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bCheckError = true >
+	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bCheckError = true/*, bool bThrow = true*/ >
 	class utf_char_view {
 	protected:
 		std::basic_string_view<tchar_from> const sv_;
@@ -49,7 +49,7 @@ namespace gtl {
 					if (position_ >= end_) {
 						buf_index_ = -1;
 					} else {
-						gtl::internal::UTFCharConverter<tchar_to, tchar_from, true, bCheckError>(position_, end_, buffer_);
+						gtl::internal::UTFCharConverter<tchar_to, tchar_from, true, bCheckError, true>(position_, end_, buffer_);
 						buf_index_ = 0;
 					}
 				}
@@ -72,7 +72,7 @@ namespace gtl {
 							buf_index_ = -1;
 						} else {
 							buffer_.clear();
-							gtl::internal::UTFCharConverter<tchar_to, tchar_from, true, bCheckError>(position_, end_, buffer_);
+							gtl::internal::UTFCharConverter<tchar_to, tchar_from, true, bCheckError, true>(position_, end_, buffer_);
 							buf_index_ = 0;
 						}
 					}
@@ -101,7 +101,7 @@ namespace gtl {
 			size_t count{};
 			auto const* const end = sv_.data() + sv_.end();
 			for (auto const* pos = sv_.data(); pos < end; ) {
-				internal::UTFCharConverter<tchar_to, tchar_from, false, false>(pos, end, count);
+				internal::UTFCharConverter<tchar_to, tchar_from, false, false, false>(pos, end, count);
 			}
 			return count;
 		}
