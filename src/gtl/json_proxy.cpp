@@ -19,8 +19,12 @@
 		// When exceptions are disabled
 		// in standalone, you must provide
 		// this function.
-		void throw_exception(std::exception const&) {
+
+		// user defined
+		BOOST_NORETURN void throw_exception(std::exception const&) {
 		}
+		//BOOST_NORETURN void throw_exception( std::exception const & e ); // user defined
+		//BOOST_NORETURN void throw_exception( std::exception const & e, boost::source_location const & loc ); // user defined
 	}
 
 #endif

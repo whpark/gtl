@@ -22,62 +22,64 @@
 namespace gtl {
 #pragma pack(push, 8)
 
-	// MW : (M)ember (W)ise
+	// REFL : Reflection. (Member Wise..., variables only. not for function ptr.)
 
-	#define MW__BEGIN_TABLE()\
-		constexpr inline static const std::tuple member_tuple_s {\
+	#define GTL_REFL__MEMBER_TABLE\
+		constexpr inline static const std::tuple member_tuple_s
 
-
-	#define MW__ADD_MEMBER(var)\
-			gtl::internal::pair{ #var##sv, &this_t::var },
-
-	#define MW__END_TABLE()\
-		};\
-
-	#define MW__MEMBER_EX(var, expr)	MW__ADD_MEMBER(var) expr
-
-	#define MW__MEMBER_1(var)			MW__ADD_MEMBER(var)
-	#define MW__MEMBER_2(var1, var2)    MW__ADD_MEMBER(var1) MW__ADD_MEMBER(var2)
-	#define MW__MEMBER_3(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_2(__VA_ARGS__))
-	#define MW__MEMBER_4(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_3(__VA_ARGS__))
-	#define MW__MEMBER_5(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_4(__VA_ARGS__))
-	#define MW__MEMBER_6(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_5(__VA_ARGS__))
-	#define MW__MEMBER_7(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_6(__VA_ARGS__))
-	#define MW__MEMBER_8(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_7(__VA_ARGS__))
-	#define MW__MEMBER_9(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_8(__VA_ARGS__))
-	#define MW__MEMBER_10(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_9(__VA_ARGS__))
-	#define MW__MEMBER_11(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_10(__VA_ARGS__))
-	#define MW__MEMBER_12(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_11(__VA_ARGS__))
-	#define MW__MEMBER_13(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_12(__VA_ARGS__))
-	#define MW__MEMBER_14(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_13(__VA_ARGS__))
-	#define MW__MEMBER_15(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_14(__VA_ARGS__))
-	#define MW__MEMBER_16(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_15(__VA_ARGS__))
-	#define MW__MEMBER_17(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_16(__VA_ARGS__))
-	#define MW__MEMBER_18(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_17(__VA_ARGS__))
-	#define MW__MEMBER_19(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_18(__VA_ARGS__))
-	#define MW__MEMBER_20(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_19(__VA_ARGS__))
-	#define MW__MEMBER_21(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_20(__VA_ARGS__))
-	#define MW__MEMBER_22(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_21(__VA_ARGS__))
-	#define MW__MEMBER_23(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_22(__VA_ARGS__))
-	#define MW__MEMBER_24(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_23(__VA_ARGS__))
-	#define MW__MEMBER_25(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_24(__VA_ARGS__))
-	#define MW__MEMBER_26(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_25(__VA_ARGS__))
-	#define MW__MEMBER_27(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_26(__VA_ARGS__))
-	#define MW__MEMBER_28(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_27(__VA_ARGS__))
-	#define MW__MEMBER_29(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_28(__VA_ARGS__))
-	#define MW__MEMBER_30(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_29(__VA_ARGS__))
-	#define MW__MEMBER_31(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_30(__VA_ARGS__))
-	#define MW__MEMBER_32(var, ...)		MW__MEMBER_EX(var, MW__MEMBER_31(__VA_ARGS__))
-
-	#define MW__MEMBERS_O2(N, ...) MW__MEMBER_##N (__VA_ARGS__)
-	#define MW__MEMBERS_O1(N, ...) MW__MEMBERS_O2(N, __VA_ARGS__)
-	#define MW__MEMBERS(...)      MW__MEMBERS_O1(NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+	//#define GTL_REFL__MEMBERS(...)\
+	//		I_GTL_REFL__MEMBERS_(NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
 
 
-	//-----------------------------------------------------------------------------
-	// IMemberWise
-	// 
-#define DECL_MEMBER_WISE_BASE(THIS_CLASS)\
+	#define I_GTL_REFL__MEMBER(var)\
+			gtl::internal::pair{ #var##sv, &this_t::var }
+
+	#define I_GTL_REFL__MEMBER_EX(var, expr)		I_GTL_REFL__MEMBER(var), expr
+
+	#define I_GTL_REFL__MEMBER_1(var)				I_GTL_REFL__MEMBER(var)
+	#define I_GTL_REFL__MEMBER_2(var1, var2)		I_GTL_REFL__MEMBER(var1), I_GTL_REFL__MEMBER(var2)
+	#define I_GTL_REFL__MEMBER_3(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_2(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_4(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_3(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_5(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_4(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_6(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_5(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_7(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_6(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_8(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_7(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_9(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_8(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_10(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_9(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_11(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_10(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_12(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_11(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_13(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_12(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_14(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_13(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_15(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_14(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_16(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_15(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_17(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_16(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_18(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_17(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_19(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_18(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_20(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_19(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_21(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_20(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_22(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_21(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_23(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_22(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_24(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_23(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_25(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_24(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_26(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_25(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_27(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_26(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_28(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_27(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_29(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_28(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_30(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_29(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_31(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_30(__VA_ARGS__))
+	#define I_GTL_REFL__MEMBER_32(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_31(__VA_ARGS__))
+
+	#define I_GTL_REFL__MEMBERS_C(N, ...)	I_GTL_REFL__MEMBER_##N (__VA_ARGS__)
+	#define I_GTL_REFL__MEMBERS_F(N, ...)	I_GTL_REFL__MEMBERS_C(N, __VA_ARGS__)
+	#define GTL_REFL__MEMBERS(...)			I_GTL_REFL__MEMBERS_F(NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+
+
+	//================================================================================================================================
+	// reflection - MACRO version
+	//
+
+
+#define GTL_REFL__CLASS__BASE(THIS_CLASS)\
 	using mw_base_t = THIS_CLASS;\
 	using this_t = THIS_CLASS;\
 	template < typename tjson >\
@@ -98,10 +100,10 @@ namespace gtl {
 		std::apply([&ar, &var](auto const& ... args) { ((ar << var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
 		return ar;\
 	}\
-	auto operator <=> (this_t const&) const = default;
+	//auto operator <=> (this_t const&) const = default;
 
 
-#define DECL_MEMBER_WISE_DERIVED(THIS_CLASS, PARENT_CLASS)\
+#define GTL_REFL__CLASS__DERIVED(THIS_CLASS, PARENT_CLASS)\
 	using this_t = THIS_CLASS;\
 	using parent_t = PARENT_CLASS;\
 	template < typename tjson >\
@@ -126,13 +128,13 @@ namespace gtl {
 		std::apply([&ar, &var](auto const& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
 		return ar;\
 	}\
-	auto operator <=> (this_t const&) const = default;
+	//auto operator <=> (this_t const&) const = default;
 
 
 	//-----------------------------------------------------------------------------
-	// IMemberWiseV : with virtual function
-#define DECL_MEMBER_WISE_BASE_VIRTUAL(THIS_CLASS)\
-	DECL_MEMBER_WISE_BASE(THIS_CLASS)\
+	// Reflection (member wise...) : with virtual function
+#define GTL_REFL__CLASS__BASE_VIRTUAL(THIS_CLASS)\
+	GTL_REFL__CLASS__BASE(THIS_CLASS)\
 	virtual void FromJson(bjson<> const& j) { from_json(j, *(this_t*)this); }\
 	virtual void ToJson(bjson<>& j) const { to_json(j, *(this_t*)this); }\
 	virtual void FromJson(njson<> const& j) { from_json(j, *(this_t*)this); }\
@@ -144,8 +146,8 @@ namespace gtl {
 	}\
 
 
-#define DECL_MEMBER_WISE_VIRTUAL_DERIVED(THIS_CLASS, PARENT_CLASS)\
-	DECL_MEMBER_WISE_DERIVED(THIS_CLASS, PARENT_CLASS)\
+#define GTL_REFL__CLASS__VIRTUAL_DERIVED(THIS_CLASS, PARENT_CLASS)\
+	GTL_REFL__CLASS__DERIVED(THIS_CLASS, PARENT_CLASS)\
 	void FromJson(bjson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }\
 	void ToJson(bjson<>& j) const override { to_json(j, *(THIS_CLASS*)this); }\
 	void FromJson(njson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }\
@@ -158,6 +160,9 @@ namespace gtl {
 
 
 
+	//================================================================================================================================
+	// reflection CRTP version.
+	//
 
 	/// @brief CRTP reflection class. (not good. better to use MACROS)
 	/// @tparam 
@@ -201,12 +206,14 @@ namespace gtl {
 			return ar;
 		}
 
-	public:
-		auto operator <=>(IMemberWise const&) const = default;
+	//public:
+	//	auto operator <=>(IMemberWise const&) const = default;
 	};
 
 
 
+	/// @brief CRTP reflection class (derived). (not good. better to use MACROS)
+	/// @tparam 
 	template < typename THIS_CLASS, typename PARENT_CLASS >
 	class IMemberWiseDerived : public PARENT_CLASS {
 	public:
@@ -242,13 +249,14 @@ namespace gtl {
 			return ar;
 		}
 
-	public:
-		auto operator <=>(IMemberWiseDerived const&) const = default;
+	//public:
+	//	auto operator <=>(IMemberWiseDerived const&) const = default;
 	};
 
 
-	//-----------------------------------------------------------------------------
-	// IMemberWiseV : with virtual function
+
+	/// @brief CRTP reflection class. (virtual) (not good. better to use MACROS)
+	/// @tparam 
 	template < typename THIS_CLASS >
 	class IMemberWiseV : public IMemberWise<THIS_CLASS> {
 	public:
@@ -263,10 +271,14 @@ namespace gtl {
 			return *this == B;
 		}
 
-	public:
-		auto operator <=>(IMemberWiseV const&) const = default;
+	//public:
+	//	auto operator <=>(IMemberWiseV const&) const = default;
 	};
 
+
+
+	/// @brief CRTP reflection class (virtual. derived). (not good. better to use MACROS)
+	/// @tparam 
 	template < typename THIS_CLASS, typename PARENT_CLASS >
 	class IMemberWiseDerivedV : public IMemberWiseDerived<PARENT_CLASS, THIS_CLASS> {
 	public:
@@ -281,9 +293,10 @@ namespace gtl {
 			return (*this) == (THIS_CLASS const&)B;
 		}
 
-	public:
-		auto operator <=>(IMemberWiseDerivedV const&) const = default;
+	//public:
+	//	auto operator <=>(IMemberWiseDerivedV const&) const = default;
 	};
+
 
 
 #pragma pack(pop)
