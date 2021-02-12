@@ -175,6 +175,44 @@ namespace gtl {
 			return a;
 		}
 
+
+		boost::json::error_code read(std::filesystem::path const& path) {
+			std::ifstream stream(path, std::ios_base::binary);
+			return read(stream);
+		}
+		boost::json::error_code read(std::istream& is) {
+			// orinin : https://www.boost.org/doc/libs/1_75_0/libs/json/doc/html/json/input_output.html
+			boost::json::error_code ec;
+			boost::json::stream_parser p;
+			std::string line;
+			while( std::getline( is, line ) ){
+				p.write( line, ec );
+				if( ec )
+					return ec;
+			}
+			p.finish( ec );
+			if( ec )
+				return ec;
+			//return p.release();
+			j_ = p.release();
+			return ec;
+		}
+
+		auto write(std::filesystem::path const& path) {
+			std::ofstream stream(path, std::ios_base::binary);
+			return write(stream);
+		}
+		bool write(std::ostream& os) {
+			try {
+				os << j_;
+				return true;
+			}
+			catch (...) {
+				return false;
+			}
+		}
+
+
 	};
 
 
