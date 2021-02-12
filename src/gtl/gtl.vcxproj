@@ -190,6 +190,7 @@
     <ClInclude Include="..\..\include\gtl\string\old_format.h" />
     <ClInclude Include="..\..\include\gtl\string\string_primitives.hpp" />
     <ClInclude Include="..\..\include\gtl\string\utf_char_view.h" />
+    <ClInclude Include="..\..\include\gtl\time.h" />
     <ClInclude Include="..\..\include\gtl\_default.h" />
     <ClInclude Include="..\..\include\gtl\string.h" />
     <ClInclude Include="..\..\include\gtl\__lib.h" />

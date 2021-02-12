@@ -14,5 +14,5 @@
 #include "gtl/misc.h"
 #include "gtl/string.h"
 #include "gtl/archive.h"
-//#include "gtl/reflection.h"
+#include "gtl/reflection.h"
 //#include "gtl/dynamic.h"
