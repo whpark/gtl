@@ -52,6 +52,7 @@
     <ClCompile Include="test_archive.cpp" />
     <ClCompile Include="test_dynamic.cpp" />
     <ClCompile Include="test_json_proxy.cpp" />
+    <ClCompile Include="test_lock.cpp" />
     <ClCompile Include="test_reflection.cpp" />
     <ClCompile Include="test_string.cpp" />
     <ClCompile Include="test_string_codepage.cpp" />

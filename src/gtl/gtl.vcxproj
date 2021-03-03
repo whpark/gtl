@@ -178,6 +178,7 @@
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\json_proxy.h" />
     <ClInclude Include="..\..\include\gtl\misc.h" />
+    <ClInclude Include="..\..\include\gtl\mutex.h" />
     <ClInclude Include="..\..\include\gtl\reflection.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_utf.h" />
     <ClInclude Include="..\..\include\gtl\string\HangeulCodeMap.h" />
