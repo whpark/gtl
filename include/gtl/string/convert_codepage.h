@@ -250,7 +250,27 @@ namespace gtl {
 	template < bool bCOUNT_FIRST = true> inline std::u32string	ToStringU32(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 	template < bool bCOUNT_FIRST = true> inline std::u32string	ToStringU32(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 
-	GTL_API bool IsUTF8String(std::string_view sv, size_t* pOutputBufferCount = nullptr, bool* pbIsMSBSet = nullptr);
+	inline bool IsUTF8String(std::string_view sv, size_t* pOutputBufferCount = nullptr, bool* pbIsMSBSet = nullptr) {
+		if (pOutputBufferCount)
+			*pOutputBufferCount = 0;
+		if (pbIsMSBSet)
+			*pbIsMSBSet = false;
+
+		size_t nOutputLen = 0;
+		auto const* pos = sv.data();
+		auto const* const end = sv.data() + sv.size();
+		while (pos < end) {
+			if (!gtl::internal::UTFCharConverter<char32_t, char8_t, false, true, false>((char8_t const*&)pos, (char8_t const*)end, nOutputLen))
+				return false;
+		}
+
+		if (pOutputBufferCount)
+			*pOutputBufferCount = nOutputLen;
+		if (pbIsMSBSet && (nOutputLen != sv.size()))
+			*pbIsMSBSet = true;
+
+		return true;
+	}
 
 
 	namespace internal {

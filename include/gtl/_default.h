@@ -117,7 +117,7 @@
 
 // until c++20 source_location
 #ifdef __cpp_lib_source_location
-#	define GTL__FUNCSIG std::u8string(std::source_location::current().function_name()) + " : "
+#	define GTL__FUNCSIG std::string(std::source_location::current().function_name()) + " : "
 #else
 	#ifdef _MSC_VER
 		#define GTL__FUNCSIG __FUNCSIG__ " : "
