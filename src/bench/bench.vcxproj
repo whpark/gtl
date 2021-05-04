@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)3rdparty\boost\json\include;$(SolutionDir)3rdparty\nlohmann\json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -110,7 +110,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)3rdparty\boost\json\include;$(SolutionDir)3rdparty\nlohmann\json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -127,7 +127,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)3rdparty\boost\json\include;$(SolutionDir)3rdparty\nlohmann\json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
@@ -144,7 +144,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;$(SolutionDir)3rdparty\boost\json\include;$(SolutionDir)3rdparty\nlohmann\json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
