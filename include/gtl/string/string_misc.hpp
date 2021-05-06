@@ -26,12 +26,12 @@ namespace gtl {
 	/// @return " \r\t\n"
 	/// 
 	template < gtlc::string_elem tchar > [[nodiscard]] constexpr std::basic_string_view<tchar> GetSpaceString() {
-		if constexpr (std::is_same_v<tchar, char>) { return _A(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, char8_t>) { return _u8(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, char16_t>) { return _u(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, char32_t>) { return _U(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, wchar_t>) { return _W(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, uint16_t>) { return (uint16_t*)_u(SPACE_STRING); }
+		if constexpr (std::is_same_v<tchar, char>) { return TEXT_A(SPACE_STRING); }
+		else if constexpr (std::is_same_v<tchar, char8_t>) { return TEXT_u8(SPACE_STRING); }
+		else if constexpr (std::is_same_v<tchar, char16_t>) { return TEXT_u(SPACE_STRING); }
+		else if constexpr (std::is_same_v<tchar, char32_t>) { return TEXT_U(SPACE_STRING); }
+		else if constexpr (std::is_same_v<tchar, wchar_t>) { return TEXT_W(SPACE_STRING); }
+		else if constexpr (std::is_same_v<tchar, uint16_t>) { return (uint16_t*)TEXT_u(SPACE_STRING); }
 		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
 	namespace charset {

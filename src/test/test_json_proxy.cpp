@@ -5,14 +5,11 @@
 #include "gtl/json_proxy.h"
 
 #if (GTL__BOOST_JSON__AS_STANDALONE)
-
 	#include "boost/json/src.hpp"   // impl
-
-	namespace boost {
-		void throw_exception(std::exception const&) {
-		}
-	}
-
+	//namespace boost {
+	//	void throw_exception(std::exception const&) {
+	//	}
+	//}
 #endif
 
 using namespace std::literals;
