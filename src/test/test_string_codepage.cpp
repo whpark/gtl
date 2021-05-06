@@ -22,35 +22,35 @@ TEST(gtl_string, codepage) {
 
 #define TEST_STRING "asdfasdf가나다라마adrg바sfdgdh사아자차카타dd파하긎긣꿳fghs뎓뫓멙뻍😊❤✔"
 
-	std::u8string stru8(_u8(TEST_STRING));
-	std::u16string stru16(_u(TEST_STRING));
-	std::u32string stru32(_U(TEST_STRING));
+	std::u8string stru8(TEXT_u8(TEST_STRING));
+	std::u16string stru16(TEXT_u(TEST_STRING));
+	std::u32string stru32(TEXT_U(TEST_STRING));
 
 	// unicode <=> unicode
-	std::u16string str4 = gtl::ToStringU16(_u8(TEST_STRING));
-	EXPECT_TRUE(str4 ==  _u(TEST_STRING));
-	std::u32string str5 = gtl::ToStringU32(_u8(TEST_STRING));
-	EXPECT_TRUE(str5 ==  _U(TEST_STRING));
+	std::u16string str4 = gtl::ToStringU16(TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(str4 ==  TEXT_u(TEST_STRING));
+	std::u32string str5 = gtl::ToStringU32(TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(str5 ==  TEXT_U(TEST_STRING));
 
-	EXPECT_TRUE(gtl::ToStringU8 ( _u8(TEST_STRING))  == _u8(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringU16( _u8(TEST_STRING))  ==  _u(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringU32( _u8(TEST_STRING))  ==  _U(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringW(   _u8(TEST_STRING))  ==  _W(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU8 ( TEXT_u8(TEST_STRING))  ==  TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU16( TEXT_u8(TEST_STRING))  ==  TEXT_u(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU32( TEXT_u8(TEST_STRING))  ==  TEXT_U(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringW(   TEXT_u8(TEST_STRING))  ==  TEXT_W(TEST_STRING));
 
-	EXPECT_TRUE(gtl::ToStringU8 ( _u(TEST_STRING))  == _u8(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringU16( _u(TEST_STRING))  ==  _u(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringU32( _u(TEST_STRING))  ==  _U(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringW(   _u(TEST_STRING))  ==  _W(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU8 ( TEXT_u(TEST_STRING))  ==  TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU16( TEXT_u(TEST_STRING))  ==  TEXT_u(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU32( TEXT_u(TEST_STRING))  ==  TEXT_U(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringW(   TEXT_u(TEST_STRING))  ==  TEXT_W(TEST_STRING));
 
-	EXPECT_TRUE(gtl::ToStringU8 ( _U(TEST_STRING))  == _u8(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringU16( _U(TEST_STRING))  ==  _u(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringU32( _U(TEST_STRING))  ==  _U(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringW(   _U(TEST_STRING))  ==  _W(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU8 ( TEXT_U(TEST_STRING))  ==  TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU16( TEXT_U(TEST_STRING))  ==  TEXT_u(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU32( TEXT_U(TEST_STRING))  ==  TEXT_U(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringW(   TEXT_U(TEST_STRING))  ==  TEXT_W(TEST_STRING));
 
-	EXPECT_TRUE(gtl::ToStringU8 ( _W(TEST_STRING))  == _u8(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringU16( _W(TEST_STRING))  ==  _u(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringU32( _W(TEST_STRING))  ==  _U(TEST_STRING));
-	EXPECT_TRUE(gtl::ToStringW(   _W(TEST_STRING))  ==  _W(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU8 ( TEXT_W(TEST_STRING))  ==  TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU16( TEXT_W(TEST_STRING))  ==  TEXT_u(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringU32( TEXT_W(TEST_STRING))  ==  TEXT_U(TEST_STRING));
+	EXPECT_TRUE(gtl::ToStringW(   TEXT_W(TEST_STRING))  ==  TEXT_W(TEST_STRING));
 
 #pragma warning(pop)
 

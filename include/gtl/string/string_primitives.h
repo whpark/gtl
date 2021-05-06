@@ -21,21 +21,23 @@
 
 //-----------------------------------------------------------------------------
 // Text Constant macros
-#define _A(x) x
+#define TEXT_A(x) x
 #define ___WIDE_TEXT(x) L##x
-#define _W(x) ___WIDE_TEXT(x)
+#define TEXT_W(x) ___WIDE_TEXT(x)
 #define ___UTF8_TEXT(x) u8##x
-#define _u8(x) ___UTF8_TEXT(x)
+#define TEXT_u8(x) ___UTF8_TEXT(x)
 #define ___UTF16_TEXT(x) u##x
-#define _u(x) ___UTF16_TEXT(x)
+#define TEXT_u(x) ___UTF16_TEXT(x)
 #define ___UTF32_TEXT(x) U##x
-#define _U(x) ___UTF32_TEXT(x)
+#define TEXT_U(x) ___UTF32_TEXT(x)
 
 #define _EOL			"\r\n"
-#define EOL				_t(_EOL)
-#define EOLA			_A(_EOL)
-#define EOLW			_W(_EOL)
-#define EOLu8			_u8(_EOL)
+#define EOL				TEXT_A(_EOL)
+#define EOLA			TEXT_A(_EOL)
+#define EOLW			TEXT_W(_EOL)
+#define EOLu8			TEXT_u8(_EOL)
+#define EOLu			TEXT_u(_EOL)
+#define EOLU			TEXT_U(_EOL)
 #define SPACE_STRING	" \t\r\n"
 
 
