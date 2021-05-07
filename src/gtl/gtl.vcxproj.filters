@@ -98,6 +98,9 @@
     <ClInclude Include="..\..\include\gtl\mutex.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\iconv_wrapper.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">
@@ -121,5 +124,8 @@
     <ClCompile Include="string.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\dependency.txt" />
   </ItemGroup>
 </Project>

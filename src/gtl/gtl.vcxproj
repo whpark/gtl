@@ -216,6 +216,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\config_gtl.h" />
     <ClInclude Include="..\..\include\gtl\dynamic.h" />
     <ClInclude Include="..\..\include\gtl\gtl.h" />
+    <ClInclude Include="..\..\include\gtl\iconv_wrapper.h" />
     <ClInclude Include="..\..\include\gtl\json_proxy.h" />
     <ClInclude Include="..\..\include\gtl\misc.h" />
     <ClInclude Include="..\..\include\gtl\mutex.h" />
@@ -252,6 +253,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="string.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\dependency.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
