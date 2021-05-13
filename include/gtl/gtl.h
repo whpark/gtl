@@ -16,3 +16,5 @@
 #include "gtl/archive.h"
 #include "gtl/reflection.h"
 //#include "gtl/dynamic.h"
+#include "gtl/coord.h"
+#include "gtl/unit.h"

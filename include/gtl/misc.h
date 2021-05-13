@@ -12,7 +12,9 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "gtl/_default.h"
+//#include "gtl/_default.h"
+#include <bitset>
+#include <algorithm>
 #include "gtl/concepts.h"
 
 namespace gtl {
@@ -369,28 +371,28 @@ namespace gtl {
 
 	/// @brief color_rgba_t
 	union color_rgba_t {
-		struct { std::byte r, g, b, a; };
+		struct { uint8_t r, g, b, a; };
 		uint32_t cr{};
 	};
-	constexpr static inline color_rgba_t RGBA(std::byte r, std::byte g, std::byte b, std::byte a = {}) {
+	constexpr static inline color_rgba_t RGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a = {}) {
 		return color_rgba_t{.r = r, .g = g, .b = b, .a = a};
 	}
 
 	/// @brief color_bgra_t
 	union color_bgra_t {
-		struct { std::byte b, g, r, a; };
+		struct { uint8_t b, g, r, a; };
 		uint32_t cr{};
 	};
-	constexpr static inline color_bgra_t BGRA(std::byte b, std::byte g, std::byte r, std::byte a = {}) {
+	constexpr static inline color_bgra_t BGRA(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
 		return color_bgra_t{ .b = b, .g = g, .r = r, .a = a };
 	}
 
 	/// @brief color_abgr_t
 	union color_abgr_t {
-		struct { std::byte a, b, g, r; };
+		struct { uint8_t a, b, g, r; };
 		uint32_t cr{};
 	};
-	constexpr static inline color_abgr_t ABGR(std::byte b, std::byte g, std::byte r, std::byte a = {}) {
+	constexpr static inline color_abgr_t ABGR(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
 		return color_abgr_t{ .a = a, .b = b, .g = g, .r = r };
 	}
 

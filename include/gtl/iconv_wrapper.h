@@ -20,8 +20,6 @@
 #include <string>
 #include "iconv.h"
 
-#include "gtl/_lib_gtl.h"
-#include "gtl/_default.h"
 #include "gtl/concepts.h"
 
 /*******************************************

@@ -9,8 +9,7 @@
 
 #pragma once
 
-#include "gtl/_default.h"
-#include "gtl/_lib_gtl.h"
+#include <concepts>
 
 #if !defined(__cpp_lib_concepts)
 #	error ERROR! Supports C++v20 only.

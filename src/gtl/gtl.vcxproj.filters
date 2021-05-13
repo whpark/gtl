@@ -101,6 +101,12 @@
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\coord.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\unit.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">
