@@ -44,11 +44,11 @@
 #include "gtl/string/convert_codepage.h"
 
 
-// from/to json
-template < typename tjson, typename T >
-void from_json(tjson const& j, T& object);
-template < typename tjson, typename T >
-void to_json(tjson& j, T const& object);
+//// from/to json
+//template < typename tjson, typename T >
+//void from_json(tjson const& j, T& object);
+//template < typename tjson, typename T >
+//void to_json(tjson& j, T const& object);
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -68,10 +68,10 @@ namespace gtl {
 
 		bjson(json_t& b) : j_(b) {}
 
-		json_t json() {
+		json_t& json() {
 			return j_;
 		}
-		json_t const json() const {
+		json_t const& json() const {
 			return j_;
 		}
 
@@ -230,10 +230,10 @@ namespace gtl {
 
 		njson(json_t& b) : j_(b) {}
 
-		json_t json() {
+		json_t& json() {
 			return j_;
 		}
-		json_t const json() const {
+		json_t const& json() const {
 			return j_;
 		}
 

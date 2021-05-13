@@ -32,6 +32,7 @@ namespace gtl {
 
 
 #define GTL__VIRTUAL_DYNAMIC_INTERFACE\
+	using mw_base_t = this_t;\
 	virtual std::unique_ptr<mw_base_t> NewObject() = 0;\
 	virtual std::unique_ptr<mw_base_t> NewClone() = 0;
 
