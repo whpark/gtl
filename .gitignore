@@ -24,6 +24,8 @@ bld/
 [Tt]emp/
 [Ll]ib/
 *.lib
+# module file
+*.ifc
 
 # Visual Studio 2015 cache/options directory
 .vs/

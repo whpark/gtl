@@ -66,6 +66,9 @@ export namespace gtl::shape {
 	struct s_text : public s_shape {
 	};
 
+	struct s_mtext : public s_shape {
+	};
+
 #if 0
 	/// @brief Shape class
 	class CShape : public s_shape {

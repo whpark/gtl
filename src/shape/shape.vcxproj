@@ -117,8 +117,8 @@
       <Message>deploy</Message>
       <Command>echo /*---- Copy *.lib to /lib ----*/
 xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
-echo /*---- Copy Target to /bin ----*/
-xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
+echo /*---- Copy *.ifc to /bin ----*/
+xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -150,8 +150,8 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <Message>deploy</Message>
       <Command>echo /*---- Copy *.lib to /lib ----*/
 xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
-echo /*---- Copy Target to /bin ----*/
-xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
+echo /*---- Copy *.ifc to /bin ----*/
+xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -179,8 +179,8 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <Message>deploy</Message>
       <Command>echo /*---- Copy *.lib to /lib ----*/
 xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
-echo /*---- Copy Target to /bin ----*/
-xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
+echo /*---- Copy *.ifc to /bin ----*/
+xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -212,8 +212,8 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <Message>deploy</Message>
       <Command>echo /*---- Copy *.lib to /lib ----*/
 xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
-echo /*---- Copy Target to /bin ----*/
-xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
+echo /*---- Copy *.ifc to /bin ----*/
+xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
