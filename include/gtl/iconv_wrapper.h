@@ -87,7 +87,7 @@ namespace gtl {
 #pragma pack(push, 8)
 
 
-	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from >
+	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from, size_t initial_dst_buf_size = 1024 >
 	class Ticonv {
 		libiconv_t cd_ {(iconv_t)-1};
 
@@ -130,30 +130,67 @@ namespace gtl {
 
 	public:
 		std::optional<std::basic_string<tchar_to>> Convert(std::basic_string<tchar_from> const& strFrom) {
-			return Convert<tchar_to, tchar_from>(std::basic_string_view<tchar_from>{strFrom});
+			return Convert(std::basic_string_view<tchar_from>{strFrom});
 		}
 		std::optional<std::basic_string<tchar_to>> Convert(std::basic_string_view<tchar_from> svFrom) {
 			if (!IsOpen())
 				return {};
-			std::basic_string<tchar_to> strTo;
-			strTo.resize(svFrom.size(), 0);
-			char* begin = std::bit_cast<char*>(svFrom.data());
-			size_t left_in = svFrom.size()*sizeof(tchar_from);
-			size_t left_out = strTo.size()*sizeof(tchar_to);
-			while (left_in) {
-				char* out = std::bit_cast<char*>(strTo.data() + strTo.size() - left_out/sizeof(tchar_to));
-				if (iconv(cd_, &begin, &left_in, &out, &left_out) == -1) {
+
+			// source
+		#if (_LIBICONV_VERSION >= 0x0110)
+			using char_source_buf_t = char;
+		#else
+			using char_source_buf_t = char const;
+		#endif
+			char_source_buf_t* src = std::bit_cast<char_source_buf_t*>(svFrom.data());
+			size_t remnant_src = svFrom.size()*sizeof(tchar_from);
+
+			auto Conv = [](iconv_t cd, std::basic_string<tchar_to>& strTo, char_source_buf_t** psrc, auto& remnant_src, auto& remnant_dst) -> std::optional<std::basic_string<tchar_to>> {
+				while (remnant_src) {
+					char* out = std::bit_cast<char*>(strTo.data() + strTo.size() - remnant_dst/sizeof(tchar_to));
+					if (iconv(cd, psrc, &remnant_src, &out, &remnant_dst) == (size_t)-1) {
+						if (errno == E2BIG) {
+							//size_t const old_size = strTo.size() * sizeof(tchar_to);
+							//size_t const new_size = strTo.size() * sizeof(tchar_to) * 2;
+							remnant_dst += strTo.size() * sizeof(tchar_to);
+							strTo.resize(strTo.size()*2);
+							continue;
+						}
+						return {};
+					}
+				}
+
+				strTo.resize(strTo.size() - remnant_dst/sizeof(tchar_to));
+				return std::move(strTo);
+			};
+
+
+			if constexpr (initial_dst_buf_size != 0) {
+				tchar_to initial_dst_buf[initial_dst_buf_size]{};
+				size_t remnant_dst = sizeof(initial_dst_buf);
+				char* out = (char*)initial_dst_buf;
+				if (iconv(cd_, &src, &remnant_src, &out, &remnant_dst) == (size_t)-1) {
 					if (errno == E2BIG) {
-						left_out += strTo.size() * sizeof(tchar_to);
-						strTo.resize(strTo.size()*2);
-						continue;
+						std::basic_string<tchar_to> strTo;
+						size_t const old_size = sizeof(initial_dst_buf);
+						size_t const new_size = std::max(old_size*2, svFrom.size());
+						strTo.resize(new_size/sizeof(tchar_to));
+						std::memmove(strTo.data(), initial_dst_buf, old_size - remnant_dst);
+						remnant_dst += (new_size - old_size);
+
+						return Conv(cd_, strTo, &src, remnant_src, remnant_dst);
 					}
 					return {};
 				}
-			}
+				return std::move(std::basic_string<tchar_to>(initial_dst_buf, std::size(initial_dst_buf)-remnant_dst/sizeof(tchar_to)));
 
-			strTo.resize(strTo.size() - left_out/sizeof(tchar_to));
-			return strTo;
+			} else {
+				std::basic_string<tchar_to> strTo;
+				strTo.resize(svFrom.size());
+				size_t remnant_dst = strTo.size()*sizeof(tchar_to);
+
+				return Conv(cd_, strTo, &src, remnant_src, remnant_dst);
+			}
 		}
 
 	public:
@@ -201,15 +238,15 @@ namespace gtl {
 	};
 
 	// helper
-	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from >
+	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from, size_t initial_dst_buf_size = 1024 >
 	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string_view<tchar_from> svFrom, char const* szCodeTo = nullptr, char const* szCodeFrom = nullptr) {
-		return Ticonv<tchar_to, tchar_from>{szCodeTo, szCodeFrom}.Convert(svFrom);
+		return Ticonv<tchar_to, tchar_from, initial_dst_buf_size>{szCodeTo, szCodeFrom}.Convert(svFrom);
 	}
 
 	// helper
-	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from >
+	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from, size_t initial_dst_buf_size = 1024 >
 	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string<tchar_from> const& strFrom, char const* szCodeTo = nullptr, char const* szCodeFrom = nullptr) {
-		return Ticonv<tchar_to, tchar_from>{szCodeTo, szCodeFrom}.Convert(strFrom);
+		return Ticonv<tchar_to, tchar_from, initial_dst_buf_size>{szCodeTo, szCodeFrom}.Convert(strFrom);
 	}
 
 #pragma pack(pop)
