@@ -137,11 +137,8 @@ namespace gtl {
 				return {};
 
 			// source
-		#if (_LIBICONV_VERSION >= 0x0110)
-			using char_source_buf_t = char;
-		#else
-			using char_source_buf_t = char const;
-		#endif
+			using char_source_buf_t = char;	// or char const
+
 			char_source_buf_t* src = std::bit_cast<char_source_buf_t*>(svFrom.data());
 			size_t remnant_src = svFrom.size()*sizeof(tchar_from);
 
