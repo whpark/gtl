@@ -56,11 +56,11 @@
 #include <string_view>
 #if defined(__cpp_lib_format)
 #	include <format>
-#	define fmt std
 #else
-#	define FMT_HEADER_ONLY
-#	include <fmt/format.h>
 #endif
+#define FMT_HEADER_ONLY
+#include <fmt/format.h>
+
 #include <regex>
 //#if defined (__cpp_lib_ctre)
 //#	include <ctre>
