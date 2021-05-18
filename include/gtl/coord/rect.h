@@ -23,38 +23,34 @@ namespace gtl {
 
 #pragma pack(push, 1)
 
-	template < typename T > struct TRect3;
+	template < typename T, int DEFAULT_FRONT = -1, int DEFAULT_BACK = 1 > struct TRect3;
 	template < typename T > struct TRect2;
 
 	//--------------------------------------------------------------------------------------------------------------------------------
 	// Rect 3 (left, top, front, right, bottom, back)
 	//
-
-	template < typename T >
+	template < typename T, int DEFAULT_FRONT, int DEFAULT_BACK >
 	struct TRect3 {
 	public:
-		union {
-			struct {
-				T left, top, front;
-				T right, bottom, back;
-			};
-			struct {
-				TPoint3<T> pt0, pt1;
-			};
-		};
+		T left{}, top{}, front{DEFAULT_FRONT};
+		T right{}, bottom{}, back{DEFAULT_BACK};
 
 		using coord_t = std::array<T, 6>;
 		using value_t = T;
 		constexpr coord_t& data() { return std::bit_cast<coord_t&>(*this); }
-		constexpr const coord_t& data() const { return std::bit_cast<coord_t const&>(*this); }
+		constexpr coord_t const& data() const { return std::bit_cast<coord_t const&>(*this); }
+		constexpr value_t& member(int i) { return data()[i]; }
+		constexpr value_t const& member(int i) const { return data()[i]; }
+		constexpr TPoint3<T>& pts(int i = 0) { return (i == 0) ? *std::bit_cast<TPoint3<T>*>(&left) : *std::bit_cast<TPoint3<T>*>(&right); }
+		constexpr TPoint3<T> const& pts(int i = 0) const { return (i == 0) ? *std::bit_cast<TPoint3<T>*>(&left) : *std::bit_cast<TPoint3<T>*>(&right); }
 
 	public:
 	// Constructors
-		constexpr T default_front() const { return -1; }
-		constexpr T default_back() const { return 1; }
+		constexpr T default_front() const { return DEFAULT_FRONT; }
+		constexpr T default_back() const { return DEFAULT_BACK; }
 
-		TRect3() : left{}, top{}, right{}, bottom{}, front(default_front()), back(default_back()) {}
-		TRect3(const TRect3&) = default;
+		TRect3() = default;
+		TRect3(TRect3 const&) = default;
 
 		TRect3(T l, T t, T r, T b) :
 			left(l), top(t), right(r), bottom(b), front(default_front()), back(default_back()) {}
@@ -63,137 +59,123 @@ namespace gtl {
 			right(r), bottom(b), back(bk) {}
 		template < typename T2 >
 		TRect3(T2 l, T2 t, T2 r, T2 b) :
-			left(RoundOrForward<T, T2>(l)), top(RoundOrForward<T, T2>(t)),
-			right(RoundOrForward<T, T2>(r)), bottom(RoundOrForward<T, T2>(b)),
+			left(RoundOrForward<T>(l)), top(RoundOrForward<T>(t)),
+			right(RoundOrForward<T>(r)), bottom(RoundOrForward<T>(b)),
 			front(default_front()), back(default_back()) {}
 		template < typename T2 >
 		TRect3(T2 l, T2 t, T2 f, T2 r, T2 b, T2 bk) :
-			left(RoundOrForward<T, T2>(l)), top(RoundOrForward<T, T2>(t)), front(RoundOrForward<T, T2>(f)),
-			right(RoundOrForward<T, T2>(r)), bottom(RoundOrForward<T, T2>(b)), back(RoundOrForward<T, T2>(bk)) {}
+			left(RoundOrForward<T>(l)), top(RoundOrForward<T>(t)), front(RoundOrForward<T>(f)),
+			right(RoundOrForward<T>(r)), bottom(RoundOrForward<T>(b)), back(RoundOrForward<T>(bk)) {}
 
-		explicit TRect3(const RECT& B) { *this = B; }
+		template < gtlc::generic_coord T_COORD >
+		explicit TRect3(T_COORD const& B) { *this = B; }
+		template < gtlc::generic_coord T_COORD >
+		TRect3& operator = (T_COORD const& B) {
+			if constexpr (gtlc::rect3<T_COORD>) {
+				pts(0) = B.pts(0);
+				pts(1) = B.pts(1);
+			}
+			else {
+				if constexpr (gtlc::has__xy<T_COORD>) {
+					left  = RoundOrForward<T>(B.x);
+					top   = RoundOrForward<T>(B.y);
+					if constexpr (gtlc::has__z<T_COORD>) {
+						front = RoundOrForward<T>(B.z);
+					}
+				}
+
+				if constexpr (gtlc::has__size2<T_COORD>) {
+					right = left + RoundOrForward<T>(B.width);
+					bottom = top + RoundOrForward<T>(B.height);
+					if constexpr (gtlc::has__depth<T_COORD>) {
+						back = front + RoundOrForward<T>(B.depth);
+					}
+				} else if constexpr (gtlc::has__cxy<T_COORD>) {
+					right = left + RoundOrForward<T>(B.cx);
+					bottom = top + RoundOrForward<T>(B.cy);
+					if constexpr (gtlc::has__cz<T_COORD>) {
+						back = front + RoundOrForward<T>(B.cz);
+					}
+				} else if constexpr (gtlc::wnd_rect<T_COORD>) {
+					left = B.left;
+					top = B.top;
+					right = B.right;
+					bottom = B.bottom;
+					//z = {};
+				} else if constexpr (gtlc::has__xy<T_COORD>) { // 삭제금지!. static_assert 걸러내기 위해서 첫 번째 if 절 다시 추가.
+				} else {
+					static_assert(false);
+				}
+			}
+			return *this;
+		}
 
 	// 3d
-		template < gtl::is__xyz T_POINT >
-		TRect3(const T_POINT& pt, const T_POINT& pt2) :
+		template < gtlc::has__xyz T_POINT >
+		TRect3(T_POINT const& pt, T_POINT const& pt2) :
 			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)}, front{RoundOrForward<T>(pt.z)},
 			right{RoundOrForward<T>(pt2.x)}, bottom{RoundOrForward<T>(pt2.y)}, back{RoundOrForward<T>(pt2.z)} {};
 
-		template < gtl::is__xyz T_POINT, gtl::is__cxyz T_SIZE>
-		TRect3(const T_POINT& pt, const T_SIZE& size) :
+		template < gtlc::has__xyz T_POINT, gtlc::has__cxyz T_SIZE>
+		TRect3(T_POINT const& pt, T_SIZE const& size) :
 			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)}, front{RoundOrForward<T>(pt.z)},
 			right{RoundOrForward<T>(pt.x+size.cx)}, bottom{RoundOrForward<T>(pt.y+size.cy)}, back{RoundOrForward<T>(pt.z+size.cz)} {};
 
-		template < gtl::is__xyz T_POINT, gtl::is__size3 T_SIZE>
-		TRect3(const T_POINT& pt, const T_SIZE& size) :
+		template < gtlc::has__xyz T_POINT, gtlc::has__size3 T_SIZE>
+		TRect3(T_POINT const& pt, T_SIZE const& size) :
 			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)}, front{RoundOrForward<T>(pt.z)},
 			right{RoundOrForward<T>(pt.x+size.width)}, bottom{RoundOrForward<T>(pt.y+size.height)}, back{RoundOrForward<T>(pt.z+size.depth)} {};
 
 	// 2d
-		template < gtl::is__xy T_POINT >
-		TRect3(const T_POINT& pt, const T_POINT& pt2) :
+		template < gtlc::has__xy T_POINT >
+		TRect3(T_POINT const& pt, T_POINT const& pt2) :
 			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
 			right{RoundOrForward<T>(pt2.x)}, bottom{RoundOrForward<T>(pt2.y)},
 			front(default_front()), back(default_back()) {};
 
-		template < gtl::is__xy T_POINT, gtl::is__cxy T_SIZE>
-		TRect3(const T_POINT& pt, const T_SIZE& size) :
+		template < gtlc::has__xy T_POINT, gtlc::has__cxy T_SIZE>
+		TRect3(T_POINT const& pt, T_SIZE const& size) :
 			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
 			right{RoundOrForward<T>(pt.x+size.cx)}, bottom{RoundOrForward<T>(pt.y+size.cy)},
 			front(default_front()), back(default_back()) {};
 
-		template < gtl::is__xy T_POINT, gtl::is__size2 T_SIZE>
-		TRect3(const T_POINT& pt, const T_SIZE& size) :
+		template < gtlc::has__xy T_POINT, gtlc::has__size2 T_SIZE>
+		TRect3(T_POINT const& pt, T_SIZE const& size) :
 			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
 			right{RoundOrForward<T>(pt.x+size.width)}, bottom{RoundOrForward<T>(pt.y+size.height)},
 			front(default_front()), back(default_back()) {};
 
 	// assign operator
-		TRect3& operator = (const TRect3& B) = default;
-
-		template < typename T_RECT > requires requires (T_RECT rect) { rect.pt0; rect.pt1; }
-		TRect3& operator = (const T_RECT& rect) { pt0 = rect.pt0; pt1 = rect.pt1; return *this; };
-
-		template < typename T_CV_RECT > requires requires (T_CV_RECT rc) { rc.x; rc.y; rc.widht; rc.height; }
-		TRect3& operator = (const T_CV_RECT& rc) {
-			left	= RoundOrForward<T>(rc.x);
-			top		= RoundOrForward<T>(rc.y);
-			right	= RoundOrForward<T>(rc.x + rc.width);
-			bottom	= RoundOrForward<T>(rc.y + rc.height);
-			return *this;
-		}
-
-		TRect3& operator = (const RECT& srcRect) {
-			left = srcRect.left; top = srcRect.top; /*front = 0;*/
-			right = srcRect.right; bottom = srcRect.bottom; /*back = 0;*/
-			return *this;
-		}
+		TRect3& operator = (TRect3 const& B) = default;
 
 		T Width() const		{ return right - left; }
 		T Height() const	{ return bottom - top; }
 		T Depth() const		{ return back - front; }
 
 	// Type Casting to cv::Size_, SIZE, ...
-
+		template < gtlc::wnd_rect T_COORD >
+		operator T_COORD () const { using T2 = decltype(T_COORD::left); return T_COORD{RoundOrForward<T2>(left), RoundOrForward<T2>(top), RoundOrForward<T2>(right), RoundOrForward<T2>(bottom) }; }
+		template < gtlc::cv_rect T_COORD >
+		operator T_COORD () const { using T2 = decltype(T_COORD::x); return T_COORD{RoundOrForward<T2>(left), RoundOrForward<T2>(top), RoundOrForward<T2>(right-left), RoundOrForward<T2>(bottom-top) }; }
 		template < typename T2 > operator TRect3<T2> () const { return TRect3<T2>(left, top, front, right, bottom, back); }
 		template < typename T2 > operator TRect2<T2> () const { return TRect2<T2>(left, top, right, bottom); }
-		operator RECT () const { return RECT{RoundOrForward<LONG, T>(left), RoundOrForward<LONG, T>(top), RoundOrForward<LONG, T>(right), RoundOrForward<LONG, T>(bottom)}; }
-
-		template < gtl::is__xy	T_COORD > operator T_COORD() const { return T_COORD{left, top}; }
-		template < gtl::is__xyz	T_COORD > operator T_COORD() const { return T_COORD{left, top, front}; }
-		template < gtl::is__cxy	T_COORD > operator T_COORD() const { return T_COORD{right-left, bottom-top}; }
-		template < gtl::is__cxyz	T_COORD > operator T_COORD() const { return T_COORD{right-left, bottom-top, back-front}; }
-		template < gtl::is__size2	T_COORD > operator T_COORD() const { return T_COORD{right-left, bottom-top}; }
-		template < gtl::is__size3	T_COORD > operator T_COORD() const { return T_COORD{right-left, bottom-top, back-front}; }
-
-		// cv::Rect_
-		template < typename T2, template <typename> typename T_CV_RECT > requires requires (T_CV_RECT<T2> rc) { rc.x; rc.y; rc.widht; rc.height; }
-		operator T_CV_RECT<T2>& () const {
-			return T_CV_RECT<T2>(
-				RoundOrForward<T2, T>(left),
-				RoundOrForward<T2, T>(top),
-				RoundOrForward<T2, T>(right-left),
-				RoundOrForward<T2, T>(bottom-top));
-		};
 
 	// Compare
-		auto operator <=> (const TRect3&) const = default;
+		auto operator <=> (TRect3 const&) const = default;
 
-		// B includes *this
-		bool operator <= (const TRect3& B) const {
-			return (left >= B.left) && (top >= B.top) && (front >= B.front)
-				&& (right <= B.right) && (bottom <= B.bottom) && (back <= B.back);
-		}
-		// *this includes B
-		bool operator >= (const TRect3& B) const {	// B includes *this
-			return (left <= B.left) && (top <= B.top) && (front <= B.front)
-				&& (right >= B.right) && (bottom >= B.bottom) && (back >= B.back);
-		}
-		// B includes *this
-		bool operator < (const TRect3& B) const {
-			return (left > B.left) && (top > B.top) && (front > B.front)
-				&& (right < B.right) && (bottom < B.bottom) && (back < B.back);
-		}
-		// *this includes B
-		bool operator > (const TRect3& B) const {	// B includes *this
-			return (left < B.left) && (top < B.top) && (front < B.front)
-				&& (right > B.right) && (bottom > B.bottom) && (back > B.back);
-		}
-		//auto operator <=> (const T& b) const { return *this <=> TRect3(b, b, b); }
+				TPoint2<T>& TopLeft()				{ return (TPoint2<T>&)pts(0); }
+		const	TPoint2<T>& TopLeft() const			{ return (TPoint2<T>&)pts(0); }
+				TPoint3<T>& TopLeftFront()			{ return pts(0); }
+		const	TPoint3<T>& TopLeftFront() const	{ return pts(0); }
 
-				TPoint2<T>& TopLeft()				{ return (TPoint2<T>&)pt0; }
-		const	TPoint2<T>& TopLeft() const			{ return (TPoint2<T>&)pt0; }
-				TPoint3<T>& TopLeftFront()			{ return pt0; }
-		const	TPoint3<T>& TopLeftFront() const	{ return pt0; }
+				TPoint2<T>& BottomRight()			{ return (TPoint2<T>&)pts(1); }
+		const	TPoint2<T>& BottomRight() const		{ return (TPoint2<T>&)pts(1); }
+				TPoint3<T>& BottomRightEnd()		{ return pts(1); }
+		const	TPoint3<T>& BottomRightEnd() const	{ return pts(1); }
 
-				TPoint2<T>& BottomRight()			{ return (TPoint2<T>&)pt1; }
-		const	TPoint2<T>& BottomRight() const		{ return (TPoint2<T>&)pt1; }
-				TPoint3<T>& BottomRightEnd()		{ return pt1; }
-		const	TPoint3<T>& BottomRightEnd() const	{ return pt1; }
+		TPoint3<T> CenterPoint() const { return (pts(0)+pts(1))/2; }
 
-		TPoint3<T> CenterPoint() const { return {(right+left)/(T)2, (bottom+top)/(T)2, (back+front)/(T)2}; }
-
-		TSize3<T> GetSize() const { return {right-left, bottom-top, back-front}; }
+		TSize3<T> GetSize() const { return pts(1)-pts(0); }
 
 		// returns true if rectangle has no area
 		bool IsRectEmpty() const {
@@ -201,17 +183,24 @@ namespace gtl {
 		}
 		// returns true if rectangle is at (0,0,0) and has no area
 		bool IsRectNull() const {
-			return !left && !top && !front && !right && !bottom && !back;
+			return (pts(0) == TPoint3<T>{}) and (pts(1) == TPoint3<T>{});
 		}
-		bool PtInRect(const TPoint3<T>& pt) const {
+		bool PtInRect(TPoint3<T> const& pt) const {
 			return (pt.x >= left) && (pt.y >= top) && (pt.z >= front) && (pt.x < right) && (pt.y < bottom) && (pt.z < back);
 		}
-		bool PtInRect(const TPoint2<T>& pt) const {
+		bool PtInRect(TPoint2<T> const& pt) const {
 			return (pt.x >= left) && (pt.y >= top) && (pt.x < right) && (pt.y < bottom);
 		}
 		// returns true if rect is within rectangle
-		bool RectInRect(const TRect3<T>& B) const {
-			return B <= *this;
+		/// @brief *this including B
+		/// @return 
+		bool RectInRect(TRect3 const& B) const {
+			return (pts(0) <= B.pts(0)) and (B.pts(1) <= pts(1));
+		}
+		/// @brief *this including B (No boundary)
+		/// @return 
+		bool RectInRectNE(TRect3 const& B) const {
+			return (pts(0) < B.pts(0)) and (B.pts(1) < pts(1));
 		}
 
 		// Operations
@@ -221,28 +210,28 @@ namespace gtl {
 			left = x1; top = y1; front = z1; right = x2; bottom = y2; back = z2;
 		}
 
-		void SetRect(const TPoint3<T>& pt, const TSize3<T>& size)		{ pt0 = pt; pt1 = pt+size; }
-		void SetRect(const TPoint3<T>& pt0, const TPoint3<T>& pt1)		{ this->pt0 = pt0; this->pt1 = pt1; }
-		void SetRectEmpty() { pt0.SetZero(); pt1.SetZero(); }
+		void SetRect(TPoint3<T> const& pt, TSize3<T> const& size)		{ pts(0) = pt; pts(1) = pt+size; }
+		void SetRect(TPoint3<T> const& pt0, TPoint3<T> const& pt1)		{ pts(0) = pt0; pts(1) = pt1; }
+		void SetRectEmpty() { pts(0).SetZero(); pts(1).SetZero(); }
 
 		// infflate the rectangles's width, height and depth
 		TRect3& InflateRect(T x, T y, T z) { left -= x; top -= y; front -= z; right += x; bottom += y; back += z; return *this; }
-		TRect3& InflateRect(const TSize3<T>& size) { pt0 -= size; pt1 += size; return *this; }
-		TRect3& InflateRect(const TRect3<T>& rect) { pt0 -= rect.pt0; pt1 += rect.pt1; return *this; }
+		TRect3& InflateRect(TSize3<T> const& size) { pts(0) -= size; pts(1) += size; return *this; }
+		TRect3& InflateRect(TRect3<T> const& rect) { pts(0) -= rect.pts(0); pts(1) += rect.pts(1); return *this; }
 		TRect3& InflateRect(T l, T t, T r, T b) { left -= l; top -= t; right += r; bottom += b; return *this; }
 		TRect3& InflateRect(T l, T t, T f, T r, T b, T bk) { left -= l; top -= t; front -= f; right += r; bottom += b; back += bk; return *this; }
 
 		// deflate the rectangle's width, height and depth
 		TRect3& DeflateRect(T x, T y, T z) { left += x; top += y; front += z; right -= x; bottom -= y; back -= z; return *this; }
-		TRect3& DeflateRect(const TSize3<T>& size) { pt0 += size; pt1 -= size; return *this; }
-		TRect3& DeflateRect(const TRect3<T>& rect) { pt0 += rect.pt0; pt1 -= rect.pt1; return *this; }
+		TRect3& DeflateRect(TSize3<T> const& size) { pts(0) += size; pts(1) -= size; return *this; }
+		TRect3& DeflateRect(TRect3<T> const& rect) { pts(0) += rect.pts(0); pts(1) -= rect.pts(1); return *this; }
 		TRect3& DeflateRect(T l, T t, T r, T b)  { left += l; top += t; right -= r; bottom -= b; return *this; }
 		TRect3& DeflateRect(T l, T t, T f, T r, T b, T bk) { left += l; top += t; front += f; right -= r; bottom -= b; back -= bk; return *this; }
 
 		// translate the rectangle by moving its top and left
 		TRect3& OffsetRect(T x, T y, T z) { left += x; top += y; front += z; right += x; bottom += y; back += z; return *this; }
-		TRect3& OffsetRect(const TPoint3<T>& pt) { pt0 += pt; pt1 += pt; return *this; }			// for Point : move whole rect, for Size : move pt1 only.
-		TRect3& OffsetSize(const TSize3<T>& size) { /*pt0 += size;*/ pt1 += size; return *this; }	// for Point : move whole rect, for Size : move pt1 only.
+		TRect3& OffsetRect(TPoint3<T> const& pt) { pts(0) += pt; pts(1) += pt; return *this; }			// for Point : move whole rect, for Size : move pts(1) only.
+		TRect3& OffsetSize(TSize3<T> const& size) { /*pt0 += size;*/ pts(1) += size; return *this; }	// for Point : move whole rect, for Size : move pts(1) only.
 
 	public:
 		void NormalizeRect() {
@@ -262,7 +251,7 @@ namespace gtl {
 		void MoveToZX(T z, T x) { MoveToZ(z); MoveToX(x); }
 		void MoveToXYZ(T x, T y, T z) { MoveToX(x); MoveToY(y); MoveToZ(z); }
 
-		void MoveTo(const TPoint3<T>& pt) {
+		void MoveTo(TPoint3<T> const& pt) {
 			MoveToX(pt.x);
 			MoveToY(pt.y);
 			MoveToZ(pt.z);
@@ -273,13 +262,13 @@ namespace gtl {
 			NormalizeRect();
 			rect2.NormalizeRect();
 
-			pt0.x = std::max(pt0.x, rect2.pt0.x);
-			pt0.y = std::max(pt0.y, rect2.pt0.y);
-			pt0.z = std::max(pt0.z, rect2.pt0.z);
+			pts(0).x = std::max(pts(0).x, rect2.pts(0).x);
+			pts(0).y = std::max(pts(0).y, rect2.pts(0).y);
+			pts(0).z = std::max(pts(0).z, rect2.pts(0).z);
 
-			pt1.x = std::min(pt1.x, rect2.pt1.x);
-			pt1.y = std::min(pt1.y, rect2.pt1.y);
-			pt1.z = std::min(pt1.z, rect2.pt1.z);
+			pts(1).x = std::min(pts(1).x, rect2.pts(1).x);
+			pts(1).y = std::min(pts(1).y, rect2.pts(1).y);
+			pts(1).z = std::min(pts(1).z, rect2.pts(1).z);
 
 			return *this;
 		}
@@ -289,40 +278,42 @@ namespace gtl {
 			NormalizeRect();
 			rect2.NormalizeRect();
 
-			pt0.x = std::min(pt0.x, rect2.pt0.x);
-			pt0.y = std::min(pt0.y, rect2.pt0.y);
-			pt0.z = std::min(pt0.z, rect2.pt0.z);
+			pts(0).x = std::min(pts(0).x, rect2.pts(0).x);
+			pts(0).y = std::min(pts(0).y, rect2.pts(0).y);
+			pts(0).z = std::min(pts(0).z, rect2.pts(0).z);
 
-			pt1.x = std::max(pt1.x, rect2.pt1.x);
-			pt1.y = std::max(pt1.y, rect2.pt1.y);
-			pt1.z = std::max(pt1.z, rect2.pt1.z);
+			pts(1).x = std::max(pts(1).x, rect2.pts(1).x);
+			pts(1).y = std::max(pts(1).y, rect2.pts(1).y);
+			pts(1).z = std::max(pts(1).z, rect2.pts(1).z);
 
 			return *this;
 		}
 
 		// Operators
-		TRect3& operator += (const TPoint3<T>& pt)		{ return OffsetRect(pt); }
-		TRect3& operator -= (const TPoint3<T>& pt)		{ return OffsetRect(-pt); }
-		TRect3& operator += (const TSize3<T>& size)		{ return OffsetSize(size); }
-		TRect3& operator -= (const TSize3<T>& size)		{ return OffsetSize(-size); }
-		TRect3& operator += (const TRect3& rect)		{ return InflateRect(rect); }
-		TRect3& operator -= (const TRect3& rect)		{ return DeflateRect(rect); }
-		TRect3& operator &= (const TRect3& rect)		{ return IntersectRect(rect); }
-		TRect3& operator |= (const TRect3& rect)		{ return UnionRect(rect); }
+		TRect3& operator += (TPoint3<T> const& pt)		{ return OffsetRect(pt); }
+		TRect3& operator -= (TPoint3<T> const& pt)		{ return OffsetRect(-pt); }
+		TRect3& operator += (TSize3<T> const& size)		{ return OffsetSize(size); }
+		TRect3& operator -= (TSize3<T> const& size)		{ return OffsetSize(-size); }
+		TRect3& operator += (TRect3 const& rect)		{ return InflateRect(rect); }
+		TRect3& operator -= (TRect3 const& rect)		{ return DeflateRect(rect); }
+		TRect3& operator &= (TRect3 const& rect)		{ return IntersectRect(rect); }
+		TRect3& operator |= (TRect3 const& rect)		{ return UnionRect(rect); }
 
 		// Operators returning TRect3 data()
-		TRect3 operator + (const TPoint3<T>& pt) const	{ return TRect3(*this) += pt; }
-		TRect3 operator - (const TPoint3<T>& pt) const	{ return TRect3(*this) -= pt; }
-		TRect3 operator + (const TSize3<T>& size) const	{ return TRect3(*this) += size; }
-		TRect3 operator - (const TSize3<T>& size) const	{ return TRect3(*this) -= size; }
-		TRect3 operator + (const TRect3& rect) const	{ return TRect3(*this) += rect; }
-		TRect3 operator - (const TRect3& rect) const	{ return TRect3(*this) -= rect; }
-		TRect3 operator & (const TRect3& rect) const	{ return TRect3(*this).IntersectRect(rect); }
-		TRect3 operator | (const TRect3& rect) const	{ return TRect3(*this).UnionRect(rect); }
+		TRect3 operator + (TPoint3<T> const& pt) const	{ return TRect3(*this) += pt; }
+		TRect3 operator - (TPoint3<T> const& pt) const	{ return TRect3(*this) -= pt; }
+		TRect3 operator + (TSize3<T> const& size) const	{ return TRect3(*this) += size; }
+		TRect3 operator - (TSize3<T> const& size) const	{ return TRect3(*this) -= size; }
+		TRect3 operator + (TRect3 const& rect) const	{ return TRect3(*this) += rect; }
+		TRect3 operator - (TRect3 const& rect) const	{ return TRect3(*this) -= rect; }
+		TRect3 operator & (TRect3 const& rect) const	{ return TRect3(*this).IntersectRect(rect); }
+		TRect3 operator | (TRect3 const& rect) const	{ return TRect3(*this).UnionRect(rect); }
 
-		template < class Archive > friend Archive& operator & (Archive& ar, const TRect3& B) {
-			return ar & B.pt0 & B.pt1;
+		template < typename Archive > friend Archive& operator & (Archive& ar, TRect3 const& B) {
+			return ar & B.pts(0) & B.pts(1);
 		}
+		template < typename JSON > friend void from_json(JSON const& j, TRect3& B) { B.pts(0) = j["pt0"]; B.pts(1) = j["pt1"]; }
+		template < typename JSON > friend void to_json(JSON& j, TRect3 const& B) { j["pt0"] = B.pts(0); j["pt1"] = B.pts(1); }
 	};
 
 
@@ -332,153 +323,104 @@ namespace gtl {
 	template < typename T >
 	struct TRect2 {
 	public:
-		union {
-			struct {
-				T left, top;
-				T right, bottom;
-			};
-			struct {
-				TPoint2<T> pt0, pt1;
-			};
-		};
+		T left{}, top{};
+		T right{}, bottom{};
 
 		using coord_t = std::array<T, 4>;
 		using value_t = T;
 		constexpr coord_t& data() { return std::bit_cast<coord_t&>(*this); }
-		constexpr const coord_t& data() const { return std::bit_cast<coord_t const&>(*this); }
+		constexpr coord_t const& data() const { return std::bit_cast<coord_t const&>(*this); }
+		constexpr value_t& member(int i) { return data()[i]; }
+		constexpr value_t const& member(int i) const { return data()[i]; }
+		constexpr TPoint2<T>& pts(int i = 0) { return (i == 0) ? *std::bit_cast<TPoint2<T>*>(&left) : *std::bit_cast<TPoint2<T>*>(&right); }
+		constexpr TPoint2<T> const& pts(int i = 0) const { return (i == 0) ? *std::bit_cast<TPoint2<T>*>(&left) : *std::bit_cast<TPoint2<T>*>(&right); }
 
 	public:
 		// Constructors
 
 		TRect2() = default;
-		TRect2(const TRect2&) = default;
+		TRect2(TRect2 const&) = default;
 
 		TRect2(T l, T t, T r, T b) :
 			left(l), top(t), right(r), bottom(b) {}
 		template < typename T2 >
 		TRect2(T2 l, T2 t, T2 r, T2 b) :
-			left(RoundOrForward<T, T2>(l)), top(RoundOrForward<T, T2>(t)),
-			right(RoundOrForward<T, T2>(r)), bottom(RoundOrForward<T, T2>(b)) {}
+			left(RoundOrForward<T>(l)), top(RoundOrForward<T>(t)),
+			right(RoundOrForward<T>(r)), bottom(RoundOrForward<T>(b)) {}
 
-		explicit TRect2(const RECT& B) { *this = B; }
+		template < gtlc::generic_coord T_COORD >
+		explicit TRect2(T_COORD const& B) { *this = B; }
+		template < gtlc::generic_coord T_COORD >
+		TRect2& operator = (T_COORD const& B) {
+			if constexpr (gtlc::rect2<T_COORD>) {
+				pts(0) = B.pts(0);
+				pts(1) = B.pts(1);
+			}
+			else {
+				if constexpr (gtlc::has__xy<T_COORD>) {
+					left  = RoundOrForward<T>(B.x);
+					top   = RoundOrForward<T>(B.y);
+				}
+
+				if constexpr (gtlc::has__size2<T_COORD>) {
+					right = left + RoundOrForward<T>(B.width);
+					bottom = top + RoundOrForward<T>(B.height);
+				} else if constexpr (gtlc::has__cxy<T_COORD>) {
+					right = left + RoundOrForward<T>(B.cx);
+					bottom = top + RoundOrForward<T>(B.cy);
+				} else if constexpr (gtlc::wnd_rect<T_COORD>) {
+					left = B.left;
+					top = B.top;
+					right = B.right;
+					bottom = B.bottom;
+					//z = {};
+				} else if constexpr (gtlc::has__xy<T_COORD>) { // 삭제금지!. static_assert 걸러내기 위해서 첫 번째 if 절 다시 추가.
+				} else {
+					static_assert(false);
+				}
+			}
+			return *this;
+		}
 
 		// 3d
-		template < gtl::is__xyz T_POINT >
-		TRect2(const T_POINT& pt, const T_POINT& pt2) :
-			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
-			right{RoundOrForward<T>(pt2.x)}, bottom{RoundOrForward<T>(pt2.y)} {};
+		template < gtlc::has__xy T_POINT >
+		TRect2(T_POINT const& pt, T_POINT const& pt2) :
+			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)}, right{RoundOrForward<T>(pt2.x)}, bottom{RoundOrForward<T>(pt2.y)} {};
 
-		template < gtl::is__xyz T_POINT, gtl::is__cxyz T_SIZE>
-		TRect2(const T_POINT& pt, const T_SIZE& size) :
-			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
-			right{RoundOrForward<T>(pt.x+size.cx)}, bottom{RoundOrForward<T>(pt.y+size.cy)} {};
+		template < gtlc::has__xy T_POINT, gtlc::has__cxy T_SIZE>
+		TRect2(T_POINT const& pt, T_SIZE const& size) :
+			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)}, right{RoundOrForward<T>(pt.x+size.cx)}, bottom{RoundOrForward<T>(pt.y+size.cy)} {};
 
-		template < gtl::is__xyz T_POINT, gtl::is__size3 T_SIZE>
-		TRect2(const T_POINT& pt, const T_SIZE& size) :
-			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
-			right{RoundOrForward<T>(pt.x+size.width)}, bottom{RoundOrForward<T>(pt.y+size.height)} {};
-
-		// 2d
-		template < gtl::is__xy T_POINT >
-		TRect2(const T_POINT& pt, const T_POINT& pt2) :
-			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
-			right{RoundOrForward<T>(pt2.x)}, bottom{RoundOrForward<T>(pt2.y)} {};
-
-		template < gtl::is__xy T_POINT, gtl::is__cxy T_SIZE>
-		TRect2(const T_POINT& pt, const T_SIZE& size) :
-			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
-			right{RoundOrForward<T>(pt.x+size.cx)}, bottom{RoundOrForward<T>(pt.y+size.cy)} {};
-
-		template < gtl::is__xy T_POINT, gtl::is__size2 T_SIZE>
-		TRect2(const T_POINT& pt, const T_SIZE& size) :
-			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)},
-			right{RoundOrForward<T>(pt.x+size.width)}, bottom{RoundOrForward<T>(pt.y+size.height)} {};
+		template < gtlc::has__xy T_POINT, gtlc::has__size2 T_SIZE>
+		TRect2(T_POINT const& pt, T_SIZE const& size) :
+			left{RoundOrForward<T>(pt.x)}, top{RoundOrForward<T>(pt.y)}, right{RoundOrForward<T>(pt.x+size.width)}, bottom{RoundOrForward<T>(pt.y+size.height)} {};
 
 		// assign operator
-		TRect2& operator = (const TRect2& B) = default;
-
-		template < typename T_RECT > requires requires (T_RECT rect) { rect.pt0; rect.pt1; }
-		TRect2& operator = (const T_RECT& rect) { pt0 = rect.pt0; pt1 = rect.pt1; return *this; }
-
-		template < typename T_CV_RECT > requires requires (T_CV_RECT rc) { rc.x; rc.y; rc.widht; rc.height; }
-		TRect2& operator = (const T_CV_RECT& rc) {
-			left	= RoundOrForward<T>(rc.x);
-			top		= RoundOrForward<T>(rc.y);
-			right	= RoundOrForward<T>(rc.x + rc.width);
-			bottom	= RoundOrForward<T>(rc.y + rc.height);
-			return *this;
-		}
-
-		TRect2& operator = (const RECT& srcRect) {
-			left = srcRect.left; top = srcRect.top; /*front = 0;*/
-			right = srcRect.right; bottom = srcRect.bottom; /*back = 0;*/
-			return *this;
-		}
+		TRect2& operator = (TRect2 const& B) = default;
 
 		T Width() const		{ return right - left; }
 		T Height() const	{ return bottom - top; }
-		//T Depth() const		{ return back - front; }
 
 		// Type Casting to cv::Size_, SIZE, ...
-
-		//template < typename T2 > operator TRect3<T2> () const { return TRect3<T2>(left, top, front, right, bottom, back); }
-		template < typename T2 > operator TRect2<T2> () const { return TRect2<T2>(left, top, right, bottom); };
-		operator RECT () const { return RECT{RoundOrForward<LONG, T>(left), RoundOrForward<LONG, T>(top), RoundOrForward<LONG, T>(right), RoundOrForward<LONG, T>(bottom)}; };
-
-		template < gtl::is__xy	T_COORD > operator T_COORD() const { return T_COORD{left, top}; };
-		//template < gtl::is__xyz	T_COORD > operator T_COORD() const { return T_COORD{left, top, front}; };
-		template < gtl::is__cxy	T_COORD > operator T_COORD() const { return T_COORD{right-left, bottom-top}; };
-		//template < gtl::is__cxyz	T_COORD > operator T_COORD() const { return T_COORD{right-left, bottom-top, back-front}; };
-		template < gtl::is__size2	T_COORD > operator T_COORD() const { return T_COORD{right-left, bottom-top}; };
-		//template < gtl::is__size3	T_COORD > operator T_COORD() const { return T_COORD{right-left, bottom-top, back-front}; };
-
-		// cv::Rect_
-		template < typename T2, template <typename> typename T_CV_RECT > requires requires (T_CV_RECT<T2> rc) { rc.x; rc.y; rc.widht; rc.height; }
-		operator T_CV_RECT<T2>& () const {
-			return T_CV_RECT<T2>(
-				RoundOrForward<T2, T>(left),
-				RoundOrForward<T2, T>(top),
-				RoundOrForward<T2, T>(right-left),
-				RoundOrForward<T2, T>(bottom-top));
-		}
+		template < gtlc::wnd_rect T_COORD >
+		operator T_COORD () const { using T2 = decltype(T_COORD::left); return T_COORD{RoundOrForward<T2>(left), RoundOrForward<T2>(top), RoundOrForward<T2>(right), RoundOrForward<T2>(bottom) }; }
+		template < gtlc::cv_rect T_COORD >
+		operator T_COORD () const { using T2 = decltype(T_COORD::x); return T_COORD{RoundOrForward<T2>(left), RoundOrForward<T2>(top), RoundOrForward<T2>(right-left), RoundOrForward<T2>(bottom-top) }; }
+		//template < typename T2 > operator TRect3<T2> () const { return TRect3<T2>(left, top, -1, right, bottom, 1); }
+		template < typename T2 > operator TRect2<T2> () const { return TRect2<T2>(left, top, right, bottom); }
 
 		// Compare
-		auto operator <=> (const TRect2&) const = default;
+		auto operator <=> (TRect2 const&) const = default;
 
-		// B includes *this
-		bool operator <= (const TRect2& B) const {
-			return (left >= B.left) && (top >= B.top)
-				&& (right <= B.right) && (bottom <= B.bottom);
-		}
-		// *this includes B
-		bool operator >= (const TRect2& B) const {	// B includes *this
-			return (left <= B.left) && (top <= B.top)
-				&& (right >= B.right) && (bottom >= B.bottom);
-		}
-		// B includes *this
-		bool operator < (const TRect2& B) const {
-			return (left > B.left) && (top > B.top)
-				&& (right < B.right) && (bottom < B.bottom);
-		}
-		// *this includes B
-		bool operator > (const TRect2& B) const {	// B includes *this
-			return (left < B.left) && (top < B.top)
-				&& (right > B.right) && (bottom > B.bottom);
-		}
+				TPoint2<T>& TopLeft()				{ return pts(0); }
+		const	TPoint2<T>& TopLeft() const			{ return pts(0); }
 
-				TPoint2<T>& TopLeft()				{ return pt0; }
-		const	TPoint2<T>& TopLeft() const			{ return pt0; }
-		//		TPoint3<T>& TopLeftFront()			{ return pt0; }
-		//const	TPoint3<T>& TopLeftFront() const	{ return pt0; }
+				TPoint2<T>& BottomRight()			{ return pts(1); }
+		const	TPoint2<T>& BottomRight() const		{ return pts(1); }
 
-				TPoint2<T>& BottomRight()			{ return pt1; }
-		const	TPoint2<T>& BottomRight() const		{ return pt1; }
-		//		TPoint3<T>& BottomRightEnd()		{ return pt1; }
-		//const	TPoint3<T>& BottomRightEnd() const	{ return pt1; }
+		TPoint2<T> CenterPoint() const { return (pts(0)+pts(1))/2; }
 
-		TPoint2<T> CenterPoint() const { return {(right+left)/(T)2, (bottom+top)/(T)2}; }
-
-		TSize2<T> GetSize() const { return {right-left, bottom-top}; }
+		TSize2<T> GetSize() const { return pts(1)-pts(0); }
 
 		// returns true if rectangle has no area
 		bool IsRectEmpty() const {
@@ -486,17 +428,21 @@ namespace gtl {
 		}
 		// returns true if rectangle is at (0,0,0) and has no area
 		bool IsRectNull() const {
-			return !left && !top && !right && !bottom;
+			return (pts(0) == TPoint2<T>{}) and (pts(1) == TPoint2<T>{});
 		}
-		//bool PtInRect(const TPoint3<T>& pt) const {
-		//	return (pt.x >= left) && (pt.y >= top) && (pt.z >= front) && (pt.x < right) && (pt.y < bottom) && (pt.z < back);
-		//}
-		bool PtInRect(const TPoint2<T>& pt) const {
+		bool PtInRect(TPoint2<T> const& pt) const {
 			return (pt.x >= left) && (pt.y >= top) && (pt.x < right) && (pt.y < bottom);
 		}
 		// returns true if rect is within rectangle
-		bool RectInRect(const TRect2& B) const {
-			return B <= *this;
+		/// @brief *this including B
+		/// @return 
+		bool RectInRect(TRect2 const& B) const {
+			return (pts(0) <= B.pts(0)) and (B.pts(1) <= pts(1));
+		}
+		/// @brief *this including B (No boundary)
+		/// @return 
+		bool RectInRectNE(TRect2 const& B) const {
+			return (pts(0) < B.pts(0)) and (B.pts(1) < pts(1));
 		}
 
 		// Operations
@@ -506,28 +452,26 @@ namespace gtl {
 			left = x1; top = y1; right = x2; bottom = y2;
 		}
 
-		void SetRect(const TPoint2<T>& pt, const TSize2<T>& size)		{ pt0 = pt; pt1 = pt+size; }
-		void SetRect(const TPoint2<T>& pt0, const TPoint2<T>& pt1)		{ this->pt0 = pt0; this->pt1 = pt1; }
-		void SetRectEmpty() { pt0.SetZero(); pt1.SetZero(); }
+		void SetRect(TPoint2<T> const& pt, TSize2<T> const& size)		{ pts(0) = pt; pts(1) = pt+size; }
+		void SetRect(TPoint2<T> const& pt0, TPoint2<T> const& pt1)		{ pts(0) = pt0; pts(1) = pt1; }
+		void SetRectEmpty() { pts(0).SetZero(); pts(1).SetZero(); }
 
 		// infflate the rectangles's width, height and depth
-		TRect2& InflateRect(T x, T y) { left -= x; top -= y; right += x; bottom += y; return *this; }
-		TRect2& InflateRect(const TSize2<T>& size) { pt0 -= size; pt1 += size; return *this; }
-		TRect2& InflateRect(const TRect2& rect) { pt0 -= rect.pt0; pt1 += rect.pt1; return *this; }
+		TRect2& InflateRect(T x, T y, T z) { left -= x; top -= y; right += x; bottom += y; return *this; }
+		TRect2& InflateRect(TSize2<T> const& size) { pts(0) -= size; pts(1) += size; return *this; }
+		TRect2& InflateRect(TRect2<T> const& rect) { pts(0) -= rect.pts(0); pts(1) += rect.pts(1); return *this; }
 		TRect2& InflateRect(T l, T t, T r, T b) { left -= l; top -= t; right += r; bottom += b; return *this; }
-		//TRect2& InflateRect(T l, T t, T f, T r, T b, T bk) { left -= l; top -= t; front -= f; right += r; bottom += b; back += bk; return *this; }
 
 		// deflate the rectangle's width, height and depth
 		TRect2& DeflateRect(T x, T y, T z) { left += x; top += y; right -= x; bottom -= y; return *this; }
-		TRect2& DeflateRect(const TSize2<T>& size) { pt0 += size; pt1 -= size; return *this; }
-		TRect2& DeflateRect(const TRect2& rect) { pt0 += rect.pt0; pt1 -= rect.pt1; return *this; }
+		TRect2& DeflateRect(TSize2<T> const& size) { pts(0) += size; pts(1) -= size; return *this; }
+		TRect2& DeflateRect(TRect2<T> const& rect) { pts(0) += rect.pts(0); pts(1) -= rect.pts(1); return *this; }
 		TRect2& DeflateRect(T l, T t, T r, T b)  { left += l; top += t; right -= r; bottom -= b; return *this; }
-		//TRect2& DeflateRect(T l, T t, T f, T r, T b, T bk) { left += l; top += t; front += f; right -= r; bottom -= b; back -= bk; return *this; }
 
 		// translate the rectangle by moving its top and left
 		TRect2& OffsetRect(T x, T y) { left += x; top += y; right += x; bottom += y; return *this; }
-		TRect2& OffsetRect(const TPoint3<T>& pt) { pt0 += pt; pt1 += pt; return *this; }			// for Point : move whole rect, for Size : move pt1 only.
-		TRect2& OffsetSize(const TSize3<T>& size) { /*pt0 += size;*/ pt1 += size; return *this; }	// for Point : move whole rect, for Size : move pt1 only.
+		TRect2& OffsetRect(TPoint2<T> const& pt) { pts(0) += pt; pts(1) += pt; return *this; }			// for Point : move whole rect, for Size : move pts(1) only.
+		TRect2& OffsetSize(TSize2<T> const& size) { /*pt0 += size;*/ pts(1) += size; return *this; }	// for Point : move whole rect, for Size : move pts(1) only.
 
 	public:
 		void NormalizeRect() {
@@ -538,18 +482,13 @@ namespace gtl {
 		// absolute position of rectangle
 		void MoveToX(T x) { right += (x-left); left = x; }
 		void MoveToY(T y) { bottom += (y-top); top = y; }
-		//void MoveToZ(T z) { back += (z-front); front = z; }
 		//void MoveToN(int i, T v) { assert(pt0.data().size() > i); pt1[i] += (v-pt0[i]); pt0[i] = v; }
 
 		void MoveToXY(T x, T y) { MoveToX(x); MoveToY(y); }
-		//void MoveToYZ(T y, T z) { MoveToY(y); MoveToZ(z); }
-		//void MoveToZX(T z, T x) { MoveToZ(z); MoveToX(x); }
-		//void MoveToXYZ(T x, T y, T z) { MoveToX(x); MoveToY(y); MoveToZ(z); }
 
-		void MoveTo(const TPoint2<T>& pt) {
+		void MoveTo(TPoint2<T> const& pt) {
 			MoveToX(pt.x);
 			MoveToY(pt.y);
-			//MoveToZ(pt.z);
 		}
 
 		// set this rectangle to intersection of two others
@@ -557,13 +496,11 @@ namespace gtl {
 			NormalizeRect();
 			rect2.NormalizeRect();
 
-			pt0.x = std::max(pt0.x, rect2.pt0.x);
-			pt0.y = std::max(pt0.y, rect2.pt0.y);
-			//pt0.z = std::max(pt0.z, rect2.pt0.z);
+			pts(0).x = std::max(pts(0).x, rect2.pts(0).x);
+			pts(0).y = std::max(pts(0).y, rect2.pts(0).y);
 
-			pt1.x = std::min(pt1.x, rect2.pt1.x);
-			pt1.y = std::min(pt1.y, rect2.pt1.y);
-			//pt1.z = std::min(pt1.z, rect2.pt1.z);
+			pts(1).x = std::min(pts(1).x, rect2.pts(1).x);
+			pts(1).y = std::min(pts(1).y, rect2.pts(1).y);
 
 			return *this;
 		}
@@ -573,46 +510,46 @@ namespace gtl {
 			NormalizeRect();
 			rect2.NormalizeRect();
 
-			pt0.x = std::min(pt0.x, rect2.pt0.x);
-			pt0.y = std::min(pt0.y, rect2.pt0.y);
-			//pt0.z = std::min(pt0.z, rect2.pt0.z);
+			pts(0).x = std::min(pts(0).x, rect2.pts(0).x);
+			pts(0).y = std::min(pts(0).y, rect2.pts(0).y);
 
-			pt1.x = std::max(pt1.x, rect2.pt1.x);
-			pt1.y = std::max(pt1.y, rect2.pt1.y);
-			//pt1.z = std::max(pt1.z, rect2.pt1.z);
+			pts(1).x = std::max(pts(1).x, rect2.pts(1).x);
+			pts(1).y = std::max(pts(1).y, rect2.pts(1).y);
 
 			return *this;
 		}
 
 		// Operators
-		TRect2& operator += (const TPoint2<T>& pt)		{ return OffsetRect(pt); }
-		TRect2& operator -= (const TPoint2<T>& pt)		{ return OffsetRect(-pt); }
-		TRect2& operator += (const TSize2<T>& size)		{ return OffsetSize(size); }
-		TRect2& operator -= (const TSize2<T>& size)		{ return OffsetSize(-size); }
-		TRect2& operator += (const TRect2& rect)		{ return InflateRect(rect); }
-		TRect2& operator -= (const TRect2& rect)		{ return DeflateRect(rect); }
-		TRect2& operator &= (const TRect2& rect)		{ return IntersectRect(rect); }
-		TRect2& operator |= (const TRect2& rect)		{ return UnionRect(rect); }
+		TRect2& operator += (TPoint2<T> const& pt)		{ return OffsetRect(pt); }
+		TRect2& operator -= (TPoint2<T> const& pt)		{ return OffsetRect(-pt); }
+		TRect2& operator += (TSize2<T> const& size)		{ return OffsetSize(size); }
+		TRect2& operator -= (TSize2<T> const& size)		{ return OffsetSize(-size); }
+		TRect2& operator += (TRect2 const& rect)		{ return InflateRect(rect); }
+		TRect2& operator -= (TRect2 const& rect)		{ return DeflateRect(rect); }
+		TRect2& operator &= (TRect2 const& rect)		{ return IntersectRect(rect); }
+		TRect2& operator |= (TRect2 const& rect)		{ return UnionRect(rect); }
 
-		// Operators returning TRect2 data()
-		TRect2 operator + (const TPoint2<T>& pt) const	{ return TRect2(*this) += pt; }
-		TRect2 operator - (const TPoint2<T>& pt) const	{ return TRect2(*this) -= pt; }
-		TRect2 operator + (const TSize2<T>& size) const	{ return TRect2(*this) += size; }
-		TRect2 operator - (const TSize2<T>& size) const	{ return TRect2(*this) -= size; }
-		TRect2 operator + (const TRect2& rect) const	{ return TRect2(*this) += rect; }
-		TRect2 operator - (const TRect2& rect) const	{ return TRect2(*this) -= rect; }
-		TRect2 operator & (const TRect2& rect) const	{ return TRect2(*this).IntersectRect(rect); }
-		TRect2 operator | (const TRect2& rect) const	{ return TRect2(*this).UnionRect(rect); }
+		// Operators returning TRect3 data()
+		TRect2 operator + (TPoint2<T> const& pt) const	{ return TRect2(*this) += pt; }
+		TRect2 operator - (TPoint2<T> const& pt) const	{ return TRect2(*this) -= pt; }
+		TRect2 operator + (TSize2<T> const& size) const	{ return TRect2(*this) += size; }
+		TRect2 operator - (TSize2<T> const& size) const	{ return TRect2(*this) -= size; }
+		TRect2 operator + (TRect2 const& rect) const	{ return TRect2(*this) += rect; }
+		TRect2 operator - (TRect2 const& rect) const	{ return TRect2(*this) -= rect; }
+		TRect2 operator & (TRect2 const& rect) const	{ return TRect2(*this).IntersectRect(rect); }
+		TRect2 operator | (TRect2 const& rect) const	{ return TRect2(*this).UnionRect(rect); }
 
-		template < class Archive > friend Archive& operator & (Archive& ar, const TRect2& B) {
-			return ar & B.pt0 & B.pt1;
+		template < typename Archive > friend Archive& operator & (Archive& ar, TRect2 const& B) {
+			return ar & B.pts(0) & B.pts(1);
 		}
+		template < typename JSON > friend void from_json(JSON const& j, TRect2& B) { B.pts(0) = j["pt0"]; B.pts(1) = j["pt1"]; }
+		template < typename JSON > friend void to_json(JSON& j, TRect2 const& B) { j["pt0"] = B.pts(0); j["pt1"] = B.pts(1); }
 
 		//-----------------------------------------------------------------------------
 		// ROI
 		//
 		template <typename T2 = std::int32_t>
-		[[nodiscard]] bool IsROI_Valid(const TSize2<T2>& sizeImage) const {
+		[[nodiscard]] bool IsROI_Valid(TSize2<T2> const& sizeImage) const {
 			if constexpr (std::is_integral_v(T2)) {
 				return 1
 					&& (RoundOrForward(left) >= 0)
@@ -630,7 +567,7 @@ namespace gtl {
 			}
 		}
 
-		bool AdjustROI(const TSize2<T>& sizeImage) {
+		bool AdjustROI(TSize2<T> const& sizeImage) {
 			NormalizeRect();
 
 			if (left < 0)
@@ -646,7 +583,7 @@ namespace gtl {
 		}
 
 		template <typename T2 = std::int32_t>
-		[[nodiscard]] TRect2<T2> GetSafeROI(const TSize2<T2>& sizeImage) const {
+		[[nodiscard]] TRect2<T2> GetSafeROI(TSize2<T2> const& sizeImage) const {
 			TRect2<T2> rectAdjusted(*this);
 
 			rectAdjusted.NormalizeRect();

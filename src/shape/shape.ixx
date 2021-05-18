@@ -4,15 +4,14 @@ module;
 #include <optional>
 #include <vector>
 #include <deque>
-#include "gtl/coord.h"
 #include "gtl/unit.h"
-#include "gtl/misc.h"
+#include "gtl/coord.h"
 
 export module shape;
 
 export namespace gtl::shape {
 
-	using point_t = POINT3D;
+	using point_t = CPoint3d;
 	struct line_t { point_t beg, end; };
 	struct polypoint_t : public point_t {
 		double bulge{};

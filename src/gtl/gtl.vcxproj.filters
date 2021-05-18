@@ -104,9 +104,6 @@
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\coord_.h">
-      <Filter>gtl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\unit.h">
       <Filter>gtl</Filter>
     </ClInclude>

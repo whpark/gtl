@@ -158,28 +158,31 @@ namespace gtl::concepts {
 
 
 	/// @brief is__coord
-	template < typename T_COORD > concept is__coord2 = 
-	(      (requires (T_COORD a) { a.x; a.y; } and !requires(T_COORD a) { a.z; })
-		|| (requires (T_COORD a) { a.cx; a.cy; } and !requires(T_COORD a) { a.cz; })
-		|| (requires (T_COORD a) { a.width; a.height; } and !requires(T_COORD a) { a.depth; })
-	);
-	template < typename T_COORD > concept is__coord3 = 
-	(      (requires (T_COORD a) { a.x; a.y; a.z; })
-		|| (requires (T_COORD a) { a.cx; a.cy; a.cz; })
-		|| (requires (T_COORD a) { a.width; a.height; a.depth; })
-	);
+	template < typename T_COORD > concept coord2 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_t, 2> >;
+	template < typename T_COORD > concept coord3 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_t, 3> >;
+	template < typename T_COORD > concept coord = coord2<T_COORD> or coord3<T_COORD>;
 
-	template < typename T_COORD > concept is__point3 = ( requires (T_COORD a) { a.x; a.y; a.z; } );
-	template < typename T_COORD > concept is__point2 = ( requires (T_COORD a) { a.x; a.y; } and !requires (T_COORD a) { a.z; } );
-	template < typename T_COORD > concept is__point = requires (T_COORD a) { a.x; a.y; };
+	template < typename T_COORD > concept point = requires (T_COORD a) { a.x; a.y; };
+	template < typename T_COORD > concept point2 = ( requires (T_COORD a) { a.x; a.y; } and !requires (T_COORD a) { a.z; } );
+	template < typename T_COORD > concept point3 = ( requires (T_COORD a) { a.x; a.y; a.z; } );
 
-	template < typename T_COORD > concept is__size3 = ( requires (T_COORD a) { a.cx; a.cy; a.cz; } );
-	template < typename T_COORD > concept is__size2 = ( requires (T_COORD a) { a.cx; a.cy; } and !requires (T_COORD a) { a.cz; } );
-	template < typename T_COORD > concept is__size = requires (T_COORD a) { a.cx; a.cy; };
+	template < typename T_COORD > concept size = requires (T_COORD a) { a.cx; a.cy; };
+	template < typename T_COORD > concept size2 = ( requires (T_COORD a) { a.cx; a.cy; } and !requires (T_COORD a) { a.cz; } );
+	template < typename T_COORD > concept size3 = ( requires (T_COORD a) { a.cx; a.cy; a.cz; } );
 
-	template < typename T_COORD > concept is__rect = requires (T_COORD a) { a.pt0; a.pt1; };
-	template < typename T_COORD > concept is__rect2 = ( is__rect<T_COORD> && requires (T_COORD a) { a.left; a.top; a.right; a.bottom; } );
-	template < typename T_COORD > concept is__rect3 = ( is__rect<T_COORD> && is__rect2<T_COORD> && requires {T_COORD::front; T_COORD::back;} );
+	template < typename T_COORD > concept rect = requires (T_COORD a) { a.pt0; a.pt1; };
+	template < typename T_COORD > concept rect2 = ( gtl::concepts::rect<T_COORD> and requires (T_COORD a) { a.left; a.top; a.right; a.bottom; } and !requires (T_COORD a) { a.front; a.back; } );
+	template < typename T_COORD > concept rect3 = ( gtl::concepts::rect<T_COORD> and requires (T_COORD a) { a.left; a.top; a.right; a.bottom; a.front; a.back;} );
+
+	template < typename T_COORD > concept wnd_point = requires (T_COORD a) { a.x; a.y; };
+	template < typename T_COORD > concept wnd_size = requires (T_COORD a) { a.cx; a.cy; };
+	template < typename T_COORD > concept wnd_rect = requires (T_COORD a) { a.left; a.top; a.right; a.bottom; };
+
+	template < typename T_COORD > concept cv_point = requires (T_COORD a) { a.x; a.y; };
+	template < typename T_COORD > concept cv_point2 = requires (T_COORD a) { a.x; a.y; } and !requires(T_COORD a) { a.z; };
+	template < typename T_COORD > concept cv_point3 = requires (T_COORD a) { a.x; a.y; a.z; };
+	template < typename T_COORD > concept cv_size = requires (T_COORD a) { a.width; a.height; };
+	template < typename T_COORD > concept cv_rect = requires (T_COORD a) { a.x; a.y; a.width; a.height; };
 
 	template < typename T_COORD > concept has__x = requires (T_COORD a) { a.x; };
 	template < typename T_COORD > concept has__y = requires (T_COORD a) { a.y; };
@@ -197,19 +200,23 @@ namespace gtl::concepts {
 	template < typename T_COORD > concept has__size2 = requires (T_COORD a) { a.width; a.height; };
 	template < typename T_COORD > concept has__size3 = requires (T_COORD a) { a.width; a.height; a.depth; };
 
-	template < typename T_COORD > concept is__xy = has__xy<T_COORD> && !has__z<T_COORD> && !has__cxy<T_COORD> && !has__cz<T_COORD> && !has__size2<T_COORD>;
-	template < typename T_COORD > concept is__cxy = has__cxy<T_COORD> && !has__cz<T_COORD> && !has__xy<T_COORD> && !has__size2<T_COORD>;
-	template < typename T_COORD > concept is__size2 = has__size2<T_COORD> && !has__depth<T_COORD> && !has__xy<T_COORD> && !has__cxy<T_COORD>;
-	template < typename T_COORD > concept is__xyz = has__xyz<T_COORD> && !has__cxy<T_COORD> && !has__size2<T_COORD>;
-	template < typename T_COORD > concept is__cxyz = has__cxyz<T_COORD> && !has__xy<T_COORD> && !has__size2<T_COORD>;
-	template < typename T_COORD > concept is__size3 = has__size3<T_COORD> && !has__xy<T_COORD> && !has__cxy<T_COORD>;
+	template < typename T_COORD > concept generic_point = has__x<T_COORD>;
+	template < typename T_COORD > concept generic_coord = coord<T_COORD> or wnd_point<T_COORD> or wnd_size<T_COORD> or wnd_rect<T_COORD> or generic_point<T_COORD> or cv_size<T_COORD> or cv_rect<T_COORD>;
 
-	template < typename T_COORD > concept is__coord2 = is__xy<T_COORD>  || is__cxy<T_COORD>  || is__size2<T_COORD>;
-	template < typename T_COORD > concept is__coord3 = is__xyz<T_COORD> || is__cxyz<T_COORD> || is__size3<T_COORD>;
 
-	//template < typename T_COORD > concept is__rect = requires (T_COORD a) { a.pt0; a.pt1; };
+	//template < typename T_COORD > concept is__xy = has__xy<T_COORD> && !has__z<T_COORD> && !has__cxy<T_COORD> && !has__cz<T_COORD> && !has__size2<T_COORD>;
+	//template < typename T_COORD > concept is__cxy = has__cxy<T_COORD> && !has__cz<T_COORD> && !has__xy<T_COORD> && !has__size2<T_COORD>;
+	//template < typename T_COORD > concept is__size2 = has__size2<T_COORD> && !has__depth<T_COORD> && !has__xy<T_COORD> && !has__cxy<T_COORD>;
+	//template < typename T_COORD > concept is__xyz = has__xyz<T_COORD> && !has__cxy<T_COORD> && !has__size2<T_COORD>;
+	//template < typename T_COORD > concept is__cxyz = has__cxyz<T_COORD> && !has__xy<T_COORD> && !has__size2<T_COORD>;
+	//template < typename T_COORD > concept is__size3 = has__size3<T_COORD> && !has__xy<T_COORD> && !has__cxy<T_COORD>;
 
-	template < typename T_COORD > concept is__cv_rect = has__xy<T_COORD> && !has__z<T_COORD> && has__size2<T_COORD> && !has__depth<T_COORD>;
+	//template < typename T_COORD > concept is__coord2 = is__xy<T_COORD>  || is__cxy<T_COORD>  || is__size2<T_COORD>;
+	//template < typename T_COORD > concept is__coord3 = is__xyz<T_COORD> || is__cxyz<T_COORD> || is__size3<T_COORD>;
+
+	////template < typename T_COORD > concept is__rect = requires (T_COORD a) { a.pt0; a.pt1; };
+
+	//template < typename T_COORD > concept is__cv_rect = has__xy<T_COORD> && !has__z<T_COORD> && has__size2<T_COORD> && !has__depth<T_COORD>;
 
 }
 
