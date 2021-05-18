@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "gtl/string.h"
+#include "fmt/chrono.h"
 //#include "gtl/string_view.h"
 
 //#include "gtl/_pre_lib_util.h"
@@ -155,7 +156,10 @@ namespace gtl {
 
 			return str;
 		}
-
+		std::wstring Format(std::wstring_view sv = L"{0:%Y-%m-%d}") const {
+			std::time_t t = *this;
+			return fmt::format(sv, fmt::localtime(t));
+		}
 
 		constexpr inline static const CSysTime::rep eTimeToSysTime = 10'000'000;	// --> 초단위로 변경
 		// for Windows only
