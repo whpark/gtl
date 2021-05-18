@@ -121,6 +121,8 @@ namespace gtl {
 	template < gtlc::string_elem tchar >
 	constexpr [[nodiscard]] std::optional<std::basic_string<tchar>> TranslateEscapeSequence(std::basic_string_view<tchar> sv, tchar cFill = (tchar)'?', tchar cTerminating = 0);
 
+	template < gtlc::string_elem tchar_t >
+	std::vector<std::basic_string<tchar_t>> ConvDataToHexString(std::span<uint8_t> data, size_t nCol = 16, int cDelimiter = ' ', bool bAddText = false, int cDelimiterText = '|');
 
 #pragma pack(pop)
 };	// namespace gtl;

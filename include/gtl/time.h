@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "gtl/string.h"
+#include "fmt/chrono.h"
 //#include "gtl/string_view.h"
 
 //#include "gtl/_pre_lib_util.h"
@@ -25,7 +26,7 @@
 namespace gtl {
 #pragma pack(push, 8)
 
-	class GTL_CLASS CSysTime;
+	//class GTL_CLASS CSysTime;
 
 	using system_clock_t = std::chrono::system_clock;
 
@@ -54,7 +55,7 @@ namespace gtl {
 
 	//-------------------------------------------------------------------------
 	//
-	class GTL_CLASS CSysTime : public std::chrono::time_point<system_clock_t> {
+	class /*GTL_CLASS*/ CSysTime : public std::chrono::time_point<system_clock_t> {
 	public:
 		using base_t = std::chrono::time_point<system_clock_t>;
 		using clock_t = base_t::clock;// == system_clock_t;
@@ -155,7 +156,10 @@ namespace gtl {
 
 			return str;
 		}
-
+		std::wstring Format(std::wstring_view sv = L"{0:%Y-%m-%d}") const {
+			std::time_t t = *this;
+			return fmt::format(sv, fmt::localtime(t));
+		}
 
 		constexpr inline static const CSysTime::rep eTimeToSysTime = 10'000'000;	// --> 초단위로 변경
 		// for Windows only

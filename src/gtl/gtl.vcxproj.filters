@@ -15,6 +15,9 @@
     <Filter Include="[ framework ]">
       <UniqueIdentifier>{b2fa2a90-3864-4f60-87e9-4ff80fe8347e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="gtl\coord">
+      <UniqueIdentifier>{26a74bbd-47dc-497c-8c54-3e39e5bd918b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\string.h">
@@ -101,10 +104,28 @@
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\unit.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\gtl\coord.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\unit.h">
+    <ClInclude Include="..\..\include\gtl\coord\rect.h">
+      <Filter>gtl\coord</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\coord\size.h">
+      <Filter>gtl\coord</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\coord\point.h">
+      <Filter>gtl\coord</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\log.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\rand.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\serial_port.h">
       <Filter>gtl</Filter>
     </ClInclude>
   </ItemGroup>
@@ -128,6 +149,12 @@
       <Filter>gtl.impl</Filter>
     </ClCompile>
     <ClCompile Include="string.cpp">
+      <Filter>gtl.impl</Filter>
+    </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>gtl.impl</Filter>
+    </ClCompile>
+    <ClCompile Include="serial_port.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
   </ItemGroup>

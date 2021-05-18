@@ -13,6 +13,7 @@
 //////////////////////////////////////////////////////////////////////
 
 //#include "gtl/_default.h"
+#include <cmath>
 #include <bitset>
 #include <algorithm>
 #include "gtl/concepts.h"
@@ -184,7 +185,7 @@ namespace gtl {
 		}
 	}
 
-#if 0
+#if 1
 	namespace internal {
 		template < typename T1, typename T2 > void op1mul(T1& v1, T2 v2) { v1 *= v2; }
 		template < typename T1, typename T2 > void op1div(T1& v1, T2 v2) { v1 /= v2; }
@@ -204,65 +205,6 @@ namespace gtl {
 		template < typename T1, typename T2 >
 		void DoArithmaticSub(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}-T2{})> ) { op1sub(v1, v2); } else { op2sub(v1, v2); } };
 	}
-#endif
-
-
-#if 0
-	template < int iMember, gtl::is__coord T_COORD >
-	constexpr auto& GetCoordMember(T_COORD& B) {
-		if constexpr (gtl::has__xy<T_COORD>) {
-			if constexpr (iMember == 0) return B.x;
-			else if constexpr (iMember == 1) return B.y;
-			else if constexpr ((iMember == 2) && has__z<T_COORD>) return B.z;
-			else static_assert(false);
-		} else if constexpr (gtl::has__cxy<T_COORD>) {
-			if constexpr (iMember == 0) return B.cx;
-			else if constexpr (iMember == 1) return B.cy;
-			else if constexpr ((iMember == 2) && has__cz<T_COORD>) return B.cz;
-		} else if constexpr (gtl::has__size2<T_COORD>) {
-			if constexpr (iMember == 0) return B.width;
-			else if constexpr (iMember == 1) return B.height;
-			else if constexpr ((iMember == 2) && has__depth<T_COORD>) return B.depth;
-		} else static_assert(false);
-	};
-	template < int iMember, gtl::is__coord T_COORD >
-	constexpr const auto& GetCoordMember(const T_COORD& B) {
-		if constexpr (gtl::has__xy<T_COORD>) {
-			if constexpr (iMember == 0) return B.x;
-			else if constexpr (iMember == 1) return B.y;
-			else if constexpr ((iMember == 2) && has__z<T_COORD>) return B.z;
-			else static_assert(false);
-		} else if constexpr (gtl::has__cxy<T_COORD>) {
-			if constexpr (iMember == 0) return B.cx;
-			else if constexpr (iMember == 1) return B.cy;
-			else if constexpr ((iMember == 2) && has__cz<T_COORD>) return B.cz;
-			else static_assert(false);
-		} else if constexpr (gtl::has__size2<T_COORD>) {
-			if constexpr (iMember == 0) return B.width;
-			else if constexpr (iMember == 1) return B.height;
-			else if constexpr ((iMember == 2) && has__depth<T_COORD>) return B.depth;
-			else static_assert(false);
-		} else static_assert(false);
-	};
-	template < int iMember, gtl::is__coord T_COORD >
-	constexpr bool HasCoordMember(const T_COORD& B) {
-		if constexpr (gtl::has__xy<T_COORD>) {
-			if constexpr (iMember == 0) return true;
-			else if constexpr (iMember == 1) return true;
-			else if constexpr ((iMember == 2) && has__z<T_COORD>) return true;
-			else return false;
-		} else if constexpr (gtl::has__cxy<T_COORD>) {
-			if constexpr (iMember == 0) return true;
-			else if constexpr (iMember == 1) return true;
-			else if constexpr ((iMember == 2) && has__cz<T_COORD>) return true;
-			else return false;
-		} else if constexpr (gtl::has__size2<T_COORD>) {
-			if constexpr (iMember == 0) return true;
-			else if constexpr (iMember == 1) return true;
-			else if constexpr ((iMember == 2) && has__depth<T_COORD>) return true;
-			else return false;
-		} else return false;
-	};
 #endif
 
 	// Boolean
