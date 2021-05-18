@@ -10,6 +10,11 @@
 
 #pragma once
 
+
+		//	#include "spdlog/logger.h"
+
+#if 0	// spdlog 
+
 #include "gtl/_default.h"
 
 //#include "gtl/_pre_lib_util.h"
@@ -154,3 +159,6 @@ namespace gtl {
 
 #pragma pack(pop)
 }	// namespace gtl
+
+
+#endif	//

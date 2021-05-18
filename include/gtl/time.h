@@ -26,7 +26,7 @@
 namespace gtl {
 #pragma pack(push, 8)
 
-	class GTL_CLASS CSysTime;
+	//class GTL_CLASS CSysTime;
 
 	using system_clock_t = std::chrono::system_clock;
 
@@ -55,7 +55,7 @@ namespace gtl {
 
 	//-------------------------------------------------------------------------
 	//
-	class GTL_CLASS CSysTime : public std::chrono::time_point<system_clock_t> {
+	class /*GTL_CLASS*/ CSysTime : public std::chrono::time_point<system_clock_t> {
 	public:
 		using base_t = std::chrono::time_point<system_clock_t>;
 		using clock_t = base_t::clock;// == system_clock_t;
