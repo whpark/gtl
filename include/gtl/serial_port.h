@@ -12,10 +12,13 @@
 
 #include "gtl/_default.h"
 
+#ifdef _WINDOWS
+
 //#include "gtl/_pre_lib_util.h"
 #include "gtl/time.h"
 #include "gtl/log.h"
 #include "gtl/mutex.h"
+
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -68,7 +71,6 @@ namespace gtl {
 
 	public:
 		CSimpleLog m_log;
-		CSimpleLog* m_pLog{};
 
 	protected:
 		HANDLE m_hComm;
@@ -88,7 +90,7 @@ namespace gtl {
 		DWORD m_dwTimeoutRX = 1'000;	// 1 sec
 
 	public:
-		bool m_bLog = false;	// if true, leaves log for read/written texts.
+		bool m_bLog {};	// if true, leaves log for read/written texts.
 
 		XComm() = default;
 
@@ -118,3 +120,5 @@ namespace gtl {
 
 #pragma pack(pop)
 }	// namespace gtl
+
+#endif	// _WINDOWS

@@ -11,6 +11,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "gtl/serial_port.h"
+
+#ifdef _WINDOWS
+
 #include "gtl/string.h"
 //#include "boost/asio/serial_port.hpp"
 
@@ -313,7 +316,7 @@ namespace gtl {
 			}
 		} while ((nReadTotal < nMaxSize) && !bQuit);
 
-		if (m_pLog) {
+		if (m_bLog) {
 			auto strs = ConvDataToHexString<wchar_t>({buf, nReadTotal}, 16);
 			for (const auto& str : strs) {
 				m_log.Log(L"Serial Read    : %s", str);
@@ -350,10 +353,10 @@ namespace gtl {
 		}
 		GetOverlappedResult(m_hComm, &m_overlappedW, &dwSize, FALSE);
 
-		if (m_bLog && m_pLog) {
+		if (m_bLog) {
 			auto strs = ConvDataToHexString<tchar>({(uint8_t*)_buf, (size_t)nSize}, 16, ' ', true, '|');
 			for (const auto& str : strs)
-				m_pLog->Log(L"Serial Written : %s", str);
+				m_log.Log(L"Serial Written : %s", str);
 		}
 
 		return dwSize;
@@ -406,3 +409,6 @@ namespace gtl {
 
 
 }
+
+
+#endif	// _WINDOWS
