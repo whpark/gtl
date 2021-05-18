@@ -184,7 +184,7 @@ namespace gtl {
 		}
 	}
 
-#if 0
+#if 1
 	namespace internal {
 		template < typename T1, typename T2 > void op1mul(T1& v1, T2 v2) { v1 *= v2; }
 		template < typename T1, typename T2 > void op1div(T1& v1, T2 v2) { v1 /= v2; }

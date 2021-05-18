@@ -215,6 +215,10 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\concepts.h" />
     <ClInclude Include="..\..\include\gtl\config_gtl.h" />
     <ClInclude Include="..\..\include\gtl\coord.h" />
+    <ClInclude Include="..\..\include\gtl\coord\point.h" />
+    <ClInclude Include="..\..\include\gtl\coord\rect.h" />
+    <ClInclude Include="..\..\include\gtl\coord\size.h" />
+    <ClInclude Include="..\..\include\gtl\coord_.h" />
     <ClInclude Include="..\..\include\gtl\dynamic.h" />
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h" />
