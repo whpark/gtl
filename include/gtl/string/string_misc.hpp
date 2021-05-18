@@ -561,6 +561,80 @@ namespace gtl {
 	}
 
 
+	template < gtlc::string_elem tchar_t >
+	std::vector<std::basic_string<tchar_t>> ConvDataToHexString(std::span<uint8_t> data, size_t nCol, int cDelimiter, bool bAddText, int cDelimiterText) {
+		std::vector<std::basic_string<tchar_t>> result;
+
+		if (data.size())
+			return result;
+
+		if (nCol == 0)
+			nCol = data.size();
+		//strsResult.clear();
+		result.reserve((data.size()-1) / nCol + 1);
+		uint8_t const* pos = data.data();
+		size_t nLeft = data.size();
+		int const nLenDelimiter = (cDelimiter ? 1 : 0);
+		int const nLenDelimiterText = (cDelimiterText ? 1 : 0);
+		while (nLeft > 0) {
+			result.push_back(TString<tchar_t>());
+			auto& str = result.back();
+
+			size_t n = std::min(nCol, nLeft);
+			if (bAddText) {
+				auto len = nCol * (2 + nLenDelimiter) + nLenDelimiterText + nLenDelimiter + n;
+				str.reserve(len);	// if cDelimiter == 0, no delimiter would be appended.
+			}
+			else
+				str.resize(n*(2 + (cDelimiter ? 1 : 0)));	// if cDelimiter == 0, no delimiter would be appended.
+
+			auto* pHead = pos;
+
+			//tchar_t* psz = str.data();
+			int i = 0;
+			for (i = 0; i < n; i++, pos++) {
+				auto ch = (*pos >> 4) & 0xF;
+				auto cl = *pos & 0xF;
+				str += tchar_t((ch > 9) ? (ch-9) + 'A' : ch + '0');
+				str += tchar_t((cl > 9) ? (cl-9) + 'A' : cl + '0');
+				if (cDelimiter)
+					str += (tchar_t)cDelimiter;
+			}
+			if (bAddText) {
+				for (; i < nCol; i++) {
+					if constexpr (std::is_same_v<tchar_t, char>) {
+						str += "  ";
+					} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
+						str += L"  ";
+					} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
+						str += u8"  ";
+					} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
+						str += u"  ";
+					} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
+						str += U"  ";
+					}
+					str += (tchar_t)cDelimiter;
+				}
+
+				if (cDelimiterText)
+					str += (tchar_t)cDelimiterText;
+				if (cDelimiter)
+					str += (tchar_t)cDelimiter;
+
+				pos = pHead;
+				for (int i = 0; i < n; i++, pos++) {
+					if ( *pos && !std::isspace(*pos) && (*pos > ' ') )
+						str += (char)*pos;
+					else
+						str += '.';
+				}
+			}
+
+			nLeft -= n;
+		}
+		return result;
+	}
+
 #pragma pack(pop)
 };	// namespace gtl;
 

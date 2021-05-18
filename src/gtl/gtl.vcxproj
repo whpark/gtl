@@ -225,7 +225,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\log.h" />
     <ClInclude Include="..\..\include\gtl\misc.h" />
     <ClInclude Include="..\..\include\gtl\mutex.h" />
+    <ClInclude Include="..\..\include\gtl\rand.h" />
     <ClInclude Include="..\..\include\gtl\reflection.h" />
+    <ClInclude Include="..\..\include\gtl\serial_port.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_utf.h" />
     <ClInclude Include="..\..\include\gtl\string\HangeulCodeMap.h" />
     <ClInclude Include="..\..\include\gtl\string\latin_charset.h" />
@@ -259,6 +261,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="serial_port.cpp" />
     <ClCompile Include="string.cpp" />
   </ItemGroup>
   <ItemGroup>
