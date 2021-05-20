@@ -203,14 +203,19 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
     <ClInclude Include="..\..\include\gtl\_macro.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="archiv.ixx" />
     <ClCompile Include="concepts.ixx" />
     <ClCompile Include="coord.ixx" />
     <ClCompile Include="coord\coord_point.ixx" />
     <ClCompile Include="coord\coord_rect.ixx" />
     <ClCompile Include="coord\coord_size.ixx" />
+    <ClCompile Include="dynamic.ixx" />
     <ClCompile Include="gtl.ixx" />
     <ClCompile Include="gtlm.cpp" />
+    <ClCompile Include="iconv_wrapper.ixx" />
+    <ClCompile Include="json_proxy.ixx" />
     <ClCompile Include="misc.ixx" />
+    <ClCompile Include="reflection.ixx" />
     <ClCompile Include="string.ixx" />
     <ClCompile Include="string\string_convert_codepage.ixx" />
     <ClCompile Include="string\string_convert_codepage_kssm.ixx" />
