@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\coord">
+      <UniqueIdentifier>{691a9a56-364a-4e3b-b146-6001975c0046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\string">
+      <UniqueIdentifier>{fff3c1a6-9b5c-44f0-a682-1bf7f78d80db}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\gtl\_macro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gtlm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="concepts.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coord.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unit.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="misc.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gtl.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="time.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="string.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_convert_codepage.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_convert_codepage_kssm.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_convert_codepage_kssm_to_utf16.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_convert_codepage_utf16_to_kssm.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_convert_utf.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_latin_charset.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_misc.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_primitives.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_to_arithmetic.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="string\string_utf_char_view.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="coord\coord_point.ixx">
+      <Filter>Source Files\coord</Filter>
+    </ClCompile>
+    <ClCompile Include="coord\coord_rect.ixx">
+      <Filter>Source Files\coord</Filter>
+    </ClCompile>
+    <ClCompile Include="coord\coord_size.ixx">
+      <Filter>Source Files\coord</Filter>
+    </ClCompile>
+    <ClCompile Include="iconv_wrapper.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="archiv.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dynamic.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="json_proxy.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mutex.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rand.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="log.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serial_port.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
