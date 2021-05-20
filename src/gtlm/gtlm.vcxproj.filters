@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\coord">
+      <UniqueIdentifier>{691a9a56-364a-4e3b-b146-6001975c0046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\string">
+      <UniqueIdentifier>{fff3c1a6-9b5c-44f0-a682-1bf7f78d80db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\_macro.h">
@@ -32,19 +38,10 @@
     <ClCompile Include="coord.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="coord_point.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="unit.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="coord_size.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="misc.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="coord_rect.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gtl.ixx">
@@ -56,35 +53,44 @@
     <ClCompile Include="string.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="string_convert_codepage_kssm_to_utf16.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_convert_codepage.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_convert_codepage_utf16_to_kssm.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_convert_codepage_kssm.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_latin_charset.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_convert_codepage_kssm_to_utf16.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_primitives.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_convert_codepage_utf16_to_kssm.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_to_arithmetic.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_convert_utf.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_convert_utf.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_latin_charset.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_convert_codepage.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_misc.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_convert_codepage_kssm.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_primitives.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_utf_char_view.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_to_arithmetic.ixx">
+      <Filter>Source Files\string</Filter>
     </ClCompile>
-    <ClCompile Include="string_misc.ixx">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="string\string_utf_char_view.ixx">
+      <Filter>Source Files\string</Filter>
+    </ClCompile>
+    <ClCompile Include="coord\coord_point.ixx">
+      <Filter>Source Files\coord</Filter>
+    </ClCompile>
+    <ClCompile Include="coord\coord_rect.ixx">
+      <Filter>Source Files\coord</Filter>
+    </ClCompile>
+    <ClCompile Include="coord\coord_size.ixx">
+      <Filter>Source Files\coord</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

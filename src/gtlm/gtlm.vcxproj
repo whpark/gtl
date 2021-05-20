@@ -204,24 +204,24 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="concepts.ixx" />
-    <ClCompile Include="string_convert_codepage.ixx" />
-    <ClCompile Include="string_convert_codepage_kssm.ixx" />
     <ClCompile Include="coord.ixx" />
-    <ClCompile Include="coord_point.ixx" />
-    <ClCompile Include="coord_rect.ixx" />
-    <ClCompile Include="coord_size.ixx" />
+    <ClCompile Include="coord\coord_point.ixx" />
+    <ClCompile Include="coord\coord_rect.ixx" />
+    <ClCompile Include="coord\coord_size.ixx" />
     <ClCompile Include="gtl.ixx" />
     <ClCompile Include="gtlm.cpp" />
-    <ClCompile Include="string_convert_codepage_kssm_to_utf16.ixx" />
-    <ClCompile Include="string_convert_codepage_utf16_to_kssm.ixx" />
-    <ClCompile Include="string_latin_charset.ixx" />
     <ClCompile Include="misc.ixx" />
     <ClCompile Include="string.ixx" />
-    <ClCompile Include="string_convert_utf.ixx" />
-    <ClCompile Include="string_misc.ixx" />
-    <ClCompile Include="string_primitives.ixx" />
-    <ClCompile Include="string_to_arithmetic.ixx" />
-    <ClCompile Include="string_utf_char_view.ixx" />
+    <ClCompile Include="string\string_convert_codepage.ixx" />
+    <ClCompile Include="string\string_convert_codepage_kssm.ixx" />
+    <ClCompile Include="string\string_convert_codepage_kssm_to_utf16.ixx" />
+    <ClCompile Include="string\string_convert_codepage_utf16_to_kssm.ixx" />
+    <ClCompile Include="string\string_convert_utf.ixx" />
+    <ClCompile Include="string\string_latin_charset.ixx" />
+    <ClCompile Include="string\string_misc.ixx" />
+    <ClCompile Include="string\string_primitives.ixx" />
+    <ClCompile Include="string\string_to_arithmetic.ixx" />
+    <ClCompile Include="string\string_utf_char_view.ixx" />
     <ClCompile Include="time.ixx" />
     <ClCompile Include="unit.ixx" />
   </ItemGroup>
