@@ -7,7 +7,7 @@
 //=========
 
 
-#include "gtl/config_gtl.h"
+#include "gtl/_config.h"
 #include "gtl/_lib_gtl.h"
 
 #include <cstdint>

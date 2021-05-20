@@ -200,9 +200,9 @@ namespace gtl {
 			double dSum = Square(x)+Square(y)+Square(z);
 			return std::sqrt(dSum);
 		}
-		[[nodiscard]] angle_rad_t GetAngleXY() const { return rad_t::atan2(y, x); }
-		[[nodiscard]] angle_rad_t GetAngleYZ() const { return rad_t::atan2(z, y); }
-		[[nodiscard]] angle_rad_t GetAngleZX() const { return rad_t::atan2(x, z); }
+		[[nodiscard]] rad_t GetAngleXY() const { return rad_t::atan2(y, x); }
+		[[nodiscard]] rad_t GetAngleYZ() const { return rad_t::atan2(z, y); }
+		[[nodiscard]] rad_t GetAngleZX() const { return rad_t::atan2(x, z); }
 
 		[[nodiscard]] TPoint3 GetNormalizedVector() const { return *this / GetLength(); }	// Length == 1.0
 		bool Normalize() { *this /= GetLength(); return IsAllValid(); }
@@ -395,9 +395,9 @@ namespace gtl {
 			double dSum = Square(x)+Square(y);
 			return std::sqrt(dSum);
 		}
-		[[nodiscard]] angle_rad_t GetAngleXY() const { return rad_t::atan2(y, x); }
-		//angle_rad_t GetAngleYZ() const { return rad_t::atan2(z, y); }
-		//angle_rad_t GetAngleZX() const { return rad_t::atan2(x, z); }
+		[[nodiscard]] rad_t GetAngleXY() const { return rad_t::atan2(y, x); }
+		//rad_t GetAngleYZ() const { return rad_t::atan2(z, y); }
+		//rad_t GetAngleZX() const { return rad_t::atan2(x, z); }
 
 		[[nodiscard]] TPoint2 GetNormalizedVector() const { return *this / GetLength(); }	// Length == 1.0
 		bool Normalize() { *this /= GetLength(); return IsAllValid(); }

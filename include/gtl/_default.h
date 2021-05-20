@@ -113,7 +113,7 @@
 
 #define GTL_DEPR_SEC [[deprecated("NOT Secure")]]
 
-#include "gtl/config_gtl.h"
+#include "gtl/_config.h"
 
 // until c++20 source_location
 #ifdef __cpp_lib_source_location

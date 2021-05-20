@@ -7,7 +7,7 @@
 //=========
 
 
-#include "gtl/config_gtl.h"
+#include "gtl/_config.h"
 
 #if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
 

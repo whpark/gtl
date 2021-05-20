@@ -213,7 +213,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\archive.h" />
     <ClInclude Include="..\..\include\gtl\concepts.h" />
-    <ClInclude Include="..\..\include\gtl\config_gtl.h" />
     <ClInclude Include="..\..\include\gtl\coord.h" />
     <ClInclude Include="..\..\include\gtl\coord\point.h" />
     <ClInclude Include="..\..\include\gtl\coord\rect.h" />
@@ -241,6 +240,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\string\utf_char_view.h" />
     <ClInclude Include="..\..\include\gtl\time.h" />
     <ClInclude Include="..\..\include\gtl\unit.h" />
+    <ClInclude Include="..\..\include\gtl\_config.h" />
     <ClInclude Include="..\..\include\gtl\_default.h" />
     <ClInclude Include="..\..\include\gtl\string.h" />
     <ClInclude Include="..\..\include\gtl\__lib.h" />
