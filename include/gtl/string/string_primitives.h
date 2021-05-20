@@ -13,32 +13,12 @@
 #define GTL_HEADER__BASIC_STRING
 
 #include "gtl/_lib_gtl.h"
+#include "gtl/_macro.h"
 #include "gtl/concepts.h"
 
 #if !defined(__cpp_lib_concepts)
 #	error ERROR! Supports C++v20 only.
 #endif
-
-//-----------------------------------------------------------------------------
-// Text Constant macros
-#define TEXT_A(x) x
-#define ___WIDE_TEXT(x) L##x
-#define TEXT_W(x) ___WIDE_TEXT(x)
-#define ___UTF8_TEXT(x) u8##x
-#define TEXT_u8(x) ___UTF8_TEXT(x)
-#define ___UTF16_TEXT(x) u##x
-#define TEXT_u(x) ___UTF16_TEXT(x)
-#define ___UTF32_TEXT(x) U##x
-#define TEXT_U(x) ___UTF32_TEXT(x)
-
-#define _EOL			"\r\n"
-#define EOL				TEXT_A(_EOL)
-#define EOLA			TEXT_A(_EOL)
-#define EOLW			TEXT_W(_EOL)
-#define EOLu8			TEXT_u8(_EOL)
-#define EOLu			TEXT_u(_EOL)
-#define EOLU			TEXT_U(_EOL)
-#define SPACE_STRING	" \t\r\n"
 
 
 namespace gtl {

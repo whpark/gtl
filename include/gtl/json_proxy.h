@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "gtl/config_gtl.h"
+#include "gtl/_config.h"
 
 
 #if (GTL__BOOST_JSON__AS_STANDALONE)

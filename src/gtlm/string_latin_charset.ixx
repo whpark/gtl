@@ -1,23 +1,26 @@
-﻿#include "pch.h"
-
-//=========
+﻿//=========
 //Automatically Generated File.
 //
 //        PWH.
 //
 //=========
 
+module;
 
-#include "gtl/string/latin_charset.h"
+#include <cstdint>
+#include <map>
 
-namespace gtl::charset {
-#pragma pack(push, 8)
+#include "gtl/_config.h"
+#include "gtl/_macro.h"
 
+export module gtl:string_latin_charset;
+
+export namespace gtl::charset {
 
 
 //-----------------------------------------------------------------------------
 //latin1
-	GTL_DATA std::map<char16_t, char16_t> const mapUL_latin1_g = { 
+	std::map<char16_t, char16_t> const mapUL_latin1_g = { 
 
 //-----------  192
 		{ 0x00c0, 0x00e0 }, // À, à : 32
@@ -52,9 +55,10 @@ namespace gtl::charset {
 		{ 0x00de, 0x00fe }, // Þ, þ : 32
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeUL_latin1_g { 0x00c0, 0x00df };
 //-----------------------------------------------------------------------------
 //latin_extended
-	GTL_DATA std::map<char16_t, char16_t> const mapUL_latin_extended_g = { 
+	std::map<char16_t, char16_t> const mapUL_latin_extended_g = { 
 
 //-----------   34
 		{ 0x0100, 0x0101 }, // Ā, ā : 1
@@ -229,9 +233,10 @@ namespace gtl::charset {
 		{ 0x024e, 0x024f }, // Ɏ, ɏ : 1
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeUL_latin_extended_g { 0x0100, 0x024f };
 //-----------------------------------------------------------------------------
 //other1
-	GTL_DATA std::map<char16_t, char16_t> const mapUL_other1_g = { 
+	std::map<char16_t, char16_t> const mapUL_other1_g = { 
 
 //-----------  290
 		{ 0x0370, 0x0371 }, // Ͱ, ͱ : 1
@@ -1071,9 +1076,10 @@ namespace gtl::charset {
 		{ 0x2cf2, 0x2cf3 }, // Ⳳ, ⳳ : 1
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeUL_other1_g { 0x0370, 0x2cf3 };
 //-----------------------------------------------------------------------------
 //other2
-	GTL_DATA std::map<char16_t, char16_t> const mapUL_other2_g = { 
+	std::map<char16_t, char16_t> const mapUL_other2_g = { 
 
 //-----------31054
 		{ 0xa640, 0xa641 }, // Ꙁ, ꙁ : 1
@@ -1205,9 +1211,10 @@ namespace gtl::charset {
 		{ 0xa7f5, 0xa7f6 }, // Ꟶ, ꟶ : 1
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeUL_other2_g { 0xa640, 0xa7f6 };
 //-----------------------------------------------------------------------------
 //other3
-	GTL_DATA std::map<char16_t, char16_t> const mapUL_other3_g = { 
+	std::map<char16_t, char16_t> const mapUL_other3_g = { 
 
 //-----------22316
 		{ 0xff21, 0xff41 }, // Ａ, ａ : 32
@@ -1238,9 +1245,10 @@ namespace gtl::charset {
 		{ 0xff3a, 0xff5a }, // Ｚ, ｚ : 32
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeUL_other3_g { 0xff21, 0xff3b };
 //-----------------------------------------------------------------------------
 //other4
-	GTL_DATA std::map<char32_t, char32_t> const mapUL_other4_g = { 
+	std::map<char32_t, char32_t> const mapUL_other4_g = { 
 
 //----------- 1222
 		{ 0x10400, 0x10428 }, // 𐐀, 𐐨 : 40
@@ -1410,9 +1418,10 @@ namespace gtl::charset {
 		{ 0x118bf, 0x118df }, // 𑢿, 𑣟 : 32
 	};
 
+	constexpr std::pair<char32_t, char32_t> const rangeUL_other4_g { 0x10400, 0x118c0 };
 //-----------------------------------------------------------------------------
 //other5
-	GTL_DATA std::map<char32_t, char32_t> const mapUL_other5_g = { 
+	std::map<char32_t, char32_t> const mapUL_other5_g = { 
 
 //-----------21889
 		{ 0x16e40, 0x16e60 }, // 𖹀, 𖹠 : 32
@@ -1449,9 +1458,10 @@ namespace gtl::charset {
 		{ 0x16e5f, 0x16e7f }, // 𖹟, 𖹿 : 32
 	};
 
+	constexpr std::pair<char32_t, char32_t> const rangeUL_other5_g { 0x16e40, 0x16e60 };
 //-----------------------------------------------------------------------------
 //other6
-	GTL_DATA std::map<char32_t, char32_t> const mapUL_other6_g = { 
+	std::map<char32_t, char32_t> const mapUL_other6_g = { 
 
 //-----------31393
 		{ 0x1e900, 0x1e922 }, // 𞤀, 𞤢 : 34
@@ -1490,9 +1500,10 @@ namespace gtl::charset {
 		{ 0x1e921, 0x1e943 }, // 𞤡, 𞥃 : 34
 	};
 
+	constexpr std::pair<char32_t, char32_t> const rangeUL_other6_g { 0x1e900, 0x1e922 };
 //-----------------------------------------------------------------------------
 //latin1
-	GTL_DATA std::map<char16_t, char16_t> const mapLU_latin1_g = { 
+	std::map<char16_t, char16_t> const mapLU_latin1_g = { 
 
 //-----------  181
 		{ 0x00b5, 0x039c }, // µ, Μ : 743
@@ -1532,9 +1543,10 @@ namespace gtl::charset {
 		{ 0x00ff, 0x0178 }, // ÿ, Ÿ : 121
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeLU_latin1_g { 0x00b5, 0x0100 };
 //-----------------------------------------------------------------------------
 //latin_extended
-	GTL_DATA std::map<char16_t, char16_t> const mapLU_latin_extended_g = { 
+	std::map<char16_t, char16_t> const mapLU_latin_extended_g = { 
 		{ 0x0101, 0x0100 }, // ā, Ā : -1
 		{ 0x0103, 0x0102 }, // ă, Ă : -1
 		{ 0x0105, 0x0104 }, // ą, Ą : -1
@@ -1688,9 +1700,10 @@ namespace gtl::charset {
 		{ 0x024f, 0x024e }, // ɏ, Ɏ : -1
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeLU_latin_extended_g { 0x0101, 0x0250 };
 //-----------------------------------------------------------------------------
 //other1
-	GTL_DATA std::map<char16_t, char16_t> const mapLU_other1_g = { 
+	std::map<char16_t, char16_t> const mapLU_other1_g = { 
 		{ 0x0250, 0x2c6f }, // ɐ, Ɐ : 10783
 		{ 0x0251, 0x2c6d }, // ɑ, Ɑ : 10780
 		{ 0x0252, 0x2c70 }, // ɒ, Ɒ : 10782
@@ -2562,9 +2575,10 @@ namespace gtl::charset {
 		{ 0x2d2d, 0x10cd }, // ⴭ, Ⴭ : -7264
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeLU_other1_g { 0x0250, 0x2d2e };
 //-----------------------------------------------------------------------------
 //other2
-	GTL_DATA std::map<char16_t, char16_t> const mapLU_other2_g = { 
+	std::map<char16_t, char16_t> const mapLU_other2_g = { 
 
 //-----------30996
 		{ 0xa641, 0xa640 }, // ꙁ, Ꙁ : -1
@@ -2770,9 +2784,10 @@ namespace gtl::charset {
 		{ 0xabbf, 0x13ef }, // ꮿ, Ꮿ : -38864
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeLU_other2_g { 0xa641, 0xabc0 };
 //-----------------------------------------------------------------------------
 //other3
-	GTL_DATA std::map<char16_t, char16_t> const mapLU_other3_g = { 
+	std::map<char16_t, char16_t> const mapLU_other3_g = { 
 
 //-----------20289
 //		{ 0xfb00, u'FF' }, // ﬀ, FF
@@ -2819,9 +2834,10 @@ namespace gtl::charset {
 		{ 0xff5a, 0xff3a }, // ｚ, Ｚ : -32
 	};
 
+	constexpr std::pair<char16_t, char16_t> const rangeLU_other3_g { 0xfb00, 0xff5b };
 //-----------------------------------------------------------------------------
 //other4
-	GTL_DATA std::map<char32_t, char32_t> const mapLU_other4_g = { 
+	std::map<char32_t, char32_t> const mapLU_other4_g = { 
 
 //----------- 1230
 		{ 0x10428, 0x10400 }, // 𐐨, 𐐀 : -40
@@ -2991,9 +3007,10 @@ namespace gtl::charset {
 		{ 0x118df, 0x118bf }, // 𑣟, 𑢿 : -32
 	};
 
+	constexpr std::pair<char32_t, char32_t> const rangeLU_other4_g { 0x10428, 0x118e0 };
 //-----------------------------------------------------------------------------
 //other5
-	GTL_DATA std::map<char32_t, char32_t> const mapLU_other5_g = { 
+	std::map<char32_t, char32_t> const mapLU_other5_g = { 
 
 //-----------21889
 		{ 0x16e60, 0x16e40 }, // 𖹠, 𖹀 : -32
@@ -3030,9 +3047,10 @@ namespace gtl::charset {
 		{ 0x16e7f, 0x16e5f }, // 𖹿, 𖹟 : -32
 	};
 
+	constexpr std::pair<char32_t, char32_t> const rangeLU_other5_g { 0x16e60, 0x16e80 };
 //-----------------------------------------------------------------------------
 //other6
-	GTL_DATA std::map<char32_t, char32_t> const mapLU_other6_g = { 
+	std::map<char32_t, char32_t> const mapLU_other6_g = { 
 
 //-----------31395
 		{ 0x1e922, 0x1e900 }, // 𞤢, 𞤀 : -34
@@ -3071,6 +3089,7 @@ namespace gtl::charset {
 		{ 0x1e943, 0x1e921 }, // 𞥃, 𞤡 : -34
 	};
 
+	constexpr std::pair<char32_t, char32_t> const rangeLU_other6_g { 0x1e922, 0x1e944 };
 
 
 }; // namespace gtl::charset

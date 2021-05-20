@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "gtl/config_gtl.h"
+#include "gtl/_config.h"
 #include "gtl/json_proxy.h"
 
 //////////////////////////////////////////////////////////////////////

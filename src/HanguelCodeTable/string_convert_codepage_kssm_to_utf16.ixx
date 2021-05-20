@@ -1,4 +1,11 @@
-﻿#include "pch.h"
+﻿module ;
+
+#include <map>
+
+#include "gtl/_config.h"
+#include "gtl/_macro.h"
+
+export module gtl:string_convert_codepage_kssm_to_utf16;
 
 //=========
 //Automatically Generated File.
@@ -8,23 +15,15 @@
 //=========
 
 
-#include "gtl/config_gtl.h"
 #if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
-
-
-#include <cstdlib>
-#include <cstdint>
-#include <array>
-
-#include "gtl/string/HangeulCodeMap.h"
 
 
 namespace gtl::charset::KSSM {
 
 
+
 	//------------------------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------------------------
-	GTL_DATA std::map<uint16_t, char16_t> const mapKSSMtoUTF16_g { {
+	std::map<uint16_t, char16_t> const mapKSSMtoUTF16_g { {
 		{ 0x8444, 0x3133/*ㄳ*/ },	{ 0x8446, 0x3135/*ㄵ*/ },	{ 0x8447, 0x3136/*ㄶ*/ },	{ 0x844a, 0x313a/*ㄺ*/ },	{ 0x844b, 0x313b/*ㄻ*/ },	{ 0x844c, 0x313c/*ㄼ*/ },	{ 0x844d, 0x313d/*ㄽ*/ },	{ 0x844e, 0x313e/*ㄾ*/ },
 		{ 0x844f, 0x313f/*ㄿ*/ },	{ 0x8450, 0x3140/*ㅀ*/ },	{ 0x8454, 0x3144/*ㅄ*/ },	{ 0x8461, 0x314f/*ㅏ*/ },	{ 0x8481, 0x3150/*ㅐ*/ },	{ 0x84a1, 0x3151/*ㅑ*/ },	{ 0x84c1, 0x3152/*ㅒ*/ },	{ 0x84e1, 0x3153/*ㅓ*/ },
 		{ 0x8541, 0x3154/*ㅔ*/ },	{ 0x8561, 0x3155/*ㅕ*/ },	{ 0x8581, 0x3156/*ㅖ*/ },	{ 0x85a1, 0x3157/*ㅗ*/ },	{ 0x85c1, 0x3158/*ㅘ*/ },	{ 0x85e1, 0x3159/*ㅙ*/ },	{ 0x8641, 0x315a/*ㅚ*/ },	{ 0x8661, 0x315b/*ㅛ*/ },

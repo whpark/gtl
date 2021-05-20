@@ -47,9 +47,6 @@
     <ClInclude Include="..\..\include\gtl\string\convert_codepage_kssm.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\config_gtl.h">
-      <Filter>gtl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\string\string_primitives.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
@@ -126,6 +123,12 @@
       <Filter>gtl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\serial_port.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\_macro.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\_config.h">
       <Filter>gtl</Filter>
     </ClInclude>
   </ItemGroup>

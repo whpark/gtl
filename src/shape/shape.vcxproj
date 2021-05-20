@@ -118,7 +118,7 @@
       <Command>echo /*---- Copy *.lib to /lib ----*/
 xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
 echo /*---- Copy *.ifc to /bin ----*/
-xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)\"
+xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -151,7 +151,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)
       <Command>echo /*---- Copy *.lib to /lib ----*/
 xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
 echo /*---- Copy *.ifc to /bin ----*/
-xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)\"
+xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -180,7 +180,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)
       <Command>echo /*---- Copy *.lib to /lib ----*/
 xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
 echo /*---- Copy *.ifc to /bin ----*/
-xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)\"
+xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -213,7 +213,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)
       <Command>echo /*---- Copy *.lib to /lib ----*/
 xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
 echo /*---- Copy *.ifc to /bin ----*/
-xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)module\$(Configuration)\"
+xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)\"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
