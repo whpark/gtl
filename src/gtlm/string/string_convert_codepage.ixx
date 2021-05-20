@@ -153,7 +153,7 @@ export namespace gtl {
 	extern eCODEPAGE eMBCS_Codepage_g;
 
 
-	constexpr static inline [[nodiscard]] std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {
+	constexpr [[nodiscard]] std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {
 		using namespace std::literals;
 		switch (eCodepage) {
 		case eCODEPAGE::DEFAULT : return {};
@@ -702,7 +702,7 @@ export namespace gtl {
 		auto const* pszSourceEnd = svFrom.data()+svFrom.size();
 
 		auto eCodepageTo = codepage.To<char>();
-		std::locale loc(std::format(".{}", eCodepageTo));
+		std::locale loc(std::format(".{}", (int)eCodepageTo));
 
 		auto const& facet = std::use_facet<std::codecvt<wchar_t, char, mbstate_t>>(loc);
 
@@ -740,7 +740,7 @@ export namespace gtl {
 
 		auto eCodepageFrom = codepage.From<char>();
 
-		std::locale loc(std::format(".{}", eCodepageFrom));
+		std::locale loc(std::format(".{}", (int)eCodepageFrom));
 
 		auto const& facet = std::use_facet<std::codecvt<wchar_t, char, mbstate_t>>(loc);
 

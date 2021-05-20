@@ -9,8 +9,8 @@
 
 module;
 
-#include <functional>
 #include <compare>
+#include <functional>
 #include <algorithm>
 
 #include "gtl/_config.h"

@@ -214,8 +214,12 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
     <ClCompile Include="gtlm.cpp" />
     <ClCompile Include="iconv_wrapper.ixx" />
     <ClCompile Include="json_proxy.ixx" />
+    <ClCompile Include="log.ixx" />
     <ClCompile Include="misc.ixx" />
+    <ClCompile Include="mutex.ixx" />
+    <ClCompile Include="rand.ixx" />
     <ClCompile Include="reflection.ixx" />
+    <ClCompile Include="serial_port.ixx" />
     <ClCompile Include="string.ixx" />
     <ClCompile Include="string\string_convert_codepage.ixx" />
     <ClCompile Include="string\string_convert_codepage_kssm.ixx" />

@@ -16,3 +16,5 @@ export import :archive;
 export import :json_proxy;
 export import :reflection;
 export import :dynamic;
+export import :mutex;
+export import :rand;

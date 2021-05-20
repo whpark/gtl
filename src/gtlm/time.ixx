@@ -18,7 +18,7 @@ module;
 #include <compare>
 #include <filesystem>
 
-#include <format>
+//#define FMT_HEADER_ONLY
 //#include "fmt/chrono.h"
 
 #include "gtl/_config.h"
@@ -151,8 +151,8 @@ export namespace gtl {
 		}
 
 
-		[[nodiscard]] [[deprecated ("Use fmt::format")]]
-		std::wstring OldFormat(std::wstring const& sv) const {
+		[[nodiscard]]
+		std::wstring Format(std::wstring const& sv) const {
 			std::wstring str;
 
 			std::time_t t = *this;
@@ -166,11 +166,11 @@ export namespace gtl {
 
 			return str;
 		}
-		std::wstring Format(std::wstring_view sv = L"{0:%Y-%m-%d}") const {
-			// todo : test
-			std::time_t t = *this;
-			return std::format(sv, std::localtime(t));
-		}
+		//std::wstring Format(std::wstring_view sv = L"{0:%Y-%m-%d}") const {
+		//	// todo : test
+		//	std::time_t t = *this;
+		//	return fmt::format(sv, fmt::localtime(t));
+		//}
 
 		constexpr inline static const TSysTime::rep eTimeToSysTime = 10'000'000;	// --> 초단위로 변경
 		// for Windows only
