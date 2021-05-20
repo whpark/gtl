@@ -1,8 +1,13 @@
 #include "pch.h"
 
+#include "nlohmann/json.hpp"
+#include "boost/json.hpp"
+
+//#include "gtl/gtl.h"
+//#include "gtl/concepts.h"
+//#include "gtl/json_proxy.h"
 #include "gtl/gtl.h"
-#include "gtl/concepts.h"
-#include "gtl/json_proxy.h"
+import gtl;
 
 #if (GTL__BOOST_JSON__AS_STANDALONE)
 	#include "boost/json/src.hpp"   // impl

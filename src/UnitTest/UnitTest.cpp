@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 
-#include "gtl/string.h"
+//#include "gtl/string.h"
+#include "gtl/gtl.h"
+import gtl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

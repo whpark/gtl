@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 
 #include "gtl/gtl.h"
+import gtl;
 
 using namespace std::literals;
 using namespace gtl::literals;

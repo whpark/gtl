@@ -56,7 +56,7 @@ export namespace gtl {
 	inline [[nodiscard]] tvalue tsztoi(std::basic_string<tchar> const& str, tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 	template < std::integral tvalue = int, gtlc::string_elem tchar >
 	GTL_DEPR_SEC inline [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < std::integral tvalue = int, gtlc::string_elem tchar, int size >
+	template < std::integral tvalue = int, typename tchar, size_t size > requires gtlc::string_elem<tchar>
 	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 	template < typename tvalue = double, gtlc::string_elem tchar = char16_t > requires std::is_floating_point_v<tvalue>
@@ -201,7 +201,7 @@ export namespace gtl {
 	GTL_DEPR_SEC inline [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz + tszlen(psz) }, ppszStopped, radix, cSplitter);
 	}
-	template < std::integral tvalue, gtlc::string_elem tchar, int size >
+	template < std::integral tvalue = int, typename tchar, size_t size > requires gtlc::string_elem<tchar>
 	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ sz, sz + tszlen(sz, size) }, ppszStopped, radix, cSplitter);
 	}

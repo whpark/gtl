@@ -1,7 +1,9 @@
 #include "pch.h"
 
-#include "gtl/reflection.h"
-#include "gtl/dynamic.h"
+//#include "gtl/reflection.h"
+//#include "gtl/dynamic.h"
+#include "gtl/gtl.h"
+import gtl;
 
 #pragma warning(disable:4566)	// character encoding
 
@@ -181,13 +183,13 @@ namespace gtl::test::reflection::CRTP {
 
 }
 
-namespace boost {
-	// When exceptions are disabled
-	// in standalone, you must provide
-	// this function.
-	BOOST_NORETURN void throw_exception(std::exception const&);
-}
-
+//namespace boost {
+//	// When exceptions are disabled
+//	// in standalone, you must provide
+//	// this function.
+//	BOOST_NORETURN void throw_exception(std::exception const&);
+//}
+//
 //#include <boost/exception/exception.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>

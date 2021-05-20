@@ -17,7 +17,8 @@ module;
 #include <string_view>
 #include <stdexcept>
 #include <algorithm>
-#include <format>
+
+#include "fmt/format.h"
 
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
@@ -542,7 +543,7 @@ export namespace gtl {
 		/// @brief fmt::format
 		template < typename S, typename ... Args >
 		TString& Format(S const& format_str, Args&& ... args) {
-			*this = std::move(std::format<S, Args...>(format_str, std::forward<Args>(args)...));
+			*this = std::move(fmt::format<S, Args...>(format_str, std::forward<Args>(args)...));
 			return *this;
 		}
 

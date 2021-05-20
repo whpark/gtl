@@ -1,7 +1,9 @@
 ﻿#include "pch.h"
 
+//#include "gtl/gtl.h"
+//#include "gtl/string.h"
 #include "gtl/gtl.h"
-#include "gtl/string.h"
+import gtl;
 
 #pragma warning(disable:4566)	// character encoding
 

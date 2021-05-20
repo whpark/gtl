@@ -10,6 +10,6 @@
 // add headers that you want to pre-compile here
 #include "gtl/gtl.h"
 
-#include "gtl/string/convert_codepage_kssm.h"
+//#include "gtl/string/convert_codepage_kssm.h"
 
 #endif //PCH_H

@@ -4,10 +4,18 @@ module;
 #include <optional>
 #include <vector>
 #include <deque>
-#include "gtl/unit.h"
-#include "gtl/coord.h"
+
+#include "gtl/gtl.h"
+
+//#include "gtl/unit.h"
+//#include "gtl/coord.h"
 
 export module shape;
+
+import gtl;
+
+using namespace std::literals;
+using namespace gtl::literals;
 
 export namespace gtl::shape {
 

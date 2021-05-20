@@ -1,7 +1,8 @@
 ﻿#include "benchmark/benchmark.h"
 
 #include "gtl/gtl.h"
-#include "gtl/string/utf_char_view.h"
+//#include "gtl/string/utf_char_view.h"
+import gtl;
 
 using namespace std::literals;
 using namespace gtl::literals;
