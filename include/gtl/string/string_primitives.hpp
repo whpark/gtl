@@ -798,7 +798,7 @@ namespace gtl {
 	GTL_DEPR_SEC inline [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz + tszlen(psz) }, ppszStopped, radix, cSplitter);
 	}
-	template < std::integral tvalue, gtlc::string_elem tchar, int size >
+	template < std::integral tvalue, gtlc::string_elem tchar, size_t size >
 	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ sz, sz + tszlen(sz, size) }, ppszStopped, radix, cSplitter);
 	}

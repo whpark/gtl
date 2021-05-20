@@ -10,6 +10,7 @@ module;
 export module shape;
 
 export namespace gtl::shape {
+	using namespace gtl::literals;
 
 	using point_t = CPoint3d;
 	struct line_t { point_t beg, end; };

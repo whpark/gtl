@@ -33,7 +33,6 @@ namespace gtl {
 		// Get One Value
 		T operator() () {
 			return m_distribution(m_engine);
-			ATOMIC_FLAG_INIT
 		}
 
 		// Get Series of random values

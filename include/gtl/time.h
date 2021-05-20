@@ -21,7 +21,10 @@
 
 //#include "gtl/_pre_lib_util.h"
 
-#include <windows.h>
+#if (GTL_USE_WINDOWS_API)
+	#define NOMINMAX
+	#include <windows.h>
+#endif
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -55,24 +58,25 @@ namespace gtl {
 
 	//-------------------------------------------------------------------------
 	//
-	class /*GTL_CLASS*/ CSysTime : public std::chrono::time_point<system_clock_t> {
+	template < typename tclock = std::chrono::system_clock >
+	class /*GTL_CLASS*/ TSysTime : public std::chrono::time_point<tclock> {
 	public:
-		using base_t = std::chrono::time_point<system_clock_t>;
-		using clock_t = base_t::clock;// == system_clock_t;
+		using base_t = std::chrono::time_point<tclock>;
+		using clock_t = base_t::clock;// == tclock;
 		using duration_t = base_t::duration;
 		using file_time_t = std::filesystem::file_time_type;
 
 	public:
-		CSysTime() = default;
-		CSysTime(const CSysTime&) = default;
-		CSysTime(CSysTime&&) = default;
-		CSysTime& operator = (const CSysTime&) = default;
-		CSysTime& operator = (CSysTime&&) = default;
+		TSysTime() = default;
+		TSysTime(const TSysTime&) = default;
+		TSysTime(TSysTime&&) = default;
+		TSysTime& operator = (const TSysTime&) = default;
+		TSysTime& operator = (TSysTime&&) = default;
 
 		using base_t::base_t;
-		CSysTime(std::time_t t) : base_t{clock_t::from_time_t(t)} {}
-		CSysTime(file_time_t t) : base_t(system_clock_t::duration(t.time_since_epoch().count() - eSysTimeToFileTime)) {}
-		CSysTime(const char*) : base_t(base_t::clock::now()) {}		// system_clock_t::now() 함수가. 타이핑 하기 귀찮으니까, "" or "now" 등으로...
+		TSysTime(std::time_t t) : base_t{clock_t::from_time_t(t)} {}
+		TSysTime(file_time_t t) : base_t(tclock::duration(t.time_since_epoch().count() - eSysTimeToFileTime)) {}
+		TSysTime(const char*) : base_t(base_t::clock::now()) {}		// tclock::now() 함수가. 타이핑 하기 귀찮으니까, "" or "now" 등으로...
 
 		static base_t now() {
 			return base_t::clock::now();
@@ -83,27 +87,27 @@ namespace gtl {
 		}
 
 
-		duration_t operator - (const CSysTime& B) const {
+		duration_t operator - (const TSysTime& B) const {
 			return (const base_t&)(*this) - (const base_t&)B;
 		}
 
 		using base_t::operator +=;
 		using base_t::operator -=;
 
-		auto operator <=> (const CSysTime&) const = default;
-		bool operator == (const CSysTime&) const = default;
+		auto operator <=> (const TSysTime&) const = default;
+		bool operator == (const TSysTime&) const = default;
 
 		// 초 단위
-		sec_t GetTotalSec() const { return time_since_epoch(); }
+		sec_t GetTotalSec() const { return base_t::time_since_epoch(); }
 
-#ifdef _WINDOWS
-		CSysTime(FILETIME ft) :
-			base_t(system_clock_t::duration((rep&)ft - eSysTimeToFileTime))
+#if defined(_WINDOWS) and (GTL_USE_WINDOWS_API)
+		TSysTime(FILETIME ft) :
+			base_t(tclock::duration(std::bit_cast<typename base_t::rep>(ft) - eSysTimeToFileTime))
 		{
-			static_assert(sizeof(rep) == sizeof(ft));
+			static_assert(sizeof(base_t::rep) == sizeof(ft));
 		}
 
-		CSysTime(const SYSTEMTIME& st) {
+		TSysTime(const SYSTEMTIME& st) {
 			FILETIME ft;
 			SystemTimeToFileTime(&st, &ft);
 			*this = ft;
@@ -111,8 +115,8 @@ namespace gtl {
 
 		operator FILETIME () const {
 			FILETIME ft;
-			static_assert(sizeof(rep) == sizeof(ft) /*&& (std::endian::little == std::endian::native)*/);
-			(CSysTime::rep&)ft = time_since_epoch().count() + eSysTimeToFileTime;
+			static_assert(sizeof(typename base_t::rep) == sizeof(ft) /*&& (std::endian::little == std::endian::native)*/);
+			(TSysTime::rep&)ft = base_t::time_since_epoch().count() + eSysTimeToFileTime;
 			return ft;
 		}
 
@@ -137,12 +141,12 @@ namespace gtl {
 #endif
 
 		operator file_time_t () const {
-			return file_time_t{file_time_t::duration{time_since_epoch().count() + eSysTimeToFileTime}};
+			return file_time_t{file_time_t::duration{base_t::time_since_epoch().count() + eSysTimeToFileTime}};
 		}
 
 
-		[[nodiscard]] [[deprecated ("Use fmt::format")]]
-		std::wstring OldFormat(std::wstring const& sv) const {
+		[[nodiscard]]
+		std::wstring Format(std::wstring const& sv) const {
 			std::wstring str;
 
 			std::time_t t = *this;
@@ -156,19 +160,22 @@ namespace gtl {
 
 			return str;
 		}
-		std::wstring Format(std::wstring_view sv = L"{0:%Y-%m-%d}") const {
-			std::time_t t = *this;
-			return fmt::format(sv, fmt::localtime(t));
-		}
+		//std::wstring Format(std::wstring_view sv = L"{0:%Y-%m-%d}") const {
+		//	// todo : test
+		//	std::time_t t = *this;
+		//	return fmt::format(sv, fmt::localtime(t));
+		//}
 
-		constexpr inline static const CSysTime::rep eTimeToSysTime = 10'000'000;	// --> 초단위로 변경
+		constexpr inline static const TSysTime::rep eTimeToSysTime = 10'000'000;	// --> 초단위로 변경
 		// for Windows only
-		constexpr inline static const CSysTime::rep eSysTimeToFileTime = 116'444'736'000'000'000; //== __std_fs_file_time_epoch_adjustment;	// 1601/01/01~1970/01/01, 134774 days, 1 tick = 100 ns
+		constexpr inline static const TSysTime::rep eSysTimeToFileTime = 116'444'736'000'000'000; //== __std_fs_file_time_epoch_adjustment;	// 1601/01/01~1970/01/01, 134774 days, 1 tick = 100 ns
 
 
-		static_assert(system_clock_t::duration::period::num == 1);
-		static_assert(system_clock_t::duration::period::den == eTimeToSysTime);
+		static_assert(tclock::duration::period::num == 1);
+		static_assert(tclock::duration::period::den == eTimeToSysTime);
 	};
+
+	using CSysTime = TSysTime<std::chrono::system_clock>;
 
 
 

@@ -18,6 +18,26 @@
 #include <algorithm>
 #include "gtl/concepts.h"
 
+namespace gtl::internal {
+	template < typename T1, typename T2 > void op1mul(T1& v1, T2 v2) { v1 *= v2; }
+	template < typename T1, typename T2 > void op1div(T1& v1, T2 v2) { v1 /= v2; }
+	template < typename T1, typename T2 > void op1add(T1& v1, T2 v2) { v1 += v2; }
+	template < typename T1, typename T2 > void op1sub(T1& v1, T2 v2) { v1 -= v2; }
+	template < typename T1, typename T2 > void op2mul(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 * v2); }
+	template < typename T1, typename T2 > void op2div(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 / v2); }
+	template < typename T1, typename T2 > void op2add(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 + v2); }
+	template < typename T1, typename T2 > void op2sub(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 - v2); }
+
+	template < typename T1, typename T2 >
+	void DoArithmaticMul(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}*T2{})> ) { op1mul(v1, v2); } else { op2mul(v1, v2); } };
+	template < typename T1, typename T2 >
+	void DoArithmaticDiv(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}/T2{})> ) { op1div(v1, v2); } else { op2div(v1, v2); } };
+	template < typename T1, typename T2 >
+	void DoArithmaticAdd(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}+T2{})> ) { op1add(v1, v2); } else { op2add(v1, v2); } };
+	template < typename T1, typename T2 >
+	void DoArithmaticSub(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}-T2{})> ) { op1sub(v1, v2); } else { op2sub(v1, v2); } };
+}
+
 namespace gtl {
 #pragma pack(push, 8)
 
@@ -184,28 +204,6 @@ namespace gtl {
 			return (T_DEST)v2;
 		}
 	}
-
-#if 1
-	namespace internal {
-		template < typename T1, typename T2 > void op1mul(T1& v1, T2 v2) { v1 *= v2; }
-		template < typename T1, typename T2 > void op1div(T1& v1, T2 v2) { v1 /= v2; }
-		template < typename T1, typename T2 > void op1add(T1& v1, T2 v2) { v1 += v2; }
-		template < typename T1, typename T2 > void op1sub(T1& v1, T2 v2) { v1 -= v2; }
-		template < typename T1, typename T2 > void op2mul(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 * v2); }
-		template < typename T1, typename T2 > void op2div(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 / v2); }
-		template < typename T1, typename T2 > void op2add(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 + v2); }
-		template < typename T1, typename T2 > void op2sub(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 - v2); }
-
-		template < typename T1, typename T2 >
-		void DoArithmaticMul(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}*T2{})> ) { op1mul(v1, v2); } else { op2mul(v1, v2); } };
-		template < typename T1, typename T2 >
-		void DoArithmaticDiv(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}/T2{})> ) { op1div(v1, v2); } else { op2div(v1, v2); } };
-		template < typename T1, typename T2 >
-		void DoArithmaticAdd(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}+T2{})> ) { op1add(v1, v2); } else { op2add(v1, v2); } };
-		template < typename T1, typename T2 >
-		void DoArithmaticSub(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}-T2{})> ) { op1sub(v1, v2); } else { op2sub(v1, v2); } };
-	}
-#endif
 
 	// Boolean
 	template < typename ... Args > constexpr bool IsAllTrue(Args&& ... args)						{ return (args && ...); }
