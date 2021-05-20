@@ -1,9 +1,9 @@
-//////////////////////////////////////////////////////////////////////
+Ôªø//////////////////////////////////////////////////////////////////////
 //
-// size.h: coord.h ø°º≠ µ˚∑Œ ª≠. (≥ π´ ±ÊæÓ..)
+// size.h: coord.h ÏóêÏÑú Îî∞Î°ú Î∫å. (ÎÑàÎ¨¥ Í∏∏Ïñ¥..)
 //
 // PWH
-// 2019.11.02. ªı∑Œ ¿€º∫ Ω√¿€
+// 2019.11.02. ÏÉàÎ°ú ÏûëÏÑ± ÏãúÏûë
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -47,7 +47,7 @@ export namespace gtl {
 		constexpr value_t const& member(int i) const { return data()[i]; }
 
 	public:
-		// Constructors
+	// Constructors
 		TSize3() = default;
 		TSize3(TSize3 const&) = default;
 		TSize3(T cx, T cy, T cz) : cx(cx), cy(cy), cz(cz) { }
@@ -55,7 +55,7 @@ export namespace gtl {
 		TSize3(T2 cx, T2 cy, T2 cz) : cx(RoundOrForward<T,T2>(cx)), cy(RoundOrForward<T,T2>(cy)), cz(RoundOrForward<T,T2>(cz)) { }
 		TSize3& operator = (TSize3 const&) = default;
 
-		// Copy Constructors and Copy Assign operators
+	// Copy Constructors and Copy Assign operators
 		template < gtlc::generic_coord T_COORD > explicit TSize3(T_COORD const& B) { *this = B; };
 		template < gtlc::generic_coord T_COORD > TSize3& operator = (T_COORD const& B) {
 			if constexpr (gtlc::has__cxy<T_COORD>) {
@@ -79,7 +79,7 @@ export namespace gtl {
 			return *this;
 		};
 
-		// Type Casting to cv::Size_, SIZE, ...
+	// Type Casting to cv::Size_, SIZE, ...
 		//template < typename T2, template <typename> typename T_COORD > requires gtlc::coord2<T_COORD<T2>>
 		//operator T_COORD<T2>() const { return T_COORD<T2>{ RoundOrForward<T2, T>(cx), RoundOrForward<T2, T>(cy) }; };
 		//template < typename T2, template <typename> typename T_COORD > requires gtlc::coord3<T_COORD<T2>>
@@ -97,14 +97,14 @@ export namespace gtl {
 		template < typename T_COORD > requires gtlc::cv_size<T_COORD>
 		operator T_COORD const () const { return T_COORD{RoundOrForward<decltype(T_COORD::width)>(cx), RoundOrForward<decltype(T_COORD::height)>(cy)}; }
 
-		// Compare
+	// Compare
 		[[nodiscard]] auto operator <=> (TSize3 const&) const = default;
 		[[nodiscard]] auto operator <=> (T const& b) const { return *this <=> TSize3(b, b, b); }
 
 		[[nodiscard]] auto CountNonZero() const														{ return std::count_if(data().begin(), data().end(), gtl::non_zero{}); }
 		[[nodiscard]] auto CountIf(std::function<bool(T const&)> pred) const							{ return std::count_if(data().begin(), data().end(), pred); }
 
-		// Numerical Operators
+	// Numerical Operators
 		TSize3& operator +=  (TSize3<T> const& B)										{ cx += B.cx; cy += B.cy; cz += B.cz; return *this; }
 		TSize3& operator -=  (TSize3<T> const& B)										{ cx -= B.cx; cy -= B.cy; cz -= B.cz; return *this; }
 		[[nodiscard]] TSize3 operator + (TSize3<T> const& B) const									{ return TSize3(cx+B.cx, cy+B.cy, cz+B.cz); }
@@ -197,7 +197,7 @@ export namespace gtl {
 			return true;
 		};
 
-		// Archiving
+	// Archiving
 		template < typename Archive > friend Archive& operator & (Archive& ar, TSize3 const& B) {
 			return ar & B.cx & B.cy & B.cz;
 		}
@@ -221,7 +221,7 @@ export namespace gtl {
 		constexpr value_t const& member(int i) const { return data()[i]; }
 
 	public:
-		// Constructors
+	// Constructors
 		TSize2() = default;
 		TSize2(TSize2 const&) = default;
 		TSize2(T cx, T cy) : cx(cx), cy(cy) { }
@@ -246,7 +246,7 @@ export namespace gtl {
 			return *this;
 		};
 
-		// Type Casting to cv::Size_, SIZE, ...
+	// Type Casting to cv::Size_, SIZE, ...
 		//template < typename T2, template <typename> typename T_COORD > requires gtlc::coord2<T_COORD<T2>>
 		//operator T_COORD<T2>() const { return T_COORD<T2>{ RoundOrForward<T2>(cx), RoundOrForward<T2>(cy) }; };
 		////template < typename T2, template <typename> typename T_COORD > requires gtlc::coord3<T_COORD<T2>>
@@ -269,14 +269,14 @@ export namespace gtl {
 		operator T_COORD const () const { return T_COORD{RoundOrForward<decltype(T_COORD::width)>(cx), RoundOrForward<decltype(T_COORD::height)>(cy)}; }
 
 
-		// Compare
+	// Compare
 		[[nodiscard]] auto operator <=> (TSize2 const&) const = default;
 		[[nodiscard]] auto operator <=> (T const& b) const { return *this <=> TSize2(b, b, b); }
 
 		[[nodiscard]] auto CountNonZero() const														{ return std::count_if(data().begin(), data().end(), gtl::non_zero{}); }
 		[[nodiscard]] auto CountIf(std::function<bool(T const&)> pred) const							{ return std::count_if(data().begin(), data().end(), pred); }
 
-		// Numerical Operators
+	// Numerical Operators
 		TSize2& operator +=  (TSize2<T> const& B)										{ cx += B.cx; cy += B.cy; return *this; }
 		TSize2& operator -=  (TSize2<T> const& B)										{ cx -= B.cx; cy -= B.cy; return *this; }
 		[[nodiscard]] TSize2 operator + (TSize2<T> const& B) const									{ return TSize2(*this) += B; }
@@ -352,7 +352,7 @@ export namespace gtl {
 			return true;
 		};
 
-		// Archiving
+	// Archiving
 		template < typename Archive > friend Archive& operator & (Archive& ar, TSize2 const& B) {
 			return ar & B.cx & B.cy;
 		}

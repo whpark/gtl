@@ -91,8 +91,14 @@ TEST(gtl_string, TString_Upper_Lower) {
 		if (IsSpace(*pos))
 			continue;
 
+		auto mapC = gtl::charset::mapUL_latin_extended_g;
+
 		char32_t c1 = *pos;
 		char32_t c2 = *(pos+1);
+
+		if (c1 == 321 or c2 == 321) {
+			fmt::print("here\n");
+		}
 
 		CStringU16 str1;
 		str1 = std::u32string_view(pos, pos+1);

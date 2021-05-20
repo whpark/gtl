@@ -379,7 +379,7 @@ export namespace gtl {
 				return false;
 			};
 
-			constexpr static std::array<std::pair<std::string_view, eCODEPAGE>, 5> const codepages{{
+			/*constexpr */static std::array<std::pair<std::string_view, eCODEPAGE>, 5> const codepages {{
 				{GetCodepageBOM(eCODEPAGE::UTF8), eCODEPAGE::UTF8},
 				{GetCodepageBOM(eCODEPAGE::UTF32LE), eCODEPAGE::UTF32LE},	// UTF32LE must precede UTF16LE
 				{GetCodepageBOM(eCODEPAGE::UTF16LE), eCODEPAGE::UTF16LE},

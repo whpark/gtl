@@ -117,11 +117,13 @@ export namespace gtl {
 
 		bjson operator [] (std::string_view svKey) {
 			boost::json::object* pObject = j_.is_null() ? &j_.emplace_object() : &j_.as_object();
-			return (*pObject)[svKey];
+			// todo :.... speed up for svKey...
+			return (*pObject)[std::string(svKey)];
 		}
 		bjson operator [] (std::u8string_view svKey) {
 			boost::json::object* pObject = j_.is_null() ? &j_.emplace_object() : &j_.as_object();
-			return (*pObject)[reinterpret_cast<std::string_view&>(svKey)];
+			std::u8string strKey(svKey);
+			return (*pObject)[reinterpret_cast<std::string&>(strKey)];
 		}
 		bjson operator [] (std::size_t index) {
 			boost::json::array* pArray = j_.is_null() ? &j_.emplace_array() : &j_.as_array();
@@ -135,13 +137,14 @@ export namespace gtl {
 			if (j_.is_null())
 				throw std::invalid_argument{"empty"};
 			boost::json::object const* pObject = &j_.as_object();
-			return (const_cast<boost::json::object&>(*pObject))[svKey];
+			return (const_cast<boost::json::object&>(*pObject))[std::string(svKey)];
 		}
 		bjson const operator [] (std::u8string_view svKey) const {
 			if (j_.is_null())
 				throw std::invalid_argument{"empty"};
 			boost::json::object const* pObject = &j_.as_object();
-			return (const_cast<boost::json::object&>(*pObject))[reinterpret_cast<std::string_view&>(svKey)];
+			std::u8string strKey{svKey};
+			return (const_cast<boost::json::object&>(*pObject))[reinterpret_cast<std::string&>(strKey)];
 		}
 		bjson const operator [] (std::size_t index) const {
 			if (j_.is_null())

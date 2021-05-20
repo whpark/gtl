@@ -48,10 +48,10 @@ export namespace gtl::concepts {
 	template < typename tcontainer >
 	concept contiguous_container =
 		requires (tcontainer v) {
-		v[0];
-		std::data(v);
-		std::size(v);
-	};
+			v[0];
+			std::data(v);
+			std::size(v);
+		};
 
 
 	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
@@ -61,7 +61,7 @@ export namespace gtl::concepts {
 			{ v[0] }			-> std::convertible_to<type>;
 			{ std::data(v) }	-> std::convertible_to<std::remove_cvref_t<type> const *>;
 			{ std::size(v) }	-> std::convertible_to<size_t>;
-	};
+		};
 
 
 	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
@@ -72,7 +72,7 @@ export namespace gtl::concepts {
 			{ std::size(v) }	-> std::convertible_to<size_t>;
 			v.begin();
 			v.end();
-	};
+		};
 
 
 	/// @brief type for string (uint16_t for KSSM (Korean Johab)
@@ -97,10 +97,10 @@ export namespace gtl::concepts {
 	template <>
 	struct as_utf<wchar_t> {
 		using type = std::conditional_t<
-			sizeof(wchar_t) == sizeof(char16_t),
-			char16_t,
-			std::conditional_t<sizeof(wchar_t) == sizeof(char32_t), char32_t, char>
-		>;
+				sizeof(wchar_t) == sizeof(char16_t),
+					char16_t,
+					std::conditional_t<sizeof(wchar_t) == sizeof(char32_t), char32_t, char>
+				>;
 	};
 	template < string_elem tchar >
 	using as_utf_t = typename as_utf<tchar>::type;
@@ -137,12 +137,12 @@ export namespace gtl::concepts {
 		and
 		(
 			requires (tcontainer v) {
-		v[0];
-		{ std::data(v) } -> std::convertible_to<std::remove_cvref_t<decltype(v[0])> const*>;
-		{ std::size(v) } -> std::convertible_to<size_t>;
-	}
-	or
-		std::is_array_v<tcontainer>
+				v[0];
+				{ std::data(v) } -> std::convertible_to<std::remove_cvref_t<decltype(v[0])> const*>;
+				{ std::size(v) } -> std::convertible_to<size_t>;
+			}
+			or
+			std::is_array_v<tcontainer>
 
 		);
 

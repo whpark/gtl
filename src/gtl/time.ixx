@@ -106,11 +106,11 @@ export namespace gtl {
 		// 초 단위
 		sec_t GetTotalSec() const { return base_t::time_since_epoch(); }
 
-#if defined(_WINDOWS) and (GTL_USE_WINDOWS_API)
+#if (GTL_USE_WINDOWS_API)
 		TSysTime(FILETIME ft) :
-			base_t(tclock::duration((rep&)ft - eSysTimeToFileTime))
+			base_t(tclock::duration(std::bit_cast<typename base_t::rep>(ft) - eSysTimeToFileTime))
 		{
-			static_assert(sizeof(rep) == sizeof(ft));
+			static_assert(sizeof(base_t::rep) == sizeof(ft));
 		}
 
 		TSysTime(const SYSTEMTIME& st) {
@@ -121,7 +121,7 @@ export namespace gtl {
 
 		operator FILETIME () const {
 			FILETIME ft;
-			static_assert(sizeof(rep) == sizeof(ft) /*&& (std::endian::little == std::endian::native)*/);
+			static_assert(sizeof(typename base_t::rep) == sizeof(ft) /*&& (std::endian::little == std::endian::native)*/);
 			(TSysTime::rep&)ft = base_t::time_since_epoch().count() + eSysTimeToFileTime;
 			return ft;
 		}

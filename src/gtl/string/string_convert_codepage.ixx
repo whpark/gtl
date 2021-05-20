@@ -150,7 +150,7 @@ export namespace gtl {
 
 	/// @brief default codepage for MBCS (windows)
 	/// you can set this value for your region.
-	extern eCODEPAGE eMBCS_Codepage_g;
+	eCODEPAGE eMBCS_Codepage_g{GTL_DEFAULT_CODEPAGE};
 
 
 	constexpr [[nodiscard]] std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {

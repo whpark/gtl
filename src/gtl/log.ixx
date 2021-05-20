@@ -63,9 +63,11 @@ export namespace gtl {
 
 		std::function<int(int, int, int)> m_fun;
 
-		std::function<CStringA  (CSimpleLog&, archive_out_t&, CSysTime, const std::string_view svTag, const std::string_view svContent)> m_funcFormatterA;		// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<CStringA  (CSimpleLog&, archive_out_t&, CSysTime, const std::string_view svTag, const std::string_view svContent)> m_funcFormatterA;			// 로그 파일 포맷을 바꾸고 싶을 때...
 		std::function<CStringW  (CSimpleLog&, archive_out_t&, CSysTime, const std::wstring_view svTag, const std::wstring_view svContent)> m_funcFormatterW;		// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<CStringU8 (CSimpleLog&, archive_out_t&, CSysTime, const std::u8string_view svTag, const std::u8string_view svContent)> m_funcFormatterU8;	// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<CStringU8 (CSimpleLog&, archive_out_t&, CSysTime, const std::u8string_view svTag, const std::u8string_view svContent)> m_funcFormatterU8;		// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<CStringU16 (CSimpleLog&, archive_out_t&, CSysTime, const std::u16string_view svTag, const std::u16string_view svContent)> m_funcFormatterU16;	// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<CStringU32 (CSimpleLog&, archive_out_t&, CSysTime, const std::u32string_view svTag, const std::u32string_view svContent)> m_funcFormatterU32;	// 로그 파일 포맷을 바꾸고 싶을 때...
 
 	public:
 		CSimpleLog() = default;
@@ -255,17 +257,17 @@ namespace gtl {
 	void CSimpleLog::_Log(const std::basic_string_view<tchar_t> svMask, const std::basic_string_view<tchar_t> svText) {
 		auto now = std::chrono::system_clock::now();
 
-#if defined(_DEBUG) and defined(_WINDOWS)
+	#if defined(_DEBUG) and defined(_WINDOWS)
 		if (m_bTraceOut) {
 			if constexpr(sizeof(tchar_t) == sizeof(char)) {
 				OutputDebugStringA((const char*)svText.data());
 				OutputDebugStringA("\r\n");
-			} else {
-				OutputDebugStringW(svText.data());
+			} else if (sizeof(tchar_t) == sizeof(wchar_t)) {
+				OutputDebugStringW((wchar_t const*)svText.data());
 				OutputDebugStringW(L"\r\n");
 			}
 		}
-#endif
+	#endif
 
 		if (!OpenFile(now) || !m_ar)
 			return;
@@ -295,6 +297,16 @@ namespace gtl {
 					m_funcFormatterU8(*this, *m_ar, now, svMask, svText);
 					break;
 				}
+			} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
+				if (m_funcFormatterU16) {
+					m_funcFormatterU16(*this, *m_ar, now, svMask, svText);
+					break;
+				}
+			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
+				if (m_funcFormatterU32) {
+					m_funcFormatterU32(*this, *m_ar, now, svMask, svText);
+					break;
+				}
 			} else {
 				static_assert(false);
 			}
@@ -312,18 +324,27 @@ namespace gtl {
 			//		static_assert(false);
 			//	}
 			//};
+
 			if constexpr (std::is_same_v<tchar_t, char>) {
 				m_ar->WriteString("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : ",
-					st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
-					svMask.size(), svMask);
+									st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+									svMask.size(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
 				m_ar->WriteString(TEXT_W("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-					st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
-					svMask.size(), svMask);
+								  st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+								  svMask.size(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
 				m_ar->WriteString(TEXT_u8("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-					st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
-					svMask.size(), svMask);
+								  st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+								  svMask.size(), svMask);
+			} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
+				m_ar->WriteString(TEXT_u("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
+								  st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+								  svMask.size(), svMask);
+			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
+				m_ar->WriteString(TEXT_U("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
+								  st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+								  svMask.size(), svMask);
 			} else {
 				static_assert(false);
 			}
@@ -360,5 +381,11 @@ namespace gtl {
 		if (m_bCloseFileAfterWrite)
 			CloseFile();
 	}
+
+	template void CSimpleLog::_Log<char>(const std::basic_string_view<char> svMask, const std::basic_string_view<char> svText);
+	template void CSimpleLog::_Log<wchar_t>(const std::basic_string_view<wchar_t> svMask, const std::basic_string_view<wchar_t> svText);
+	template void CSimpleLog::_Log<char8_t>(const std::basic_string_view<char8_t> svMask, const std::basic_string_view<char8_t> svText);
+	template void CSimpleLog::_Log<char16_t>(const std::basic_string_view<char16_t> svMask, const std::basic_string_view<char16_t> svText);
+	template void CSimpleLog::_Log<char32_t>(const std::basic_string_view<char32_t> svMask, const std::basic_string_view<char32_t> svText);
 
 }

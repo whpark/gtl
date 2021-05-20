@@ -241,7 +241,7 @@ export namespace gtl {
 	template < std::integral T > constexpr inline T AdjustAlign16(T w) { return ((w+1)/2*2); }		//	((w+ 1)>>1)<<1
 
 
-																									// byte swap
+	// byte swap
 #if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY)
 	template < std::integral type >
 	[[nodiscard]] inline auto GetByteSwap(type v) {
@@ -312,7 +312,7 @@ export namespace gtl {
 		//using remove_ref_const_t = std::remove_const_t<std::remove_reference_t<T>>;
 
 
-	};
+	}
 
 	/// color
 

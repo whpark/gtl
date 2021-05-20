@@ -17,6 +17,9 @@ module;
 #include <string_view>
 #include <filesystem>
 
+#define FMT_HEADER_ONLY
+#include "fmt/format.h"
+
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
@@ -31,7 +34,7 @@ import :log;
 import :mutex;
 
 
-#ifdef _WINDOWS
+#if (GTL_USE_WINDOWS_API)
 
 export namespace gtl {
 
@@ -420,11 +423,11 @@ namespace gtl {
 				break;
 			default :
 				//			WriteLog("Serial : Timeout");
-#if _USE_CANCEL_IO_EX
+			#if _USE_CANCEL_IO_EX
 				CancelIoEx(m_hComm, NULL);
-#else
+			#else
 				CancelIo(m_hComm);
-#endif
+			#endif
 				bQuit = TRUE;
 				break;
 			}
@@ -456,11 +459,11 @@ namespace gtl {
 		}
 
 		if (WaitForSingleObject(m_overlappedW.hEvent, dwTimeout) == WAIT_TIMEOUT) {
-#if _USE_CANCEL_IO_EX
+		#if _USE_CANCEL_IO_EX
 			CancelIoEx(m_hComm, NULL);
-#else
+		#else
 			CancelIo(m_hComm);
-#endif
+		#endif
 
 			m_log.LogTag(L"E", L"!!!! Serial FAILED !!!! ");
 			return 0;
@@ -525,4 +528,5 @@ namespace gtl {
 }
 
 
-#endif	// _WINDOWS
+#endif	// #if (GTL_USE_WINDOWS_API)
+

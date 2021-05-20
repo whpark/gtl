@@ -1,9 +1,9 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
-// rect.h: coord.h ¿¡¼­ µû·Î »­. (³Ê¹« ±æ¾î..)
+// rect.h: coord.h ì—ì„œ ë”°ë¡œ ëºŒ. (ë„ˆë¬´ ê¸¸ì–´..)
 //
 // PWH
-// 2019.11.02. ÀüÃ¼ ¼öÁ¤
+// 2019.11.02. ì „ì²´ ìˆ˜ì •
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -109,7 +109,7 @@ export namespace gtl {
 					right = B.right;
 					bottom = B.bottom;
 					//z = {};
-				} else if constexpr (gtlc::has__xy<T_COORD>) { // »èÁ¦±İÁö!. static_assert °É·¯³»±â À§ÇØ¼­ Ã¹ ¹øÂ° if Àı ´Ù½Ã Ãß°¡.
+				} else if constexpr (gtlc::has__xy<T_COORD>) { // ì‚­ì œê¸ˆì§€!. static_assert ê±¸ëŸ¬ë‚´ê¸° ìœ„í•´ì„œ ì²« ë²ˆì§¸ if ì ˆ ë‹¤ì‹œ ì¶”ê°€.
 				} else {
 					static_assert(false);
 				}
@@ -381,7 +381,7 @@ export namespace gtl {
 					right = B.right;
 					bottom = B.bottom;
 					//z = {};
-				} else if constexpr (gtlc::has__xy<T_COORD>) { // »èÁ¦±İÁö!. static_assert °É·¯³»±â À§ÇØ¼­ Ã¹ ¹øÂ° if Àı ´Ù½Ã Ãß°¡.
+				} else if constexpr (gtlc::has__xy<T_COORD>) { // ì‚­ì œê¸ˆì§€!. static_assert ê±¸ëŸ¬ë‚´ê¸° ìœ„í•´ì„œ ì²« ë²ˆì§¸ if ì ˆ ë‹¤ì‹œ ì¶”ê°€.
 				} else {
 					static_assert(false);
 				}
