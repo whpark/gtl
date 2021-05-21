@@ -79,7 +79,7 @@ namespace gtl {
 	std::basic_string<tchar_t> ToString(const T_COORD& coord, const tchar_t* pszFMT = nullptr) {
 		std::basic_string<tchar_t> str;
 		if ( !pszFMT || !pszFMT[0] )
-			pszFMT = GetDefaultFormatSpecifier<tchar_t, typename T_COORD::value_t>(0);
+			pszFMT = GetDefaultFormatSpecifier<tchar_t, typename T_COORD::value_type>(0);
 
 		for (size_t i = 0; i < coord.data().size(); i++) {
 			if (i) {
@@ -96,7 +96,7 @@ namespace gtl {
 		for (auto& v : coord.data()) {
 			if (!psz || !*psz)
 				return nullptr;
-			v = tszto_number<tchar_t, typename T_COORD::value_t>(psz, &psz);
+			v = tszto_number<tchar_t, typename T_COORD::value_type>(psz, &psz);
 			if (*psz == ',') psz++;	// or....... if (*psz) psz++
 		}
 		return coord;
