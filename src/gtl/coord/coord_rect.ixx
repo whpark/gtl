@@ -43,11 +43,11 @@ export namespace gtl {
 		T right{}, bottom{}, back{DEFAULT_BACK};
 
 		using coord_t = std::array<T, 6>;
-		using value_t = T;
+		using value_type = T;
 		constexpr coord_t& data() { return std::bit_cast<coord_t&>(*this); }
 		constexpr coord_t const& data() const { return std::bit_cast<coord_t const&>(*this); }
-		constexpr value_t& member(int i) { return data()[i]; }
-		constexpr value_t const& member(int i) const { return data()[i]; }
+		constexpr value_type& member(int i) { return data()[i]; }
+		constexpr value_type const& member(int i) const { return data()[i]; }
 		constexpr TPoint3<T>& pts(int i = 0) { return (i == 0) ? *std::bit_cast<TPoint3<T>*>(&left) : *std::bit_cast<TPoint3<T>*>(&right); }
 		constexpr TPoint3<T> const& pts(int i = 0) const { return (i == 0) ? *std::bit_cast<TPoint3<T>*>(&left) : *std::bit_cast<TPoint3<T>*>(&right); }
 
@@ -334,11 +334,11 @@ export namespace gtl {
 		T right{}, bottom{};
 
 		using coord_t = std::array<T, 4>;
-		using value_t = T;
+		using value_type = T;
 		constexpr coord_t& data() { return std::bit_cast<coord_t&>(*this); }
 		constexpr coord_t const& data() const { return std::bit_cast<coord_t const&>(*this); }
-		constexpr value_t& member(int i) { return data()[i]; }
-		constexpr value_t const& member(int i) const { return data()[i]; }
+		constexpr value_type& member(int i) { return data()[i]; }
+		constexpr value_type const& member(int i) const { return data()[i]; }
 		constexpr TPoint2<T>& pts(int i = 0) { return (i == 0) ? *std::bit_cast<TPoint2<T>*>(&left) : *std::bit_cast<TPoint2<T>*>(&right); }
 		constexpr TPoint2<T> const& pts(int i = 0) const { return (i == 0) ? *std::bit_cast<TPoint2<T>*>(&left) : *std::bit_cast<TPoint2<T>*>(&right); }
 

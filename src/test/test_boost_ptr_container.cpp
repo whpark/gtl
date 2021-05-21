@@ -22,22 +22,55 @@ namespace gtl::test::boost_ptr_container {
 		auto operator <=> (ttt const&) const = default;
 		ttt(int i={}, int j={}, int k={}) : i(i), j(j), k(k) {}
 
-		virtual ttt* new_clone() {
-			return new ttt{*this};
+		virtual std::unique_ptr<ttt> NewClone() const {
+			return std::make_unique<ttt>(*this);
 			//return nullptr;
+		}
+
+		friend inline ttt* new_clone(ttt const& r) {
+			return r.NewClone().release();
+		}
+
+	};
+
+	struct tt2 : public ttt {
+		double l{}, m{};
+
+		tt2() = default;
+		tt2(tt2 const&) = default;
+		tt2(ttt const& base, double l, double m) : ttt(base), l(l), m(m) {}
+		tt2& operator = (tt2& const) = default;
+
+		auto operator <=> (tt2 const&) const = default;
+
+		virtual std::unique_ptr<ttt> NewClone() const override {
+			return std::make_unique<tt2>(*this);
 		}
 	};
 
 	TEST(ptr_container, test_deque) {
 		boost::ptr_deque<ttt> lst;
 		lst.push_back(std::make_unique<ttt>(382, 3, 32));
-		lst.push_back(new ttt{1, 2, 3});
-		lst.push_back(new ttt{0, 31, 33});
+		lst.push_back(std::make_unique<ttt>(1, 2, 3));
+		lst.push_back(std::make_unique<ttt>(0, 31, 33));
+		lst.push_back(std::make_unique<tt2>(ttt{1, 2, 3}, 1.0, 2.0));
+		lst.push_back(std::make_unique<tt2>(ttt{4, 5, 6}, 1.0, 2.0));
+		{
+			boost::ptr_deque<ttt> lst2 = lst;
+			auto& a0 = lst2[0];
+			auto& a1 = lst2[1];
+			auto& a2 = lst2[2];
+			auto& a3 = lst2[3];
+			auto& a4 = lst2[4];
+
+			int k = a0.i;
+		}
+
 		lst.sort();
 		auto r = lst.pop_back();
 		//std::unique_ptr<ttt> r2 = std::move(lst.pop_back());
 
-		EXPECT_EQ(lst.size(), 2);
+		EXPECT_EQ(lst.size(), 4);
 		EXPECT_EQ(r->i, 382);
 		EXPECT_EQ(r->j, 3);
 		EXPECT_EQ(r->k, 32);

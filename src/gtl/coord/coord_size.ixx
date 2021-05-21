@@ -40,11 +40,11 @@ export namespace gtl {
 	public:
 		T cx{}, cy{}, cz{};
 		using coord_t = std::array<T, 3>;
-		using value_t = T;
+		using value_type = T;
 		constexpr coord_t& data() { return std::bit_cast<coord_t&>(*this); }
 		constexpr coord_t const& data() const { return std::bit_cast<coord_t const&>(*this); }
-		constexpr value_t& member(int i) { return data()[i]; }
-		constexpr value_t const& member(int i) const { return data()[i]; }
+		constexpr value_type& member(int i) { return data()[i]; }
+		constexpr value_type const& member(int i) const { return data()[i]; }
 
 	public:
 	// Constructors
@@ -214,11 +214,11 @@ export namespace gtl {
 	public:
 		T cx{}, cy{};
 		using coord_t = std::array<T, 2>;
-		using value_t = T;
+		using value_type = T;
 		constexpr coord_t& data() { return std::bit_cast<coord_t&>(*this); }
 		constexpr coord_t const& data() const { return std::bit_cast<coord_t const&>(*this); }
-		constexpr value_t& member(int i) { return data()[i]; }
-		constexpr value_t const& member(int i) const { return data()[i]; }
+		constexpr value_type& member(int i) { return data()[i]; }
+		constexpr value_type const& member(int i) const { return data()[i]; }
 
 	public:
 	// Constructors

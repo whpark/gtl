@@ -251,8 +251,8 @@ export namespace gtl {
 		//}
 		template < typename T >//requires (!requires (json_t j, T v) { j = v; })
 		njson& operator = (T const& b) {
-			using value_t = std::remove_cvref_t<T>;
-			if constexpr (std::is_integral_v<value_t> or std::is_floating_point_v<value_t>) {
+			using value_type = std::remove_cvref_t<T>;
+			if constexpr (std::is_integral_v<value_type> or std::is_floating_point_v<value_type>) {
 				j_ = b;
 			} else {
 				to_json(*this, b);
