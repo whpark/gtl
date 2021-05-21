@@ -6,6 +6,8 @@
 using namespace std::literals;
 using namespace gtl::literals;
 
+#pragma warning(disable:4566)	// character encoding
+
 
 TEST(gtl_string, codepage) {
 #pragma warning(push)
