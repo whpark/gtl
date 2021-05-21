@@ -229,7 +229,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\serial_port.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_utf.h" />
     <ClInclude Include="..\..\include\gtl\string\HangeulCodeMap.h" />
-    <ClInclude Include="..\..\include\gtl\string\latin_charset.h" />
     <ClInclude Include="..\..\include\gtl\string\string_misc.h" />
     <ClInclude Include="..\..\include\gtl\string\string_misc.hpp" />
     <ClInclude Include="..\..\include\gtl\string\string_primitives.h" />
@@ -253,7 +252,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClCompile Include="HangeulCodeMapKSSM_UTF16.cpp" />
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp" />
     <ClCompile Include="json_proxy.cpp" />
-    <ClCompile Include="latin_charset.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

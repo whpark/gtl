@@ -59,9 +59,6 @@
     <ClInclude Include="..\..\include\gtl\archive.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\string\latin_charset.h">
-      <Filter>gtl\string</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\string\string_misc.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
@@ -134,9 +131,6 @@
       <Filter>gtl.impl</Filter>
     </ClCompile>
     <ClCompile Include="HangeulCodeMapKSSM_UTF16.cpp">
-      <Filter>gtl.impl</Filter>
-    </ClCompile>
-    <ClCompile Include="latin_charset.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">

@@ -13,7 +13,7 @@
 #define GTL_HEADER__BASIC_STRING_MISC_IMPL
 
 #include "gtl/_default.h"
-#include "latin_charset.h"
+//#include "latin_charset.h"
 //#include <gtl/concepts.h>
 //#include <gtl/string/string_primitives.h>
 
@@ -34,6 +34,7 @@ namespace gtl {
 		else if constexpr (std::is_same_v<tchar, uint16_t>) { return (uint16_t*)TEXT_u(SPACE_STRING); }
 		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
+#if 0 // obsolete
 	namespace charset {
 		template < gtlc::string_elem tchar >
 		struct S_ULPair { tchar cUpper, cLower; };
@@ -175,10 +176,30 @@ namespace gtl {
 		}
 		return c;
 	}
-	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c) {
+
+#endif // 0
+
+	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
+	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToLower(tchar c) {
+		if constexpr (std::is_same_v<tchar, char>) {
+			return std::tolower(c);
+		} else {
+			return std::towlower(c);
+		}
+	}
+	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
+	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToUpper(tchar c) {
+		if constexpr (std::is_same_v<tchar, char>) {
+			return std::toupper(c);
+		} else {
+			return std::towupper(c);
+		}
+	}
+
+	template < gtlc::string_elem tchar > inline void MakeLower(tchar& c) {
 		c = ToLower(c);
 	}
-	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c) {
+	template < gtlc::string_elem tchar > inline void MakeUpper(tchar& c) {
 		c = ToUpper(c);
 	}
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c) {
