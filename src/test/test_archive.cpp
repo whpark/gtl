@@ -8,10 +8,10 @@
 using namespace std::literals;
 using namespace gtl::literals;
 
-template <typename tchar>
-auto ReadFile(auto & ar) -> std::vector<gtl::TString<tchar>> {
+template <typename tchar, typename tarchive >
+std::vector<gtl::TString<tchar>> ReadFile(tarchive& ar) {
 	std::vector<gtl::TString<tchar>> strs;
-	for (decltype(ar.ReadLine<tchar>()) r; r = ar.ReadLine<tchar>(); ) {
+	for (std::optional<std::basic_string<tchar>> r; r = ar.ReadLine<tchar>(tchar('\n')); ) {
 		strs.emplace_back(std::move(*r));
 	}
 	return strs;

@@ -209,7 +209,7 @@ namespace gtl {
 	inline [[nodiscard]] tvalue tsztoi(std::basic_string<tchar> const& str, tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 	template < std::integral tvalue = int, gtlc::string_elem tchar >
 	GTL_DEPR_SEC inline [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < std::integral tvalue = int, gtlc::string_elem tchar, int size >
+	template < std::integral tvalue = int, gtlc::string_elem tchar, size_t size >
 	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 	template < std::floating_point tvalue = double, gtlc::string_elem tchar = char16_t >

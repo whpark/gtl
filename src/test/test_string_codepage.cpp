@@ -63,7 +63,7 @@ TEST(gtl_string_codepage_Test, iconv_wrapper) {
 	// unicode <=> mbcs
 	auto r1 = gtl::ToString_iconv<char16_t>("가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv, nullptr, "CP949");
 	std::u16string str1 = r1.value_or(u"ERROR"s);
-	EXPECT_TRUE(str1 == u"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv);
+	EXPECT_EQ(str1, u"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv);
 
 	std::u8string strLong_u8(TEXT_u8(TEST_STRING));
 	int n {4};
@@ -75,9 +75,9 @@ TEST(gtl_string_codepage_Test, iconv_wrapper) {
 		strLong_u += strLong_u + strLong_u;
 	}
 	auto r = gtl::ToString_iconv<char16_t>(strLong_u8);
-	EXPECT_TRUE(strLong_u == gtl::ToString_iconv<char16_t>(strLong_u8));
+	EXPECT_EQ(strLong_u , gtl::ToString_iconv<char16_t>(strLong_u8));
 	EXPECT_TRUE(strLong_u8 == gtl::ToString_iconv<char8_t>(strLong_u));
-	EXPECT_TRUE(strLong_u == (gtl::ToString_iconv<char16_t, char8_t, 0>(strLong_u8)));
+	EXPECT_EQ(strLong_u , (gtl::ToString_iconv<char16_t, char8_t, 0>(strLong_u8)));
 	EXPECT_TRUE(strLong_u8 == (gtl::ToString_iconv<char8_t, char16_t, 0>(strLong_u)));
 
 	auto r2 = gtl::ToString_iconv<char>(u"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv, "CP949");
@@ -97,24 +97,24 @@ TEST(gtl_string_codepage_Test, iconv_wrapper) {
 	EXPECT_TRUE(str5 ==  TEXT_U(TEST_STRING));
 
 	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_u8(TEST_STRING) ""sv)  ==  TEXT_u8(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<char16_t>(TEXT_u8(TEST_STRING) ""sv)  ==  TEXT_u(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<char32_t>(TEXT_u8(TEST_STRING) ""sv)  ==  TEXT_U(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<wchar_t> (TEXT_u8(TEST_STRING) ""sv)  ==  TEXT_W(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<char16_t>(TEXT_u8(TEST_STRING) ""sv), TEXT_u(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<char32_t>(TEXT_u8(TEST_STRING) ""sv), TEXT_U(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<wchar_t> (TEXT_u8(TEST_STRING) ""sv), TEXT_W(TEST_STRING));
 
 	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_u(TEST_STRING) ""sv)  ==  TEXT_u8(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<char16_t>(TEXT_u(TEST_STRING) ""sv)  ==  TEXT_u(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<char32_t>(TEXT_u(TEST_STRING) ""sv)  ==  TEXT_U(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<wchar_t> (TEXT_u(TEST_STRING) ""sv)  ==  TEXT_W(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<char16_t>(TEXT_u(TEST_STRING) ""sv), TEXT_u(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<char32_t>(TEXT_u(TEST_STRING) ""sv), TEXT_U(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<wchar_t> (TEXT_u(TEST_STRING) ""sv), TEXT_W(TEST_STRING));
 
 	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_U(TEST_STRING) ""sv)  ==  TEXT_u8(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<char16_t>(TEXT_U(TEST_STRING) ""sv)  ==  TEXT_u(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<char32_t>(TEXT_U(TEST_STRING) ""sv)  ==  TEXT_U(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<wchar_t> (TEXT_U(TEST_STRING) ""sv)  ==  TEXT_W(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<char16_t>(TEXT_U(TEST_STRING) ""sv), TEXT_u(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<char32_t>(TEXT_U(TEST_STRING) ""sv), TEXT_U(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<wchar_t> (TEXT_U(TEST_STRING) ""sv), TEXT_W(TEST_STRING));
 
 	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_W(TEST_STRING) ""sv)  ==  TEXT_u8(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<char16_t>(TEXT_W(TEST_STRING) ""sv)  ==  TEXT_u(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<char32_t>(TEXT_W(TEST_STRING) ""sv)  ==  TEXT_U(TEST_STRING));
-	EXPECT_TRUE(gtl::ToString_iconv<wchar_t> (TEXT_W(TEST_STRING) ""sv)  ==  TEXT_W(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<char16_t>(TEXT_W(TEST_STRING) ""sv), TEXT_u(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<char32_t>(TEXT_W(TEST_STRING) ""sv), TEXT_U(TEST_STRING));
+	EXPECT_EQ(gtl::ToString_iconv<wchar_t> (TEXT_W(TEST_STRING) ""sv), TEXT_W(TEST_STRING));
 
 
 }

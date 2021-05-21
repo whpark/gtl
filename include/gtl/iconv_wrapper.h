@@ -137,11 +137,8 @@ namespace gtl {
 				return {};
 
 			// source
-		#if (_LIBICONV_VERSION >= 0x0110)
-			using char_source_buf_t = char;
-		#else
-			using char_source_buf_t = char const;
-		#endif
+			using char_source_buf_t = char;	// or char const
+
 			char_source_buf_t* src = std::bit_cast<char_source_buf_t*>(svFrom.data());
 			size_t remnant_src = svFrom.size()*sizeof(tchar_from);
 
@@ -197,31 +194,32 @@ namespace gtl {
 		template < gtlc::string_elem tchar >
 		constexpr static char const* GuessCodeFromType() {
 			using namespace std::literals;
-			if constexpr (std::endian::native == std::endian::little) {
-				if constexpr (std::is_same_v<tchar, char8_t>) {
-					return "UTF-8";
-				} else if (std::is_same_v<tchar, char16_t>) {
+			if constexpr (std::is_same_v<tchar, char8_t>) {
+				return "UTF-8";
+			}
+			else if (std::is_same_v<tchar, char16_t>) {
+				if constexpr (std::endian::native == std::endian::little) {
 					return "UTF-16LE";
-				} else if (std::is_same_v<tchar, char32_t>) {
-					return "UTF-32LE";
-				} else if (std::is_same_v<tchar, wchar_t>) {
-					return "wchar_t";
-				} else if (std::is_same_v<tchar, char>) {
-					return "char";
-				}
-			} else {
-				if constexpr (std::is_same_v<tchar, char8_t>) {
-					return "UTF-8";
-				} else if (std::is_same_v<tchar, char16_t>) {
+				} else {
 					return "UTF-16BE";
-				} else if (std::is_same_v<tchar, char32_t>) {
+				}
+			} else if (std::is_same_v<tchar, char32_t>) {
+				if constexpr (std::endian::native == std::endian::little) {
+					return "UTF-32LE";
+				} else {
 					return "UTF-32BE";
-				} else if (std::is_same_v<tchar, wchar_t>) {
-					return "wchar_t";
-				} else if (std::is_same_v<tchar, char>) {
-					return "char";
 				}
 			}
+			else if (std::is_same_v<tchar, wchar_t>) {
+				return "wchar_t";
+			} else if (std::is_same_v<tchar, char>) {
+				return "char";
+			}
+		#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
+			else if (std::is_same_v<tchar, uint16_t>) {
+				return "JOHAB";
+			}
+		#endif
 			return nullptr;
 		};
 

@@ -101,7 +101,7 @@ namespace UnitTest {
 
 			std::string_view sv{ str1 };
 			std::string_view sv2{ str2 };
-			std::u16string_view sv3{ str4 };
+			std::wstring_view sv3{ str4 };
 
 			auto stru = fmt::format(u8"{}", 1);
 			auto strU16 = fmt::format(u"{}", 2);

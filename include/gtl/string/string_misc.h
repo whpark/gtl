@@ -35,10 +35,10 @@ namespace gtl {
 
 
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeLower(tchar& c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeUpper(tchar& c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c/* Locale Irrelavant */);
@@ -121,6 +121,8 @@ namespace gtl {
 	template < gtlc::string_elem tchar >
 	constexpr [[nodiscard]] std::optional<std::basic_string<tchar>> TranslateEscapeSequence(std::basic_string_view<tchar> sv, tchar cFill = (tchar)'?', tchar cTerminating = 0);
 
+	template < gtlc::string_elem tchar_t >
+	std::vector<std::basic_string<tchar_t>> ConvDataToHexString(std::span<uint8_t> data, size_t nCol = 16, int cDelimiter = ' ', bool bAddText = false, int cDelimiterText = '|');
 
 #pragma pack(pop)
 };	// namespace gtl;

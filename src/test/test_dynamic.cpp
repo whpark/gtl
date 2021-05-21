@@ -181,12 +181,12 @@ namespace gtl::test::reflection::CRTP {
 
 }
 
-namespace boost {
-	// When exceptions are disabled
-	// in standalone, you must provide
-	// this function.
-	BOOST_NORETURN void throw_exception(std::exception const&);
-}
+//namespace boost {
+//	// When exceptions are disabled
+//	// in standalone, you must provide
+//	// this function.
+//	BOOST_NORETURN void throw_exception(std::exception const&);
+//}
 
 //#include <boost/exception/exception.hpp>
 #include <boost/archive/text_oarchive.hpp>

@@ -19,33 +19,34 @@ namespace gtl {
 
 	// length - mm
 
-	class length_mm_t {	// represents length in mm
+	template < std::floating_point T >
+	class tlength_mm_t {	// represents length in mm
 	public:
-		double dValue = 0.0;
+		T dValue{};
 
-		length_mm_t(double v) : dValue(v) { }
+		tlength_mm_t(T v) : dValue(v) { }
 
-		operator double& () { return dValue; };
-		operator double () const { return dValue; };
+		operator T& () { return dValue; };
+		operator T () const { return dValue; };
 
-		auto operator <=> (const length_mm_t& ) const = default;
-		auto operator <=> (double b) const { return dValue <=> b; }
+		[[ nodiscard ]] auto operator <=> (tlength_mm_t const& ) const = default;
+		[[ nodiscard ]] auto operator <=> (T b) const { return dValue <=> b; }
 	};
-	using mm_t = length_mm_t;
+	using mm_t = tlength_mm_t<double>;
 
 	namespace literals {
-		inline length_mm_t operator "" _nm (long double v)					{ return length_mm_t(v * 1.e-6); }
-		inline length_mm_t operator "" _um (long double v)					{ return length_mm_t(v * 1.e-3); }
-		inline length_mm_t operator "" _mm (long double v)					{ return length_mm_t(v); }
-		inline length_mm_t operator "" _cm (long double v)					{ return length_mm_t(v * 1.e1); }
-		inline length_mm_t operator ""  _m (long double v)					{ return length_mm_t(v * 1.e3); }
-		inline length_mm_t operator "" _km (long double v)					{ return length_mm_t(v * 1.e6); }
-		inline length_mm_t operator "" _nm (unsigned long long v)			{ return length_mm_t(v * 1.e-6); }
-		inline length_mm_t operator "" _um (unsigned long long v)			{ return length_mm_t(v * 1.e-3); }
-		inline length_mm_t operator "" _mm (unsigned long long v)			{ return length_mm_t((double)v); }
-		inline length_mm_t operator "" _cm (unsigned long long v)			{ return length_mm_t(v * 1.e1); }
-		inline length_mm_t operator ""  _m (unsigned long long v)			{ return length_mm_t(v * 1.e3); }
-		inline length_mm_t operator "" _km (unsigned long long v)			{ return length_mm_t(v * 1.e6); }
+		inline mm_t operator "" _nm (long double v)					{ return mm_t(v * 1.e-6); }
+		inline mm_t operator "" _um (long double v)					{ return mm_t(v * 1.e-3); }
+		inline mm_t operator "" _mm (long double v)					{ return mm_t(v); }
+		inline mm_t operator "" _cm (long double v)					{ return mm_t(v * 1.e1); }
+		inline mm_t operator ""  _m (long double v)					{ return mm_t(v * 1.e3); }
+		inline mm_t operator "" _km (long double v)					{ return mm_t(v * 1.e6); }
+		inline mm_t operator "" _nm (unsigned long long v)			{ return mm_t(v * 1.e-6); }
+		inline mm_t operator "" _um (unsigned long long v)			{ return mm_t(v * 1.e-3); }
+		inline mm_t operator "" _mm (unsigned long long v)			{ return mm_t((double)v); }
+		inline mm_t operator "" _cm (unsigned long long v)			{ return mm_t(v * 1.e1); }
+		inline mm_t operator ""  _m (unsigned long long v)			{ return mm_t(v * 1.e3); }
+		inline mm_t operator "" _km (unsigned long long v)			{ return mm_t(v * 1.e6); }
 
 		inline unsigned long long operator "" _KB (unsigned long long v)	{ return v * 1024; }
 		inline unsigned long long operator "" _MB (unsigned long long v)	{ return v * 1024_KB; }
@@ -67,173 +68,216 @@ namespace gtl {
 	};
 
 
+	template < std::floating_point tvalue_t > class tangle_rad_t;
+	template < std::floating_point tvalue_t > class tangle_deg_t;
+
 	// angle - rad, deg
-	class angle_deg_t;
-	class angle_rad_t;
-	class angle_rad_t {	// represents angle in rad
+	template < std::floating_point tvalue_t >
+	class tangle_rad_t {	// represents angle in rad
 	public:
-		double dValue = 0.0;
+		using value_t = tvalue_t;
+		value_t dValue{};
 
-		angle_rad_t() = default;
-		angle_rad_t(angle_rad_t const&) = default;
-		angle_rad_t(angle_rad_t&&) = default;
-		angle_rad_t(angle_deg_t const& b);
-		explicit angle_rad_t(double v) : dValue(v) { }
+		tangle_rad_t() = default;
+		tangle_rad_t(tangle_rad_t const&) = default;
+		tangle_rad_t(tangle_rad_t&&) = default;
+		tangle_rad_t(tangle_deg_t<value_t> const& b);
+		explicit tangle_rad_t(value_t v) : dValue(v) { }
 
-		operator double& () { return dValue; };
-		operator double () const { return dValue; };
-		//operator angle_deg_t() const;
-		angle_rad_t& operator = (angle_rad_t const&) = default;
-		angle_rad_t& operator = (double const& b) { dValue = b; return *this; }
-		angle_rad_t& operator = (angle_deg_t const& b);
-		angle_rad_t operator - () const { return angle_rad_t(-dValue); }
-		auto operator <=> (angle_rad_t const&) const = default;
-		auto operator <=> (angle_deg_t const& deg) const { return *this <=> (angle_rad_t)deg; }
-		auto operator <=> (double rad) const { return dValue <=> rad; }
+		operator value_t& () { return dValue; };
+		operator value_t () const { return dValue; };
+		//operator tangle_deg_t() const;
+		tangle_rad_t& operator = (tangle_rad_t const&) = default;
+		tangle_rad_t& operator = (value_t const& b) { dValue = b; return *this; }
+		tangle_rad_t& operator = (tangle_deg_t<value_t> const& b);
+		tangle_rad_t operator - () const { return tangle_rad_t(-dValue); }
+		[[ nodiscard ]] auto operator <=> (tangle_rad_t const&) const = default;
+		[[ nodiscard ]] auto operator <=> (tangle_deg_t<value_t> const& deg) const { return *this <=> (tangle_rad_t)deg; }
+		[[ nodiscard ]] auto operator <=> (value_t rad) const { return dValue <=> rad; }
 
-		angle_rad_t operator + (angle_rad_t const& b) const { return angle_rad_t(dValue + b.dValue); }
-		angle_rad_t operator - (angle_rad_t const& b) const { return angle_rad_t(dValue - b.dValue); }
-		angle_rad_t operator * (angle_rad_t const& b) const { return angle_rad_t(dValue * b.dValue); }
-		angle_rad_t operator / (angle_rad_t const& b) const { return angle_rad_t(dValue / b.dValue); }
-		angle_rad_t& operator += (angle_rad_t const& b) { dValue += b.dValue; return *this; }
-		angle_rad_t& operator -= (angle_rad_t const& b) { dValue -= b.dValue; return *this; }
-		angle_rad_t& operator *= (angle_rad_t const& b) { dValue *= b.dValue; return *this; }
-		angle_rad_t& operator /= (angle_rad_t const& b) { dValue /= b.dValue; return *this; }
+		tangle_rad_t operator + (tangle_rad_t const& b) const { return tangle_rad_t(dValue + b.dValue); }
+		tangle_rad_t operator - (tangle_rad_t const& b) const { return tangle_rad_t(dValue - b.dValue); }
+		tangle_rad_t operator * (tangle_rad_t const& b) const { return tangle_rad_t(dValue * b.dValue); }
+		tangle_rad_t operator / (tangle_rad_t const& b) const { return tangle_rad_t(dValue / b.dValue); }
+		tangle_rad_t& operator += (tangle_rad_t const& b) { dValue += b.dValue; return *this; }
+		tangle_rad_t& operator -= (tangle_rad_t const& b) { dValue -= b.dValue; return *this; }
+		tangle_rad_t& operator *= (tangle_rad_t const& b) { dValue *= b.dValue; return *this; }
+		tangle_rad_t& operator /= (tangle_rad_t const& b) { dValue /= b.dValue; return *this; }
 
-		angle_rad_t operator + (angle_deg_t const& b) const;
-		angle_rad_t operator - (angle_deg_t const& b) const;
-		angle_rad_t operator * (angle_deg_t const& b) const;
-		angle_rad_t operator / (angle_deg_t const& b) const;
-		angle_rad_t& operator += (angle_deg_t const& b);
-		angle_rad_t& operator -= (angle_deg_t const& b);
-		angle_rad_t& operator *= (angle_deg_t const& b);
-		angle_rad_t& operator /= (angle_deg_t const& b);
+		tangle_rad_t operator + (tangle_deg_t<value_t> const& b) const;
+		tangle_rad_t operator - (tangle_deg_t<value_t> const& b) const;
+		tangle_rad_t operator * (tangle_deg_t<value_t> const& b) const;
+		tangle_rad_t operator / (tangle_deg_t<value_t> const& b) const;
+		tangle_rad_t& operator += (tangle_deg_t<value_t> const& b);
+		tangle_rad_t& operator -= (tangle_deg_t<value_t> const& b);
+		tangle_rad_t& operator *= (tangle_deg_t<value_t> const& b);
+		tangle_rad_t& operator /= (tangle_deg_t<value_t> const& b);
 
-		angle_rad_t operator + (double const b) const;
-		angle_rad_t operator - (double const b) const;
-		angle_rad_t operator * (double const b) const;
-		angle_rad_t operator / (double const b) const;
-		angle_rad_t& operator += (double const b);
-		angle_rad_t& operator -= (double const b);
-		angle_rad_t& operator *= (double const b);
-		angle_rad_t& operator /= (double const b);
+		tangle_rad_t operator + (value_t const b) const;
+		tangle_rad_t operator - (value_t const b) const;
+		tangle_rad_t operator * (value_t const b) const;
+		tangle_rad_t operator / (value_t const b) const;
+		tangle_rad_t& operator += (value_t const b);
+		tangle_rad_t& operator -= (value_t const b);
+		tangle_rad_t& operator *= (value_t const b);
+		tangle_rad_t& operator /= (value_t const b);
 
-		static angle_rad_t atan(double v)				{ return angle_rad_t(::atan(v)); }
-		static angle_rad_t atan2(double y, double x)	{ return angle_rad_t(::atan2(y, x)); }
-		static angle_rad_t asin(double v)				{ return angle_rad_t(::asin(v)); }
-		static angle_rad_t acos(double v)				{ return angle_rad_t(::acos(v)); }
+		static tangle_rad_t atan(value_t v)				{ return tangle_rad_t(::atan(v)); }
+		static tangle_rad_t atan2(value_t y, value_t x)	{ return tangle_rad_t(::atan2(y, x)); }
+		static tangle_rad_t asin(value_t v)				{ return tangle_rad_t(::asin(v)); }
+		static tangle_rad_t acos(value_t v)				{ return tangle_rad_t(::acos(v)); }
 	};
-	class __declspec(novtable) angle_deg_t {	// represents angle in deg
+
+	template < std::floating_point tvalue_t >
+	class tangle_deg_t {	// represents angle in deg
 	public:
-		double dValue = 0.0;
+		using value_t = tvalue_t;
+		value_t dValue{};
 
-		angle_deg_t() = default;
-		angle_deg_t(angle_deg_t const&) = default;
-		angle_deg_t(angle_deg_t&&) = default;
-		angle_deg_t(angle_rad_t const& b);
-		explicit angle_deg_t(double v) : dValue(v) { }
+		tangle_deg_t() = default;
+		tangle_deg_t(tangle_deg_t const&) = default;
+		tangle_deg_t(tangle_deg_t&&) = default;
+		tangle_deg_t(tangle_rad_t<value_t> const& b);
+		explicit tangle_deg_t(value_t v) : dValue(v) { }
 
-		operator double& () { return dValue; };
-		operator double () const { return dValue; };
-		//operator angle_rad_t() const;
-		angle_deg_t& operator = (angle_deg_t const&) = default;
-		angle_deg_t& operator = (double const& b) { dValue = b; return *this; }
-		angle_deg_t& operator = (angle_rad_t const& b);
-		angle_deg_t operator - () const { return angle_deg_t(-dValue); }
-		auto operator <=> (angle_deg_t const&) const = default;
-		auto operator <=> (angle_rad_t const& deg) const { return *this <=> (angle_deg_t)deg; }
-		auto operator <=> (double deg) const { return dValue <=> deg; }
-		angle_deg_t operator + (angle_deg_t const& b) const { return angle_deg_t(dValue + b.dValue); }
-		angle_deg_t operator - (angle_deg_t const& b) const { return angle_deg_t(dValue - b.dValue); }
-		angle_deg_t operator * (angle_deg_t const& b) const { return angle_deg_t(dValue * b.dValue); }
-		angle_deg_t operator / (angle_deg_t const& b) const { return angle_deg_t(dValue / b.dValue); }
-		angle_deg_t& operator += (angle_deg_t const& b) { dValue += b.dValue; return *this; }
-		angle_deg_t& operator -= (angle_deg_t const& b) { dValue -= b.dValue; return *this; }
-		angle_deg_t& operator *= (angle_deg_t const& b) { dValue *= b.dValue; return *this; }
-		angle_deg_t& operator /= (angle_deg_t const& b) { dValue /= b.dValue; return *this; }
+		operator value_t& () { return dValue; };
+		operator value_t () const { return dValue; };
+		//operator tangle_rad_t<value_t>() const;
+		tangle_deg_t& operator = (tangle_deg_t const&) = default;
+		tangle_deg_t& operator = (value_t const& b) { dValue = b; return *this; }
+		tangle_deg_t& operator = (tangle_rad_t<value_t> const& b);
+		tangle_deg_t operator - () const { return tangle_deg_t(-dValue); }
+		[[ nodiscard ]] auto operator <=> (tangle_deg_t const&) const = default;
+		[[ nodiscard ]] auto operator <=> (tangle_rad_t<value_t> const& deg) const { return *this <=> (tangle_deg_t)deg; }
+		[[ nodiscard ]] auto operator <=> (value_t deg) const { return dValue <=> deg; }
+		tangle_deg_t operator + (tangle_deg_t const& b) const { return tangle_deg_t(dValue + b.dValue); }
+		tangle_deg_t operator - (tangle_deg_t const& b) const { return tangle_deg_t(dValue - b.dValue); }
+		tangle_deg_t operator * (tangle_deg_t const& b) const { return tangle_deg_t(dValue * b.dValue); }
+		tangle_deg_t operator / (tangle_deg_t const& b) const { return tangle_deg_t(dValue / b.dValue); }
+		tangle_deg_t& operator += (tangle_deg_t const& b) { dValue += b.dValue; return *this; }
+		tangle_deg_t& operator -= (tangle_deg_t const& b) { dValue -= b.dValue; return *this; }
+		tangle_deg_t& operator *= (tangle_deg_t const& b) { dValue *= b.dValue; return *this; }
+		tangle_deg_t& operator /= (tangle_deg_t const& b) { dValue /= b.dValue; return *this; }
 
-		angle_deg_t operator + (angle_rad_t const& b) const;
-		angle_deg_t operator - (angle_rad_t const& b) const;
-		angle_deg_t operator * (angle_rad_t const& b) const;
-		angle_deg_t operator / (angle_rad_t const& b) const;
-		angle_deg_t& operator += (angle_rad_t const& b);
-		angle_deg_t& operator -= (angle_rad_t const& b);
-		angle_deg_t& operator *= (angle_rad_t const& b);
-		angle_deg_t& operator /= (angle_rad_t const& b);
+		tangle_deg_t operator + (tangle_rad_t<value_t> const& b) const;
+		tangle_deg_t operator - (tangle_rad_t<value_t> const& b) const;
+		tangle_deg_t operator * (tangle_rad_t<value_t> const& b) const;
+		tangle_deg_t operator / (tangle_rad_t<value_t> const& b) const;
+		tangle_deg_t& operator += (tangle_rad_t<value_t> const& b);
+		tangle_deg_t& operator -= (tangle_rad_t<value_t> const& b);
+		tangle_deg_t& operator *= (tangle_rad_t<value_t> const& b);
+		tangle_deg_t& operator /= (tangle_rad_t<value_t> const& b);
 
-		angle_deg_t operator + (double const b) const;
-		angle_deg_t operator - (double const b) const;
-		angle_deg_t operator * (double const b) const;
-		angle_deg_t operator / (double const b) const;
-		angle_deg_t& operator += (double const b);
-		angle_deg_t& operator -= (double const b);
-		angle_deg_t& operator *= (double const b);
-		angle_deg_t& operator /= (double const b);
+		tangle_deg_t operator + (value_t const b) const;
+		tangle_deg_t operator - (value_t const b) const;
+		tangle_deg_t operator * (value_t const b) const;
+		tangle_deg_t operator / (value_t const b) const;
+		tangle_deg_t& operator += (value_t const b);
+		tangle_deg_t& operator -= (value_t const b);
+		tangle_deg_t& operator *= (value_t const b);
+		tangle_deg_t& operator /= (value_t const b);
 
-		static angle_deg_t atan(double v)				{ return angle_rad_t::atan(v); }
-		static angle_deg_t atan2(double y, double x)	{ return angle_rad_t::atan2(y, x); }
-		static angle_deg_t asin(double v)				{ return angle_rad_t::asin(v); }
-		static angle_deg_t acos(double v)				{ return angle_rad_t::acos(v); }
+		static tangle_deg_t atan(value_t v)				{ return tangle_rad_t<value_t>::atan(v); }
+		static tangle_deg_t atan2(value_t y, value_t x)	{ return tangle_rad_t<value_t>::atan2(y, x); }
+		static tangle_deg_t asin(value_t v)				{ return tangle_rad_t<value_t>::asin(v); }
+		static tangle_deg_t acos(value_t v)				{ return tangle_rad_t<value_t>::acos(v); }
 	};
-	inline angle_rad_t::angle_rad_t(angle_deg_t const& b) : dValue(deg2rad(b.dValue)) {}
-	inline angle_deg_t::angle_deg_t(angle_rad_t const& b) : dValue(rad2deg(b.dValue)) {}
-	inline angle_rad_t& angle_rad_t::operator = (angle_deg_t const& b) { dValue = deg2rad(b.dValue); return *this; };
-	inline angle_deg_t& angle_deg_t::operator = (angle_rad_t const& b) { dValue = rad2deg(b.dValue); return *this; };
-	//inline angle_rad_t::operator angle_deg_t() const { return angle_deg_t(rad2deg(dValue)); }
-	//inline angle_deg_t::operator angle_rad_t() const { return angle_rad_t(deg2rad(dValue)); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>::tangle_rad_t(tangle_deg_t<tvalue_t> const& b) : dValue(deg2rad(b.dValue)) {}
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>::tangle_deg_t(tangle_rad_t<tvalue_t> const& b) : dValue(rad2deg(b.dValue)) {}
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator = (tangle_deg_t<tvalue_t> const& b) { dValue = deg2rad(b.dValue); return *this; };
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator = (tangle_rad_t<tvalue_t> const& b) { dValue = rad2deg(b.dValue); return *this; };
+	//inline tangle_rad_t::operator tangle_deg_t() const { return tangle_deg_t(rad2deg(dValue)); }
+	//inline tangle_deg_t::operator tangle_rad_t() const { return tangle_rad_t(deg2rad(dValue)); }
 
-	inline angle_rad_t operator "" _rad (long double v)					{ return angle_rad_t(v); }
-	inline angle_rad_t operator "" _rad (unsigned long long v)			{ return angle_rad_t((double) v); }
-	inline angle_deg_t operator "" _deg (long double v)					{ return angle_deg_t(v); }
-	inline angle_deg_t operator "" _deg (unsigned long long v)			{ return angle_deg_t((double) v); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>  tangle_rad_t<tvalue_t>::operator +  (tangle_deg_t<tvalue_t> const& b) const { return tangle_rad_t<tvalue_t>(dValue + (tangle_rad_t<tvalue_t>)b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>  tangle_rad_t<tvalue_t>::operator -  (tangle_deg_t<tvalue_t> const& b) const { return tangle_rad_t<tvalue_t>(dValue - (tangle_rad_t<tvalue_t>)b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>  tangle_rad_t<tvalue_t>::operator *  (tangle_deg_t<tvalue_t> const& b) const { return tangle_rad_t<tvalue_t>(dValue * (tangle_rad_t<tvalue_t>)b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>  tangle_rad_t<tvalue_t>::operator /  (tangle_deg_t<tvalue_t> const& b) const { return tangle_rad_t<tvalue_t>(dValue / (tangle_rad_t<tvalue_t>)b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator += (tangle_deg_t<tvalue_t> const& b) { dValue += (tangle_rad_t<tvalue_t>)b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator -= (tangle_deg_t<tvalue_t> const& b) { dValue -= (tangle_rad_t<tvalue_t>)b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator *= (tangle_deg_t<tvalue_t> const& b) { dValue *= (tangle_rad_t<tvalue_t>)b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator /= (tangle_deg_t<tvalue_t> const& b) { dValue /= (tangle_rad_t<tvalue_t>)b; return *this; }
 
-	inline angle_rad_t angle_rad_t::operator + (angle_deg_t const& b) const { return angle_rad_t(dValue + (angle_rad_t)b); }
-	inline angle_rad_t angle_rad_t::operator - (angle_deg_t const& b) const { return angle_rad_t(dValue - (angle_rad_t)b); }
-	inline angle_rad_t angle_rad_t::operator * (angle_deg_t const& b) const { return angle_rad_t(dValue * (angle_rad_t)b); }
-	inline angle_rad_t angle_rad_t::operator / (angle_deg_t const& b) const { return angle_rad_t(dValue / (angle_rad_t)b); }
-	inline angle_rad_t& angle_rad_t::operator += (angle_deg_t const& b) { dValue += (angle_rad_t)b; return *this; }
-	inline angle_rad_t& angle_rad_t::operator -= (angle_deg_t const& b) { dValue -= (angle_rad_t)b; return *this; }
-	inline angle_rad_t& angle_rad_t::operator *= (angle_deg_t const& b) { dValue *= (angle_rad_t)b; return *this; }
-	inline angle_rad_t& angle_rad_t::operator /= (angle_deg_t const& b) { dValue /= (angle_rad_t)b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>  tangle_rad_t<tvalue_t>::operator +  (tvalue_t const b) const { return tangle_rad_t<tvalue_t>(dValue + b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>  tangle_rad_t<tvalue_t>::operator -  (tvalue_t const b) const { return tangle_rad_t<tvalue_t>(dValue - b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>  tangle_rad_t<tvalue_t>::operator *  (tvalue_t const b) const { return tangle_rad_t<tvalue_t>(dValue * b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>  tangle_rad_t<tvalue_t>::operator /  (tvalue_t const b) const { return tangle_rad_t<tvalue_t>(dValue / b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator += (tvalue_t const b) { dValue += b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator -= (tvalue_t const b) { dValue -= b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator *= (tvalue_t const b) { dValue *= b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_rad_t<tvalue_t>& tangle_rad_t<tvalue_t>::operator /= (tvalue_t const b) { dValue /= b; return *this; }
 
-	inline angle_rad_t angle_rad_t::operator + (double const b) const { return angle_rad_t(dValue + b); }
-	inline angle_rad_t angle_rad_t::operator - (double const b) const { return angle_rad_t(dValue - b); }
-	inline angle_rad_t angle_rad_t::operator * (double const b) const { return angle_rad_t(dValue * b); }
-	inline angle_rad_t angle_rad_t::operator / (double const b) const { return angle_rad_t(dValue / b); }
-	inline angle_rad_t& angle_rad_t::operator += (double const b) { dValue += b; return *this; }
-	inline angle_rad_t& angle_rad_t::operator -= (double const b) { dValue -= b; return *this; }
-	inline angle_rad_t& angle_rad_t::operator *= (double const b) { dValue *= b; return *this; }
-	inline angle_rad_t& angle_rad_t::operator /= (double const b) { dValue /= b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>  tangle_deg_t<tvalue_t>::operator +  (tangle_rad_t<tvalue_t> const& b) const { return tangle_deg_t<tvalue_t>(dValue + (tangle_deg_t<tvalue_t>)b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>  tangle_deg_t<tvalue_t>::operator -  (tangle_rad_t<tvalue_t> const& b) const { return tangle_deg_t<tvalue_t>(dValue - (tangle_deg_t<tvalue_t>)b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>  tangle_deg_t<tvalue_t>::operator *  (tangle_rad_t<tvalue_t> const& b) const { return tangle_deg_t<tvalue_t>(dValue * (tangle_deg_t<tvalue_t>)b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>  tangle_deg_t<tvalue_t>::operator /  (tangle_rad_t<tvalue_t> const& b) const { return tangle_deg_t<tvalue_t>(dValue / (tangle_deg_t<tvalue_t>)b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator += (tangle_rad_t<tvalue_t> const& b) { dValue += (tangle_deg_t<tvalue_t>)b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator -= (tangle_rad_t<tvalue_t> const& b) { dValue -= (tangle_deg_t<tvalue_t>)b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator *= (tangle_rad_t<tvalue_t> const& b) { dValue *= (tangle_deg_t<tvalue_t>)b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator /= (tangle_rad_t<tvalue_t> const& b) { dValue /= (tangle_deg_t<tvalue_t>)b; return *this; }
 
-	inline angle_deg_t angle_deg_t::operator + (angle_rad_t const& b) const { return angle_deg_t(dValue + (angle_deg_t)b); }
-	inline angle_deg_t angle_deg_t::operator - (angle_rad_t const& b) const { return angle_deg_t(dValue - (angle_deg_t)b); }
-	inline angle_deg_t angle_deg_t::operator * (angle_rad_t const& b) const { return angle_deg_t(dValue * (angle_deg_t)b); }
-	inline angle_deg_t angle_deg_t::operator / (angle_rad_t const& b) const { return angle_deg_t(dValue / (angle_deg_t)b); }
-	inline angle_deg_t& angle_deg_t::operator += (angle_rad_t const& b) { dValue += (angle_deg_t)b; return *this; }
-	inline angle_deg_t& angle_deg_t::operator -= (angle_rad_t const& b) { dValue -= (angle_deg_t)b; return *this; }
-	inline angle_deg_t& angle_deg_t::operator *= (angle_rad_t const& b) { dValue *= (angle_deg_t)b; return *this; }
-	inline angle_deg_t& angle_deg_t::operator /= (angle_rad_t const& b) { dValue /= (angle_deg_t)b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>  tangle_deg_t<tvalue_t>::operator + (tvalue_t const b) const { return tangle_deg_t<tvalue_t>(dValue + b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>  tangle_deg_t<tvalue_t>::operator - (tvalue_t const b) const { return tangle_deg_t<tvalue_t>(dValue - b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>  tangle_deg_t<tvalue_t>::operator * (tvalue_t const b) const { return tangle_deg_t<tvalue_t>(dValue * b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>  tangle_deg_t<tvalue_t>::operator / (tvalue_t const b) const { return tangle_deg_t<tvalue_t>(dValue / b); }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator += (tvalue_t const b) { dValue += b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator -= (tvalue_t const b) { dValue -= b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator *= (tvalue_t const b) { dValue *= b; return *this; }
+	template < std::floating_point tvalue_t >
+	inline tangle_deg_t<tvalue_t>& tangle_deg_t<tvalue_t>::operator /= (tvalue_t const b) { dValue /= b; return *this; }
 
-	inline angle_deg_t angle_deg_t::operator + (double const b) const { return angle_deg_t(dValue + b); }
-	inline angle_deg_t angle_deg_t::operator - (double const b) const { return angle_deg_t(dValue - b); }
-	inline angle_deg_t angle_deg_t::operator * (double const b) const { return angle_deg_t(dValue * b); }
-	inline angle_deg_t angle_deg_t::operator / (double const b) const { return angle_deg_t(dValue / b); }
-	inline angle_deg_t& angle_deg_t::operator += (double const b) { dValue += b; return *this; }
-	inline angle_deg_t& angle_deg_t::operator -= (double const b) { dValue -= b; return *this; }
-	inline angle_deg_t& angle_deg_t::operator *= (double const b) { dValue *= b; return *this; }
-	inline angle_deg_t& angle_deg_t::operator /= (double const b) { dValue /= b; return *this; }
+	//typedef tangle_rad_t rad_t;
+	//typedef tangle_deg_t deg_t;
 
-	//typedef angle_rad_t rad_t;
-	//typedef angle_deg_t deg_t;
+	template < std::floating_point tvalue_t > inline double cos(tangle_rad_t<tvalue_t> t)	{ return ::cos((tvalue_t)t); }
+	template < std::floating_point tvalue_t > inline double sin(tangle_rad_t<tvalue_t> t)	{ return ::sin((tvalue_t)t); }
+	template < std::floating_point tvalue_t > inline double tan(tangle_rad_t<tvalue_t> t)	{ return ::tan((tvalue_t)t); }
+	template < std::floating_point tvalue_t > inline double cos(tangle_deg_t<tvalue_t> t)	{ return ::cos((tvalue_t)(tangle_rad_t<tvalue_t>)t); }
+	template < std::floating_point tvalue_t > inline double sin(tangle_deg_t<tvalue_t> t)	{ return ::sin((tvalue_t)(tangle_rad_t<tvalue_t>)t); }
+	template < std::floating_point tvalue_t > inline double tan(tangle_deg_t<tvalue_t> t)	{ return ::tan((tvalue_t)(tangle_rad_t<tvalue_t>)t); }
 
-	using rad_t = angle_rad_t;
-	using deg_t = angle_deg_t;
-
-	inline double cos(angle_rad_t t)				{ return ::cos((double)t); }
-	inline double sin(angle_rad_t t)				{ return ::sin((double)t); }
-	inline double tan(angle_rad_t t)				{ return ::tan((double)t); }
-	inline double cos(angle_deg_t t)				{ return ::cos((double)(rad_t)t); }
-	inline double sin(angle_deg_t t)				{ return ::sin((double)(rad_t)t); }
-	inline double tan(angle_deg_t t)				{ return ::tan((double)(rad_t)t); }
+	using rad_t = tangle_rad_t<double>;
+	using deg_t = tangle_deg_t<double>;
+	namespace literals {
+		inline rad_t operator "" _rad (long double v)				{ return rad_t(v); }
+		inline rad_t operator "" _rad (unsigned long long v)		{ return rad_t((double) v); }
+		inline deg_t operator "" _deg (long double v)				{ return deg_t(v); }
+		inline deg_t operator "" _deg (unsigned long long v)		{ return deg_t((double) v); }
+	}
 
 }	// namespace gtl

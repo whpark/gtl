@@ -13,7 +13,7 @@
 #define GTL_HEADER__BASIC_STRING_MISC_IMPL
 
 #include "gtl/_default.h"
-#include "latin_charset.h"
+//#include "latin_charset.h"
 //#include <gtl/concepts.h>
 //#include <gtl/string/string_primitives.h>
 
@@ -34,6 +34,7 @@ namespace gtl {
 		else if constexpr (std::is_same_v<tchar, uint16_t>) { return (uint16_t*)TEXT_u(SPACE_STRING); }
 		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
+#if 0 // obsolete
 	namespace charset {
 		template < gtlc::string_elem tchar >
 		struct S_ULPair { tchar cUpper, cLower; };
@@ -175,10 +176,30 @@ namespace gtl {
 		}
 		return c;
 	}
-	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c) {
+
+#endif // 0
+
+	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
+	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToLower(tchar c) {
+		if constexpr (std::is_same_v<tchar, char>) {
+			return std::tolower(c);
+		} else {
+			return std::towlower(c);
+		}
+	}
+	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
+	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToUpper(tchar c) {
+		if constexpr (std::is_same_v<tchar, char>) {
+			return std::toupper(c);
+		} else {
+			return std::towupper(c);
+		}
+	}
+
+	template < gtlc::string_elem tchar > inline void MakeLower(tchar& c) {
 		c = ToLower(c);
 	}
-	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c) {
+	template < gtlc::string_elem tchar > inline void MakeUpper(tchar& c) {
 		c = ToUpper(c);
 	}
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c) {
@@ -560,6 +581,80 @@ namespace gtl {
 		return str;
 	}
 
+
+	template < gtlc::string_elem tchar_t >
+	std::vector<std::basic_string<tchar_t>> ConvDataToHexString(std::span<uint8_t> data, size_t nCol, int cDelimiter, bool bAddText, int cDelimiterText) {
+		std::vector<std::basic_string<tchar_t>> result;
+
+		if (data.size())
+			return result;
+
+		if (nCol == 0)
+			nCol = data.size();
+		//strsResult.clear();
+		result.reserve((data.size()-1) / nCol + 1);
+		uint8_t const* pos = data.data();
+		size_t nLeft = data.size();
+		int const nLenDelimiter = (cDelimiter ? 1 : 0);
+		int const nLenDelimiterText = (cDelimiterText ? 1 : 0);
+		while (nLeft > 0) {
+			result.push_back(TString<tchar_t>());
+			auto& str = result.back();
+
+			size_t n = std::min(nCol, nLeft);
+			if (bAddText) {
+				auto len = nCol * (2 + nLenDelimiter) + nLenDelimiterText + nLenDelimiter + n;
+				str.reserve(len);	// if cDelimiter == 0, no delimiter would be appended.
+			}
+			else
+				str.resize(n*(2 + (cDelimiter ? 1 : 0)));	// if cDelimiter == 0, no delimiter would be appended.
+
+			auto* pHead = pos;
+
+			//tchar_t* psz = str.data();
+			int i = 0;
+			for (i = 0; i < n; i++, pos++) {
+				auto ch = (*pos >> 4) & 0xF;
+				auto cl = *pos & 0xF;
+				str += tchar_t((ch > 9) ? (ch-9) + 'A' : ch + '0');
+				str += tchar_t((cl > 9) ? (cl-9) + 'A' : cl + '0');
+				if (cDelimiter)
+					str += (tchar_t)cDelimiter;
+			}
+			if (bAddText) {
+				for (; i < nCol; i++) {
+					if constexpr (std::is_same_v<tchar_t, char>) {
+						str += "  ";
+					} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
+						str += L"  ";
+					} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
+						str += u8"  ";
+					} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
+						str += u"  ";
+					} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
+						str += U"  ";
+					}
+					str += (tchar_t)cDelimiter;
+				}
+
+				if (cDelimiterText)
+					str += (tchar_t)cDelimiterText;
+				if (cDelimiter)
+					str += (tchar_t)cDelimiter;
+
+				pos = pHead;
+				for (int i = 0; i < n; i++, pos++) {
+					if ( *pos && !std::isspace(*pos) && (*pos > ' ') )
+						str += (char)*pos;
+					else
+						str += '.';
+				}
+			}
+
+			nLeft -= n;
+		}
+		return result;
+	}
 
 #pragma pack(pop)
 };	// namespace gtl;

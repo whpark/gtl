@@ -2,7 +2,7 @@
 
 #include "pch.h"
 
-#include "gtl/config_gtl.h"
+#include "gtl/_config.h"
 
 
 // When you are using pre-compiled headers, this source file is necessary for compilation to succeed.

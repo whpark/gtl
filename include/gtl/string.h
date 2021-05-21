@@ -581,7 +581,7 @@ namespace gtl {
 	};	// TString
 
 
-	using CString = TString<char16_t>;
+	using CString = TString<wchar_t>;
 	using CStringA = TString<char>;				// MBCS
 	using CStringW = TString<wchar_t>;			// Unicode (WideChar)
 	using CStringU8 = TString<char8_t>;			// Unicode UTF-8

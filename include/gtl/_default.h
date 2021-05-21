@@ -31,6 +31,7 @@
 #include <clocale>
 #include <cstring>
 #include <cwchar>
+#include <cwctype>
 #include <ciso646>
 //#include <tchar.h>
 //#include <cstdbool>
@@ -113,7 +114,7 @@
 
 #define GTL_DEPR_SEC [[deprecated("NOT Secure")]]
 
-#include "gtl/config_gtl.h"
+#include "gtl/_config.h"
 
 // until c++20 source_location
 #ifdef __cpp_lib_source_location

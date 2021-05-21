@@ -13,9 +13,30 @@
 //////////////////////////////////////////////////////////////////////
 
 //#include "gtl/_default.h"
+#include <cmath>
 #include <bitset>
 #include <algorithm>
 #include "gtl/concepts.h"
+
+namespace gtl::internal {
+	template < typename T1, typename T2 > void op1mul(T1& v1, T2 v2) { v1 *= v2; }
+	template < typename T1, typename T2 > void op1div(T1& v1, T2 v2) { v1 /= v2; }
+	template < typename T1, typename T2 > void op1add(T1& v1, T2 v2) { v1 += v2; }
+	template < typename T1, typename T2 > void op1sub(T1& v1, T2 v2) { v1 -= v2; }
+	template < typename T1, typename T2 > void op2mul(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 * v2); }
+	template < typename T1, typename T2 > void op2div(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 / v2); }
+	template < typename T1, typename T2 > void op2add(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 + v2); }
+	template < typename T1, typename T2 > void op2sub(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 - v2); }
+
+	template < typename T1, typename T2 >
+	void DoArithmaticMul(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}*T2{})> ) { op1mul(v1, v2); } else { op2mul(v1, v2); } };
+	template < typename T1, typename T2 >
+	void DoArithmaticDiv(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}/T2{})> ) { op1div(v1, v2); } else { op2div(v1, v2); } };
+	template < typename T1, typename T2 >
+	void DoArithmaticAdd(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}+T2{})> ) { op1add(v1, v2); } else { op2add(v1, v2); } };
+	template < typename T1, typename T2 >
+	void DoArithmaticSub(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}-T2{})> ) { op1sub(v1, v2); } else { op2sub(v1, v2); } };
+}
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -183,87 +204,6 @@ namespace gtl {
 			return (T_DEST)v2;
 		}
 	}
-
-#if 0
-	namespace internal {
-		template < typename T1, typename T2 > void op1mul(T1& v1, T2 v2) { v1 *= v2; }
-		template < typename T1, typename T2 > void op1div(T1& v1, T2 v2) { v1 /= v2; }
-		template < typename T1, typename T2 > void op1add(T1& v1, T2 v2) { v1 += v2; }
-		template < typename T1, typename T2 > void op1sub(T1& v1, T2 v2) { v1 -= v2; }
-		template < typename T1, typename T2 > void op2mul(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 * v2); }
-		template < typename T1, typename T2 > void op2div(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 / v2); }
-		template < typename T1, typename T2 > void op2add(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 + v2); }
-		template < typename T1, typename T2 > void op2sub(T1& v1, T2 v2) { v1 = RoundOrForward<T1>(v1 - v2); }
-
-		template < typename T1, typename T2 >
-		void DoArithmaticMul(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}*T2{})> ) { op1mul(v1, v2); } else { op2mul(v1, v2); } };
-		template < typename T1, typename T2 >
-		void DoArithmaticDiv(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}/T2{})> ) { op1div(v1, v2); } else { op2div(v1, v2); } };
-		template < typename T1, typename T2 >
-		void DoArithmaticAdd(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}+T2{})> ) { op1add(v1, v2); } else { op2add(v1, v2); } };
-		template < typename T1, typename T2 >
-		void DoArithmaticSub(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}-T2{})> ) { op1sub(v1, v2); } else { op2sub(v1, v2); } };
-	}
-#endif
-
-
-#if 0
-	template < int iMember, gtl::is__coord T_COORD >
-	constexpr auto& GetCoordMember(T_COORD& B) {
-		if constexpr (gtl::has__xy<T_COORD>) {
-			if constexpr (iMember == 0) return B.x;
-			else if constexpr (iMember == 1) return B.y;
-			else if constexpr ((iMember == 2) && has__z<T_COORD>) return B.z;
-			else static_assert(false);
-		} else if constexpr (gtl::has__cxy<T_COORD>) {
-			if constexpr (iMember == 0) return B.cx;
-			else if constexpr (iMember == 1) return B.cy;
-			else if constexpr ((iMember == 2) && has__cz<T_COORD>) return B.cz;
-		} else if constexpr (gtl::has__size2<T_COORD>) {
-			if constexpr (iMember == 0) return B.width;
-			else if constexpr (iMember == 1) return B.height;
-			else if constexpr ((iMember == 2) && has__depth<T_COORD>) return B.depth;
-		} else static_assert(false);
-	};
-	template < int iMember, gtl::is__coord T_COORD >
-	constexpr const auto& GetCoordMember(const T_COORD& B) {
-		if constexpr (gtl::has__xy<T_COORD>) {
-			if constexpr (iMember == 0) return B.x;
-			else if constexpr (iMember == 1) return B.y;
-			else if constexpr ((iMember == 2) && has__z<T_COORD>) return B.z;
-			else static_assert(false);
-		} else if constexpr (gtl::has__cxy<T_COORD>) {
-			if constexpr (iMember == 0) return B.cx;
-			else if constexpr (iMember == 1) return B.cy;
-			else if constexpr ((iMember == 2) && has__cz<T_COORD>) return B.cz;
-			else static_assert(false);
-		} else if constexpr (gtl::has__size2<T_COORD>) {
-			if constexpr (iMember == 0) return B.width;
-			else if constexpr (iMember == 1) return B.height;
-			else if constexpr ((iMember == 2) && has__depth<T_COORD>) return B.depth;
-			else static_assert(false);
-		} else static_assert(false);
-	};
-	template < int iMember, gtl::is__coord T_COORD >
-	constexpr bool HasCoordMember(const T_COORD& B) {
-		if constexpr (gtl::has__xy<T_COORD>) {
-			if constexpr (iMember == 0) return true;
-			else if constexpr (iMember == 1) return true;
-			else if constexpr ((iMember == 2) && has__z<T_COORD>) return true;
-			else return false;
-		} else if constexpr (gtl::has__cxy<T_COORD>) {
-			if constexpr (iMember == 0) return true;
-			else if constexpr (iMember == 1) return true;
-			else if constexpr ((iMember == 2) && has__cz<T_COORD>) return true;
-			else return false;
-		} else if constexpr (gtl::has__size2<T_COORD>) {
-			if constexpr (iMember == 0) return true;
-			else if constexpr (iMember == 1) return true;
-			else if constexpr ((iMember == 2) && has__depth<T_COORD>) return true;
-			else return false;
-		} else return false;
-	};
-#endif
 
 	// Boolean
 	template < typename ... Args > constexpr bool IsAllTrue(Args&& ... args)						{ return (args && ...); }

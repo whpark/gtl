@@ -148,7 +148,7 @@ TEST(json_proxy, basic) {
 		gtl::CTestClassDerived b;
 		b = j;
 
-		EXPECT_EQ(a, b);
+		EXPECT_TRUE(a == b);
 	}
 
 	{
@@ -163,7 +163,7 @@ TEST(json_proxy, basic) {
 		gtl::CTestClassDerived b;
 		b = j;
 
-		EXPECT_EQ(a, b);
+		EXPECT_TRUE(a == b);
 	}
 
 	{
@@ -178,7 +178,7 @@ TEST(json_proxy, basic) {
 		gtl::CTestClassDerived b;
 		b = j;
 
-		EXPECT_EQ(a, b);
+		EXPECT_TRUE(a == b);
 	}
 
 }

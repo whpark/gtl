@@ -22,10 +22,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Tt]emp/
-[Ll]ib/
-*.lib
-# module file
-*.ifc
+/[Ll]ib/
+/[Mm]odule/
 
 # Visual Studio 2015 cache/options directory
 .vs/
