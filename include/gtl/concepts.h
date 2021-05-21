@@ -158,13 +158,9 @@ namespace gtl::concepts {
 
 
 	/// @brief is__coord
-	template < typename T_COORD > concept coord2 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 2> >;
-	template < typename T_COORD > concept coord3 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 3> >;
+	template < typename T_COORD > concept coord2 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_t, 2> >;
+	template < typename T_COORD > concept coord3 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_t, 3> >;
 	template < typename T_COORD > concept coord = coord2<T_COORD> or coord3<T_COORD>;
-
-	template < typename T_COORD, typename T > concept tcoord2 = std::is_same_v< typename T_COORD::coord_t, std::array<T, 2> >;
-	template < typename T_COORD, typename T > concept tcoord3 = std::is_same_v< typename T_COORD::coord_t, std::array<T, 3> >;
-	template < typename T_COORD, typename T > concept tcoord = coord2<T_COORD> or coord3<T_COORD>;
 
 	template < typename T_COORD > concept point = requires (T_COORD a) { a.x; a.y; };
 	template < typename T_COORD > concept point2 = ( requires (T_COORD a) { a.x; a.y; } and !requires (T_COORD a) { a.z; } );

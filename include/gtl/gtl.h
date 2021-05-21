@@ -10,7 +10,6 @@
 #pragma once
 
 #include "gtl/_default.h"
-#include "gtl/_lib_gtl.h"
 #include "gtl/concepts.h"
 #include "gtl/misc.h"
 #include "gtl/string.h"

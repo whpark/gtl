@@ -125,9 +125,6 @@
     <ClInclude Include="..\..\include\gtl\_config.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\coord\coord_trans.h">
-      <Filter>gtl\coord</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">
