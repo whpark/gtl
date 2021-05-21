@@ -11,6 +11,18 @@
 #pragma comment(lib, "Shlwapi.lib")
 
 
+namespace testing::internal {
+
+	//void PrintU8StringTo(const ::std::u8string& s, ::std::ostream* os) {
+	//	for (auto c : s) {
+	//		*os << std::hex << (int) c << ", ";
+	//	}
+	//	*os << std::dec;
+	//}
+
+}
+
+
 
 int main(int argc, wchar_t** argv) {
 	testing::InitGoogleTest(&argc, argv);

@@ -7,9 +7,9 @@
 //=========
 
 
-#include "gtl/config_gtl.h"
+#include "gtl/_config.h"
 
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
+#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)
 
 #include <cstdint>
 #include <map>
@@ -28,4 +28,4 @@ namespace gtl::charset::KSSM {
 }	// namespace gtl::charset::KSSM
 
 
-#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM
+#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)

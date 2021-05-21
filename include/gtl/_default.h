@@ -31,6 +31,7 @@
 #include <clocale>
 #include <cstring>
 #include <cwchar>
+#include <cwctype>
 #include <ciso646>
 //#include <tchar.h>
 //#include <cstdbool>
