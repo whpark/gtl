@@ -10,6 +10,7 @@
 module;
 
 #include <cctype>
+#include <cwctype>
 #include <string_view>
 #include <vector>
 #include <map>
@@ -22,7 +23,9 @@ module;
 
 export module gtl:string_misc;
 import :concepts;
+#if 0
 import :string_latin_charset;
+#endif
 import :string_convert_codepage;
 
 export namespace gtl {
@@ -40,8 +43,8 @@ export namespace gtl {
 
 
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
+	//template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
+	//template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c/* Locale Irrelavant */);
@@ -151,6 +154,9 @@ export namespace gtl {
 		else if constexpr (std::is_same_v<tchar, uint16_t>) { return (uint16_t*)TEXT_u(SPACE_STRING); }
 		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
+
+
+#if 0 // obsolete
 	namespace charset {
 		template < gtlc::string_elem tchar >
 		struct S_ULPair { tchar cUpper, cLower; };
@@ -201,12 +207,12 @@ export namespace gtl {
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c) {
 		if (c < 'A')
 			return c;
-
+	
 		if (c <= 'Z')
 			return c - 'A' + 'a';
-
+	
 		using namespace gtl::charset;
-
+	
 		if constexpr (sizeof(tchar) >= sizeof(char16_t)) {
 			// Latin-1
 			if (c < rangeUL_latin1_g.first)
@@ -228,7 +234,7 @@ export namespace gtl {
 				}
 			}
 		}
-
+	
 		if constexpr (sizeof(tchar) >= sizeof(char32_t)) {
 			for (auto const& [range, map] : mapUL32) {
 				if (c < range.first)
@@ -248,9 +254,9 @@ export namespace gtl {
 			return c;
 		if (c <= 'z')
 			return c - 'a' + 'A';
-
+	
 		using namespace gtl::charset;
-
+	
 		if constexpr (sizeof(tchar) >= sizeof(char16_t)) {
 			//// Latin-1
 			//if (c < rangeLU_latin1_g.first) {
@@ -277,7 +283,7 @@ export namespace gtl {
 				}
 			}
 		}
-
+	
 		if constexpr (sizeof(tchar) >= sizeof(char32_t)) {
 			for (auto const& [range, map] : mapLU32) {
 				if (c < range.first)
@@ -292,6 +298,26 @@ export namespace gtl {
 		}
 		return c;
 	}
+
+#endif // 0
+
+	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
+	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToLower(tchar c) {
+		if constexpr (std::is_same_v<tchar, char>) {
+			return std::tolower(c);
+		} else {
+			return std::towlower(c);
+		}
+	}
+	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
+	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToUpper(tchar c) {
+		if constexpr (std::is_same_v<tchar, char>) {
+			return std::toupper(c);
+		} else {
+			return std::towupper(c);
+		}
+	}
+
 	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c) {
 		c = ToLower(c);
 	}

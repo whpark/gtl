@@ -73,7 +73,7 @@ strLineSeperator = '//----------------------------------------------------------
 #                '\n'
 #                '\n'
 #                '#include "gtl/config_gtl.h"\n\n'
-#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)\n\n'
+#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n\n'
 #                '#include <cstdint>\n'
 #                '#include <map>\n'
 #                '\n'
@@ -89,7 +89,7 @@ strLineSeperator = '//----------------------------------------------------------
 #                '#pragma pack(pop)\n'
 #                '}\t// namespace gtl::charset::KSSM\n'
 #                '\n\n'
-#                '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
+#                '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
 #                )
 #fOutHeader.flush()
 
@@ -105,7 +105,7 @@ strLineSeperator = '//----------------------------------------------------------
 #                '//=========\n'
 #                '\n\n'
 #                '#include "gtl/config_gtl.h"\n'
-#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)\n'
+#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
 #                '\n\n'
 #                '#include <cstdlib>\n'
 #                '#include <cstdint>\n'
@@ -139,7 +139,7 @@ strLineSeperator = '//----------------------------------------------------------
 #fOutImpl.write('\n\n')
 #
 #fOutImpl.write('}\t// namespace gtl::charset::KSSM\n\n'
-#               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
+#               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
 #               )
 #fOutImpl.flush()
 #fOutImpl.close()
@@ -150,10 +150,12 @@ fOutModuleUTF16_KSSM = open(pathOutModule_UTF16_KSSM, mode='w', encoding='utf-8-
 fOutModuleUTF16_KSSM.write(
         'module ;\n'
         '\n'
-        '#include <map>\n'
-        '\n'
         '#include "gtl/_config.h"\n'
         '#include "gtl/_macro.h"\n'
+        '\n'
+        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+        '\t#include <map>\n'
+        '#endif\n'
         '\n'
         'export module gtl:string_convert_codepage_utf16_to_kssm;\n'
         '\n'
@@ -165,7 +167,7 @@ fOutModuleUTF16_KSSM.write(
         '//=========\n'
         '\n'
         '\n'
-        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)\n'
+        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
         '\n'
         '\n'
         'namespace gtl::charset::KSSM {\n'
@@ -195,7 +197,7 @@ fOutModuleUTF16_KSSM.write('\n\t} };\n')
 fOutModuleUTF16_KSSM.write('\n\n')
 
 fOutModuleUTF16_KSSM.write('}\t// namespace gtl::charset::KSSM\n\n'
-               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n')
+               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n')
 fOutModuleUTF16_KSSM.flush()
 fOutModuleUTF16_KSSM.close()
 
@@ -212,7 +214,7 @@ fOutModuleUTF16_KSSM.close()
 #                '//=========\n'
 #                '\n\n'
 #                '#include "gtl/config_gtl.h"\n'
-#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)\n'
+#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
 #                '\n\n'
 #                '#include <cstdlib>\n'
 #                '#include <cstdint>\n'
@@ -246,7 +248,7 @@ fOutModuleUTF16_KSSM.close()
 #fOutImpl.write('\n\n')
 #
 #fOutImpl.write('}\t// namespace gtl::charset::KSSM\n\n'
-#               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n'
+#               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
 #               )
 #fOutImpl.flush()
 #fOutImpl.close()
@@ -257,10 +259,12 @@ fOutModuleKSSM_UTF16 = open(pathOutModule_KSSM_UTF16, mode='w', encoding='utf-8-
 fOutModuleKSSM_UTF16.write(
         'module ;\n'
         '\n'
-        '#include <map>\n'
-        '\n'
         '#include "gtl/_config.h"\n'
         '#include "gtl/_macro.h"\n'
+        '\n'
+        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+        '\t#include <map>\n'
+        '#endif\n'
         '\n'
         'export module gtl:string_convert_codepage_kssm_to_utf16;\n'
         '\n'
@@ -272,7 +276,7 @@ fOutModuleKSSM_UTF16.write(
         '//=========\n'
         '\n'
         '\n'
-        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)\n'
+        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
         '\n'
         '\n'
         'namespace gtl::charset::KSSM {\n'
@@ -303,7 +307,7 @@ fOutModuleKSSM_UTF16.write('\n\t} };\n')
 fOutModuleKSSM_UTF16.write('\n\n')
 
 fOutModuleKSSM_UTF16.write('}\t// namespace gtl::charset::KSSM\n\n'
-               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM\n')
+               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n')
 fOutModuleKSSM_UTF16.flush()
 fOutModuleKSSM_UTF16.close()
 

@@ -1,9 +1,12 @@
 ﻿module ;
 
-#include <map>
 
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
+
+#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)
+	#include <map>
+#endif
 
 export module gtl:string_convert_codepage_utf16_to_kssm;
 
@@ -15,7 +18,7 @@ export module gtl:string_convert_codepage_utf16_to_kssm;
 //=========
 
 
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
+#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)
 
 
 namespace gtl::charset::KSSM {
@@ -1432,4 +1435,4 @@ namespace gtl::charset::KSSM {
 
 }	// namespace gtl::charset::KSSM
 
-#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM
+#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)

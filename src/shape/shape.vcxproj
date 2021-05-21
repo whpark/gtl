@@ -109,6 +109,7 @@
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableModules>true</EnableModules>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -140,6 +141,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableModules>true</EnableModules>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -171,6 +173,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableModules>true</EnableModules>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -202,6 +205,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableModules>true</EnableModules>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>

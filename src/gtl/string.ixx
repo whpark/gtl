@@ -30,7 +30,7 @@ export import :string_primitives;
 export import :string_to_arithmetic;
 export import :string_convert_codepage;
 export import :string_convert_utf;
-export import :string_latin_charset;
+//export import :string_latin_charset;
 export import :string_misc;
 export import :string_primitives;
 export import :string_utf_char_view;
