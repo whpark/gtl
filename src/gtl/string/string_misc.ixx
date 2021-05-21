@@ -43,10 +43,10 @@ export namespace gtl {
 
 
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
-	//template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
-	//template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeLower(tchar& c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeUpper(tchar& c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c/* Locale Irrelavant */);
@@ -318,10 +318,10 @@ export namespace gtl {
 		}
 	}
 
-	template < gtlc::string_elem tchar > constexpr inline               void MakeLower(tchar& c) {
+	template < gtlc::string_elem tchar > inline void MakeLower(tchar& c) {
 		c = ToLower(c);
 	}
-	template < gtlc::string_elem tchar > constexpr inline               void MakeUpper(tchar& c) {
+	template < gtlc::string_elem tchar > inline void MakeUpper(tchar& c) {
 		c = ToUpper(c);
 	}
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c) {
