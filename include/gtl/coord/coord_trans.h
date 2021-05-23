@@ -140,19 +140,19 @@ namespace gtl {
 		// Constructors
 		CCoordTransChain() = default;
 		//virtual ~CCoordTransChain() { }
-		CCoordTransChain(const CCoordTransChain& B) = default;
-		CCoordTransChain& operator = (const CCoordTransChain& B) = default;
+		CCoordTransChain(CCoordTransChain const& B) = default;
+		CCoordTransChain& operator = (CCoordTransChain const& B) = default;
 
-		CCoordTransChain& operator *= (const CCoordTransChain& B)	{
+		CCoordTransChain& operator *= (CCoordTransChain const& B)	{
 			for (auto const& ct : chain_) 
 				chain_.push_back(std::move(ct.NewClone()));
 			return *this;
 		}
-		CCoordTransChain& operator *= (const ICoordTrans& B) {
+		CCoordTransChain& operator *= (ICoordTrans const& B) {
 			chain_.push_back(std::move(B.NewClone()));
 			return *this;
 		}
-		CCoordTransChain operator * (const CCoordTransChain& B) const {
+		CCoordTransChain operator * (CCoordTransChain const& B) const {
 			CCoordTransChain newChain;
 			for (auto const& ct : chain_) {
 				newChain.chain_.push_back(std::move(ct.NewClone()));
@@ -203,13 +203,16 @@ namespace gtl {
 
 
 	//-----------------------------------------------------------------------------
-	//class CCoordTrans2d;
+	/// @brief class CCoordTrans2d 
+	/// TARGET = scale * mat ( SOURCE - origin ) + offset
 	class GTL_CLASS CCoordTrans2d : public ICoordTrans {
 	public:
-		double scale_{};
-		cv::Matx22d mat_;
-		CPoint2d origin_;
-		CPoint2d offset_;
+		using mat_t = cv::Matx22d;
+	public:
+		double scale_{1.0};	// additional scale value
+		mat_t mat_;			// transform matrix
+		CPoint2d origin_;	// pivot of source coordinate
+		CPoint2d offset_;	// pivot of target coordinate
 
 	public:
 		using base_t = ICoordTrans;
@@ -228,60 +231,122 @@ namespace gtl {
 
 	public:
 		// Constructors
-		CCoordTrans2d(double dScale = {}, const cv::Matx22d& m = cv::Matx22d::eye(), const CPoint2d& ptShift = {}, const CPoint2d& ptOffset = {}) :
-			scale_{dScale},
+		CCoordTrans2d(double scale = 1.0, mat_t const& m = mat_t::eye(), CPoint2d const& origin = {}, CPoint2d const& offset = {}) :
+			scale_{scale},
 			mat_(m),
-			origin_(ptShift),
-			offset_(ptOffset)
+			origin_(origin),
+			offset_(offset)
 		{
 		}
 
-		CCoordTrans2d(const CCoordTrans2d& B) = default;
-		CCoordTrans2d& operator = (const CCoordTrans2d& B) = default;
+		CCoordTrans2d(CCoordTrans2d const& B) = default;
+		CCoordTrans2d& operator = (CCoordTrans2d const& B) = default;
 
 		//bool operator == (const CCoordTrans2d& B) const { return (scale_ == B.scale_) && (mat_ == B.mat_) && (origin_ == B.origin_) && (offset_ == B.offset_); }
 		//bool operator != (const CCoordTrans2d& B) const { return !(*this == B); }
 		//-------------------------------------------------------------------------
-		std::optional<CCoordTrans2d> GetInverse() const;
+		std::optional<CCoordTrans2d> GetInverse() const {
+			// Scale
+			double scale = 1/scale_;
+			if (!std::isfinite(scale))
+				return {};
+
+			// Matrix
+			bool bOK {};
+			auto mat = mat_.inv(0, &bOK);
+			if (!bOK)
+				return {};
+
+			return CCoordTrans2d(scale, mat, offset_, origin_);
+		}
 
 		//-------------------------------------------------------------------------
 		// Setting
-		bool Set(double dScale, const cv::Matx22d& m, const CPoint2d& ptShift, const CPoint2d& ptOffset);
-		bool SetR(double dScale, rad_t dTheta, const CPoint2d& ptShift = {}, const CPoint2d& ptOffset = {});
-
-		bool SetFrom2Points(CPoint2d const (&ptsSource)[2], const CPoint2d ptsTarget[], bool bCalcScale = true, double dMinDeterminant = 0.0);
-		bool SetFrom3Points(CPoint2d const (&ptsSource)[3], const CPoint2d ptsTarget[], bool bCalcScale = true, double dMinDeterminant = 0.0);
-
-		void SetScale(double dScale) { scale_ = dScale; }
-		double GetScale() const { return scale_; }
-		void SetMatrix(double m00, double m01, double m10, double m11) {
-			mat_ = cv::Matx22d(m00, m01, m10, m11);
-		}
-		void SetMatrix(const cv::Matx22d& m) {
+		void Set(double scale = 1., mat_t const& m = mat_t::eye(), CPoint2d const& origin = {}, CPoint2d const& offset = {}) {
+			scale_ = scale;
 			mat_ = m;
+			origin_ = origin;
+			offset_ = offset;
 		}
-		void SetMatrix(rad_t dTheta) {
-			double c, s;
-			c = cos(dTheta);
-			s = sin(dTheta);
-			SetMatrix(c, -s, s, c);
+		void Set(double scale, rad_t angle, CPoint2d const& origin = {}, CPoint2d const& offset = {}) {
+			scale_ = scale;
+			mat_ = GetRotatingMatrix(angle);
+			origin_ = origin;
+			offset_ = offset;
 		}
-		void GetMatrix(double& m00, double& m01, double& m10, double& m11) const { m00 = mat_(0, 0); m01 = mat_(0, 1); m10 = mat_(1, 0); m11 = mat_(1, 1); }
 
-		void GetShift(double& dShiftX, double& dShiftY) const		{ dShiftX = origin_.x; dShiftY = origin_.y; }
-		const CPoint2d& GetShift() const							{ return origin_; }
-		CPoint2d& GetShift()										{ return origin_; }
-		void SetShift(double dShiftX, double dShiftY)				{ origin_.x = dShiftX; origin_.y = dShiftY; }
-		void SetShift(const CPoint2d& ptShift)						{ origin_ = ptShift; }
+		bool SetFrom2Points(std::span<CPoint2d const, 2> ptsSource, std::span<CPoint2d const, 2> ptsTarget, bool bCalcScale = true, double dMinDeterminant = 0.0, bool bRightHanded = true) {
+			std::array<CPoint2d, 3> ptsS{ptsSource[0], ptsSource[1]}, ptsT{ptsTarget[0], ptsTarget[1]};
+			// 세번째 점은 각각, 0번 기준으로 1번을 90도 회전시킴
+			ptsS[2].x = -(ptsS[1].y-ptsS[0].y) + ptsS[0].x;
+			ptsS[2].y =  (ptsS[1].x-ptsS[0].x) + ptsS[0].y;
+			if (bRightHanded) {
+				ptsT[2].x = -(ptsT[1].y-ptsT[0].y) + ptsT[0].x;
+				ptsT[2].y =  (ptsT[1].x-ptsT[0].x) + ptsT[0].y;
+			}
+			else {
+				ptsT[2].x =  (ptsT[1].y-ptsT[0].y) + ptsT[0].x;
+				ptsT[2].y = -(ptsT[1].x-ptsT[0].x) + ptsT[0].y;
+			}
 
-		void GetOffset(double& dOffsetX, double& dOffsetY) const	{ dOffsetX = offset_.x; dOffsetY = offset_.y; }
-		const CPoint2d& GetOffset() const							{ return offset_; }
-		CPoint2d& GetOffset()										{ return offset_; }
-		void SetOffset(double dOffsetX, double dOffsetY)			{ offset_.x = dOffsetX; offset_.y = dOffsetY; }
-		void SetOffset(const CPoint2d& ptOffset)					{ offset_ = ptOffset; }
+			return SetFrom3Points(ptsS, ptsT, bCalcScale, dMinDeterminant);
+		}
+		bool SetFrom3Points(std::span<CPoint2d const, 3> ptsSource, std::span<CPoint2d const, 3> ptsTarget, bool bCalcScale = true, double dMinDeterminant = 0.0) {
+			origin_ = ptsSource[0];
+			offset_ = ptsTarget[0];
+			auto v1s = ptsSource[1] - origin_;
+			auto v2s = ptsSource[2] - origin_;
+			auto v1t = ptsTarget[1] - offset_;
+			auto v2t = ptsTarget[2] - offset_;
+			double dLenSource = v1s.GetLength();
+			double dLenTarget = v1t.GetLength();
 
-		void RotateM(rad_t dTheta);
-		void Rotate(rad_t dTheta, const CPoint2d& ptCenter);
+			if ( (dLenSource == 0.0) || (dLenTarget == 0.0) )
+				return false;
+
+			cv::Matx22d matSource;
+			matSource(0, 0) = v1s.x;
+			matSource(1, 0) = v1s.y;
+			matSource(0, 1) = v2s.x;
+			matSource(1, 1) = v2s.y;
+
+			// Check.
+			double d = cv::determinant(matSource);
+			if (fabs(d) <= dMinDeterminant)
+				return false;
+
+			cv::Matx22d matTarget;
+			matTarget(0, 0) = v1t.x;
+			matTarget(1, 0) = v1t.y;
+			matTarget(0, 1) = v2t.x;
+			matTarget(1, 1) = v2t.y;
+
+			mat_ = matTarget * matSource.inv();
+
+			scale_ = cv::determinant(mat_);
+			mat_ /= scale_;
+
+			if (!bCalcScale)
+				scale_ = 1.0;
+
+			return true;
+		}
+
+		static inline mat_t GetRotatingMatrix(rad_t angle) {
+			double c{cos(angle)}, s{sin(angle)};
+			return mat_t(c, -s, s, c);
+		}
+		void SetRotaionalMatrix(rad_t angle) {
+			mat_ = GetRotatingMatrix(angle);
+		}
+		void RotateMatrix(rad_t angle) {
+			mat_ = GetRotatingMatrix(angle) * mat_;
+		}
+		void Rotate(rad_t angle, CPoint2d const& ptCenter) {
+			CCoordTrans2d backup(*this);
+			Set(1.0, angle, ptCenter, ptCenter);
+			*this *= backup;
+		}
 		void NegMX();
 		void NegMY();
 		void FlipMX();
@@ -290,102 +355,47 @@ namespace gtl {
 		void FlipY(double y = 0);
 		void FlipXY(double x = 0, double y = 0);
 		template < class TPOINT >
-		void FlipXY(const TPOINT pt) { FlipXY(pt.x, pt.y); }
+		void FlipXY(TPOINT const pt) { FlipXY(pt.x, pt.y); }
 
 		//-------------------------------------------------------------------------
 		// Operation
 		//
-		virtual CPoint2d Trans(const CPoint2d& pt) const {
+		virtual CPoint2d Trans(CPoint2d const& pt) const {
 			double x = pt.x - origin_.x;
 			double y = pt.y - origin_.y;
 			CPoint2d ptT;
 			ptT = scale_ * (mat_ * (pt-origin_)) + offset_;
 			return ptT;
 		}
-		virtual CPoint3d Trans(const CPoint3d& pt) const {
+		virtual CPoint3d Trans(CPoint3d const& pt) const {
 			CPoint2d ptT(Trans((CPoint2d&)pt));
 			return CPoint3d(ptT.x, ptT.y, pt.z);
 		}
-		virtual CPoint2d TransI(const CPoint2d& pt) const {
+		virtual CPoint2d TransI(CPoint2d const& pt) const {
 			return GetInverse().value_or(CCoordTrans2d{}).Trans(pt);
 		}
-		virtual CPoint3d TransI(const CPoint3d& pt) const {
+		virtual CPoint3d TransI(CPoint3d const& pt) const {
 			CPoint2d ptT(GetInverse().Trans(pt));
 			return CPoint3d(ptT.x, ptT.y, pt.z);
 		}
 
-		virtual double TransLength(double dLength) const {
+		virtual double Trans(double dLength) const {
 			CPoint2d pt0 = Trans(CPoint2d(0, 0));
 			CPoint2d pt1 = Trans(CPoint2d(1, 1));
-			double dScale = pt0.Distance(pt1) / sqrt(2.0);
-			return dScale * dLength;
+			double scale = pt0.Distance(pt1) / sqrt(2.0);
+			return scale * dLength;
 		}
-		virtual double TransLengthI(double dLength) const {
+		virtual double TransI(double dLength) const {
 			CPoint2d pt0 = Trans(CPoint2d(0, 0));
 			CPoint2d pt1 = Trans(CPoint2d(1, 1));
-			double dScale = sqrt(2.0) / pt0.Distance(pt1);
-			return dScale * dLength;
+			double scale = sqrt(2.0) / pt0.Distance(pt1);
+			return scale * dLength;
 		}
 		virtual bool IsRightHanded() const;
 
-		CCoordTrans2d& operator *= (const CCoordTrans2d& B);
-		CCoordTrans2d operator * (const CCoordTrans2d& B) const;
+		CCoordTrans2d& operator *= (CCoordTrans2d const& B);
+		CCoordTrans2d operator * (CCoordTrans2d const& B) const;
 
-	//
-	public:
-		template <class Archive> Archive& StoreTo(Archive& ar) const {
-			ar << CStringA("CoordTrans2d");
-			ar << scale_
-				<< mat_(0, 0) << mat_(0, 1) << mat_(1, 0) << mat_(1, 1)
-				<< origin_
-				<< offset_
-				;
-			return ar;
-		}
-		template <class Archive> Archive& LoadFrom(Archive& ar) {
-			CStringA str;
-			ar >> str;
-			if ( (str == "CoordTrans1.0") || (str == "CoordTrans2d") ) {
-				ar >> scale_
-					>> mat_(0, 0) >> mat_(0, 1) >> mat_(1, 0) >> mat_(1, 1)
-					>> origin_
-					>> offset_
-					;
-			} else {
-				__throw_exception__("Serialization FAILED");
-			}
-			return ar;
-		}
-		template <class Archive>
-		friend Archive& operator << (Archive& ar, const CCoordTrans2d& B) {
-			return B.StoreTo(ar);
-		}
-		template <class Archive>
-		friend Archive& operator >> (Archive& ar, CCoordTrans2d& B) {
-			return B.LoadFrom(ar);
-		}
-
-		template <class CProfileSection> 
-		bool SyncData(bool bStore, CProfileSection& section) {
-			section.SyncItemValue(bStore, _T("Scale"), scale_);
-			section.SyncItemValue(bStore, _T("m00"), mat_(0, 0));
-			section.SyncItemValue(bStore, _T("m01"), mat_(0, 1));
-			section.SyncItemValue(bStore, _T("m10"), mat_(1, 0));
-			section.SyncItemValue(bStore, _T("m11"), mat_(1, 1));
-			section.SyncItemValue(bStore, _T("ShiftX"), origin_.x);
-			section.SyncItemValue(bStore, _T("ShiftY"), origin_.y);
-			section.SyncItemValue(bStore, _T("OffsetX"), offset_.x);
-			section.SyncItemValue(bStore, _T("OffsetY"), offset_.y);
-			return true;
-		}
-
-	public:
-		FEM_BEGIN_TBL(CCoordTrans2d)
-			FEM_ADD_MEMBER(scale_)
-			FEM_ADD_MEMBER(mat_)
-			FEM_ADD_MEMBER(origin_)
-			FEM_ADD_MEMBER(offset_)
-		FEM_END_TBL()
 
 	};
 
@@ -396,21 +406,21 @@ namespace gtl {
 		double m_mat02 = 0, m_mat12 = 0;
 	public:
 		// Constructors
-		CCoordTransNL(double dScale = 1.0, const cv::Matx23d& m = cv::Matx23d::eye(), const CPoint2d& ptShift = CPoint2d(), const CPoint2d& ptOffset = CPoint2d()) :
-			CCoordTrans2d(dScale, cv::Matx22d(m(0, 0), m(0, 1), m(1, 0), m(1, 1)), ptShift, ptOffset)
+		CCoordTransNL(double scale = 1.0, const cv::Matx23d& m = cv::Matx23d::eye(), CPoint2d const& origin = CPoint2d(), CPoint2d const& offset = CPoint2d()) :
+			CCoordTrans2d(scale, cv::Matx22d(m(0, 0), m(0, 1), m(1, 0), m(1, 1)), origin, offset)
 		{
 		}
 
-		CCoordTransNL(const CCoordTransNL& B) = default;
-		CCoordTransNL(const CCoordTrans2d& B) : CCoordTrans2d(B), m_mat02(0), m_mat12(0) {}
+		CCoordTransNL(CCoordTransNL const& B) = default;
+		CCoordTransNL(CCoordTrans2d const& B) : CCoordTrans2d(B), m_mat02(0), m_mat12(0) {}
 
 		DECLARE_NEWCLONE(CCoordTransNL);
 
-		CCoordTransNL& operator = (const CCoordTransNL& B) = default;
-		CCoordTransNL& operator = (const CCoordTrans2d& B) { (CCoordTrans2d&)*this = B; m_mat02 = 0; m_mat12 = 0; return *this; }
+		CCoordTransNL& operator = (CCoordTransNL const& B) = default;
+		CCoordTransNL& operator = (CCoordTrans2d const& B) { (CCoordTrans2d&)*this = B; m_mat02 = 0; m_mat12 = 0; return *this; }
 
-		//bool operator == (const CCoordTransNL& B) const { return ((CCoordTrans2d&)*this == (CCoordTrans2d&)B) && (m_mat02 == B.m_mat02) && (m_mat12 == B.m_mat12); }
-		//bool operator != (const CCoordTransNL& B) const { return !(*this == B); }
+		//bool operator == (CCoordTransNL const& B) const { return ((CCoordTrans2d&)*this == (CCoordTrans2d&)B) && (m_mat02 == B.m_mat02) && (m_mat12 == B.m_mat12); }
+		//bool operator != (CCoordTransNL const& B) const { return !(*this == B); }
 
 		//-------------------------------------------------------------------------
 	protected:
@@ -428,18 +438,18 @@ namespace gtl {
 	public:
 		//-------------------------------------------------------------------------
 		// Setting
-		bool Set(double dScale, const cv::Matx22d& m, const CPoint2d& ptShift, const CPoint2d& ptOffset);
-		bool Set(double dScale, const cv::Matx23d& m, const CPoint2d& ptShift, const CPoint2d& ptOffset);
+		bool Set(double scale, const cv::Matx22d& m, CPoint2d const& origin, CPoint2d const& offset);
+		bool Set(double scale, const cv::Matx23d& m, CPoint2d const& origin, CPoint2d const& offset);
 
-		bool SetFrom2Points(const CPoint2d ptsSource[], const CPoint2d ptsTarget[], bool bCalcScale = true, double dMinDeterminant = 0.0) {
+		bool SetFrom2Points(CPoint2d const ptsSource[], CPoint2d const ptsTarget[], bool bCalcScale = true, double dMinDeterminant = 0.0) {
 			m_mat02 = m_mat12 = 0;
 			return __super::SetFrom2Points(ptsSource, ptsTarget, bCalcScale, dMinDeterminant);
 		}
-		bool SetFrom3Points(const CPoint2d ptsSource[], const CPoint2d ptsTarget[], bool bCalcScale = true, double dMinDeterminant = 0.0) {
+		bool SetFrom3Points(CPoint2d const ptsSource[], CPoint2d const ptsTarget[], bool bCalcScale = true, double dMinDeterminant = 0.0) {
 			m_mat02 = m_mat12 = 0;
 			return __super::SetFrom3Points(ptsSource, ptsTarget, bCalcScale, dMinDeterminant);
 		}
-		bool SetFrom4Points(const CPoint2d ptsSource[4], const CPoint2d ptsTarget[4], bool bCalcScale = true, double dMinDeterminant = 0.0);
+		bool SetFrom4Points(CPoint2d const ptsSource[4], CPoint2d const ptsTarget[4], bool bCalcScale = true, double dMinDeterminant = 0.0);
 
 		void SetMatrix(double m00, double m01, double m02, double m10, double m11, double m12) {
 			mat_(0, 0) = m00; mat_(0, 1) = m01; m_mat02 = m02;
@@ -463,32 +473,32 @@ namespace gtl {
 		void FlipX(double x = 0);
 		void FlipY(double y = 0);
 		void FlipXY(double x = 0, double y = 0);
-		void FlipXY(const CPoint2d& pt) { FlipXY(pt.x, pt.y); }
+		void FlipXY(CPoint2d const& pt) { FlipXY(pt.x, pt.y); }
 
 		//-------------------------------------------------------------------------
 		// Operation
 		//
-		virtual CPoint2d Trans(const CPoint2d& pt) const {
+		virtual CPoint2d Trans(CPoint2d const& pt) const {
 			CPoint2d p = pt-origin_;
 			CPoint2d ptT;
 			ptT = scale_ * (mat_ * p + CPoint2d(m_mat02, m_mat12)*p.x*p.y) + offset_;
 			return ptT;
 		}
-		virtual CPoint3d Trans(const CPoint3d& pt) const {
+		virtual CPoint3d Trans(CPoint3d const& pt) const {
 			CPoint2d ptT(Trans((CPoint2d&)pt));
 			return CPoint3d(ptT.x, ptT.y, pt.z);
 		}
-		virtual CPoint2d TransI(const CPoint2d& pt) const {
+		virtual CPoint2d TransI(CPoint2d const& pt) const {
 			ASSERT(false);
 			return GetInverse().Trans(pt);
 		}
-		virtual CPoint3d TransI(const CPoint3d& pt) const {
+		virtual CPoint3d TransI(CPoint3d const& pt) const {
 			ASSERT(false);
 			CPoint2d ptT(GetInverse().Trans(pt));
 			return CPoint3d(ptT.x, ptT.y, pt.z);
 		}
 
-		friend CCoordTransNL operator * (const CCoordTrans2d& A, const CCoordTransNL& B);
+		friend CCoordTransNL operator * (CCoordTrans2d const& A, CCoordTransNL const& B);
 
 		//
 	public:
@@ -521,7 +531,7 @@ namespace gtl {
 			return ar;
 		}
 		template <class Archive>
-		friend Archive& operator << (Archive& ar, const CCoordTransNL& B) {
+		friend Archive& operator << (Archive& ar, CCoordTransNL const& B) {
 			return B.StoreTo(ar);
 		}
 		template <class Archive>
@@ -559,19 +569,19 @@ namespace gtl {
 	public:
 		// Constructors
 		CCoordTrans3d(
-			double dScale = 1.0,
-			const mat_t& mat = mat_t::eye(),		// I (eigen matrix)
-			const CPoint3d& ptShift = CPoint3d(0, 0, 0),
-			const CPoint3d& ptOffset = CPoint3d(0, 0, 0)
+			double scale = 1.0,
+			mat_t const& mat = mat_t::eye(),		// I (eigen matrix)
+			CPoint3d const& origin = CPoint3d(0, 0, 0),
+			CPoint3d const& offset = CPoint3d(0, 0, 0)
 			)
 		{
-			scale_ = dScale;
+			scale_ = scale;
 			mat_ = mat;
-			origin_ = ptShift;
-			offset_ = ptOffset;
+			origin_ = origin;
+			offset_ = offset;
 		}
-		CCoordTrans3d(const CCoordTrans3d& B) = default;
-		CCoordTrans3d& operator = (const CCoordTrans3d& B) = default;
+		CCoordTrans3d(CCoordTrans3d const& B) = default;
+		CCoordTrans3d& operator = (CCoordTrans3d const& B) = default;
 		//{
 		//	if (this != &B) {
 		//		scale_		= B.scale_;
@@ -584,10 +594,10 @@ namespace gtl {
 
 		DECLARE_NEWCLONE(CCoordTrans3d);
 
-		//bool operator == (const CCoordTrans3d& B) const { return (scale_ == B.scale_) && (mat_ == B.mat_) && (origin_ == B.origin_) && (offset_ == B.offset_); }
-		//bool operator != (const CCoordTrans3d& B) const { return !(*this == B); }
+		//bool operator == (CCoordTrans3d const& B) const { return (scale_ == B.scale_) && (mat_ == B.mat_) && (origin_ == B.origin_) && (offset_ == B.offset_); }
+		//bool operator != (CCoordTrans3d const& B) const { return !(*this == B); }
 
-		bool IsSame(const CCoordTrans3d& B) const {
+		bool IsSame(CCoordTrans3d const& B) const {
 			return (*this)(CPoint3d(0, 0, 0)) == B.Trans(CPoint3d(0, 0, 0))
 				&& (*this)(CPoint3d(1, 0, 0)) == B.Trans(CPoint3d(1, 0, 0))
 				&& (*this)(CPoint3d(0, 1, 0)) == B.Trans(CPoint3d(0, 1, 0))
@@ -604,37 +614,37 @@ namespace gtl {
 
 		//-------------------------------------------------------------------------
 		// Setting
-		bool Set(double dScale = 1.0,
-			const mat_t& mat = mat_t::eye(),		// I (eigen matrix)
-			const CPoint3d& ptShift = CPoint3d(0, 0, 0),
-			const CPoint3d& ptOffset = CPoint3d(0, 0, 0));
-		bool SetRXAxis(double dScale = 1.0,
+		bool Set(double scale = 1.0,
+			mat_t const& mat = mat_t::eye(),		// I (eigen matrix)
+			CPoint3d const& origin = CPoint3d(0, 0, 0),
+			CPoint3d const& offset = CPoint3d(0, 0, 0));
+		bool SetRXAxis(double scale = 1.0,
 			rad_t dT = 0.0_rad,
-			const CPoint3d& ptShift = CPoint3d(0, 0, 0),
-			const CPoint3d& ptOffset = CPoint3d(0, 0, 0));
-		bool SetRYAxis(double dScale = 1.0,
+			CPoint3d const& origin = CPoint3d(0, 0, 0),
+			CPoint3d const& offset = CPoint3d(0, 0, 0));
+		bool SetRYAxis(double scale = 1.0,
 			rad_t dT = 0.0_rad,
-			const CPoint3d& ptShift = CPoint3d(0, 0, 0),
-			const CPoint3d& ptOffset = CPoint3d(0, 0, 0));
-		bool SetRZAxis(double dScale = 1.0,
+			CPoint3d const& origin = CPoint3d(0, 0, 0),
+			CPoint3d const& offset = CPoint3d(0, 0, 0));
+		bool SetRZAxis(double scale = 1.0,
 			rad_t dT = 0.0_rad,
-			const CPoint3d& ptShift = CPoint3d(0, 0, 0),
-			const CPoint3d& ptOffset = CPoint3d(0, 0, 0));
-		bool SetRXYZ(double dScale = 1.0,
+			CPoint3d const& origin = CPoint3d(0, 0, 0),
+			CPoint3d const& offset = CPoint3d(0, 0, 0));
+		bool SetRXYZ(double scale = 1.0,
 			rad_t dTx = 0.0_rad, rad_t dTy = 0.0_rad, rad_t dTz = 0.0_rad,
-			const CPoint3d& ptShift = CPoint3d(0, 0, 0),
-			const CPoint3d& ptOffset = CPoint3d(0, 0, 0));
+			CPoint3d const& origin = CPoint3d(0, 0, 0),
+			CPoint3d const& offset = CPoint3d(0, 0, 0));
 
-		bool SetFrom4Points(const CPoint3d pts0[4], const CPoint3d pts1[4], bool bCalcScale = true, double dMinDeterminant = 0.0);
-		bool SetFrom3Points(const CPoint3d pts0[3], const CPoint3d pts1[3], bool bCalcScale = true, double dMinDeterminant = 0.0);
-		//bool SetFrom2Points(const CPoint3d pts0[2], const CPoint3d pts1[2], bool bCalcScale = true, double dMinDeterminant = 0.0);
+		bool SetFrom4Points(CPoint3d const pts0[4], CPoint3d const pts1[4], bool bCalcScale = true, double dMinDeterminant = 0.0);
+		bool SetFrom3Points(CPoint3d const pts0[3], CPoint3d const pts1[3], bool bCalcScale = true, double dMinDeterminant = 0.0);
+		//bool SetFrom2Points(CPoint3d const pts0[2], CPoint3d const pts1[2], bool bCalcScale = true, double dMinDeterminant = 0.0);
 
-		void SetScale(double dScale) { scale_ = dScale; }
+		void SetScale(double scale) { scale_ = scale; }
 		double GetScale() const { return scale_; }
 		void SetMatrix(double m[9]) {
 			mat_ = mat_t(m);
 		}
-		void SetMatrix(const mat_t& mat) { mat_ = mat; }
+		void SetMatrix(mat_t const& mat) { mat_ = mat; }
 		void SetMatrix(double m00, double m01, double m02, double m10, double m11, double m12, double m20, double m21, double m22) {
 			double m[] = { m00, m01, m02, m10, m11, m12, m20, m21, m22 };
 			SetMatrix(m);
@@ -658,7 +668,7 @@ namespace gtl {
 		void SetMatrixRotateZXY(rad_t dTx, rad_t dTy, rad_t dTz) { mat_ = GetRMatZ(dTz) * GetRMatX(dTx) * GetRMatY(dTy); }
 		void SetMatrixRotateZYX(rad_t dTx, rad_t dTy, rad_t dTz) { mat_ = GetRMatZ(dTz) * GetRMatY(dTy) * GetRMatX(dTx); }
 		mat_t& GetMatrix() { return mat_; }
-		const mat_t& GetMatrix() const { return mat_; }
+		mat_t const& GetMatrix() const { return mat_; }
 		void GetMatrix(double m[mat_t::cols * mat_t::rows]) const {
 			//ASSERT((mat_.cols >= 3) && (mat_.rows >= 3) && (mat_.depth() == CV_64F));
 			//if ( (mat_.cols < 3) && (mat_.rows < 3) && (mat_.depth() != CV_64F) )
@@ -680,34 +690,34 @@ namespace gtl {
 			origin_.SetPoint(dShiftX, dShiftY, dShiftZ);
 		}
 		template < class TPOINT >
-		void SetShift(const TPOINT& ptShift) {
-			origin_.SetPoint(ptShift.x, ptShift.y, ptShift.z);
+		void SetShift(TPOINT const& origin) {
+			origin_.SetPoint(origin.x, origin.y, origin.z);
 		}
 		void GetShift(double& dShiftX, double& dShiftY, double& dShiftZ) const {
 			dShiftX = origin_.x; dShiftY = origin_.y; dShiftZ = origin_.z;
 		}
 		template < class TPOINT >
-		void GetShift(TPOINT& ptShift) const {
-			ptShift.x = origin_.x; ptShift.y = origin_.y; ptShift.z = origin_.z;
+		void GetShift(TPOINT& origin) const {
+			origin.x = origin_.x; origin.y = origin_.y; origin.z = origin_.z;
 		}
-		const CPoint3d& GetShift() const { return origin_; }
+		CPoint3d const& GetShift() const { return origin_; }
 		CPoint3d& GetShift() { return origin_; }
 
 		void SetOffset(double dOffsetX, double dOffsetY, double dOffsetZ) {
 			offset_.SetPoint(dOffsetX, dOffsetY, dOffsetZ);
 		}
 		template < class TPOINT >
-		void SetOffset(const TPOINT& ptOffset) {
-			offset_.SetPoint(ptOffset.x, ptOffset.y, ptOffset.z);
+		void SetOffset(TPOINT const& offset) {
+			offset_.SetPoint(offset.x, offset.y, offset.z);
 		}
 		void GetOffset(double& dOffsetX, double& dOffsetY, double& dOffsetZ) const {
 			dOffsetX = offset_.x; dOffsetY = offset_.y; dOffsetZ = offset_.z;
 		}
 		template < class TPOINT >
-		void GetOffset(TPOINT& ptOffset) const {
-			ptOffset.x = offset_.x; ptOffset.y = offset_.y; ptOffset.z = offset_.z;
+		void GetOffset(TPOINT& offset) const {
+			offset.x = offset_.x; offset.y = offset_.y; offset.z = offset_.z;
 		}
-		const CPoint3d& GetOffset() const { return offset_; }
+		CPoint3d const& GetOffset() const { return offset_; }
 		CPoint3d& GetOffset() { return offset_; }
 
 		void RotateMX(rad_t dTx);
@@ -723,45 +733,45 @@ namespace gtl {
 		void FlipYZ(double y = 0, double z = 0);
 		void FlipZX(double z = 0, double x = 0);
 		void FlipXYZ(double x = 0, double y = 0, double z = 0);
-		void FlipXYZ(const CPoint3d& ptCenter);
+		void FlipXYZ(CPoint3d const& ptCenter);
 
 		//-------------------------------------------------------------------------
 		// Operation
 		//
 
-			// ptTarget = (dScale + alpha) * m * ( ptSource - ptShift ) + ptOffset
+			// ptTarget = (scale + alpha) * m * ( ptSource - origin ) + offset
 		void Trans(double x0, double y0, double z0, double& x1, double& y1, double& z1) const;
 
-		virtual CPoint2d Trans(const CPoint2d& pt) const { return Trans(CPoint3d(pt.x, pt.y, 0)); }
-		virtual CPoint2d TransI(const CPoint2d& pt) const { return TransI(CPoint3d(pt.x, pt.y, 0)); }
-		virtual CPoint3d Trans(const CPoint3d& pt) const {
+		virtual CPoint2d Trans(CPoint2d const& pt) const { return Trans(CPoint3d(pt.x, pt.y, 0)); }
+		virtual CPoint2d TransI(CPoint2d const& pt) const { return TransI(CPoint3d(pt.x, pt.y, 0)); }
+		virtual CPoint3d Trans(CPoint3d const& pt) const {
 			CPoint3d ptT;
 			ptT = scale_ * (mat_ * (pt - origin_)) + offset_;
 			return ptT;
 		}
-		virtual CPoint3d TransI(const CPoint3d& pt) const {
+		virtual CPoint3d TransI(CPoint3d const& pt) const {
 			return GetInverse().Trans(pt);
 		}
 
 		virtual double TransLength(double dLength) const {
 			CPoint3d pt0 = Trans(CPoint3d(0, 0, 0));
 			CPoint3d pt1 = Trans(CPoint3d(1, 1, 1));
-			double dScale = pt0.Distance(pt1) / sqrt(3.0);
-			return dScale * dLength;
+			double scale = pt0.Distance(pt1) / sqrt(3.0);
+			return scale * dLength;
 		}
 		virtual double TransLengthI(double dLength) const {
 			CPoint3d pt0 = Trans(CPoint3d(0, 0, 0));
 			CPoint3d pt1 = Trans(CPoint3d(1, 1, 1));
-			double dScale = sqrt(3.0) / pt0.Distance(pt1);
-			return dScale * dLength;
+			double scale = sqrt(3.0) / pt0.Distance(pt1);
+			return scale * dLength;
 		}
 		bool IsRightHanded() const;
 
 
-		CPoint3d Project(const CPoint3d& pt, const CPoint3d& alpha = CPoint3d(0, 0, 0)) const;
+		CPoint3d Project(CPoint3d const& pt, CPoint3d const& alpha = CPoint3d(0, 0, 0)) const;
 
-		CCoordTrans3d& operator *= (const CCoordTrans3d& B);
-		CCoordTrans3d operator * (const CCoordTrans3d& B) const;
+		CCoordTrans3d& operator *= (CCoordTrans3d const& B);
+		CCoordTrans3d operator * (CCoordTrans3d const& B) const;
 
 	//
 	public:
@@ -789,7 +799,7 @@ namespace gtl {
 			return ar;
 		}
 		template <class Archive>
-		friend Archive& operator << (Archive& ar, const CCoordTrans3d& B) {
+		friend Archive& operator << (Archive& ar, CCoordTrans3d const& B) {
 			return B.StoreTo(ar);
 		}
 		template <class Archive>
@@ -827,8 +837,8 @@ namespace gtl {
 		static mat_t GetRMatX(rad_t dT);
 		static mat_t GetRMatY(rad_t dT);
 		static mat_t GetRMatZ(rad_t dT);
-		static bool MakeProjection(CCoordTrans3d& ct, const CPoint3d& vecPlaneNorm, const CPoint3d& ptPlaneBase = CPoint3d());
-		static bool MakeProjectionOntoXY(CCoordTrans3d& ct, const CPoint3d& vecPlaneX, const CPoint3d& vecPlaneY, const CPoint3d& ptPlaneBase = CPoint3d());
+		static bool MakeProjection(CCoordTrans3d& ct, CPoint3d const& vecPlaneNorm, CPoint3d const& ptPlaneBase = CPoint3d());
+		static bool MakeProjectionOntoXY(CCoordTrans3d& ct, CPoint3d const& vecPlaneX, CPoint3d const& vecPlaneY, CPoint3d const& ptPlaneBase = CPoint3d());
 
 	public:
 		FEM_BEGIN_TBL(CCoordTrans3d)

@@ -9,6 +9,6 @@ using namespace gtl::literals;
 TEST(gtl_coord_trans, ct) {
 	using namespace gtl;
 
-	CCoordTransChain ct;
+	CCoordTrans2d ct;
 
 }
