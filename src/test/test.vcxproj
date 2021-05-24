@@ -51,6 +51,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="test_archive.cpp" />
     <ClCompile Include="test_boost_ptr_container.cpp" />
+    <ClCompile Include="test_coord.cpp" />
     <ClCompile Include="test_coord_trans.cpp" />
     <ClCompile Include="test_dynamic.cpp" />
     <ClCompile Include="test_json_proxy.cpp" />

@@ -129,7 +129,9 @@
 
 #define NOMINMAX	// disable Windows::min/max
 #if defined(min) || defined(max)
-#	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
+//#	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
+#	undef min
+#	undef max
 #endif
 
 

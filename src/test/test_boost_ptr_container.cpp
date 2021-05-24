@@ -21,7 +21,6 @@ namespace gtl::test::boost_ptr_container {
 		auto operator <=> (ITT const&) const = default;
 
 	};
-
 	struct ttt : public ITT {
 		int i, j, k;
 
@@ -53,6 +52,7 @@ namespace gtl::test::boost_ptr_container {
 		lst.push_back(std::make_unique<ttt>(0, 31, 33));
 		lst.push_back(std::make_unique<tt2>(ttt{1, 2, 3}, 1.0, 2.0));
 		lst.push_back(std::make_unique<tt2>(ttt{4, 5, 6}, 1.0, 2.0));
+		//auto* ptr = new_clone(lst.back());
 		{
 			boost::ptr_deque<ttt> lst2 = lst;
 			auto& a0 = lst2[0];
