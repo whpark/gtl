@@ -20,6 +20,9 @@
     <ClInclude Include="pch.h">
       <Filter>framework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shape.h">
+      <Filter>shape</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

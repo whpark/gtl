@@ -1,4 +1,43 @@
-module;
+//////////////////////////////////////////////////////////////////////
+//
+// shape.h:
+//
+// 2017.07.20
+// PWH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+/*
+
+	1. CShapeObject 에서 변경 내용 :
+
+		class name :
+
+			CShapeObject	-> CQShape
+			CShapeLine		-> CQSLine
+			CShapePolyLine	-> CQSPolyline
+			...
+
+		Container :
+
+			TList -> boost::ptr_deque
+
+		Point / Line : x, y, z 3차원으로 변경
+
+			typedef CSize3d					QSSize;
+			typedef CPoint3d				QSPoint;
+			typedef CRect3d					QSRect;
+			typedef std::vector<QSLine>		QSLines;
+
+			typedef CCoordTrans3d			CQSCoordTrans;
+
+
+
+*/
+///////////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #include <cstdint>
 #include <optional>
@@ -7,15 +46,17 @@ module;
 #include "gtl/unit.h"
 #include "gtl/coord.h"
 
-export module shape;
+//export module shape;
 
-export namespace gtl::shape {
+namespace gtl::shape {
+
 	using namespace gtl::literals;
 
 	using point_t = CPoint3d;
 	struct line_t { point_t beg, end; };
-	struct polypoint_t : public point_t {
-		double bulge{};
+	struct polypoint_t : public TPointT<double, 4> {
+		double& Bulge() { return w; }
+		double Bulge() const { return w; }
 	};
 
 	using color_t = color_rgba_t;
@@ -27,10 +68,17 @@ export namespace gtl::shape {
 		uint32_t eFlag{};
 		double dInterval{};
 	};
+	struct s_cookie {
+		void* ptr{};
+		std::vector<uint8_t> buffer;
+		std::u8string str;
+		std::chrono::nanoseconds duration;
+	};
 
 	struct s_shape {
 		color_t color;
 		std::optional<hatching_t> hatch;
+		std::optional<s_cookie> cookie;
 	};
 
 	struct s_dot : public s_shape {
