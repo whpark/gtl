@@ -2,7 +2,6 @@
 
 //#include "gtl/reflection.h"
 //#include "gtl/dynamic.h"
-#include "gtl/gtl.h"
 import gtl;
 
 #pragma warning(disable:4566)	// character encoding

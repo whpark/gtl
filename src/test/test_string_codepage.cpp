@@ -3,7 +3,6 @@
 //#include "gtl/gtl.h"
 //#include "gtl/iconv_wrapper.h"
 
-#include "gtl/gtl.h"
 import gtl;
 
 using namespace std::literals;

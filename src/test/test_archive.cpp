@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 
 //#include "gtl/archive.h"
-#include "gtl/gtl.h"
+
 import gtl;
 
 #pragma warning(disable:4566)	// character encoding

@@ -9,6 +9,7 @@
 #pragma warning(push)
 #pragma warning(disable: 5104 5105)
 
+
 #include "gtl/gtl.h"
 
 #include <windows.h>

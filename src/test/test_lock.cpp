@@ -1,7 +1,6 @@
 #include "pch.h"
 
 //#include "gtl/mutex.h"
-#include "gtl/gtl.h"
 import gtl;
 
 #pragma warning(disable:4566)	// character encoding

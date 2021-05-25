@@ -1,13 +1,10 @@
 
 #include "pch.h"
 
-//#include "gtl/reflection.h"
-
-#include "gtl/gtl.h"
-import gtl;
-
 #include "boost/ptr_container/ptr_deque.hpp"
 #include "boost/ptr_container/ptr_vector.hpp"
+
+import gtl;
 
 #pragma warning(disable:4566)	// character encoding
 
