@@ -29,7 +29,9 @@
 
 #define NOMINMAX	// disable Windows::min/max
 #if defined(min) || defined(max)
-#	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
+//#	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
+#	undef min
+#	undef max
 #endif
 
 
@@ -69,18 +71,20 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const = 0;\
 	virtual std::unique_ptr<mw_base_t> NewClone()  const = 0;\
-	friend mw_base_t* new_clone(mw_base_t const& r) { return r.NewClone().release(); }
+	friend mw_base_t* new_clone(mw_this_t const& r) { return r.NewClone().release(); }
 
 #define GTL__VIRTUAL_DYNAMIC_BASE(className)\
 	using mw_base_t = className;\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const { return std::make_unique<mw_this_t>(); }\
-	virtual std::unique_ptr<mw_base_t> NewClone()  const { return std::make_unique<mw_this_t>(*this); }
+	virtual std::unique_ptr<mw_base_t> NewClone()  const { return std::make_unique<mw_this_t>(*this); }\
+	friend mw_this_t* new_clone(mw_this_t const& r) { return (mw_this_t*)r.NewClone().release(); }
 
 #define GTL__VIRTUAL_DYNAMIC_DERIVED(className)\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const override { return std::make_unique<mw_this_t>(); }\
-	virtual std::unique_ptr<mw_base_t> NewClone()  const override { return std::make_unique<mw_this_t>(*this); }
+	virtual std::unique_ptr<mw_base_t> NewClone()  const override { return std::make_unique<mw_this_t>(*this); }\
+	friend mw_this_t* new_clone(mw_this_t const& r) { return (mw_this_t*)r.NewClone().release(); }
 
 #define GTL_DYN__BASE(T_IDENTIFIER)\
 	static inline TDynamicCreateBase<this_t, T_IDENTIFIER> dynamicCreateBase_s;

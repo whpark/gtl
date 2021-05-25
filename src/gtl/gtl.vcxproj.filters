@@ -119,5 +119,8 @@
     <ClCompile Include="gtl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="coord_trans.ixx">
+      <Filter>Source Files\coord</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,6 +9,7 @@ export import :concepts;
 export import :misc;
 export import :unit;
 export import :coord;
+export import :coord_trans;
 export import :string;
 export import :time;
 export import :iconv_wrapper;

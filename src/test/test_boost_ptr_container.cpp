@@ -56,12 +56,12 @@ namespace gtl::test::boost_ptr_container {
 		lst.push_back(std::make_unique<tt2>(ttt{1, 2, 3}, 1.0, 2.0));
 		lst.push_back(std::make_unique<tt2>(ttt{4, 5, 6}, 1.0, 2.0));
 		{
-			boost::ptr_deque<ttt> lst2 = lst;
-			auto& a0 = lst2[0];
-			auto& a1 = lst2[1];
-			auto& a2 = lst2[2];
-			auto& a3 = lst2[3];
-			auto& a4 = lst2[4];
+			boost::ptr_deque<ttt> lst_2 = lst;
+			auto& a0 = lst_2[0];
+			auto& a1 = lst_2[1];
+			auto& a2 = lst_2[2];
+			auto& a3 = lst_2[3];
+			auto& a4 = lst_2[4];
 
 			int k = a0.i;
 		}
