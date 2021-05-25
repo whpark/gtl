@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
 
-#include <windows.h>
-
 #include "gtl/gtl.h"
 #include "gtl/coord.h"
 

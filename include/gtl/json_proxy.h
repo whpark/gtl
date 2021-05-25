@@ -34,8 +34,12 @@
 #endif
 
 
+#pragma warning(push)
+#pragma warning(disable: 5104 5105)
 // https://www.boost.org/doc/libs/1_75_0/libs/json/doc/html/json/quick_look.html
 #include "boost/json.hpp"       // decl
+#pragma warning(pop)
+
 
 // https://github.com/nlohmann/json
 #include "nlohmann/json.hpp"

@@ -33,6 +33,11 @@ namespace gtl {
 	class ICoordTrans {
 	public:
 		using this_t = ICoordTrans;
+		using value_type = double;
+		using point3_t = TPoint3<value_type>;
+		using point2_t = TPoint2<value_type>;
+		using size2_t = TSize2<value_type>;
+		using size3_t = TSize3<value_type>;
 
 		// Constructors
 		ICoordTrans() { }
@@ -50,18 +55,18 @@ namespace gtl {
 	public:
 		/// @brief pt -> pt2
 		/// @return 
-		CPoint3d operator () (CPoint3d const& pt) const {
+		point3_t operator () (point3_t const& pt) const {
 			return Trans(pt);
 		}
 
 		/// @brief 
-		/// @tparam tcoord3d : Not CPoint3d but one of 3d Coord.
+		/// @tparam tcoord3d : Not point3_t but one of 3d Coord.
 		/// @param pt 
 		/// @return 
-		template < typename tcoord3d > requires (gtlc::tcoord3<tcoord3d, double> and !std::is_same_v<CPoint3d, tcoord3d>)
+		template < typename tcoord3d > requires (gtlc::tcoord3<tcoord3d, double> and !std::is_same_v<point3_t, tcoord3d>)
 		[[ nodiscard ]] tcoord3d operator () (tcoord3d const& pt) const {
 			auto v{pt};
-			((CPoint3d&)v) = Trans((CPoint3d&)pt);
+			((point3_t&)v) = Trans((point3_t&)pt);
 			return v;
 		}
 
@@ -69,7 +74,7 @@ namespace gtl {
 		template < typename tcoord3d > requires (gtlc::has__xyz<tcoord3d>) and (!gtlc::tcoord3<tcoord3d, double>)
 		[[ nodiscard ]] tcoord3d operator () (tcoord3d const& pt) const {
 			auto v{pt};
-			auto r = Trans(CPoint3d(pt.x, pt.y, pt.z));
+			auto r = Trans(point3_t(pt.x, pt.y, pt.z));
 			v.x = RoundOrForward<decltype(v.x)>(r.x);
 			v.y = RoundOrForward<decltype(v.y)>(r.y);
 			v.z = RoundOrForward<decltype(v.z)>(r.z);
@@ -80,18 +85,18 @@ namespace gtl {
 		/// @brief pt -> pt2
 		/// @param pt 
 		/// @return 
-		[[ nodiscard ]] CPoint2d operator () (CPoint2d const& pt) const {
+		[[ nodiscard ]] point2_t operator () (point2_t const& pt) const {
 			return Trans(pt);
 		}
 
 		/// @brief pt -> pt2
-		/// @tparam tcoord3d : Not CPoint3d but one of 3d Coord.
+		/// @tparam tcoord3d : Not point3_t but one of 3d Coord.
 		/// @param pt 
 		/// @return 
-		template < typename tcoord2d > requires (gtlc::tcoord2<tcoord2d, double> and !std::is_same_v<CPoint2d, tcoord2d>)
+		template < typename tcoord2d > requires (gtlc::tcoord2<tcoord2d, double> and !std::is_same_v<point2_t, tcoord2d>)
 		[[ nodiscard ]] tcoord2d operator () (tcoord2d const& pt) const {
 			auto v{pt};
-			((CPoint2d&)v) = Trans((CPoint2d&)pt);
+			((point2_t&)v) = Trans((point2_t&)pt);
 			return v;
 		}
 
@@ -99,7 +104,7 @@ namespace gtl {
 		template < typename tcoord2d > requires (gtlc::has__xy<tcoord2d>) and (!gtlc::tcoord2<tcoord2d, double>)
 		[[ nodiscard ]] tcoord2d operator () (tcoord2d const& pt) const {
 			auto v{pt};
-			auto r = Trans(CPoint2d(pt.x, pt.y));
+			auto r = Trans(point2_t(pt.x, pt.y));
 			v.x = RoundOrForward<decltype(v.x)>(r.x);
 			v.y = RoundOrForward<decltype(v.y)>(r.y);
 			return v;
@@ -108,24 +113,27 @@ namespace gtl {
 		//-------------------------------------------------------------------------
 		// Operation
 		//
-		virtual [[nodiscard]] CPoint2d Trans(CPoint2d const& pt) const = 0;
-		virtual [[nodiscard]] CPoint2d TransI(CPoint2d const& pt) const = 0;
-		virtual [[nodiscard]] CPoint3d Trans(CPoint3d const& pt) const = 0;
-		virtual [[nodiscard]] CPoint3d TransI(CPoint3d const& pt) const = 0;
+		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const = 0;
+		virtual [[nodiscard]] point2_t TransI(point2_t const& pt) const = 0;
+		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const = 0;
+		virtual [[nodiscard]] point3_t TransI(point3_t const& pt) const = 0;
 		virtual [[nodiscard]] double Trans(double dLength) const = 0;
 		virtual [[nodiscard]] double TransI(double dLength) const = 0;
 
 		virtual [[nodiscard]] bool IsRightHanded() const = 0;
 	};
 
+
 	//-----------------------------------------------------------------------------
-	class GTL_CLASS CCoordTransChain : public ICoordTrans {
+//	template < std::floating_point T >
+	class CCoordTransChain : public ICoordTrans {
+	public:
+		using base_t = ICoordTrans;
+
 	protected:
 		boost::ptr_deque<ICoordTrans> chain_;	// 마지막 Back() CT부터 Front() 까지 Transform() 적용.
 
 	public:
-		using base_t = ICoordTrans;
-
 		friend class boost::serialization::access;
 		template < typename tBoostArchive >
 		void serialize(tBoostArchive &ar, unsigned int const version) {
@@ -138,7 +146,7 @@ namespace gtl {
 	public:
 		// Constructors
 		CCoordTransChain() = default;
-		//virtual ~CCoordTransChain() { }
+		//virtual ~TCoordTransChain() { }
 		CCoordTransChain(CCoordTransChain const& B) = default;
 		CCoordTransChain& operator = (CCoordTransChain const& B) = default;
 
@@ -182,10 +190,10 @@ namespace gtl {
 			return ptT;
 		}
 
-		virtual [[nodiscard]] CPoint2d Trans(CPoint2d const& pt) const override  { return ChainTrans(chain_, pt); }
-		virtual [[nodiscard]] CPoint2d TransI(CPoint2d const& pt) const override { return ChainTransI(chain_, pt); }
-		virtual [[nodiscard]] CPoint3d Trans(CPoint3d const& pt) const override  { return ChainTrans(chain_, pt); }
-		virtual [[nodiscard]] CPoint3d TransI(CPoint3d const& pt) const override { return ChainTransI(chain_, pt); }
+		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const override  { return ChainTrans(chain_, pt); }
+		virtual [[nodiscard]] point2_t TransI(point2_t const& pt) const override { return ChainTransI(chain_, pt); }
+		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override  { return ChainTrans(chain_, pt); }
+		virtual [[nodiscard]] point3_t TransI(point3_t const& pt) const override { return ChainTransI(chain_, pt); }
 		virtual [[nodiscard]] double Trans(double dLength) const override  { return ChainTrans(chain_, dLength); }
 		virtual [[nodiscard]] double TransI(double dLength) const override { return ChainTransI(chain_, dLength); }
 
@@ -209,6 +217,7 @@ namespace gtl {
 		static_assert( dim == 2 or dim == 3 );
 	public:
 		using this_t = TCoordTransDim;
+		using base_t = ICoordTrans;
 		using mat_t = cv::Matx<double, dim, dim>;
 		using point_t = TPointT<double, dim>;
 
@@ -219,7 +228,6 @@ namespace gtl {
 		point_t offset_;	// pivot of target coordinate
 
 	public:
-		using base_t = ICoordTrans;
 
 		friend class boost::serialization::access;
 		template < typename tBoostArchive >
@@ -473,26 +481,26 @@ namespace gtl {
 		//-------------------------------------------------------------------------
 		// Operation
 		//
-		virtual [[nodiscard]] CPoint2d Trans(CPoint2d const& pt) const override {
+		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const override {
 			if constexpr (dim == 2) {
 				return scale_ * (mat_ * (pt-origin_)) + offset_;
 			} else if constexpr (dim == 3) {
 				return scale_ * (mat_ * (point_t(pt)-origin_)) + offset_;
 			}
 		}
-		virtual [[nodiscard]] CPoint3d Trans(CPoint3d const& pt) const override {
+		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override {
 			if constexpr (dim == 2) {
-				CPoint3d ptNew(Trans((CPoint2d&)pt));
+				point3_t ptNew(Trans((point2_t&)pt));
 				ptNew.z = pt.z;
 				return ptNew;
 			} else if constexpr (dim == 3) {
 				return scale_ * (mat_ * (pt-origin_)) + offset_;
 			}
 		}
-		virtual [[nodiscard]] CPoint2d TransI(CPoint2d const& pt) const override {
+		virtual [[nodiscard]] point2_t TransI(point2_t const& pt) const override {
 			return GetInverse().value_or(TCoordTransDim{}).Trans(pt);
 		}
-		virtual [[nodiscard]] CPoint3d TransI(CPoint3d const& pt) const override {
+		virtual [[nodiscard]] point3_t TransI(point3_t const& pt) const override {
 			return GetInverse().value_or(TCoordTransDim{}).Trans(pt);
 		}
 
@@ -503,8 +511,8 @@ namespace gtl {
 			return scale * dLength;
 		}
 		virtual [[nodiscard]] double TransI(double dLength) const override {
-			CPoint2d pt0 = Trans(point_t::All(0));
-			CPoint2d pt1 = Trans(point_t::All(1));
+			point2_t pt0 = Trans(point_t::All(0));
+			point2_t pt1 = Trans(point_t::All(1));
 			double scale = sqrt((double)dim) / pt0.Distance(pt1);
 			return scale * dLength;
 		}
@@ -527,11 +535,16 @@ namespace gtl {
 
 	};
 
-	template GTL_CLASS TCoordTransDim<2>;
-	template GTL_CLASS TCoordTransDim<3>;
 
+	//template GTL_CLASS TCoordTransChain<double>;
+	//using CCoordTransChain = TCoordTransChain<double>;
+
+	template TCoordTransDim<2>;
 	using CCoordTrans2d = TCoordTransDim<2>;
+
+	template TCoordTransDim<3>;
 	using CCoordTrans3d = TCoordTransDim<3>;
+
 
 	//GTL_CLASS CCoordTrans2d;
 	//GTL_CLASS CCoordTrans3d;

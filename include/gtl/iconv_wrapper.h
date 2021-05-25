@@ -18,7 +18,11 @@
 #define GTL_HEADER__ICONV_WRAPPER
 
 #include <string>
+
+#pragma warning(push)
+#pragma warning(disable: 4819)	// codepage
 #include "iconv.h"
+#pragma warning(pop)
 
 #include "gtl/concepts.h"
 

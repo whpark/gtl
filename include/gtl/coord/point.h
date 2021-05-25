@@ -262,7 +262,7 @@ namespace gtl {
 			return true;
 		}
 
-		[[nodiscard]] bool CheckMinMax(this_t& ptMin, this_t& ptMax) const {
+		bool CheckMinMax(this_t& ptMin, this_t& ptMax) const {
 			bool bModified = false;
 			for (size_t i {}; i < size(); i++) {
 				if (ptMin.data()[i] > data()[i]) { ptMin.data()[i] = data()[i]; bModified = true; }

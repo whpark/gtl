@@ -116,6 +116,14 @@
 
 #include "gtl/_config.h"
 
+#if (GTL_USE_WINDOWS_API)
+	#define NOMINMAX
+	#pragma warning(push)
+	#pragma warning(disable: 5104 5105)
+	#include <windows.h>
+	#pragma warning(pop)
+#endif
+
 // until c++20 source_location
 #ifdef __cpp_lib_source_location
 #	define GTL__FUNCSIG std::string(std::source_location::current().function_name()) + " : "
