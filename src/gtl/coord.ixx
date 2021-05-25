@@ -30,7 +30,7 @@ import :concepts;
 export import :coord_point;
 export import :coord_size;
 export import :coord_rect;
-
+export import :coord_trans;
 
 export namespace gtl {
 
