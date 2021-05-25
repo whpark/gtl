@@ -36,7 +36,7 @@ namespace gtl::test::boost_ptr_container {
 		tt2() = default;
 		tt2(tt2 const&) = default;
 		tt2(ttt const& base, double l, double m) : ttt(base), l(l), m(m) {}
-		tt2& operator = (tt2& const) = default;
+		tt2& operator = (tt2 const&) = default;
 
 		auto operator <=> (tt2 const&) const = default;
 
