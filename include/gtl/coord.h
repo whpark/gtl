@@ -20,6 +20,7 @@
 #include "gtl/coord/size.h"
 #include "gtl/coord/point.h"
 #include "gtl/coord/rect.h"
+#include "gtl/coord/coord_trans.h"
 
 //=============================================================================
 //
