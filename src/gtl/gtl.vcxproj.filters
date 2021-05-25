@@ -120,7 +120,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="coord_trans.ixx">
-      <Filter>Source Files\coord</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

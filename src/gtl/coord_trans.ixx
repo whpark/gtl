@@ -23,9 +23,7 @@ module;
 
 export module gtl:coord_trans;
 import :concepts;
-import :coord_point;
-import :coord_size;
-import :coord_rect;
+import :coord;
 
 export namespace gtl {
 
