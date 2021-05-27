@@ -45,8 +45,35 @@
 #include <deque>
 #include "gtl/unit.h"
 #include "gtl/coord.h"
+#include "gtl/dynamic.h"
+
+#include "boost/ptr_container/ptr_container.hpp"
+#include "boost/serialization/string.hpp"
+#include "boost/serialization/serialization.hpp"
+#include "boost/archive/text_iarchive.hpp"
+#include "boost/archive/text_oarchive.hpp"
+#include "boost/archive/binary_iarchive.hpp"
+#include "boost/archive/binary_oarchive.hpp"
 
 //export module shape;
+
+namespace gtl {
+
+	template < typename archive >
+	void serialize(archive& ar, gtl::mm_t& len, unsigned int const file_version) {
+		ar & len.dValue;
+	}
+
+	template < typename archive >
+	void serialize(archive& ar, gtl::deg_t& len, unsigned int const file_version) {
+		ar & len.dValue;
+	}
+
+	template < typename archive >
+	void serialize(archive& ar, gtl::rad_t& len, unsigned int const file_version) {
+		ar & len.dValue;
+	}
+};
 
 namespace gtl::shape {
 
@@ -64,57 +91,322 @@ namespace gtl::shape {
 	enum class eSHAPE : uint8_t { none, layer, dot, line, polyline, spline, circle, arc, ellipse, text, mtext, nSHAPE };
 	constexpr color_t const CR_DEFAULT = RGBA(255, 255, 255);
 
-	struct hatching_t {
-		uint32_t eFlag{};
-		double dInterval{};
-	};
-	struct s_cookie {
+	//struct hatching_t {
+	//	uint32_t eFlag{};
+	//	double dInterval{};
+	//};
+	struct cookie_t {
 		void* ptr{};
 		std::vector<uint8_t> buffer;
 		std::u8string str;
 		std::chrono::nanoseconds duration;
+
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (ptrdiff_t&)ptr;
+			ar & buffer;
+			ar & str;
+			ar & duration;
+		};
 	};
 
 	struct s_shape {
 		color_t color;
-		std::optional<hatching_t> hatch;
-		std::optional<s_cookie> cookie;
+		//std::optional<hatching_t> hatch;
+		std::optional<cookie_t> cookie;
+
+		virtual ~s_shape() {}
+
+		GTL__VIRTUAL_DYNAMIC_INTERFACE(s_shape);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & color;
+			//ar & hatch;
+			ar & cookie;
+		}
+
+		virtual point_t PointAt(double t) const = 0;
+		virtual bool Transform(CCoordTrans3d const&) = 0;
+		virtual bool GetBoundingRect(CRect2d&) const = 0;
+
+
+	};
+
+	struct s_layer : public s_shape {
+		std::wstring name;
+
+		boost::ptr_deque<s_shape> shapes;
+
+		virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
+		virtual bool Transform(CCoordTrans3d const& ct) override {
+			bool r{true};
+			for (auto& shape : shapes)
+				r &= shape.Transform(ct);
+			return r;
+		}
+		virtual bool GetBoundingRect(CRect2d& rect) const override {
+			bool r{};
+			for (auto& shape : shapes)
+				r |= shape.GetBoundingRect(rect);
+			return r;
+		}
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_layer);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_shape&)*this;
+
+			ar & name;
+			ar & shapes;
+		}
+
 	};
 
 	struct s_dot : public s_shape {
 		point_t pt;
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_dot);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_shape&)*this;
+
+			ar & pt;
+		}
+
 	};
 
 	struct s_line : public s_shape {
 		point_t pt0, pt1;
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_line);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_shape&)*this;
+			ar & pt0 & pt1;
+		}
 	};
 
 	struct s_polyline : public s_shape {
 		std::vector<polypoint_t> pts;
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_polyline);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_shape&)*this;
+			ar & pts;
+		}
 	};
 
 	struct s_circle : public s_shape {
 		point_t center;
 		double radius{};
 		deg_t angle_length{360_deg};	// 회전 방향.
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_circle);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_shape&)*this;
+
+			ar & center & radius & (double&)angle_length;
+		}
 	};
 
 	struct s_arc : public s_circle {
 		deg_t angle_start{};
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_arc);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_circle&)*this;
+
+			ar & angle_start;
+		}
 	};
 
 	struct s_ellipse : public s_arc {
 		double radius2{};
 		deg_t angle_first_axis{};
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_ellipse);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_arc&)*this;
+			ar & radius2 & (double&)angle_first_axis;
+		}
 	};
 
 	struct s_spline : public s_shape {
+		point_t ptNormal;
+		point_t ptStartTangent, ptEndTangent;
+		int degree{};
+		int nFit{};
+
+		std::vector<double> knots;
+		std::vector<point_t> controlPoints;
+
+		double knotTolerance{0.0000001};
+		double controlPointTolerance{0.0000001};
+		double fitPointTolerance{0.0000001};
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_spline);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_shape&)*this;
+
+			ar & ptNormal;
+			ar & ptStartTangent & ptEndTangent;
+			ar & degree;
+			ar & nFit;
+
+			ar & knots;
+			ar & controlPoints;
+
+			ar & knotTolerance;
+			ar & controlPointTolerance;
+			ar & fitPointTolerance;
+		}
 	};
 
 	struct s_text : public s_shape {
+		enum class eVERT_ALIGN : int { base_line = 0, bottom, mid, top };
+		enum class eHORZ_ALIGN : int { left = 0, center, right, aligned, middle, fit };
+
+		point_t pt0, pt1;
+		std::wstring text;
+		double height{};
+		deg_t angle{};
+		double widthScale{};
+		deg_t oblique;
+		std::u8string textStyle;
+		int textgen{};
+		eHORZ_ALIGN horzAlign{eHORZ_ALIGN::left};
+		eVERT_ALIGN vertAlign{eVERT_ALIGN::base_line};
+	
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_text);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_shape&)*this;
+
+			ar & pt0 & pt1;
+			ar & text;
+			ar & height;
+			ar & angle;
+			ar & widthScale;
+			ar & oblique;
+			ar & textStyle;
+			ar & textgen;
+			ar & (int&)horzAlign;
+			ar & (int&)vertAlign;
+		}
 	};
 
-	struct s_mtext : public s_shape {
+	struct s_mtext : public s_text {
+		enum class eATTACH {
+			topLeft = 1,
+			topCenter,
+			topRight,
+			middleLeft,
+			middleCenter,
+			middleRight,
+			bottomLeft,
+			bottomCenter,
+			bottomRight
+		};
+
+		eATTACH eAttch{eATTACH::topLeft};
+		int interlin{};
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_mtext);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_text&)*this;
+
+			ar & (int&)eAttch;
+			ar & interlin;
+		}
+	};
+
+	struct s_hatch : public s_shape {
+		std::u8string name;
+		bool bSolid{};
+		int associative{};
+		int hstyle{};
+		int hpattern{};
+		int doubleflag{};
+		deg_t angle{};
+		double scale{};
+		int deflines{};
+
+		std::vector<s_polyline> boundaries;
+
+		virtual point_t PointAt(double t) const override {};
+		virtual bool Transform(CCoordTrans3d const&) override { return true; };
+		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+
+		GTL__VIRTUAL_DYNAMIC_DERIVED(s_hatch);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & (s_shape&)*this;
+
+			ar & name;
+			ar & bSolid;
+			ar & associative;
+			ar & hstyle;
+			ar & hpattern;
+			ar & doubleflag;
+			ar & angle;
+			ar & scale;
+			ar & deflines;
+		}
 	};
 
 #if 0
