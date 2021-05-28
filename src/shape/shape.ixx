@@ -92,7 +92,7 @@ export namespace gtl::shape {
 		}
 
 	public:
-		GTL__VIRTUAL_DYNAMIC_INTERFACE;
+		GTL__DYNAMIC_VIRTUAL_INTERFACE;
 		GTL_DYN__BASE(eSHAPE);
 
 	public:

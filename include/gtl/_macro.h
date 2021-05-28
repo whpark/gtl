@@ -41,6 +41,80 @@
 static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preprocessor");
 
 
+#define I_GTL__RECURSIVE_MACRO(macro, var)								macro(var)
+#define I_GTL__RECURSIVE_MACRO_EX_COMMA(macro, var, expr)				macro(var), expr
+#define I_GTL__RECURSIVE_MACRO_EX_SPACE(macro, var, expr)				macro(var)  expr
+#define I_GTL__RECURSIVE_MACRO_1(seperator, macro, var)					macro(var)
+#define I_GTL__RECURSIVE_MACRO_2(seperator, macro, var, var2)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_1(seperator, macro, var2))
+#define I_GTL__RECURSIVE_MACRO_3(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_2(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_4(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_3(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_5(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_4(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_6(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_5(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_7(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_6(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_8(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_7(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_9(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_8(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_10(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_9(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_11(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_10(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_12(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_11(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_13(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_12(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_14(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_13(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_15(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_14(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_16(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_15(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_17(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_16(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_18(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_17(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_19(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_18(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_20(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_19(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_21(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_20(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_22(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_21(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_23(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_22(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_24(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_23(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_25(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_24(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_26(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_25(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_27(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_26(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_28(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_27(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_29(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_28(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_30(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_29(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_31(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_30(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_32(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_31(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_33(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_32(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_34(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_33(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_35(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_34(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_36(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_35(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_37(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_36(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_38(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_37(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_39(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_38(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_40(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_39(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_41(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_40(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_42(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_41(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_43(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_42(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_44(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_43(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_45(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_44(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_46(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_45(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_47(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_46(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_48(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_47(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_49(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_48(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_50(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_49(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_51(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_50(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_52(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_51(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_53(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_52(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_54(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_53(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_55(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_54(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_56(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_55(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_57(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_56(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_58(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_57(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_59(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_58(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_60(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_59(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_61(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_60(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_62(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_61(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_63(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_62(seperator, macro, __VA_ARGS__))
+#define I_GTL__RECURSIVE_MACRO_64(seperator, macro, var, ...)			I_GTL__RECURSIVE_MACRO_EX_##seperator(macro, var, I_GTL__RECURSIVE_MACRO_63(seperator, macro, __VA_ARGS__))
+
+#define I_GTL__RECURSIVE_MACRO_C(seperator, macro, N, ...)				I_GTL__RECURSIVE_MACRO_##N(seperator, macro, __VA_ARGS__)
+#define I_GTL__RECURSIVE_MACRO_F(seperator, macro, N, ...)				I_GTL__RECURSIVE_MACRO_C(seperator, macro, N, __VA_ARGS__)
+#define GTL__RECURSIVE_MACRO_COMMA(macro, ...)							I_GTL__RECURSIVE_MACRO_F(COMMA, macro, NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+#define GTL__RECURSIVE_MACRO_SPACE(macro, ...)							I_GTL__RECURSIVE_MACRO_F(SPACE, macro, NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+
+
 //-----------------------------------------------------------------------------
 // Text Constant macros
 #define TEXT_A(x) x
@@ -66,21 +140,21 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 
 //-----------------------------------------------------------------------------
 // dynamic
-#define GTL__VIRTUAL_DYNAMIC_INTERFACE(className)\
+#define GTL__DYNAMIC_VIRTUAL_INTERFACE(className)\
 	using mw_base_t = className;\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const = 0;\
 	virtual std::unique_ptr<mw_base_t> NewClone()  const = 0;\
 	friend mw_base_t* new_clone(mw_this_t const& r) { return r.NewClone().release(); }
 
-#define GTL__VIRTUAL_DYNAMIC_BASE(className)\
+#define GTL__DYNAMIC_VIRTUAL_BASE(className)\
 	using mw_base_t = className;\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const { return std::make_unique<mw_this_t>(); }\
 	virtual std::unique_ptr<mw_base_t> NewClone()  const { return std::make_unique<mw_this_t>(*this); }\
 	friend mw_this_t* new_clone(mw_this_t const& r) { return (mw_this_t*)r.NewClone().release(); }
 
-#define GTL__VIRTUAL_DYNAMIC_DERIVED(className)\
+#define GTL__DYNAMIC_VIRTUAL_DERIVED(className)\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const override { return std::make_unique<mw_this_t>(); }\
 	virtual std::unique_ptr<mw_base_t> NewClone()  const override { return std::make_unique<mw_this_t>(*this); }\
@@ -103,51 +177,10 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 #define GTL_REFL__MEMBER_TABLE\
 		constexpr inline static const std::tuple member_tuple_s
 
-	//#define GTL_REFL__MEMBERS(...)\
-	//		I_GTL_REFL__MEMBERS_(NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
-
-
 	#define I_GTL_REFL__MEMBER(var)\
 			gtl::internal::pair{ #var##sv, &this_t::var }
 
-	#define I_GTL_REFL__MEMBER_EX(var, expr)		I_GTL_REFL__MEMBER(var), expr
-
-	#define I_GTL_REFL__MEMBER_1(var)				I_GTL_REFL__MEMBER(var)
-	#define I_GTL_REFL__MEMBER_2(var1, var2)		I_GTL_REFL__MEMBER(var1), I_GTL_REFL__MEMBER(var2)
-	#define I_GTL_REFL__MEMBER_3(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_2(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_4(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_3(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_5(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_4(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_6(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_5(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_7(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_6(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_8(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_7(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_9(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_8(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_10(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_9(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_11(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_10(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_12(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_11(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_13(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_12(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_14(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_13(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_15(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_14(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_16(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_15(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_17(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_16(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_18(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_17(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_19(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_18(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_20(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_19(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_21(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_20(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_22(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_21(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_23(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_22(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_24(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_23(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_25(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_24(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_26(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_25(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_27(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_26(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_28(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_27(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_29(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_28(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_30(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_29(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_31(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_30(__VA_ARGS__))
-	#define I_GTL_REFL__MEMBER_32(var, ...)			I_GTL_REFL__MEMBER_EX(var, I_GTL_REFL__MEMBER_31(__VA_ARGS__))
-
-	#define I_GTL_REFL__MEMBERS_C(N, ...)	I_GTL_REFL__MEMBER_##N (__VA_ARGS__)
-	#define I_GTL_REFL__MEMBERS_F(N, ...)	I_GTL_REFL__MEMBERS_C(N, __VA_ARGS__)
-	#define GTL_REFL__MEMBERS(...)			I_GTL_REFL__MEMBERS_F(NUM_ARGS(__VA_ARGS__), __VA_ARGS__)
+	#define GTL_REFL__MEMBERS(...)			GTL__RECURSIVE_MACRO_COMMA(I_GTL_REFL__MEMBER, __VA_ARGS__)
 
 
 	//================================================================================================================================
