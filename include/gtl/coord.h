@@ -54,6 +54,16 @@ namespace gtl {
 	using CRect2i	= TRect2<int>;
 
 
+	/// @brief Interpolation (lerp)
+	template < typename T, int dim >
+	TPointT<T, dim> lerp(TPointT<T, dim> const& a, TPointT<T, dim> const& b, double t) {
+		TPointT<T, dim> c;
+		for (int i = 0; i < dim; i++)
+			c.member(i) = std::lerp(a.member(i), b.member(i), t);
+		return c;
+	}
+
+
 	//-------------------------------------------------------------------------
 	// Archive <---------> TPoint2/3, TSize2/3, TRect2/3
 	//
