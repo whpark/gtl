@@ -373,7 +373,7 @@ namespace gtl {
 		template < typename JSON > friend void to_json(JSON& j, this_t const& B) { j["pt0"] = B.pts(0); j["pt1"] = B.pts(1); }
 
 
-		bool CheckBounding(point_t const& pt) {
+		bool CheckBoundary(point_t const& pt) {
 			bool bModified{};
 			for (int i = 0; i < pt.size(); i++) {
 				if (pts(0).member(i) > pt.member(i)) {
