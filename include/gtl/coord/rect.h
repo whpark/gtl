@@ -373,6 +373,23 @@ namespace gtl {
 		template < typename JSON > friend void to_json(JSON& j, this_t const& B) { j["pt0"] = B.pts(0); j["pt1"] = B.pts(1); }
 
 
+		bool CheckBounding(point_t const& pt) {
+			bool bModified{};
+			for (int i = 0; i < pt.size(); i++) {
+				if (pts(0).member(i) > pt.member(i)) {
+					bModified = true;
+					pts(0).member(i) = pt.member(i);
+				}
+			}
+			for (int i = 0; i < pt.size(); i++) {
+				if (pts(1).member(i) < pt.member(i)) {
+					bModified = true;
+					pts(1).member(i) = pt.member(i);
+				}
+			}
+			return bModified;
+		}
+
 		//-----------------------------------------------------------------------------
 		// ROI
 		//
