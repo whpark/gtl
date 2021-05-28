@@ -23,6 +23,9 @@
     <ClInclude Include="..\..\include\gtl\shape\shape.h">
       <Filter>shape</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\canvas.h">
+      <Filter>shape</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

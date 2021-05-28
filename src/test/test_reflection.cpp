@@ -18,7 +18,6 @@ namespace gtl::test::reflection::MACRO {
 
 	private:
 		GTL_REFL__CLASS__BASE(CTestStruct)
-
 	#if 1
 		GTL_REFL__MEMBER_TABLE {
 			GTL_REFL__MEMBERS(str1),

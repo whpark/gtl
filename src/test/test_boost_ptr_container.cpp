@@ -7,6 +7,8 @@
 #include "gtl/reflection.h"
 #include "boost/ptr_container/ptr_deque.hpp"
 #include "boost/ptr_container/ptr_vector.hpp"
+#include "boost/archive/text_iarchive.hpp"
+#include "boost/archive/text_oarchive.hpp"
 
 #pragma warning(disable:4566)	// character encoding
 
@@ -16,7 +18,11 @@ using namespace gtl::literals;
 namespace gtl::test::boost_ptr_container {
 
 	struct ITT {
-		GTL__VIRTUAL_DYNAMIC_INTERFACE(ITT);
+		GTL__DYNAMIC_VIRTUAL_INTERFACE(ITT);
+
+		template < typename archive >
+		friend void serialization(archive& ar, unsigned int const file_version) {
+		}
 
 		auto operator <=> (ITT const&) const = default;
 
@@ -27,7 +33,13 @@ namespace gtl::test::boost_ptr_container {
 		auto operator <=> (ttt const&) const = default;
 		ttt(int i={}, int j={}, int k={}) : i(i), j(j), k(k) {}
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(ttt);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(ttt);
+
+		template < typename archive >
+		friend void serialization(archive& ar, ttt& object, unsigned int const file_version) {
+			ar & (ITT&)object;
+			ar & object.i & object.j & object.k;
+		}
 
 	};
 
@@ -41,7 +53,7 @@ namespace gtl::test::boost_ptr_container {
 
 		auto operator <=> (tt2 const&) const = default;
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(tt2);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(tt2);
 
 	};
 

@@ -118,7 +118,7 @@ namespace gtl::shape {
 
 		virtual ~s_shape() {}
 
-		GTL__VIRTUAL_DYNAMIC_INTERFACE(s_shape);
+		GTL__DYNAMIC_VIRTUAL_INTERFACE(s_shape);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -153,7 +153,7 @@ namespace gtl::shape {
 			return r;
 		}
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_layer);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_layer);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -172,7 +172,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_dot);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_dot);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -190,7 +190,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_line);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_line);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -206,7 +206,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_polyline);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_polyline);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -224,7 +224,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_circle);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_circle);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -241,7 +241,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_arc);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_arc);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -259,7 +259,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_ellipse);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_ellipse);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -285,7 +285,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_spline);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_spline);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -324,7 +324,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_text);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_text);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -363,7 +363,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_mtext);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_mtext);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -391,7 +391,7 @@ namespace gtl::shape {
 		virtual bool Transform(CCoordTrans3d const&) override { return true; };
 		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(s_hatch);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_hatch);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
@@ -425,7 +425,7 @@ namespace gtl::shape {
 		}
 
 	public:
-		GTL__VIRTUAL_DYNAMIC_INTERFACE;
+		GTL__DYNAMIC_VIRTUAL_INTERFACE;
 		GTL_DYN__BASE(eSHAPE);
 
 	public:

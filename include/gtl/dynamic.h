@@ -31,26 +31,32 @@ namespace gtl {
 	}
 
 
-#define GTL__VIRTUAL_DYNAMIC_INTERFACE(className)\
+#define GTL__DYNAMIC_VIRTUAL_INTERFACE(className)\
 	using mw_base_t = className;\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const = 0;\
 	virtual std::unique_ptr<mw_base_t> NewClone()  const = 0;\
 	friend mw_base_t* new_clone(mw_this_t const& r) { return r.NewClone().release(); }
 
-#define GTL__VIRTUAL_DYNAMIC_BASE(className)\
+#define GTL__DYNAMIC_VIRTUAL_BASE(className)\
 	using mw_base_t = className;\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const { return std::make_unique<mw_this_t>(); }\
 	virtual std::unique_ptr<mw_base_t> NewClone()  const { return std::make_unique<mw_this_t>(*this); }\
 	friend mw_this_t* new_clone(mw_this_t const& r) { return (mw_this_t*)r.NewClone().release(); }
 
-#define GTL__VIRTUAL_DYNAMIC_DERIVED(className)\
+#define GTL__DYNAMIC_VIRTUAL_DERIVED(className)\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const override { return std::make_unique<mw_this_t>(); }\
 	virtual std::unique_ptr<mw_base_t> NewClone()  const override { return std::make_unique<mw_this_t>(*this); }\
 	friend mw_this_t* new_clone(mw_this_t const& r) { return (mw_this_t*)r.NewClone().release(); }
 
+
+#define GTL__DYNAMIC_VIRTUAL_SERIALIZE_INTERFACE(className, ...)\
+
+#define GTL__DYNAMIC_VIRTUAL_SERIALIZE_BASE(className, ...)\
+
+#define GTL__DYNAMIC_VIRTUAL_SERIALIZE_DERIVED(className, ...)\
 
 	//-----------------------------------------------------------------------------
 	// Dynamic Creation. (Create using IDENTIFIER_DN)

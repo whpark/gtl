@@ -43,7 +43,7 @@ namespace gtl {
 		ICoordTrans() { }
 		virtual ~ICoordTrans() { }
 
-		GTL__VIRTUAL_DYNAMIC_INTERFACE(ICoordTrans);
+		GTL__DYNAMIC_VIRTUAL_INTERFACE(ICoordTrans);
 
 	public:
 		friend class boost::serialization::access;
@@ -141,7 +141,7 @@ namespace gtl {
 			ar & chain_;
 		}
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(CCoordTransChain);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(CCoordTransChain);
 
 	public:
 		// Constructors
@@ -269,7 +269,7 @@ namespace gtl {
 			B.offset_ = j["offset"];
 		}
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(TCoordTransDim);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(TCoordTransDim);
 
 	public:
 		// Constructors
