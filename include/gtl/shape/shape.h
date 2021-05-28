@@ -39,118 +39,38 @@
 
 #pragma once
 
-#include <cstdint>
-#include <optional>
-#include <vector>
-#include <deque>
-#include "gtl/unit.h"
-#include "gtl/coord.h"
-#include "gtl/dynamic.h"
-
-#include "boost/ptr_container/ptr_container.hpp"
-#include "boost/serialization/string.hpp"
-#include "boost/serialization/serialization.hpp"
-#include "boost/archive/text_iarchive.hpp"
-#include "boost/archive/text_oarchive.hpp"
-#include "boost/archive/binary_iarchive.hpp"
-#include "boost/archive/binary_oarchive.hpp"
+#include "shape_default.h"
+#include "canvas.h"
 
 //export module shape;
 
-namespace gtl {
-
-	template < typename archive >
-	void serialize(archive& ar, gtl::mm_t& len, unsigned int const file_version) {
-		ar & len.dValue;
-	}
-
-	template < typename archive >
-	void serialize(archive& ar, gtl::deg_t& len, unsigned int const file_version) {
-		ar & len.dValue;
-	}
-
-	template < typename archive >
-	void serialize(archive& ar, gtl::rad_t& len, unsigned int const file_version) {
-		ar & len.dValue;
-	}
-};
-
 namespace gtl::shape {
-
-	using namespace gtl::literals;
-
-	using point_t = CPoint3d;
-	struct line_t { point_t beg, end; };
-	struct polypoint_t : public TPointT<double, 4> {
-		double& Bulge() { return w; }
-		double Bulge() const { return w; }
-	};
-
-	using color_t = color_rgba_t;
-
-	enum class eSHAPE : uint8_t { none, layer, dot, line, polyline, spline, circle, arc, ellipse, text, mtext, nSHAPE };
-	constexpr color_t const CR_DEFAULT = RGBA(255, 255, 255);
-
-	//struct hatching_t {
-	//	uint32_t eFlag{};
-	//	double dInterval{};
-	//};
-	struct cookie_t {
-		void* ptr{};
-		std::vector<uint8_t> buffer;
-		std::u8string str;
-		std::chrono::nanoseconds duration;
-
-		friend class boost::serialization::access;
-		template < typename archive >
-		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (ptrdiff_t&)ptr;
-			ar & buffer;
-			ar & str;
-			ar & duration;
-		};
-	};
-
-	struct s_shape {
-		color_t color;
-		//std::optional<hatching_t> hatch;
-		std::optional<cookie_t> cookie;
-
-		virtual ~s_shape() {}
-
-		GTL__DYNAMIC_VIRTUAL_INTERFACE(s_shape);
-		friend class boost::serialization::access;
-		template < typename archive >
-		void serialize(archive& ar, unsigned int const file_version) {
-			ar & color;
-			//ar & hatch;
-			ar & cookie;
-		}
-
-		virtual point_t PointAt(double t) const = 0;
-		virtual bool Transform(CCoordTrans3d const&) = 0;
-		virtual bool GetBoundingRect(CRect2d&) const = 0;
-
-
-	};
 
 	struct s_layer : public s_shape {
 		std::wstring name;
 
 		boost::ptr_deque<s_shape> shapes;
 
-		virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
-		virtual bool Transform(CCoordTrans3d const& ct) override {
-			bool r{true};
+		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
+		virtual void FlipX() override { for (auto& shape : shapes) shape.FlipX(); }
+		virtual void FlipY() override { for (auto& shape : shapes) shape.FlipY(); }
+		virtual void FlipZ() override { for (auto& shape : shapes) shape.FlipZ(); }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
 			for (auto& shape : shapes)
-				r &= shape.Transform(ct);
-			return r;
+				shape.Transform(ct, bRightHanded);
 		}
 		virtual bool GetBoundingRect(CRect2d& rect) const override {
 			bool r{};
 			for (auto& shape : shapes)
 				r |= shape.GetBoundingRect(rect);
 			return r;
+		}
+		virtual void Draw(ICanvas& canvas) const override {
+			for (auto& shape : shapes) {
+				canvas.PreDraw(shape);
+				shape.Draw(canvas);
+				canvas.PostDraw(shape);
+			}
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_layer);
@@ -168,9 +88,20 @@ namespace gtl::shape {
 	struct s_dot : public s_shape {
 		point_t pt;
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override { return pt; };
+		virtual void FlipX() override { pt.x = -pt.x; }
+		virtual void FlipY() override { pt.y = -pt.y; }
+		virtual void FlipZ() override { pt.z = -pt.z; }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			pt = ct(pt);
+		};
+		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+			return rectBoundary.CheckBoundary(pt);
+		};
+		virtual void Draw(ICanvas& canvas) const override {
+			canvas.MoveTo(pt);
+			canvas.LineTo(pt);
+		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_dot);
 		friend class boost::serialization::access;
@@ -186,9 +117,22 @@ namespace gtl::shape {
 	struct s_line : public s_shape {
 		point_t pt0, pt1;
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override { return lerp(pt0, pt1, t); }
+		virtual void FlipX() override { pt0.x = -pt0.x; pt1.x = -pt1.x; }
+		virtual void FlipY() override { pt0.y = -pt0.y; pt1.y = -pt1.y; }
+		virtual void FlipZ() override { pt0.z = -pt0.z; pt1.z = -pt1.z; }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			pt0 = ct(pt0); pt1 = ct(pt1);
+		};
+		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+			bool bModified{};
+			bModified |= rectBoundary.CheckBoundary(pt0);
+			bModified |= rectBoundary.CheckBoundary(pt1);
+			return bModified;
+		};
+		virtual void Draw(ICanvas& canvas) const override {
+			canvas.Line(pt0, pt1);
+		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_line);
 		friend class boost::serialization::access;
@@ -200,11 +144,28 @@ namespace gtl::shape {
 	};
 
 	struct s_polyline : public s_shape {
+		bool bLoop{};
 		std::vector<polypoint_t> pts;
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override {};
+		virtual void FlipX() override { for (auto& pt : pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } }
+		virtual void FlipY() override { for (auto& pt : pts) { pt.y = -pt.y;  pt.Bulge() = -pt.Bulge(); } }
+		virtual void FlipZ() override { for (auto& pt : pts) { pt.z = -pt.z;  pt.Bulge() = -pt.Bulge(); } }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			for (auto& pt : pts) {
+				(point_t&)pt = ct((point_t&)pt);
+			}
+			if (!bRightHanded) {
+				for (auto& pt : pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } 
+			}
+		};
+		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+			bool bModified{};
+			for (auto const& pt : pts)
+				bModified |= rectBoundary.CheckBoundary(pt);
+			return bModified;
+		};
+		virtual void Draw(ICanvas& canvas) const override;
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_polyline);
 		friend class boost::serialization::access;
@@ -215,56 +176,152 @@ namespace gtl::shape {
 		}
 	};
 
-	struct s_circle : public s_shape {
-		point_t center;
+	struct s_circleXY : public s_shape {
+		point_t ptCenter;
 		double radius{};
 		deg_t angle_length{360_deg};	// 회전 방향.
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override {};
+		virtual void FlipX() override { ptCenter.x = -ptCenter.x; angle_length = -angle_length; }
+		virtual void FlipY() override { ptCenter.y = -ptCenter.y; angle_length = -angle_length; }
+		virtual void FlipZ() override { ptCenter.z = -ptCenter.z; angle_length = -angle_length; }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			ptCenter = ct(ptCenter); radius = ct.Trans(radius);
+			if (!bRightHanded)
+				angle_length = -angle_length;
+		}
+		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+			bool bResult{};
+			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x-radius, ptCenter.y-radius, ptCenter.z));
+			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x+radius, ptCenter.y+radius, ptCenter.z));
+			return bResult;
+		};
+		virtual void Draw(ICanvas& canvas) const override {
+			canvas.Arc(ptCenter, radius, 0._deg, angle_length);
+		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_circle);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_circleXY);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
 			ar & (s_shape&)*this;
 
-			ar & center & radius & (double&)angle_length;
+			ar & ptCenter & radius & (double&)angle_length;
 		}
 	};
 
-	struct s_arc : public s_circle {
+	struct s_arcXY : public s_circleXY {
 		deg_t angle_start{};
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override {};
+		virtual void FlipX() override { s_circleXY::FlipX(); angle_start = AdjustAngle(180._deg - angle_start); }
+		virtual void FlipY() override { s_circleXY::FlipY(); angle_start = AdjustAngle(-angle_start); }
+		virtual void FlipZ() override { s_circleXY::FlipZ(); angle_start = AdjustAngle(180._deg - angle_start); }	// ????.....  성립 안되지만,
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			// todo : ... upgrade?
+			s_circleXY::Transform(ct, bRightHanded);
+			if (!bRightHanded)
+				angle_start = -angle_start;
+		}
+		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+			// todo : ... upgrade?
+			return s_circleXY::GetBoundingRect(rectBoundary);
+		}
+		virtual void Draw(ICanvas& canvas) const override {
+			canvas.Arc(ptCenter, radius, angle_start, angle_length);
+		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_arc);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_arcXY);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_circle&)*this;
+			ar & (s_circleXY&)*this;
 
 			ar & angle_start;
 		}
+
+		deg_t AdjustAngle(deg_t angle) {
+			//if ( (angle < 0) || (angle > 360.) ) {
+			//	int r = angle / 360.;
+			//	angle = angle - 360. * r;
+			//}
+			//while (angle < 0)
+			//	angle += 360.;
+			angle = std::fmod(angle, 360.);
+			if (angle < 0.)
+				angle += 360.;
+			return angle;
+		}
+
+		static s_arcXY GetFromBulge(double bulge, point_t const& pt0, point_t const& pt1) {
+			s_arcXY arc;
+			CPoint2d vecPerpendicular(-(pt0.y-pt1.y), (pt0.x-pt1.x));
+			// Normalize
+			{
+				double d = vecPerpendicular.Distance(CPoint2d(0.0, 0.0));
+				vecPerpendicular.x /= d;
+				vecPerpendicular.y /= d;
+			}
+			CPoint2d ptCenterOfLine((pt0.x+pt1.x)/2., (pt0.y+pt1.y)/2.);
+			double l = pt1.Distance(pt0)/2.;
+			CPoint2d ptBulge;
+			ptBulge.x = ptCenterOfLine.x + vecPerpendicular.x * (bulge * l);
+			ptBulge.y = ptCenterOfLine.y + vecPerpendicular.y * (bulge * l);
+			double h = ptBulge.Distance(ptCenterOfLine);
+			arc.radius = (Square(l) + Square(h)) / (2 * h);
+
+			arc.ptCenter.x = ptBulge.x + (arc.radius / h) * (ptCenterOfLine.x - ptBulge.x);
+			arc.ptCenter.y = ptBulge.y + (arc.radius / h) * (ptCenterOfLine.y - ptBulge.y);
+			arc.angle_start = atan2(pt0.y - arc.ptCenter.y, pt0.x - arc.ptCenter.x);
+			double dT1 = atan2(pt1.y - arc.ptCenter.y, pt1.x - arc.ptCenter.x);
+			//arc.m_eDirection = (dBulge > 0) ? 1 : -1;
+			//arc.m_dTLength = (dBulge > 0) ? fabs(dT1-arc.m_dT0) : -fabs(dT1-arc.m_dT0);
+			if (bulge > 0) {
+				while (dT1 < arc.angle_start)
+					dT1 += std::numbers::pi*2;
+				arc.angle_length = dT1 - arc.angle_start;
+			} else {
+				while (dT1 > arc.angle_start)
+					dT1 -= std::numbers::pi*2;
+				arc.angle_length = dT1 - arc.angle_start;
+			}
+
+			return arc;
+		}
+
 	};
 
-	struct s_ellipse : public s_arc {
-		double radius2{};
+	struct s_ellipseXY : public s_arcXY {
+		double radiusH{};
 		deg_t angle_first_axis{};
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override {};
+		virtual void FlipX() override { s_arcXY::FlipX(); angle_first_axis = 180._deg - angle_first_axis; }
+		virtual void FlipY() override { s_arcXY::FlipY(); angle_first_axis = - angle_first_axis; }
+		virtual void FlipZ() override { s_arcXY::FlipZ(); angle_first_axis = 180._deg - angle_first_axis; }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			s_arcXY::Transform(ct, bRightHanded);
+			radiusH = ct.Trans(radiusH);
+			if (!bRightHanded)
+				angle_first_axis = -angle_first_axis;
+		}
+		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+			// todo : ... upgrade
+			bool bResult{};
+			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x-radius, ptCenter.y-radiusH, ptCenter.z));
+			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x+radius, ptCenter.y+radiusH, ptCenter.z));
+			return bResult;
+		}
+		virtual void Draw(ICanvas& canvas) const override {
+			canvas.Ellipse(ptCenter, radius, radiusH, angle_first_axis, angle_start, angle_length);
+		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_ellipse);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_ellipseXY);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_arc&)*this;
-			ar & radius2 & (double&)angle_first_axis;
+			ar & (s_arcXY&)*this;
+			ar & radiusH & (double&)angle_first_axis;
 		}
 	};
 
@@ -281,9 +338,25 @@ namespace gtl::shape {
 		double controlPointTolerance{0.0000001};
 		double fitPointTolerance{0.0000001};
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override {};
+		virtual void FlipX() override { for (auto& pt : controlPoints) pt.x = -pt.x; ptNormal.x = -ptNormal.x; ptStartTangent.x = -ptStartTangent.x; ptEndTangent.x = -ptEndTangent.x; }
+		virtual void FlipY() override { for (auto& pt : controlPoints) pt.y = -pt.y; ptNormal.y = -ptNormal.y; ptStartTangent.y = -ptStartTangent.y; ptEndTangent.y = -ptEndTangent.y; }
+		virtual void FlipZ() override { for (auto& pt : controlPoints) pt.z = -pt.z; ptNormal.z = -ptNormal.z; ptStartTangent.z = -ptStartTangent.z; ptEndTangent.z = -ptEndTangent.z; }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			ptNormal = ct(ptNormal);
+			ptStartTangent = ct(ptStartTangent);
+			ptEndTangent = ct(ptEndTangent);
+			for (auto& pt : controlPoints)
+				pt = ct(pt);
+		}
+		virtual bool GetBoundingRect(CRect2d& rect) const override {
+			bool b{};
+			for (auto& pt : controlPoints)
+				b = rect.CheckBoundary(pt);
+		};
+		virtual void Draw(ICanvas& canvas) const override {
+
+		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_spline);
 		friend class boost::serialization::access;
@@ -314,15 +387,30 @@ namespace gtl::shape {
 		double height{};
 		deg_t angle{};
 		double widthScale{};
-		deg_t oblique;
+		deg_t oblique{};
 		std::u8string textStyle;
 		int textgen{};
 		eHORZ_ALIGN horzAlign{eHORZ_ALIGN::left};
 		eVERT_ALIGN vertAlign{eVERT_ALIGN::base_line};
 	
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override {};
+		virtual void FlipX() override { pt0.x = -pt0.x; pt1.x = -pt1.x; }
+		virtual void FlipY() override { pt0.y = -pt0.y; pt1.y = -pt1.y; }
+		virtual void FlipZ() override { pt0.z = -pt0.z; pt1.z = -pt1.z; }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			pt0 = ct(pt0);
+			pt1 = ct(pt1);
+		}
+		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+			// todo : upgrade.
+			bool b{};
+			b |= rectBoundary.CheckBoundary(pt0);
+			b |= rectBoundary.CheckBoundary(pt1);
+			return b;
+		}
+		virtual void Draw(ICanvas& canvas) const override {
+			// todo :
+		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_text);
 		friend class boost::serialization::access;
@@ -359,9 +447,12 @@ namespace gtl::shape {
 		eATTACH eAttch{eATTACH::topLeft};
 		int interlin{};
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override {};
+		//virtual void FlipX() override {}
+		//virtual void FlipY() override {}
+		//virtual void FlipY() override {}
+		//virtual void Transform(CCoordTrans3d const&, bool bRightHanded) override { return true; };
+		//virtual bool GetBoundingRect(CRect2d& rectBoundary) const override { return true; };
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_mtext);
 		friend class boost::serialization::access;
@@ -387,9 +478,21 @@ namespace gtl::shape {
 
 		std::vector<s_polyline> boundaries;
 
-		virtual point_t PointAt(double t) const override {};
-		virtual bool Transform(CCoordTrans3d const&) override { return true; };
-		virtual bool GetBoundingRect(CRect2d&) const override { return true; };
+		//virtual point_t PointAt(double t) const override {};
+		virtual void FlipX() override { for (auto& b : boundaries) b.FlipX(); }
+		virtual void FlipY() override { for (auto& b : boundaries) b.FlipY(); }
+		virtual void FlipZ() override { for (auto& b : boundaries) b.FlipZ(); }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		};
+		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+			bool b{};
+			for (auto const& bound : boundaries) {
+				b |= bound.GetBoundingRect(rectBoundary);
+			}
+			return b;
+		}
+		virtual void Draw(ICanvas& canvas) const override {
+		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_hatch);
 		friend class boost::serialization::access;
@@ -408,6 +511,41 @@ namespace gtl::shape {
 			ar & deflines;
 		}
 	};
+
+
+	void s_polyline::Draw(ICanvas& canvas) const {
+		for (int iPt = 0; iPt < pts.size(); iPt++) {
+			polypoint_t pt0{pts[iPt]};
+			polypoint_t pt1;
+			bool bLast = false;
+			if (bLoop) {
+				if (iPt == pts.size()-1) {
+					pt1 = pts[0];
+					bLast = true;
+				} else {
+					pt1 = pts[iPt+1];
+				}
+			} else {
+				if (iPt == pts.size()-1)
+					break;
+				bLast = iPt == pts.size()-2;
+				pt1 = pts[iPt+1];
+			}
+
+			double dBulge = pt0.Bulge();
+
+			if (dBulge == 0.0) {
+				canvas.LineTo(pt1);
+			} else {
+				canvas.LineTo(pt0);
+				s_arcXY arc = s_arcXY::GetFromBulge(dBulge, pt0, pt1);
+
+				arc.Draw(canvas);
+
+				canvas.LineTo(pt1);
+			}
+		}
+	}
 
 #if 0
 	/// @brief Shape class

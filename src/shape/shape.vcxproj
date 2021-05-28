@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\shape\canvas.h" />
     <ClInclude Include="..\..\include\gtl\shape\shape.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shape_default.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
