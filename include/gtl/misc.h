@@ -138,7 +138,7 @@ namespace gtl {
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 	constexpr [[nodiscard]] T_DEST Round(T_SOURCE v) {
 		//return T_DEST(std::round(v));
-		return T_DEST(v+0.5*(v<0?-1:1));
+		return T_DEST(v+0.5*(v<T_SOURCE{}?-1:1));
 	}
 
 	/// @brief Rounding to nearest integer.
@@ -150,7 +150,7 @@ namespace gtl {
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 	constexpr [[nodiscard]] T_DEST Round(T_SOURCE v, T_SOURCE place) {
 		//return T_DEST(T_DEST(std::round(v/place/10))*place*10);
-		return T_DEST(T_DEST(v/place/10+0.5*(v<0?-1:1))*place*10);
+		return T_DEST(T_DEST(v/place/10+0.5*(v<T_SOURCE{}?-1:1))*place*10);
 	}
 
 	/// @brief Round or just forward values. (실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.)
