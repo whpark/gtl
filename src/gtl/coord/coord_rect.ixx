@@ -17,8 +17,9 @@ module;
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
-#include "boost/archive/polymorphic_xml_iarchive.hpp"
-#include "boost/archive/polymorphic_xml_oarchive.hpp"
+//#include "boost/ptr_container/ptr_container.hpp"
+//#include "boost/serialization/serialization.hpp"
+//#include "boost/serialization/export.hpp"
 
 export module gtl:coord_rect;
 
@@ -369,10 +370,10 @@ export namespace gtl {
 		this_t operator & (this_t const& rect) const	{ return this_t(*this).IntersectRect(rect); }
 		this_t operator | (this_t const& rect) const	{ return this_t(*this).UnionRect(rect); }
 
-		friend class boost::serialization::access;
+		//friend class boost::serialization::access;
 		template < typename tBoostArchive >
-		void serialize(tBoostArchive &ar, unsigned int const version) {
-			ar & *this;
+		friend void serialize(tBoostArchive &ar, TRectT& rect, unsigned int const version) {
+			ar & rect;
 		}
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
 			return ar & B.pts(0) & B.pts(1);

@@ -15,9 +15,10 @@ module;
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
-#include "boost/ptr_container/ptr_deque.hpp"
-#include "boost/archive/polymorphic_xml_iarchive.hpp"
-#include "boost/archive/polymorphic_xml_oarchive.hpp"
+#include "boost/ptr_container/ptr_container.hpp"
+//#include "boost/serialization/base_object.hpp"
+//#include "boost/archive/polymorphic_xml_iarchive.hpp"
+//#include "boost/archive/polymorphic_xml_oarchive.hpp"
 
 #include "opencv2/opencv.hpp"
 
@@ -46,9 +47,9 @@ export namespace gtl {
 		GTL__DYNAMIC_VIRTUAL_INTERFACE(ICoordTrans);
 
 	public:
-		friend class boost::serialization::access;
+		//friend class boost::serialization::access;
 		template < typename Archive >
-		void serialize(Archive &ar, unsigned int const version) {
+		friend void serialize(Archive &ar, ICoordTrans& ct, unsigned int const version) {
 			//ar & boost::serialization::base_object<base_t>(*this);
 		}
 
@@ -137,11 +138,11 @@ export namespace gtl {
 		boost::ptr_deque<ICoordTrans> chain_;	// 마지막 Back() CT부터 Front() 까지 Transform() 적용.
 
 	public:
-		friend class boost::serialization::access;
-		template < typename tBoostArchive >
-		void serialize(tBoostArchive &ar, unsigned int const version) {
-			ar & boost::serialization::base_object<base_t>(*this);
-			ar & chain_;
+		//friend class boost::serialization::access;
+		template < typename Archive >
+		friend void serialize(Archive &ar, CCoordTransChain& ct, unsigned int const version) {
+			//ar & boost::serialization::base_object<base_t>(ct);
+			ar & ct.chain_;
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(CCoordTransChain);
@@ -249,14 +250,13 @@ export namespace gtl {
 		point_t offset_;	// pivot of target coordinate
 
 	public:
-
-		friend class boost::serialization::access;
-		template < typename tBoostArchive >
-		void serialize(tBoostArchive &ar, unsigned int const version) {
-			ar & *this;
+		//friend class boost::serialization::access;
+		template < typename Archive >
+		friend void serialize(Archive &ar, TCoordTransDim& ct, unsigned int const version) {
+			ar & ct;
 		}
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
-			ar & boost::serialization::base_object<base_t>(*this);
+			//ar & boost::serialization::base_object<base_t>(*this);
 			ar & scale_;
 			for (auto& v : mat_.val)
 				ar & v;

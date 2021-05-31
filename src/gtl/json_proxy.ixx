@@ -89,30 +89,17 @@ export namespace gtl {
 			to_json(*this, b);
 			return *this;
 		}
-		bjson& operator = (std::string const& str) {
-			j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(str));
-			return *this;
-		}
-		//bjson& operator = (std::string&& str) {
-		//	j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(str));
-		//	return *this;
-		//}
-		bjson& operator = (std::string_view sv) {
-			j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(sv));
-			return *this;
-		}
-		bjson& operator = (std::u8string const& str) {
-			j_ = reinterpret_cast<std::string const&>(str);
-			return *this;
-		}
-		//bjson& operator = (std::u8string && str) {
-		//	j_ = reinterpret_cast<std::string &&>(str);
-		//	return *this;
-		//}
-		bjson& operator = (std::u8string_view sv) {
-			j_ = reinterpret_cast<std::string_view&>(sv);
-			return *this;
-		}
+		bjson& operator = (std::string const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
+		bjson& operator = (std::wstring const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
+		bjson& operator = (std::u8string const& str) { j_ = reinterpret_cast<std::string const&>(str); return *this; }
+		bjson& operator = (std::u16string const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
+		bjson& operator = (std::u32string const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
+
+		bjson& operator = (std::string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
+		bjson& operator = (std::wstring_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
+		bjson& operator = (std::u8string_view sv) { j_ = reinterpret_cast<std::string_view&>(sv); return *this; }
+		bjson& operator = (std::u16string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
+		bjson& operator = (std::u32string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 
 
 		bjson operator [] (std::string_view svKey) {
@@ -160,21 +147,24 @@ export namespace gtl {
 		operator int() const { return (int)j_.as_int64(); }
 		operator int64_t() const { return j_.as_int64(); }
 		operator double() const { return j_.as_double(); }
-		operator std::u8string() const {
+
+		template < gtlc::string_elem tchar_t >
+		operator std::basic_string<tchar_t> () const {
 			auto& jstrU8 = j_.as_string();
-			return std::u8string((char8_t const*)jstrU8.data(), jstrU8.size());
-		}
-		operator std::string() const { 
-			// todo : u8 -> ansi
-			auto& jstrU8 = j_.as_string();
-			std::u8string_view svU8{(char8_t const*)jstrU8.data(), jstrU8.size()};
-			return ToString<char, char8_t, false>(svU8);
+			if constexpr (std::is_same_v<tchar_t, char8_t>) {
+				return std::u8string((char8_t const*)jstrU8.data(), jstrU8.size());
+			} else {
+				std::u8string_view svU8{(char8_t const*)jstrU8.data(), jstrU8.size()};
+				return gtl::ToString<tchar_t, char8_t, false>(svU8);
+			}
 		}
 		template < typename T >
 			requires (
 				std::is_class_v<T>
-				&& !std::is_convertible_v<T, std::u8string> && !std::is_convertible_v<T, std::string>
-				&& !std::is_convertible_v<T, std::string_view> && !std::is_convertible_v<T, std::u8string_view>
+				&& !std::is_convertible_v<T, std::string> && !std::is_convertible_v<T, std::wstring>
+				&& !std::is_convertible_v<T, std::u8string> && !std::is_convertible_v<T, std::u16string> && !std::is_convertible_v<T, std::u32string>
+				&& !std::is_convertible_v<T, std::string_view> && !std::is_convertible_v<T, std::wstring_view>
+				&& !std::is_convertible_v<T, std::u8string_view> && !std::is_convertible_v<T, std::u16string_view> && !std::is_convertible_v<T, std::u32string_view>
 				)
 		operator T() const {
 			T a;
@@ -259,30 +249,17 @@ export namespace gtl {
 			}
 			return *this;
 		}
-		njson& operator = (std::string const& str) {
-			j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(str));
-			return *this;
-		}
-		//njson& operator = (std::string&& str) {
-		//	j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(str));
-		//	return *this;
-		//}
-		njson& operator = (std::string_view sv) {
-			j_ = reinterpret_cast<std::string&>(gtl::ToStringU8(sv));
-			return *this;
-		}
-		njson& operator = (std::u8string const& str) {
-			j_ = reinterpret_cast<std::string const&>(str);
-			return *this;
-		}
-		//njson& operator = (std::u8string && str) {
-		//	j_ = reinterpret_cast<std::string &&>(str);
-		//	return *this;
-		//}
-		njson& operator = (std::u8string_view sv) {
-			j_ = reinterpret_cast<std::string_view&>(sv);
-			return *this;
-		}
+		njson& operator = (std::string const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
+		njson& operator = (std::wstring const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
+		njson& operator = (std::u8string const& str) { j_ = reinterpret_cast<std::string const&>(str); return *this; }
+		njson& operator = (std::u16string const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
+		njson& operator = (std::u32string const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
+
+		njson& operator = (std::string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
+		njson& operator = (std::wstring_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
+		njson& operator = (std::u8string_view sv) { j_ = reinterpret_cast<std::string_view&>(sv); return *this; }
+		njson& operator = (std::u16string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
+		njson& operator = (std::u32string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 
 
 		njson operator [] (std::string_view svKey) {
@@ -309,19 +286,23 @@ export namespace gtl {
 		operator int() const { return (int)j_; }
 		operator int64_t() const { return (int64_t)j_; }
 		operator double() const { return (double)j_; }
-		operator std::u8string() const {
-			return reinterpret_cast<std::u8string&>((std::string)j_);
-		}
-		operator std::string() const { 
-			// todo : u8 -> ansi
-			std::string str = j_;
-			return ToStringA(reinterpret_cast<std::u8string&>(str));
+		template < gtlc::string_elem tchar_t >
+		operator std::basic_string<tchar_t> () const {
+			auto jstrU8 = (std::string)j_;
+			if constexpr (std::is_same_v<tchar_t, char8_t>) {
+				return std::u8string((char8_t const*)jstrU8.data(), jstrU8.size());
+			} else {
+				std::u8string_view svU8{(char8_t const*)jstrU8.data(), jstrU8.size()};
+				return gtl::ToString<tchar_t, char8_t, false>(svU8);
+			}
 		}
 		template < typename T >
 			requires (
 				std::is_class_v<T>
-				&& !std::is_convertible_v<T, std::u8string> && !std::is_convertible_v<T, std::string>
-				&& !std::is_convertible_v<T, std::string_view> && !std::is_convertible_v<T, std::u8string_view>
+				&& !std::is_convertible_v<T, std::string> && !std::is_convertible_v<T, std::wstring>
+				&& !std::is_convertible_v<T, std::u8string> && !std::is_convertible_v<T, std::u16string> && !std::is_convertible_v<T, std::u32string>
+				&& !std::is_convertible_v<T, std::string_view> && !std::is_convertible_v<T, std::wstring_view>
+				&& !std::is_convertible_v<T, std::u8string_view> && !std::is_convertible_v<T, std::u16string_view> && !std::is_convertible_v<T, std::u32string_view>
 				)
 		operator T() const {
 			T a;

@@ -18,8 +18,10 @@ module;
 
 #include "opencv2/opencv.hpp"
 
-#include "boost/archive/polymorphic_xml_iarchive.hpp"
-#include "boost/archive/polymorphic_xml_oarchive.hpp"
+//#include "boost/ptr_container/ptr_deque.hpp"
+//#include "boost/serialization/serialization.hpp"
+//#include "boost/serialization/export.hpp"
+//#include "boost/serialization/base_object.hpp"
 
 export module gtl:coord_point;
 
@@ -277,10 +279,10 @@ export namespace gtl {
 		}
 
 		// Archiving
-		friend class boost::serialization::access;
+		//friend class boost::serialization::access;
 		template < typename tBoostArchive >
-		void serialize(tBoostArchive &ar, unsigned int const version) {
-			ar & *this;
+		friend void serialize(tBoostArchive &ar, TPointT& pt, unsigned int const version) {
+			ar & pt;
 		}
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
 			for (auto& v : B.arr())

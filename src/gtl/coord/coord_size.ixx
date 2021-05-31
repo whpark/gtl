@@ -16,8 +16,9 @@ module;
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
-#include "boost/archive/polymorphic_xml_iarchive.hpp"
-#include "boost/archive/polymorphic_xml_oarchive.hpp"
+//#include "boost/ptr_container/ptr_container.hpp"
+#include "boost/serialization/serialization.hpp"
+//#include "boost/serialization/export.hpp"
 
 export module gtl:coord_size;
 
@@ -254,10 +255,10 @@ export namespace gtl {
 		}
 
 		// Archiving
-		friend class boost::serialization::access;
+		//friend class boost::serialization::access;
 		template < typename tBoostArchive >
-		void serialize(tBoostArchive &ar, unsigned int const version) {
-			ar & *this;
+		friend void serialize(tBoostArchive &ar, TSizeT& size, unsigned int const version) {
+			ar & size;
 		}
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
 			for (auto& v : B.arr())
