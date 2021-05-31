@@ -2,8 +2,9 @@
 //
 // shape.h:
 //
-// 2017.07.20
 // PWH
+// 2017.07.20
+// 2021.05.27
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -14,9 +15,9 @@
 
 		class name :
 
-			CShapeObject	-> CQShape
-			CShapeLine		-> CQSLine
-			CShapePolyLine	-> CQSPolyline
+			CShapeObject	-> s_shape
+			CShapeLine		-> s_line
+			CShapePolyLine	-> s_polyline
 			...
 
 		Container :
@@ -25,12 +26,12 @@
 
 		Point / Line : x, y, z 3차원으로 변경
 
-			typedef CSize3d					QSSize;
-			typedef CPoint3d				QSPoint;
-			typedef CRect3d					QSRect;
-			typedef std::vector<QSLine>		QSLines;
+			typedef CSize3d					size2d_t;
+			typedef CPoint3d				point_t;
+			typedef CRect3d					rect_t;
+			typedef std::vector<s_line>		s_lines;
 
-			typedef CCoordTrans3d			CQSCoordTrans;
+			typedef CCoordTrans3d			ct_t;
 
 
 
@@ -39,6 +40,8 @@
 
 #pragma once
 
+#include "gtl/iconv_wrapper.h"
+
 #include "shape_default.h"
 #include "canvas.h"
 
@@ -46,10 +49,17 @@
 
 namespace gtl::shape {
 
-	struct s_layer : public s_shape {
-		std::wstring name;
-
+	struct GTL_SHAPE_CLASS s_layer : public s_shape {
+		string_t name;
+		bool bUse{true};
+		uint32_t flags{};
+		string_t lineType;
 		boost::ptr_deque<s_shape> shapes;
+
+		s_layer() = default;
+		s_layer(s_layer const&) = default;
+		s_layer(s_layer&&) = default;
+		s_layer(string_t const& name) : name(name) {}
 
 		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
 		virtual void FlipX() override { for (auto& shape : shapes) shape.FlipX(); }
@@ -77,15 +87,27 @@ namespace gtl::shape {
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_shape&)*this;
+			ar & boost::serialization::base_object<s_shape>(*this);
 
 			ar & name;
+			ar & flags;
+			ar & lineType;
 			ar & shapes;
+		}
+		virtual bool FromJson(boost::json::value& _j, string_t& layer) override {
+			s_shape::FromJson(_j, layer);
+			using namespace std::literals;
+			bjson j(_j);
+			name = j["name"sv];
+			flags = (int)j["flags"sv];
+			bUse = (bool)j["plotF"sv];
+			lineType = j["lineType"sv];
+			return true;
 		}
 
 	};
 
-	struct s_dot : public s_shape {
+	struct GTL_SHAPE_CLASS s_dot : public s_shape {
 		point_t pt;
 
 		//virtual point_t PointAt(double t) const override { return pt; };
@@ -107,14 +129,22 @@ namespace gtl::shape {
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_shape&)*this;
+			ar & boost::serialization::base_object<s_shape>(*this);
 
 			ar & pt;
 		}
 
+		virtual bool FromJson(boost::json::value& _j, string_t& layer) override {
+			s_shape::FromJson(_j, layer);
+			using namespace std::literals;
+			bjson j(_j);
+			FromJson_ShapeCoord(j["basePoint"sv], pt);
+			return true;
+		}
+
 	};
 
-	struct s_line : public s_shape {
+	struct GTL_SHAPE_CLASS s_line : public s_shape {
 		point_t pt0, pt1;
 
 		//virtual point_t PointAt(double t) const override { return lerp(pt0, pt1, t); }
@@ -138,12 +168,22 @@ namespace gtl::shape {
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_shape&)*this;
+			ar & boost::serialization::base_object<s_shape>(*this);
+
 			ar & pt0 & pt1;
+		}
+
+		virtual bool FromJson(boost::json::value& _j, string_t& layer) override {
+			s_shape::FromJson(_j, layer);
+			using namespace std::literals;
+			bjson j(_j);
+			FromJson_ShapeCoord(j["basePoint"sv], pt0);
+			FromJson_ShapeCoord(j["secPoint"sv], pt1);
+			return true;
 		}
 	};
 
-	struct s_polyline : public s_shape {
+	struct GTL_SHAPE_CLASS s_polyline : public s_shape {
 		bool bLoop{};
 		std::vector<polypoint_t> pts;
 
@@ -171,12 +211,28 @@ namespace gtl::shape {
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_shape&)*this;
+			ar & boost::serialization::base_object<s_shape>(*this);
+
 			ar & pts;
+		}
+
+		virtual bool FromJson(boost::json::value& _j, string_t& layer) override {
+			s_shape::FromJson(_j, layer);
+			using namespace std::literals;
+			bjson j(_j);
+
+			auto jpts = j["vertlist"sv];
+			auto apts = jpts.json().as_array();
+			for (auto iter = apts.begin(); iter != apts.end(); iter++) {
+				pts.push_back(polypoint_t{});
+				FromJson_ShapeCoord(*iter, pts.back());
+			}
+
+			return true;
 		}
 	};
 
-	struct s_circleXY : public s_shape {
+	struct GTL_SHAPE_CLASS s_circleXY : public s_shape {
 		point_t ptCenter;
 		double radius{};
 		deg_t angle_length{360_deg};	// 회전 방향.
@@ -204,13 +260,13 @@ namespace gtl::shape {
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_shape&)*this;
+			ar & boost::serialization::base_object<s_shape>(*this);
 
 			ar & ptCenter & radius & (double&)angle_length;
 		}
 	};
 
-	struct s_arcXY : public s_circleXY {
+	struct GTL_SHAPE_CLASS s_arcXY : public s_circleXY {
 		deg_t angle_start{};
 
 		//virtual point_t PointAt(double t) const override {};
@@ -235,7 +291,7 @@ namespace gtl::shape {
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_circleXY&)*this;
+			ar & boost::serialization::base_object<s_circleXY>(*this);
 
 			ar & angle_start;
 		}
@@ -291,7 +347,7 @@ namespace gtl::shape {
 
 	};
 
-	struct s_ellipseXY : public s_arcXY {
+	struct GTL_SHAPE_CLASS s_ellipseXY : public s_arcXY {
 		double radiusH{};
 		deg_t angle_first_axis{};
 
@@ -320,12 +376,13 @@ namespace gtl::shape {
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_arcXY&)*this;
+			ar & boost::serialization::base_object<s_arcXY>(*this);
+
 			ar & radiusH & (double&)angle_first_axis;
 		}
 	};
 
-	struct s_spline : public s_shape {
+	struct GTL_SHAPE_CLASS s_spline : public s_shape {
 		point_t ptNormal;
 		point_t ptStartTangent, ptEndTangent;
 		int degree{};
@@ -353,16 +410,17 @@ namespace gtl::shape {
 			bool b{};
 			for (auto& pt : controlPoints)
 				b = rect.CheckBoundary(pt);
+			return b;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
-
+			canvas.Spline(degree, controlPoints, knots, false);
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_spline);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_shape&)*this;
+			ar & boost::serialization::base_object<s_shape>(*this);
 
 			ar & ptNormal;
 			ar & ptStartTangent & ptEndTangent;
@@ -378,17 +436,17 @@ namespace gtl::shape {
 		}
 	};
 
-	struct s_text : public s_shape {
+	struct GTL_SHAPE_CLASS s_text : public s_shape {
 		enum class eVERT_ALIGN : int { base_line = 0, bottom, mid, top };
 		enum class eHORZ_ALIGN : int { left = 0, center, right, aligned, middle, fit };
 
 		point_t pt0, pt1;
-		std::wstring text;
+		string_t text;
 		double height{};
 		deg_t angle{};
 		double widthScale{};
 		deg_t oblique{};
-		std::u8string textStyle;
+		string_t textStyle;
 		int textgen{};
 		eHORZ_ALIGN horzAlign{eHORZ_ALIGN::left};
 		eVERT_ALIGN vertAlign{eVERT_ALIGN::base_line};
@@ -416,7 +474,7 @@ namespace gtl::shape {
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_shape&)*this;
+			ar & boost::serialization::base_object<s_shape>(*this);
 
 			ar & pt0 & pt1;
 			ar & text;
@@ -431,7 +489,7 @@ namespace gtl::shape {
 		}
 	};
 
-	struct s_mtext : public s_text {
+	struct GTL_SHAPE_CLASS s_mtext : public s_text {
 		enum class eATTACH {
 			topLeft = 1,
 			topCenter,
@@ -453,20 +511,23 @@ namespace gtl::shape {
 		//virtual void FlipY() override {}
 		//virtual void Transform(CCoordTrans3d const&, bool bRightHanded) override { return true; };
 		//virtual bool GetBoundingRect(CRect2d& rectBoundary) const override { return true; };
+		virtual void Draw(ICanvas& canvas) const override {
+			// todo : draw mtext
+		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_mtext);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_text&)*this;
+			ar & boost::serialization::base_object<s_text>(*this);
 
 			ar & (int&)eAttch;
 			ar & interlin;
 		}
 	};
 
-	struct s_hatch : public s_shape {
-		std::u8string name;
+	struct GTL_SHAPE_CLASS s_hatch : public s_shape {
+		string_t name;
 		bool bSolid{};
 		int associative{};
 		int hstyle{};
@@ -492,13 +553,14 @@ namespace gtl::shape {
 			return b;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
+			// todo : draw hatch
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_hatch);
 		friend class boost::serialization::access;
 		template < typename archive >
 		void serialize(archive& ar, unsigned int const file_version) {
-			ar & (s_shape&)*this;
+			ar & boost::serialization::base_object<s_shape>(*this);
 
 			ar & name;
 			ar & bSolid;
@@ -513,187 +575,53 @@ namespace gtl::shape {
 	};
 
 
-	void s_polyline::Draw(ICanvas& canvas) const {
-		for (int iPt = 0; iPt < pts.size(); iPt++) {
-			polypoint_t pt0{pts[iPt]};
-			polypoint_t pt1;
-			bool bLast = false;
-			if (bLoop) {
-				if (iPt == pts.size()-1) {
-					pt1 = pts[0];
-					bLast = true;
-				} else {
-					pt1 = pts[iPt+1];
-				}
-			} else {
-				if (iPt == pts.size()-1)
-					break;
-				bLast = iPt == pts.size()-2;
-				pt1 = pts[iPt+1];
-			}
+	struct GTL_SHAPE_CLASS s_drawing : public s_shape {
 
-			double dBulge = pt0.Bulge();
+		boost::ptr_deque<s_layer> layers;
 
-			if (dBulge == 0.0) {
-				canvas.LineTo(pt1);
-			} else {
-				canvas.LineTo(pt0);
-				s_arcXY arc = s_arcXY::GetFromBulge(dBulge, pt0, pt1);
+		s_drawing() {
+			layers.push_back(std::make_unique<s_layer>(L"0"));
+		}
 
-				arc.Draw(canvas);
-
-				canvas.LineTo(pt1);
+		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
+		virtual void FlipX() override { for (auto& layer : layers) layer.FlipX(); }
+		virtual void FlipY() override { for (auto& layer : layers) layer.FlipY(); }
+		virtual void FlipZ() override { for (auto& layer : layers) layer.FlipZ(); }
+		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+			for (auto& layer : layers)
+				layer.Transform(ct, bRightHanded);
+		}
+		virtual bool GetBoundingRect(CRect2d& rect) const override {
+			bool r{};
+			for (auto& layer : layers)
+				r |= layer.GetBoundingRect(rect);
+			return r;
+		}
+		virtual void Draw(ICanvas& canvas) const override {
+			for (auto& layer : layers) {
+				canvas.PreDraw(layer);
+				layer.Draw(canvas);
+				canvas.PostDraw(layer);
 			}
 		}
-	}
 
-#if 0
-	/// @brief Shape class
-	class CShape : public s_shape {
-	public:
-		eSHAPE const eShape_;
+		GTL__DYNAMIC_VIRTUAL_DERIVED(s_drawing);
+		friend class boost::serialization::access;
+		template < typename archive >
+		void serialize(archive& ar, unsigned int const file_version) {
+			ar & boost::serialization::base_object<s_shape>(*this);
 
-		// Constructor
-	protected:
-		CShape(eSHAPE eShape, color_t cr = CR_DEFAULT) : eShape_(eShape), s_shape{cr} {
-		}
-	public:
-		CShape(const CShape& B) = delete;
-		virtual ~CShape(void) {
+			ar & layers;
 		}
 
 	public:
-		GTL__DYNAMIC_VIRTUAL_INTERFACE;
-		GTL_DYN__BASE(eSHAPE);
+		virtual bool FromJson(boost::json::value& _j, string_t& layer) override {
+			//s_shape::FromJson(_j, layer);
 
-	public:
-		// default assign operator
-		CShape& operator = (const CShape& B) { return CopyFrom(B); }
-		virtual CShape& CopyFrom(const CShape& B) {
-			if (this == &B)
-				return *this;
-			if (eShape_ != B.eShape_)
-				throw std::invalid_argument(fmt::format("Cannot copy from {} to {}", B.eShape_, eShape_));
-
-			return *this;
-		}
-		virtual CShape& CopyAttrFrom(const CShape& B) {
-			if (this == &B)
-				return *this;
-			m_cr = B.m_cr;
-			m_eHatching = B.m_eHatching;
-			m_dHatching = B.m_dHatching;
-			return *this;
+			return true;
 		}
 
-		virtual CArchive& Serialize(CArchive& ar) {
-			if (ar.IsStoring()) {
-				ar << m_cr;
-				ar << m_eHatching;
-				ar << m_dHatching;
-				//ar << m_strCookie;
-			} else {
-				ar >> m_cr;
-				ar >> m_eHatching;
-				ar >> m_dHatching;
-				//ar >> m_strCookie;
-			}
-			return ar;
-		}
-
-	public:
-		BOOL operator == (const CShape& B) const { return Compare(B); }
-
-		// Attributes
-		static LPCTSTR GetShapeName(eSHAPE eShape);
-		virtual LPCTSTR GetShapeName() const;
-		eSHAPE GetShape() const { return m_eShape; }
-		COLORREF GetColor() const { return m_cr; }
-		virtual COLORREF SetColor(COLORREF cr);
-
-		virtual DWORD GetHatching() const { return m_eHatching; }
-		virtual double GetHatchingDensity() const { return m_dHatching; }
-		virtual void SetHatching(DWORD eHatching = SH_NONE, double dHatching = 0.0) { m_eHatching = eHatching; m_dHatching = dHatching; }
-
-		virtual CString Print() const = NULL;
-
-	public:
-		// Operations
-		virtual CPoint2d GetCenterPoint() const { TRectD rect; GetBoundingRect(rect); return rect.CenterPoint(); };
-	private:
-		void GetPointsConst(TList<TLineD>& lines) const { GetPoints(lines); }	// Helper
-	public:
-		virtual void GetPoints(TList<TLineD>& lines) const = NULL;						// Bounding Rect계산용. Add Points incrementally. DO NOT RESET pts (DO NOT CALL pts.DeleteAll())
-		virtual void GetPoints(TList<TLineD>& lines) { GetPointsConst(lines) ; }			// Bounding Rect계산용. Add Points incrementally. DO NOT RESET pts (DO NOT CALL pts.DeleteAll())
-		virtual BOOL SetFromPoints(const TLineD& line) { return FALSE; }
-		virtual void GetBoundingRect(TRectD& rect, BOOL bResetRect = TRUE) const;
-		virtual BOOL GetStartEndPoint(CPoint2d& pt0, CPoint2d& pt1) const = NULL;
-		virtual BOOL Compare(const CShape& B) const;
-
-		virtual BOOL AddLaserOffset(double dThickness) = NULL;
-
-		// Transform Operations
-		virtual void Revert() = NULL;														// 가공 순서 Reverse
-		virtual void AddOffset(const CPoint2d& ptOffset) = NULL;								// Object Center 이동.
-		virtual void FlipX(const CPoint2d& ptCenter) = NULL;									// Object Center 중심으로 Y축 반전. (X값 변경)
-		virtual void FlipY(const CPoint2d& ptCenter) = NULL;									// Object Center 중심으로 X축 반전. (Y값 변경)
-		virtual void Rotate(rad_t dTheta, const CPoint2d& ptCenter) = NULL;					// Object Center 중심으로 회전
-		virtual void Resize(double dScale, const CPoint2d& ptCenter) = NULL;					// Object Center 중심으로 크기 변환
-		virtual void Resize(double dScaleX, double dScaleY, const CPoint2d& ptCenter) = NULL;// Object Center 중심으로 크기 변환
-		virtual BOOL Deflate(double dSizeX, double dSizeY) = NULL;							// 줄어드는 양. (원 Size가 10일경우, 2을 넣으면 8가 됨. 양쪽으로 2 씩 줄일 경우, *2 해서, 4를 넣어야 함)
-		virtual BOOL ClipByRect(const CRect2d& rect, TRefList<CShape>& objects) = NULL;	// by 이범호
-		enum eSORT_DIRECTION {
-			SD_AS_IS, SD_ANY,
-			SD_RIGHT, SD_LEFT, SD_UP, SD_DOWN,
-			SD_RIGHT_UP, SD_RIGHT_DOWN, SD_LEFT_UP, SD_LEFT_DOWN,
-			SD_UP_RIGHT, SD_UP_LEFT, SD_DOWN_RIGHT, SD_DOWN_LEFT,
-			SD_CCW, SD_CW,
-			nSD
-		};
-		virtual void ChangeDirection(eSORT_DIRECTION eDirection, const CPoint2d& ptCenter = CPoint2d()) = NULL;
-		static LPCTSTR GetDirectionName(eSORT_DIRECTION eDirection);
-
-	public:
-		// Drawing
-		virtual BOOL Draw(ISCanvas& canvas) const = NULL;
-
-	public:
-		// Hepler
-		static BOOL GetBoundingRect(TRectD& rect, const CPoint2d& pt, BOOL bResetRect = TRUE);
-		static BOOL GetBoundingRect(TRectD& rect, const TLineD& pts, BOOL bResetRect = TRUE);
-		static BOOL GetBoundingRect(TRectD& rect, const TList<TLineD>& lines, BOOL bResetRect = TRUE);
-		static BOOL GetBoundingRect(TRectD& rect, const TRectD& rectObject, BOOL bResetRect = TRUE);
-
-		static BOOL MergeLines(TRefList<CShape>& objects, double dMaxSizeX = 0.0, double dMaxSizeY = 0.0);	// 시작/끝점이 겹치는 line object 를 하나로 합침
 	};
 
-	typedef CShape* PShapeObject;
-
-	//-----------------------------------------------------------------------------
-
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_PXPY(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_PXNY(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_NXPY(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_NXNY(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_PYPX(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_PYNX(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_NYPX(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_NYNX(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-
-	AFX_EXT_API_SHAPE int CompareObjectX(const CShape& ob1, const CShape& ob2);
-	AFX_EXT_API_SHAPE int CompareObjectY(const CShape& ob1, const CShape& ob2);
-	AFX_EXT_API_SHAPE int CompareObjectXD(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectYD(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareArcX(const CShape& arc1, const CShape& arc2);
-	AFX_EXT_API_SHAPE int CompareArcY(const CShape& arc1, const CShape& arc2);
-	AFX_EXT_API_SHAPE int CompareLineX(const CShape& line1, const CShape& line2);
-	AFX_EXT_API_SHAPE int CompareLineY(const CShape& line1, const CShape& line2);
-	AFX_EXT_API_SHAPE int CompareLineXD(const CShape& line1, const CShape& line2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareLineYD(const CShape& line1, const CShape& line2, void* pdToleranceLineDistance);
-
-	//-----------------------------------------------------------------------------
-	BOOL AFX_EXT_API_SHAPE AddLaserOffsetToLine(const TLineD& pts, TLineD& ptsResult, double dThickness, BOOL bLoop);
-
-#endif
 
 }

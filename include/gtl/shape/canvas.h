@@ -46,14 +46,15 @@ namespace gtl::shape {
 	class ICanvas {
 	protected:
 		std::unique_ptr<ICoordTrans> rCT_, rCTI_;
-
 		point_t ptLast_{};
+
+	public:
+
 		/// @brief for laser on/off
 		double min_jump_length_ = 0.0;
 
 		/// @brief target resolution
 		double target_interpolation_inverval_{1.0};
-
 
 	public:
 		ICanvas() = default;
@@ -138,8 +139,7 @@ namespace gtl::shape {
 				LineTo(ct(point_t{radius1*c, radius2*s}));
 			}
 		}
-		virtual void Spline(std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
-		}
+		virtual void Spline(int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
 
 	//public:
 	//	virtual rad_t CalcArcInterval(double radius, double target_resolution) {
@@ -205,7 +205,7 @@ namespace gtl::shape {
 		// Primative, returns End Position.
 		virtual void MoveTo_Target(point_t const& pt) override {}
 		virtual void LineTo_Target(point_t const& pt) override {
-			cv::line(img_, ptLast_, pt, color_, line_thickness_, line_type_);
+			cv::line(img_, ptLast_, pt, color_, (int)line_thickness_, line_type_);
 		}
 
 		//inline auto ColorS() { return ColorS(cr_); }

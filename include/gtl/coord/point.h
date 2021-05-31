@@ -285,10 +285,10 @@ namespace gtl {
 		}
 
 		// Archiving
-		friend class boost::serialization::access;
-		template < typename tBoostArchive >
-		void serialize(tBoostArchive &ar, unsigned int const version) {
-			ar & *this;
+		//friend class boost::serialization::access;
+		template < typename Archive >
+		friend void serialize(Archive &ar, TPointT& pt, unsigned int const version) {
+			ar & pt;
 		}
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
 			for (auto& v : B.arr())
