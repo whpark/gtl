@@ -74,6 +74,10 @@ namespace gtl {
 		constexpr TPointT(T2 x, T2 y, T2 z) requires (dim == 3) : base_t{RoundOrForward<T,T2>(x), RoundOrForward<T,T2>(y), RoundOrForward<T,T2>(z)} { }
 		template < typename T2 >
 		constexpr TPointT(T2 x, T2 y, T2 z, T w)  requires (dim == 4) : base_t{RoundOrForward<T,T2>(x), RoundOrForward<T,T2>(y), RoundOrForward<T,T2>(z), RoundOrForward<T,T2>(w) } { }
+		// from vector
+		explicit TPointT(std::vector<T> const& B) {
+			*this = B;
+		}
 		TPointT& operator = (TPointT const&) = default;
 		TPointT& operator = (TPointT &&) = default;
 
@@ -105,6 +109,15 @@ namespace gtl {
 				static_assert(false);
 			return *this;
 		};
+
+		// from vector
+		TPointT& operator = (std::vector<T> const& B) {
+			size_t n = std::min(size(), B.size());
+			for (size_t i = 0; i < n; i++) {
+				member(i) = B[i];
+			}
+			return *this;
+		}
 
 
 		constexpr static inline this_t All(T v) {

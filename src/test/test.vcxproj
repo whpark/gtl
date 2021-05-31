@@ -72,6 +72,9 @@
     <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\shape\shape.vcxproj">
+      <Project>{fba95adb-13a2-4139-ba8e-789bfe9aa1ae}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

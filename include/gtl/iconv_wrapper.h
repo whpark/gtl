@@ -17,6 +17,7 @@
 #ifndef GTL_HEADER__ICONV_WRAPPER
 #define GTL_HEADER__ICONV_WRAPPER
 
+#include <optional>
 #include <string>
 
 #pragma warning(push)
@@ -24,6 +25,7 @@
 #include "iconv.h"
 #pragma warning(pop)
 
+#include "gtl/_config.h"
 #include "gtl/concepts.h"
 
 /*******************************************

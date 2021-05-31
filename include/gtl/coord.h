@@ -14,8 +14,7 @@
 #include "gtl/misc.h"
 #include "gtl/concepts.h"
 
-#include "boost/archive/polymorphic_xml_iarchive.hpp"
-#include "boost/archive/polymorphic_xml_oarchive.hpp"
+#include "boost/serialization/serialization.hpp"
 
 #include "gtl/coord/size.h"
 #include "gtl/coord/point.h"
