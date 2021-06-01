@@ -67,6 +67,18 @@ namespace gtl {
 		TSizeT& operator = (TSizeT const&) = default;
 		TSizeT& operator = (TSizeT &&) = default;
 
+		// from vector
+		explicit TSizeT(std::vector<T> const& B) {
+			*this = B;
+		}
+		TSizeT& operator = (std::vector<T> const& B) {
+			size_t n = std::min(size(), B.size());
+			for (size_t i = 0; i < n; i++) {
+				member((int)i) = B[i];
+			}
+			return *this;
+		}
+
 		// Copy Constructors and Copy Assign operators
 		template < gtlc::generic_coord T_COORD > explicit TSizeT(T_COORD const& B) { *this = B; };
 		template < gtlc::generic_coord T_COORD > TSizeT& operator = (T_COORD const& B) {
