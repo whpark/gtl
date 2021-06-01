@@ -148,7 +148,6 @@ export namespace gtl {
 		operator int64_t() const { return j_.as_int64(); }
 		operator double() const { return j_.is_double() ? j_.as_double() : (j_.is_int64() ? (double)j_.as_int64() : 0.0); }
 
-
 		template < typename T >
 		T value_or(T const& default_value) {
 			if constexpr (std::is_same_v<T, bool>) {
