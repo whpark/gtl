@@ -146,7 +146,24 @@ export namespace gtl {
 		operator bool() const { return j_.as_bool(); }
 		operator int() const { return (int)j_.as_int64(); }
 		operator int64_t() const { return j_.as_int64(); }
-		operator double() const { return j_.as_double(); }
+		operator double() const { return j_.is_double() ? j_.as_double() : (j_.is_int64() ? (double)j_.as_int64() : 0.0); }
+
+
+		template < typename T >
+		T value_or(T const& default_value) {
+			if constexpr (std::is_same_v<T, bool>) {
+				return j_.is_bool() ? j_.as_bool() : default_value;
+			}
+			else if constexpr (std::is_integral_v<T>) {
+				return j_.is_int64() ? j_.as_int64() : default_value;
+			}
+			else if constexpr (std::is_floating_point_v<T>) {
+				return j_.is_double() ? j_.as_double() : j_.is_int64() ? (double)j_.as_int64() : default_value;
+			}
+			else {
+				static_assert(false);
+			}
+		}
 
 		template < gtlc::string_elem tchar_t >
 		operator std::basic_string<tchar_t> () const {
