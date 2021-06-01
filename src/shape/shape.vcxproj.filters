@@ -29,9 +29,6 @@
     <ClInclude Include="..\..\include\gtl\shape\canvas.h">
       <Filter>shape</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\shape\shape_default.h">
-      <Filter>shape</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\_lib_gtl_shape.h">
       <Filter>shape</Filter>
     </ClInclude>
@@ -43,6 +40,15 @@
     </ClInclude>
     <ClInclude Include="..\..\3rdparty\tinyspline\tinysplinecxx.h">
       <Filter>tinyspline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shape_others.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\color_table.h">
+      <Filter>shape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

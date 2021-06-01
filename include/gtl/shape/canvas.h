@@ -12,7 +12,7 @@
 
 //#include <afxwin.h>
 
-#include "shape_default.h"
+#include "shape_primitives.h"
 
 namespace gtl::shape {
 #pragma pack(push, 8)

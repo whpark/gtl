@@ -183,8 +183,10 @@
     <ClInclude Include="..\..\3rdparty\tinyspline\tinyspline.h" />
     <ClInclude Include="..\..\3rdparty\tinyspline\tinysplinecxx.h" />
     <ClInclude Include="..\..\include\gtl\shape\canvas.h" />
+    <ClInclude Include="..\..\include\gtl\shape\color_table.h" />
     <ClInclude Include="..\..\include\gtl\shape\shape.h" />
-    <ClInclude Include="..\..\include\gtl\shape\shape_default.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shape_others.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h" />
     <ClInclude Include="..\..\include\gtl\shape\_lib_gtl_shape.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />

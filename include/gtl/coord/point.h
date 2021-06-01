@@ -376,6 +376,7 @@ namespace gtl {
 		}
 	};
 
+	template < typename T > using TPoint4 = TPointT<T, 4>;
 	template < typename T > using TPoint3 = TPointT<T, 3>;
 	template < typename T > using TPoint2 = TPointT<T, 2>;
 

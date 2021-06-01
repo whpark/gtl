@@ -41,12 +41,14 @@ namespace gtl {
 
 	using CSize3d	= TSize3<double>;
 	using CSize2d	= TSize2<double>;
+	using CPoint4d	= TPoint4<double>;
 	using CPoint3d	= TPoint3<double>;
 	using CPoint2d	= TPoint2<double>;
 	using CRect3d	= TRect3<double>;
 	using CRect2d	= TRect2<double>;
 	using CSize3i	= TSize3<int>;
 	using CSize2i	= TSize2<int>;
+	using CPoint4i	= TPoint4<int>;
 	using CPoint3i	= TPoint3<int>;
 	using CPoint2i	= TPoint2<int>;
 	using CRect3i	= TRect3<int>;

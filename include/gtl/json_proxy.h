@@ -102,15 +102,18 @@ namespace gtl {
 		bjson& operator = (std::u32string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 
 
+		template < size_t n >
+		bjson operator [] (char const (&sz)[n]) { return operator [](std::string_view{sz}); }
+		template < size_t n >
+		bjson operator [] (char8_t const (&sz)[n]) { return operator [](std::u8string_view{sz}); }
 		bjson operator [] (std::string_view svKey) {
 			boost::json::object* pObject = j_.is_null() ? &j_.emplace_object() : &j_.as_object();
 			// todo :.... speed up for svKey...
-			return (*pObject)[std::string(svKey)];
+			return (*pObject)[boost::json::string_view{svKey.data(), svKey.size()}];
 		}
 		bjson operator [] (std::u8string_view svKey) {
 			boost::json::object* pObject = j_.is_null() ? &j_.emplace_object() : &j_.as_object();
-			std::u8string strKey(svKey);
-			return (*pObject)[reinterpret_cast<std::string&>(strKey)];
+			return (*pObject)[boost::json::string_view{(char const*)svKey.data(), svKey.size()}];
 		}
 		bjson operator [] (std::size_t index) {
 			boost::json::array* pArray = j_.is_null() ? &j_.emplace_array() : &j_.as_array();
@@ -120,6 +123,10 @@ namespace gtl {
 			return (*pArray)[index];
 		}
 
+		template < size_t n >
+		bjson operator [] (char const (&sz)[n]) const { return operator [](std::string_view{sz}); }
+		template < size_t n >
+		bjson operator [] (char8_t const (&sz)[n]) const { return operator [](std::u8string_view{sz}); }
 		bjson operator [] (std::string_view svKey) const {
 			if (j_.is_null())
 				throw std::invalid_argument{"empty"};
@@ -146,10 +153,28 @@ namespace gtl {
 		operator bool() const { return j_.as_bool(); }
 		operator int() const { return (int)j_.as_int64(); }
 		operator int64_t() const { return j_.as_int64(); }
-		operator double() const { return j_.as_double(); }
+		operator double() const { return j_.is_double() ? j_.as_double() : (j_.is_int64() ? (double)j_.as_int64() : 0.0); }
+
+		template < typename T >
+		T value_or(T const& default_value) {
+			if constexpr (std::is_same_v<T, bool>) {
+				return j_.is_bool() ? j_.as_bool() : default_value;
+			}
+			else if constexpr (std::is_integral_v<T>) {
+				return j_.is_int64() ? j_.as_int64() : default_value;
+			}
+			else if constexpr (std::is_floating_point_v<T>) {
+				return j_.is_double() ? j_.as_double() : j_.is_int64() ? (double)j_.as_int64() : default_value;
+			}
+			else {
+				static_assert(false);
+			}
+		}
 
 		template < gtlc::string_elem tchar_t >
 		operator std::basic_string<tchar_t> () const {
+			if (!j_.is_string())
+				return {};
 			auto& jstrU8 = j_.as_string();
 			if constexpr (std::is_same_v<tchar_t, char8_t>) {
 				return std::u8string((char8_t const*)jstrU8.data(), jstrU8.size());
@@ -277,6 +302,10 @@ namespace gtl {
 		njson& operator = (std::u32string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 
 
+		template < size_t n >
+		njson operator [] (char const (&sz)[n]) { return operator [](std::string_view{sz}); }
+		template < size_t n >
+		njson operator [] (char8_t const (&sz)[n]) { return operator [](std::u8string_view{sz}); }
 		njson operator [] (std::string_view svKey) {
 			return j_[reinterpret_cast<std::string&>(gtl::ToString<char8_t>(svKey))];
 		}
@@ -287,14 +316,18 @@ namespace gtl {
 		njson operator [] (std::size_t index) {
 			return j_[index];
 		}
-		njson const operator [] (std::size_t index) const {
-			return j_[index];
-		}
+		template < size_t n >
+		njson operator [] (char const (&sz)[n]) const { return operator [](std::string_view{sz}); }
+		template < size_t n >
+		njson operator [] (char8_t const (&sz)[n]) const { return operator [](std::u8string_view{sz}); }
 		njson const operator [] (std::string_view svKey) const {
 			return j_[reinterpret_cast<std::string&>(gtl::ToString<char8_t>(svKey))];
 		}
 		njson const operator [] (std::u8string_view svKey) const {
 			return j_[std::string((char const*)svKey.data(), svKey.size())];
+		}
+		njson const operator [] (std::size_t index) const {
+			return j_[index];
 		}
 
 		operator bool() const { return (bool)j_; }
