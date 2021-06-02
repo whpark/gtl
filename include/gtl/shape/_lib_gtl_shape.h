@@ -25,7 +25,7 @@
 #		define GTL_SHAPE_CLASS		GTL_IMPORT
 #		define GTL_SHAPE_API		GTL_IMPORT
 #		define GTL_SHAPE_DATA		GTL_IMPORT
-		GTL_IMPORT_LIB(gtl)
+		GTL_IMPORT_LIB(shape)
 #	endif
 #else	// _GTL_SHAPE_AS_DLL
 #	define GTL_SHAPE_CLASS
