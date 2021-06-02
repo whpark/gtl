@@ -615,7 +615,6 @@ TEST(gtl_string, tszupr_lwr) {
 	EXPECT_TRUE(ERANGE == tszupr(ptr, -1));
 }
 
-
 TEST(gtl_string, tszto) {
 
 	auto ExpectEQ = []<typename T1, typename T2 = T1>(T1 && a, T2 && b) {

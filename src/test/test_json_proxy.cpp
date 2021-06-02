@@ -52,6 +52,7 @@ namespace gtl {
 		double a{}, b{}, c{};
 		std::string str {"str"};
 		std::u8string strU8 { u8"strU8" };
+		std::wstring strW { L"strW" };
 		CTestStruct test;
 
 
@@ -71,6 +72,7 @@ namespace gtl {
 			gtl::internal::pair { "c"sv, &this_t::c},
 			gtl::internal::pair { "str"sv, &this_t::str},
 			gtl::internal::pair { "strU8"sv, &this_t::strU8},
+			gtl::internal::pair { "strW"sv, &this_t::strW},
 			gtl::internal::pair { "test"sv, &this_t::test},
 		};
 

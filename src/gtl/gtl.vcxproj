@@ -102,11 +102,13 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>echo /*---- Copy *.lib to /lib ----*/
@@ -133,6 +135,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,6 +143,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>echo /*---- Copy *.lib to /lib ----*/
@@ -164,11 +168,13 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>echo /*---- Copy *.lib to /lib ----*/
@@ -195,6 +201,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -202,6 +209,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>echo /*---- Copy *.lib to /lib ----*/

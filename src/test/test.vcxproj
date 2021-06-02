@@ -51,10 +51,13 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="test_archive.cpp" />
     <ClCompile Include="test_boost_ptr_container.cpp" />
+    <ClCompile Include="test_coord.cpp" />
+    <ClCompile Include="test_coord_trans.cpp" />
     <ClCompile Include="test_dynamic.cpp" />
     <ClCompile Include="test_json_proxy.cpp" />
     <ClCompile Include="test_lock.cpp" />
     <ClCompile Include="test_reflection.cpp" />
+    <ClCompile Include="test_shape.cpp" />
     <ClCompile Include="test_string.cpp" />
     <ClCompile Include="test_string_codepage.cpp" />
     <ClCompile Include="test_string_primitives.cpp" />
@@ -68,6 +71,9 @@
   <ItemGroup>
     <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\shape\shape.vcxproj">
+      <Project>{fba95adb-13a2-4139-ba8e-789bfe9aa1ae}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemDefinitionGroup />
@@ -88,6 +94,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;C:\local\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -108,6 +115,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;C:\local\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -127,6 +135,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;C:\local\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -148,6 +157,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;C:\local\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

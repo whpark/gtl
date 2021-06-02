@@ -191,8 +191,10 @@ namespace gtl::concepts {
 	template < typename T_COORD > concept has__x = requires (T_COORD a) { a.x; };
 	template < typename T_COORD > concept has__y = requires (T_COORD a) { a.y; };
 	template < typename T_COORD > concept has__z = requires (T_COORD a) { a.z; };
+	template < typename T_COORD > concept has__w = requires (T_COORD a) { a.w; };
 	template < typename T_COORD > concept has__xy = requires (T_COORD a) { a.x; a.y; };
 	template < typename T_COORD > concept has__xyz = requires (T_COORD a) { a.x; a.y; a.z; };
+	template < typename T_COORD > concept has__xyzw = requires (T_COORD a) { a.x; a.y; a.z; a.w; };
 	template < typename T_COORD > concept has__cx = requires (T_COORD a) { a.cx; };
 	template < typename T_COORD > concept has__cy = requires (T_COORD a) { a.cy; };
 	template < typename T_COORD > concept has__cz = requires (T_COORD a) { a.cz; };

@@ -1,22 +1,82 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="framework">
+      <UniqueIdentifier>{775ca48d-92e4-4396-b675-414c606ab5ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shape">
+      <UniqueIdentifier>{c878a5b0-8cbf-4d50-bb72-c9ae65485173}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="tinyspline">
+      <UniqueIdentifier>{976f6fca-ba13-4986-a064-066182868640}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="shape.ixx">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="framework.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shape.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\canvas.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\_lib_gtl_shape.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\tinyspline\parson.h">
+      <Filter>tinyspline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\tinyspline\tinyspline.h">
+      <Filter>tinyspline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\tinyspline\tinysplinecxx.h">
+      <Filter>tinyspline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shape_others.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\color_table.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>framework</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="shape.cpp">
+      <Filter>shape</Filter>
+    </ClCompile>
+    <ClCompile Include="canvas.cpp">
+      <Filter>shape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\tinyspline\tinysplinecxx.cxx">
+      <Filter>tinyspline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\tinyspline\parson.c">
+      <Filter>tinyspline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\tinyspline\tinyspline.c">
+      <Filter>tinyspline</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\3rdparty\tinyspline\LICENSE">
+      <Filter>tinyspline</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -138,7 +138,7 @@ namespace gtl {
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 	constexpr [[nodiscard]] T_DEST Round(T_SOURCE v) {
 		//return T_DEST(std::round(v));
-		return T_DEST(v+0.5*(v<0?-1:1));
+		return T_DEST(v+0.5*(v<T_SOURCE{}?-1:1));
 	}
 
 	/// @brief Rounding to nearest integer.
@@ -150,7 +150,7 @@ namespace gtl {
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 	constexpr [[nodiscard]] T_DEST Round(T_SOURCE v, T_SOURCE place) {
 		//return T_DEST(T_DEST(std::round(v/place/10))*place*10);
-		return T_DEST(T_DEST(v/place/10+0.5*(v<0?-1:1))*place*10);
+		return T_DEST(T_DEST(v/place/10+0.5*(v<T_SOURCE{}?-1:1))*place*10);
 	}
 
 	/// @brief Round or just forward values. (실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.)
@@ -313,6 +313,30 @@ namespace gtl {
 	union color_rgba_t {
 		struct { uint8_t r, g, b, a; };
 		uint32_t cr{};
+
+		using this_t = color_rgba_t;
+
+		this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
+		bool operator == (this_t const& B) const { return cr == B.cr; }
+		auto operator <=> (this_t const& B) const { return cr <=> B.cr; }
+		template < typename tjson >
+		friend void from_json(tjson const& j, this_t& color) {
+			color.cr = (uint32_t)(int64_t)j;
+		}
+		template < typename tjson >
+		friend void to_json(tjson& j, this_t const& color) {
+			j = (int64_t)color.cr;
+		}
+
+		template < typename archive >
+		friend void serialize(archive& ar, this_t& cr, unsigned int const file_version) {
+			ar & cr.cr;
+		}
+		template < typename archive >
+		friend archive& operator & (archive& ar, this_t& cr) {
+			ar & cr.cr;
+			return ar;
+		}
 	};
 	constexpr static inline color_rgba_t RGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a = {}) {
 		return color_rgba_t{.r = r, .g = g, .b = b, .a = a};
@@ -322,6 +346,30 @@ namespace gtl {
 	union color_bgra_t {
 		struct { uint8_t b, g, r, a; };
 		uint32_t cr{};
+
+		using this_t = color_bgra_t;
+
+		this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
+		bool operator == (this_t const& B) const { return cr == B.cr; }
+		auto operator <=> (this_t const& B) const { return cr <=> B.cr; }
+		template < typename tjson >
+		friend void from_json(tjson const& j, this_t& color) {
+			color.cr = (uint32_t)(int64_t)j;
+		}
+		template < typename tjson >
+		friend void to_json(tjson& j, this_t const& color) {
+			j = (int64_t)color.cr;
+		}
+
+		template < typename archive >
+		friend void serialize(archive& ar, this_t& cr, unsigned int const file_version) {
+			ar & cr.cr;
+		}
+		template < typename archive >
+		friend archive& operator & (archive& ar, this_t& cr) {
+			ar & cr.cr;
+			return ar;
+		}
 	};
 	constexpr static inline color_bgra_t BGRA(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
 		return color_bgra_t{ .b = b, .g = g, .r = r, .a = a };
@@ -331,6 +379,30 @@ namespace gtl {
 	union color_abgr_t {
 		struct { uint8_t a, b, g, r; };
 		uint32_t cr{};
+
+		using this_t = color_abgr_t;
+
+		this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
+		bool operator == (this_t const& B) const { return cr == B.cr; }
+		auto operator <=> (this_t const& B) const { return cr <=> B.cr; }
+		template < typename tjson >
+		friend void from_json(tjson const& j, this_t& color) {
+			color.cr = (uint32_t)(int64_t)j;
+		}
+		template < typename tjson >
+		friend void to_json(tjson& j, this_t const& color) {
+			j = (int64_t)color.cr;
+		}
+
+		template < typename archive >
+		friend void serialize(archive& ar, this_t& cr, unsigned int const file_version) {
+			ar & cr.cr;
+		}
+		template < typename archive >
+		friend archive& operator & (archive& ar, this_t& cr) {
+			ar & cr.cr;
+			return ar;
+		}
 	};
 	constexpr static inline color_abgr_t ABGR(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
 		return color_abgr_t{ .a = a, .b = b, .g = g, .r = r };

@@ -1,9 +1,10 @@
-//
-// pch.h
-// Header for standard system include files.
-//
-
 #pragma once
+
+#include <cstdint>
+#include <array>
+#include <vector>
+#include <deque>
+#include <optional>
 
 #define NOMINMAX
 #pragma warning(push)
@@ -11,8 +12,12 @@
 #include <windows.h>
 #pragma warning(pop)
 
-#include "gtest/gtest.h"
-#include "benchmark/benchmark.h"
+#include "gtl/_config.h"
+#include "gtl/concepts.h"
+#include "gtl/unit.h"
+#include "gtl/coord.h"
+#include "gtl/dynamic.h"
+#include "gtl/json_proxy.h"
 
 #include "boost/json.hpp"
 #include "boost/variant.hpp"

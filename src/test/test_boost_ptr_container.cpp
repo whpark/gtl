@@ -7,6 +7,8 @@
 #include "gtl/reflection.h"
 #include "boost/ptr_container/ptr_deque.hpp"
 #include "boost/ptr_container/ptr_vector.hpp"
+#include "boost/archive/text_iarchive.hpp"
+#include "boost/archive/text_oarchive.hpp"
 
 #pragma warning(disable:4566)	// character encoding
 
@@ -16,19 +18,28 @@ using namespace gtl::literals;
 namespace gtl::test::boost_ptr_container {
 
 	struct ITT {
-		GTL__VIRTUAL_DYNAMIC_INTERFACE(ITT);
+		GTL__DYNAMIC_VIRTUAL_INTERFACE(ITT);
+
+		template < typename archive >
+		friend void serialization(archive& ar, unsigned int const file_version) {
+		}
 
 		auto operator <=> (ITT const&) const = default;
 
 	};
-
 	struct ttt : public ITT {
 		int i, j, k;
 
 		auto operator <=> (ttt const&) const = default;
 		ttt(int i={}, int j={}, int k={}) : i(i), j(j), k(k) {}
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(ttt);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(ttt);
+
+		template < typename archive >
+		friend void serialization(archive& ar, ttt& object, unsigned int const file_version) {
+			ar & (ITT&)object;
+			ar & object.i & object.j & object.k;
+		}
 
 	};
 
@@ -42,7 +53,7 @@ namespace gtl::test::boost_ptr_container {
 
 		auto operator <=> (tt2 const&) const = default;
 
-		GTL__VIRTUAL_DYNAMIC_DERIVED(tt2);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(tt2);
 
 	};
 
@@ -53,13 +64,14 @@ namespace gtl::test::boost_ptr_container {
 		lst.push_back(std::make_unique<ttt>(0, 31, 33));
 		lst.push_back(std::make_unique<tt2>(ttt{1, 2, 3}, 1.0, 2.0));
 		lst.push_back(std::make_unique<tt2>(ttt{4, 5, 6}, 1.0, 2.0));
+		//auto* ptr = new_clone(lst.back());
 		{
-			boost::ptr_deque<ttt> lst2 = lst;
-			auto& a0 = lst2[0];
-			auto& a1 = lst2[1];
-			auto& a2 = lst2[2];
-			auto& a3 = lst2[3];
-			auto& a4 = lst2[4];
+			boost::ptr_deque<ttt> lst_2 = lst;
+			auto& a0 = lst_2[0];
+			auto& a1 = lst_2[1];
+			auto& a2 = lst_2[2];
+			auto& a3 = lst_2[3];
+			auto& a4 = lst_2[4];
 
 			int k = a0.i;
 		}
