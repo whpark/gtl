@@ -31,24 +31,32 @@ namespace gtl {
 	}
 
 
-#define GTL__VIRTUAL_DYNAMIC_INTERFACE(className)\
+#define GTL__DYNAMIC_VIRTUAL_INTERFACE(className)\
 	using mw_base_t = className;\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const = 0;\
 	virtual std::unique_ptr<mw_base_t> NewClone()  const = 0;\
-	friend mw_base_t* new_clone(mw_base_t const& r) { return r.NewClone().release(); }
+	friend mw_base_t* new_clone(mw_this_t const& r) { return r.NewClone().release(); }
 
-#define GTL__VIRTUAL_DYNAMIC_BASE(className)\
+#define GTL__DYNAMIC_VIRTUAL_BASE(className)\
 	using mw_base_t = className;\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const { return std::make_unique<mw_this_t>(); }\
-	virtual std::unique_ptr<mw_base_t> NewClone()  const { return std::make_unique<mw_this_t>(*this); }
+	virtual std::unique_ptr<mw_base_t> NewClone()  const { return std::make_unique<mw_this_t>(*this); }\
+	friend mw_this_t* new_clone(mw_this_t const& r) { return (mw_this_t*)r.NewClone().release(); }
 
-#define GTL__VIRTUAL_DYNAMIC_DERIVED(className)\
+#define GTL__DYNAMIC_VIRTUAL_DERIVED(className)\
 	using mw_this_t = className;\
 	virtual std::unique_ptr<mw_base_t> NewObject() const override { return std::make_unique<mw_this_t>(); }\
-	virtual std::unique_ptr<mw_base_t> NewClone()  const override { return std::make_unique<mw_this_t>(*this); }
+	virtual std::unique_ptr<mw_base_t> NewClone()  const override { return std::make_unique<mw_this_t>(*this); }\
+	friend mw_this_t* new_clone(mw_this_t const& r) { return (mw_this_t*)r.NewClone().release(); }
 
+
+#define GTL__DYNAMIC_VIRTUAL_SERIALIZE_INTERFACE(className, ...)\
+
+#define GTL__DYNAMIC_VIRTUAL_SERIALIZE_BASE(className, ...)\
+
+#define GTL__DYNAMIC_VIRTUAL_SERIALIZE_DERIVED(className, ...)\
 
 	//-----------------------------------------------------------------------------
 	// Dynamic Creation. (Create using IDENTIFIER_DN)
@@ -92,7 +100,7 @@ namespace gtl {
 		static inline map_t tableDynamicCreate_s;
 	};
 
-#define GTL_DYN__BASE(T_IDENTIFIER)\
+#define GTL__DYNAMIC_BASE(T_IDENTIFIER)\
 	static inline TDynamicCreateBase<this_t, T_IDENTIFIER> dynamicCreateBase_s;
 
 
@@ -110,11 +118,11 @@ namespace gtl {
 		static inline SDynamicCreateRegister dynamicCreateRegister_s;
 	};
 
-//#define GTL_DYN__CLASS(ID)\
+//#define GTL__DYNAMIC_CLASS(ID)\
 //	static inline TDynamicCreateHelper<this_t, ID, []() -> std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(); }> dynamicCreateDerived_s;
-#define GTL_DYN__CLASS(ID)\
+#define GTL__DYNAMIC_CLASS(ID)\
 	static inline TDynamicCreateHelper<this_t, ID, std::make_unique<this_t>> dynamicCreateDerived_s;
-#define GTL_DYN__CLASS_EMPLACE(ID, ...)\
+#define GTL__DYNAMIC_CLASS_EMPLACE(ID, ...)\
 	static inline TDynamicCreateHelper<this_t, ID, []()->std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(__VA_ARGS__); }> dynamicCreateDerived_s;
 
 

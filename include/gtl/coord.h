@@ -14,9 +14,12 @@
 #include "gtl/misc.h"
 #include "gtl/concepts.h"
 
+#include "boost/serialization/serialization.hpp"
+
 #include "gtl/coord/size.h"
 #include "gtl/coord/point.h"
 #include "gtl/coord/rect.h"
+#include "gtl/coord/coord_trans.h"
 
 //=============================================================================
 //
@@ -38,16 +41,28 @@ namespace gtl {
 
 	using CSize3d	= TSize3<double>;
 	using CSize2d	= TSize2<double>;
+	using CPoint4d	= TPoint4<double>;
 	using CPoint3d	= TPoint3<double>;
 	using CPoint2d	= TPoint2<double>;
 	using CRect3d	= TRect3<double>;
 	using CRect2d	= TRect2<double>;
 	using CSize3i	= TSize3<int>;
 	using CSize2i	= TSize2<int>;
+	using CPoint4i	= TPoint4<int>;
 	using CPoint3i	= TPoint3<int>;
 	using CPoint2i	= TPoint2<int>;
 	using CRect3i	= TRect3<int>;
 	using CRect2i	= TRect2<int>;
+
+
+	/// @brief Interpolation (lerp)
+	template < typename T, int dim >
+	TPointT<T, dim> lerp(TPointT<T, dim> const& a, TPointT<T, dim> const& b, double t) {
+		TPointT<T, dim> c;
+		for (int i = 0; i < dim; i++)
+			c.member(i) = std::lerp(a.member(i), b.member(i), t);
+		return c;
+	}
 
 
 	//-------------------------------------------------------------------------

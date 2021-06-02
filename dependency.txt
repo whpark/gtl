@@ -2,3 +2,4 @@ boost (1.76)
 nlohmann json
 fmt/format
 libiconv
+openCV

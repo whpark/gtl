@@ -16,14 +16,20 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "gtl/string.h"
+#pragma warning(push)
+#pragma warning(disable: 4819)
 #include "fmt/chrono.h"
+#pragma warning(pop)
 //#include "gtl/string_view.h"
 
 //#include "gtl/_pre_lib_util.h"
 
 #if (GTL_USE_WINDOWS_API)
 	#define NOMINMAX
+#pragma warning(push)
+#pragma warning(disable: 5104 5105)
 	#include <windows.h>
+#pragma warning(pop)
 #endif
 
 namespace gtl {
