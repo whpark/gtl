@@ -160,35 +160,35 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 	virtual std::unique_ptr<mw_base_t> NewClone()  const override { return std::make_unique<mw_this_t>(*this); }\
 	friend mw_this_t* new_clone(mw_this_t const& r) { return (mw_this_t*)r.NewClone().release(); }
 
-#define GTL_DYN__BASE(T_IDENTIFIER)\
+#define GTL__DYNAMIC_BASE(T_IDENTIFIER)\
 	static inline TDynamicCreateBase<this_t, T_IDENTIFIER> dynamicCreateBase_s;
 
-//#define GTL_DYN__CLASS(ID)\
+//#define GTL__DYNAMIC_CLASS(ID)\
 //	static inline TDynamicCreateHelper<this_t, ID, []() -> std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(); }> dynamicCreateDerived_s;
-#define GTL_DYN__CLASS(ID)\
+#define GTL__DYNAMIC_CLASS(ID)\
 	static inline TDynamicCreateHelper<this_t, ID, std::make_unique<this_t>> dynamicCreateDerived_s;
-#define GTL_DYN__CLASS_EMPLACE(ID, ...)\
+#define GTL__DYNAMIC_CLASS_EMPLACE(ID, ...)\
 	static inline TDynamicCreateHelper<this_t, ID, []()->std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(__VA_ARGS__); }> dynamicCreateDerived_s;
 
 
-	//================================================================================================================================
-	// reflection
-	//
-#define GTL_REFL__MEMBER_TABLE\
-		constexpr inline static const std::tuple member_tuple_s
+//================================================================================================================================
+// reflection
+//
+#define I_GTL__REFLECTION_MEMBER(var)\
+	gtl::internal::pair{ #var##sv, &this_t::var }
 
-	#define I_GTL_REFL__MEMBER(var)\
-			gtl::internal::pair{ #var##sv, &this_t::var }
+#define GTL__REFLECTION_MEMBERS(...) \
+	constexpr inline static const std::tuple member_tuple_s {\
+		using namespace std::literals;\
+		GTL__RECURSIVE_MACRO_COMMA(I_GTL__REFLECTION_MEMBER, __VA_ARGS__) \
+	};
 
-	#define GTL_REFL__MEMBERS(...)			GTL__RECURSIVE_MACRO_COMMA(I_GTL_REFL__MEMBER, __VA_ARGS__)
+//================================================================================================================================
+// reflection - MACRO version
+//
 
 
-	//================================================================================================================================
-	// reflection - MACRO version
-	//
-
-
-#define GTL_REFL__CLASS__BASE(THIS_CLASS)\
+#define GTL__REFLECTION_BASE(THIS_CLASS)\
 	using mw_base_t = THIS_CLASS;\
 	using this_t = THIS_CLASS;\
 	template < typename tjson >\
@@ -212,7 +212,7 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 	//auto operator <=> (this_t const&) const = default;
 
 
-#define GTL_REFL__CLASS__DERIVED(THIS_CLASS, PARENT_CLASS)\
+#define GTL__REFLECTION_DERIVED(THIS_CLASS, PARENT_CLASS)\
 	using this_t = THIS_CLASS;\
 	using parent_t = PARENT_CLASS;\
 	template < typename tjson >\
@@ -242,8 +242,8 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 
 	//-----------------------------------------------------------------------------
 	// Reflection (member wise...) : with virtual function
-#define GTL_REFL__CLASS__BASE_VIRTUAL(THIS_CLASS)\
-	GTL_REFL__CLASS__BASE(THIS_CLASS)\
+#define GTL__REFLECTION_VIRTUAL_BASE(THIS_CLASS)\
+	GTL__REFLECTION_BASE(THIS_CLASS)\
 	virtual void FromJson(bjson<> const& j) { from_json(j, *(this_t*)this); }\
 	virtual void ToJson(bjson<>& j) const { to_json(j, *(this_t*)this); }\
 	virtual void FromJson(njson<> const& j) { from_json(j, *(this_t*)this); }\
@@ -255,8 +255,8 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 	}\
 
 
-#define GTL_REFL__CLASS__VIRTUAL_DERIVED(THIS_CLASS, PARENT_CLASS)\
-	GTL_REFL__CLASS__DERIVED(THIS_CLASS, PARENT_CLASS)\
+#define GTL__REFLECTION_VIRTUAL_DERIVED(THIS_CLASS, PARENT_CLASS)\
+	GTL__REFLECTION_DERIVED(THIS_CLASS, PARENT_CLASS)\
 	void FromJson(bjson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }\
 	void ToJson(bjson<>& j) const override { to_json(j, *(THIS_CLASS*)this); }\
 	void FromJson(njson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }\

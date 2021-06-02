@@ -12,6 +12,8 @@ using namespace gtl::literals;
 
 
 TEST(gtl_string, codepage) {
+#pragma warning(push)
+#pragma warning(disable: 4566)
 
 	// unicode <=> mbcs
 	std::u16string str1 = gtl::ToStringU16("가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍", {.from = gtl::eCODEPAGE::KO_KR_949});
@@ -54,6 +56,8 @@ TEST(gtl_string, codepage) {
 	EXPECT_TRUE(gtl::ToStringU16( TEXT_W(TEST_STRING))  ==  TEXT_u(TEST_STRING));
 	EXPECT_TRUE(gtl::ToStringU32( TEXT_W(TEST_STRING))  ==  TEXT_U(TEST_STRING));
 	EXPECT_TRUE(gtl::ToStringW(   TEXT_W(TEST_STRING))  ==  TEXT_W(TEST_STRING));
+
+#pragma warning(pop)
 
 }
 
@@ -101,22 +105,20 @@ TEST(gtl_string_codepage_Test, iconv_wrapper) {
 	EXPECT_EQ(gtl::ToString_iconv<char32_t>(TEXT_u8(TEST_STRING) ""sv), TEXT_U(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<wchar_t> (TEXT_u8(TEST_STRING) ""sv), TEXT_W(TEST_STRING));
 
-	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_u(TEST_STRING) ""sv) == TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_u(TEST_STRING) ""sv)  ==  TEXT_u8(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<char16_t>(TEXT_u(TEST_STRING) ""sv), TEXT_u(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<char32_t>(TEXT_u(TEST_STRING) ""sv), TEXT_U(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<wchar_t> (TEXT_u(TEST_STRING) ""sv), TEXT_W(TEST_STRING));
 
-	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_U(TEST_STRING) ""sv) == TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_U(TEST_STRING) ""sv)  ==  TEXT_u8(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<char16_t>(TEXT_U(TEST_STRING) ""sv), TEXT_u(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<char32_t>(TEXT_U(TEST_STRING) ""sv), TEXT_U(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<wchar_t> (TEXT_U(TEST_STRING) ""sv), TEXT_W(TEST_STRING));
 
-	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_W(TEST_STRING) ""sv) == TEXT_u8(TEST_STRING));
+	EXPECT_TRUE(gtl::ToString_iconv<char8_t> (TEXT_W(TEST_STRING) ""sv)  ==  TEXT_u8(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<char16_t>(TEXT_W(TEST_STRING) ""sv), TEXT_u(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<char32_t>(TEXT_W(TEST_STRING) ""sv), TEXT_U(TEST_STRING));
 	EXPECT_EQ(gtl::ToString_iconv<wchar_t> (TEXT_W(TEST_STRING) ""sv), TEXT_W(TEST_STRING));
 
 
 }
-
-

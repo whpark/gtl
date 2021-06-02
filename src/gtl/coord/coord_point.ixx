@@ -84,6 +84,18 @@ export namespace gtl {
 		TPointT& operator = (TPointT const&) = default;
 		TPointT& operator = (TPointT &&) = default;
 
+		// from vector
+		explicit TPointT(std::vector<T> const& B) {
+			*this = B;
+		}
+		TPointT& operator = (std::vector<T> const& B) {
+			size_t n = std::min(size(), B.size());
+			for (size_t i = 0; i < n; i++) {
+				member((int)i) = B[i];
+			}
+			return *this;
+		}
+
 		// Copy Constructors and Assign Operators
 		template < gtlc::generic_coord T_COORD > explicit TPointT(T_COORD const& B) { *this = B; };
 		template < gtlc::generic_coord T_COORD > TPointT& operator = (T_COORD const& B) {
@@ -280,8 +292,8 @@ export namespace gtl {
 
 		// Archiving
 		//friend class boost::serialization::access;
-		template < typename tBoostArchive >
-		friend void serialize(tBoostArchive &ar, TPointT& pt, unsigned int const version) {
+		template < typename Archive >
+		friend void serialize(Archive &ar, TPointT& pt, unsigned int const version) {
 			ar & pt;
 		}
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
@@ -290,20 +302,12 @@ export namespace gtl {
 			return ar;
 		}
 		template < typename JSON > friend void from_json(JSON const& j, this_t& B) {
-			B.x = j[0];
-			B.y = j[1];
-			if constexpr (dim >= 3)
-				B.z = j[2];
-			if constexpr (dim >= 4)
-				B.w = j[3];
+			for (size_t i{}; i < dim; i++)
+				B.member(i) = j[i];
 		}
-		template < typename JSON > friend void to_json(JSON& j, this_t const& B) {
-			if constexpr (dim >= 4)
-				j = { B.x, B.y, B.z, B.w };
-			else if constexpr (dim >= 3)
-				j = { B.x, B.y, B.z };
-			else if constexpr (dim >= 2)
-				j = { B.x, B.y };
+		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) {
+			for (size_t i{}; i < dim; i++)
+				j[i] = B.member(i);
 		}
 
 	public:
@@ -371,6 +375,7 @@ export namespace gtl {
 		}
 	};
 
+	template < typename T > using TPoint4 = TPointT<T, 4>;
 	template < typename T > using TPoint3 = TPointT<T, 3>;
 	template < typename T > using TPoint2 = TPointT<T, 2>;
 

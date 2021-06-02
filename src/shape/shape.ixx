@@ -93,7 +93,7 @@ export namespace gtl::shape {
 
 	public:
 		GTL__DYNAMIC_VIRTUAL_INTERFACE;
-		GTL_DYN__BASE(eSHAPE);
+		GTL__DYNAMIC_BASE(eSHAPE);
 
 	public:
 		// default assign operator

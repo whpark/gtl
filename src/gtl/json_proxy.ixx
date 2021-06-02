@@ -49,12 +49,32 @@ export module gtl:json_proxy;
 import :concepts;
 import :string;
 
-//// from/to json
-//template < typename tjson, typename T >
-//void from_json(tjson const& j, T& object);
-//template < typename tjson, typename T >
-//void to_json(tjson& j, T const& object);
+// from/to json
+template < typename tjson, typename T >
+void from_json(tjson const& j, T& object);
+template < typename tjson, typename T >
+void to_json(tjson&& j, T const& object);
 
+template < typename tjson, gtlc::arithmetic T >
+void from_json(tjson const& j, T& value) {
+	value = j;
+}
+template < typename tjson, gtlc::arithmetic T >
+void to_json(tjson&& j, T const& value) {
+	j = value;
+}
+template < typename tjson, gtlc::string_elem tchar >
+void from_json(tjson const& j, std::basic_string<tchar>& str) {
+	str = j;
+}
+template < typename tjson, gtlc::string_elem tchar >
+void to_json(tjson&& j, std::basic_string<tchar> const& str) {
+	j = str;
+}
+template < typename tjson, gtlc::string_elem tchar >
+void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
+	j = sv;
+}
 export namespace gtl {
 
     /// @brief json proxy for boost:json
@@ -102,15 +122,18 @@ export namespace gtl {
 		bjson& operator = (std::u32string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 
 
+		template < size_t n >
+		bjson operator [] (char const (&sz)[n]) { return operator [](std::string_view{sz}); }
+		template < size_t n >
+		bjson operator [] (char8_t const (&sz)[n]) { return operator [](std::u8string_view{sz}); }
 		bjson operator [] (std::string_view svKey) {
 			boost::json::object* pObject = j_.is_null() ? &j_.emplace_object() : &j_.as_object();
 			// todo :.... speed up for svKey...
-			return (*pObject)[std::string(svKey)];
+			return (*pObject)[boost::json::string_view{svKey.data(), svKey.size()}];
 		}
 		bjson operator [] (std::u8string_view svKey) {
 			boost::json::object* pObject = j_.is_null() ? &j_.emplace_object() : &j_.as_object();
-			std::u8string strKey(svKey);
-			return (*pObject)[reinterpret_cast<std::string&>(strKey)];
+			return (*pObject)[boost::json::string_view{(char const*)svKey.data(), svKey.size()}];
 		}
 		bjson operator [] (std::size_t index) {
 			boost::json::array* pArray = j_.is_null() ? &j_.emplace_array() : &j_.as_array();
@@ -120,6 +143,10 @@ export namespace gtl {
 			return (*pArray)[index];
 		}
 
+		template < size_t n >
+		bjson operator [] (char const (&sz)[n]) const { return operator [](std::string_view{sz}); }
+		template < size_t n >
+		bjson operator [] (char8_t const (&sz)[n]) const { return operator [](std::u8string_view{sz}); }
 		bjson operator [] (std::string_view svKey) const {
 			if (j_.is_null())
 				throw std::invalid_argument{"empty"};
@@ -154,7 +181,7 @@ export namespace gtl {
 				return j_.is_bool() ? j_.as_bool() : default_value;
 			}
 			else if constexpr (std::is_integral_v<T>) {
-				return j_.is_int64() ? j_.as_int64() : default_value;
+				return j_.is_int64() ? (T)j_.as_int64() : default_value;
 			}
 			else if constexpr (std::is_floating_point_v<T>) {
 				return j_.is_double() ? j_.as_double() : j_.is_int64() ? (double)j_.as_int64() : default_value;
@@ -166,6 +193,8 @@ export namespace gtl {
 
 		template < gtlc::string_elem tchar_t >
 		operator std::basic_string<tchar_t> () const {
+			if (!j_.is_string())
+				return {};
 			auto& jstrU8 = j_.as_string();
 			if constexpr (std::is_same_v<tchar_t, char8_t>) {
 				return std::u8string((char8_t const*)jstrU8.data(), jstrU8.size());
@@ -278,6 +307,10 @@ export namespace gtl {
 		njson& operator = (std::u32string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 
 
+		template < size_t n >
+		njson operator [] (char const (&sz)[n]) { return operator [](std::string_view{sz}); }
+		template < size_t n >
+		njson operator [] (char8_t const (&sz)[n]) { return operator [](std::u8string_view{sz}); }
 		njson operator [] (std::string_view svKey) {
 			return j_[reinterpret_cast<std::string&>(gtl::ToString<char8_t>(svKey))];
 		}
@@ -288,14 +321,18 @@ export namespace gtl {
 		njson operator [] (std::size_t index) {
 			return j_[index];
 		}
-		njson const operator [] (std::size_t index) const {
-			return j_[index];
-		}
+		template < size_t n >
+		njson operator [] (char const (&sz)[n]) const { return operator [](std::string_view{sz}); }
+		template < size_t n >
+		njson operator [] (char8_t const (&sz)[n]) const { return operator [](std::u8string_view{sz}); }
 		njson const operator [] (std::string_view svKey) const {
 			return j_[reinterpret_cast<std::string&>(gtl::ToString<char8_t>(svKey))];
 		}
 		njson const operator [] (std::u8string_view svKey) const {
 			return j_[std::string((char const*)svKey.data(), svKey.size())];
+		}
+		njson const operator [] (std::size_t index) const {
+			return j_[index];
 		}
 
 		operator bool() const { return (bool)j_; }

@@ -77,6 +77,18 @@ export namespace gtl {
 		TSizeT& operator = (TSizeT const&) = default;
 		TSizeT& operator = (TSizeT &&) = default;
 
+		// from vector
+		explicit TSizeT(std::vector<T> const& B) {
+			*this = B;
+		}
+		TSizeT& operator = (std::vector<T> const& B) {
+			size_t n = std::min(size(), B.size());
+			for (size_t i = 0; i < n; i++) {
+				member((int)i) = B[i];
+			}
+			return *this;
+		}
+
 		// Copy Constructors and Copy Assign operators
 		template < gtlc::generic_coord T_COORD > explicit TSizeT(T_COORD const& B) { *this = B; };
 		template < gtlc::generic_coord T_COORD > TSizeT& operator = (T_COORD const& B) {
@@ -266,16 +278,12 @@ export namespace gtl {
 			return ar;
 		}
 		template < typename JSON > friend void from_json(JSON const& j, this_t& B) {
-			B.cx = j[0];
-			B.cy = j[1];
-			if constexpr (dim >= 3)
-				B.cz = j[2];
+			for (size_t i{}; i < dim; i++)
+				B.member(i) = j[i];
 		}
-		template < typename JSON > friend void to_json(JSON& j, this_t const& B) {
-			if constexpr (dim >= 3)
-				j = { B.cx, B.cy, B.cz };
-			else
-				j = { B.cx, B.cy };
+		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) {
+			for (size_t i{}; i < dim; i++)
+				j[i] = B.member(i);
 		}
 
 	};

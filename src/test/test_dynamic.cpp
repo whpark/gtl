@@ -17,14 +17,11 @@ namespace gtl::test::reflection::MACRO {
 		std::string str1{"str1"};
 		std::string str2{"str2"};
 
-		GTL_REFL__CLASS__BASE(CTestStruct)
+		GTL__REFLECTION_BASE(CTestStruct)
 	private:
 
 	#if 1
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(str1),
-			GTL_REFL__MEMBERS(str2)
-		};
+		GTL__REFLECTION_MEMBERS(str1, str2)
 	#else
 		constexpr inline static const std::tuple member_tuple_s{
 			gtl::internal::pair{ "str1"sv, &this_t::str1 },
@@ -33,8 +30,8 @@ namespace gtl::test::reflection::MACRO {
 	#endif
 
 	public:
-		GTL_DYN__BASE(int);
-		GTL_DYN__CLASS(0);
+		GTL__DYNAMIC_BASE(int);
+		GTL__DYNAMIC_CLASS(0);
 
 	};
 
@@ -52,22 +49,19 @@ namespace gtl::test::reflection::MACRO {
 
 		virtual ~CTestClass() {}
 
-		GTL_REFL__CLASS__BASE(CTestClass)
+		GTL__REFLECTION_BASE(CTestClass)
 	private:
 		
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(b1),
-			GTL_REFL__MEMBERS(b2),
-			GTL_REFL__MEMBERS(i, j),
-			GTL_REFL__MEMBERS(k, l),
-			GTL_REFL__MEMBERS(a, b, c),
-			GTL_REFL__MEMBERS(str, strU8),
-			GTL_REFL__MEMBERS(test)
-		};
+		GTL__REFLECTION_MEMBERS(b1, b2,
+								i, j,
+								k, l,
+								a, b, c,
+								str, strU8,
+								test)
 
 	public:
-		GTL_DYN__BASE(int);
-		GTL_DYN__CLASS(0);
+		GTL__DYNAMIC_BASE(int);
+		GTL__DYNAMIC_CLASS(0);
 	};
 
 
@@ -81,15 +75,13 @@ namespace gtl::test::reflection::MACRO {
 
 		virtual ~CTestClassDerived() {}
 
-		GTL_REFL__CLASS__DERIVED(CTestClassDerived, CTestStruct)
+		GTL__REFLECTION_DERIVED(CTestClassDerived, CTestStruct)
 	private:
 
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(k, a, b, c, str, strU8)
-		};
+		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8)
 
 	public:
-		//GTL_DYN__CLASS(1);
+		//GTL__DYNAMIC_CLASS(1);
 		constexpr static inline auto Creator = []() -> std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(); };
 		static inline TDynamicCreateHelper<this_t, 1, Creator> dynamicCreateDerived_s;
 	};
@@ -102,15 +94,13 @@ namespace gtl::test::reflection::MACRO {
 	public:
 		CTestClassDerived2(double d) : dummy(d) {}
 
-		GTL_REFL__CLASS__DERIVED(CTestClassDerived2, CTestStruct)
+		GTL__REFLECTION_DERIVED(CTestClassDerived2, CTestStruct)
 
 	private:
-		GTL_REFL__MEMBER_TABLE{
-			GTL_REFL__MEMBERS(dummy)
-		};
+		GTL__REFLECTION_MEMBERS(dummy)
 
 	public:
-		GTL_DYN__CLASS_EMPLACE(3, 1.2);
+		GTL__DYNAMIC_CLASS_EMPLACE(3, 1.2);
 
 	};
 
@@ -138,9 +128,7 @@ namespace gtl::test::reflection::CRTP {
 	public:
 		//using this_t = std::remove_cvref_t<decltype(*this)>;
 
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(str1, str2)
-		};
+		GTL__REFLECTION_MEMBERS(str1, str2)
 
 	};
 
@@ -155,15 +143,13 @@ namespace gtl::test::reflection::CRTP {
 		std::u8string strU8 { u8"strU8" };
 		CTestStruct test;
 
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(b1),
-			GTL_REFL__MEMBERS(b2),
-			GTL_REFL__MEMBERS(i, j),
-			GTL_REFL__MEMBERS(k, l),
-			GTL_REFL__MEMBERS(a, b, c),
-			GTL_REFL__MEMBERS(str, strU8),
-			GTL_REFL__MEMBERS(test),
-		};
+		GTL__REFLECTION_MEMBERS(b1,
+								b2,
+								i, j,
+								k, l,
+								a, b, c,
+								str, strU8,
+								test);
 	};
 
 
@@ -175,9 +161,7 @@ namespace gtl::test::reflection::CRTP {
 		std::u8string strU8 { u8"strU8" };
 
 	private:
-		GTL_REFL__MEMBER_TABLE{
-			GTL_REFL__MEMBERS(k, a, b, c, str, strU8)
-		};
+		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8)
 	};
 
 }
