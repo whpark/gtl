@@ -268,16 +268,12 @@ namespace gtl {
 			return ar;
 		}
 		template < typename JSON > friend void from_json(JSON const& j, this_t& B) {
-			B.cx = j[0];
-			B.cy = j[1];
-			if constexpr (dim >= 3)
-				B.cz = j[2];
+			for (size_t i{}; i < dim; i++)
+				B.member(i) = j[i];
 		}
-		template < typename JSON > friend void to_json(JSON& j, this_t const& B) {
-			if constexpr (dim >= 3)
-				j = { B.cx, B.cy, B.cz };
-			else
-				j = { B.cx, B.cy };
+		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) {
+			for (size_t i{}; i < dim; i++)
+				j[i] = B.member(i);
 		}
 
 	};

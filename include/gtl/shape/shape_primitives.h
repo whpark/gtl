@@ -15,6 +15,8 @@
 #include <deque>
 #include <optional>
 
+#include "fmt/ostream.h"
+
 #include "gtl/_config.h"
 #include "gtl/concepts.h"
 #include "gtl/unit.h"
@@ -114,32 +116,22 @@ namespace gtl::shape {
 	enum class eSHAPE : uint8_t { none, layer, dot, line, polyline, spline, circle, arc, ellipse, text, mtext, nSHAPE };
 	constexpr color_t const CR_DEFAULT = RGBA(255, 255, 255);
 
-	template < typename archive >
-	void serialize(archive& ar, color_t& cr, unsigned int const file_version) {
-		ar & cr.cr;
-	}
-	template < typename archive >
-	archive& operator & (archive& ar, color_t& cr) {
-		ar & cr.cr;
-		return ar;
-	}
+	using variable_t = boost::variant<string_t, int, double, point_t>;
 
-	//struct hatching_t {
-	//	uint32_t eFlag{};
-	//	double dInterval{};
-	//};
 	struct cookie_t {
 		void* ptr{};
 		std::vector<uint8_t> buffer;
 		string_t str;
-		std::chrono::nanoseconds duration;
+		std::chrono::nanoseconds duration{};
+
+		auto operator <=> (cookie_t const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, cookie_t& var, unsigned int const file_version) {
 			ar & var;
 		}
 		template < typename archive >
-		friend void serialize(archive& ar, cookie_t& var) {
+		friend archive& operator & (archive& ar, cookie_t& var) {
 			ar & (ptrdiff_t&)var.ptr;
 			ar & var.buffer;
 			ar & var.str;
@@ -152,6 +144,7 @@ namespace gtl::shape {
 			if constexpr (archive::is_loading()) {
 				var.duration = std::chrono::nanoseconds(count);
 			}
+			return ar;
 		};
 	};
 
@@ -171,49 +164,11 @@ namespace gtl::shape {
 			ar & var.name;
 			ar & var.flags;
 			ar & var.path;
-		}
 
-	};
-
-#if 1
-	using variable_t = boost::variant<string_t, int, double, point_t>;
-#else
-	struct variable_t {
-		string_t name;
-		std::variant<string_t, int, double, point_t> content;
-
-		template < typename archive >
-		friend void serialize(archive& ar, variable_t& var, unsigned int const file_version) {
-			ar & var;
-		}
-		template < typename archive >
-		friend archive& operator & (archive& ar, variable_t& var) {
-			ar & var.name;
-			int index{};
-			if constexpr (archive::is_saving()) {
-				index = (int)var.content.index();
-			}
-			ar & index;
-			if constexpr (!archive::is_saving()) {
-				switch (index) {
-				case 0 : var.content.emplace<0>({}); break;
-				case 1 : var.content.emplace<1>({}); break;
-				case 2 : var.content.emplace<2>({}); break;
-				case 3 : var.content.emplace<3>({}); break;
-				}
-			}
-
-			switch (index) {
-			case 0 : ar & std::get<0>(var.content); break;
-			case 1 : ar & std::get<1>(var.content); break;
-			case 2 : ar & std::get<2>(var.content); break;
-			case 3 : ar & std::get<3>(var.content); break;
-			}
 			return ar;
 		}
 
 	};
-#endif
 
 
 	class ICanvas;
@@ -260,8 +215,10 @@ namespace gtl::shape {
 
 		};
 	protected:
+		friend struct s_drawing;
 		int crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
 	public:
+		string_t strLayer;	// temporary value. (while loading from dxf)
 		color_t color{};
 		int eLineType{};
 		string_t strLineType;
@@ -269,23 +226,38 @@ namespace gtl::shape {
 		bool bVisible{};
 		bool bTransparent{};
 		//std::optional<hatching_t> hatch;
-		boost::optional<cookie_t> cookie;
+		//boost::optional<cookie_t> cookie;
+		cookie_t cookie;
 
 	public:
 		virtual ~s_shape() {}
 
 		GTL__DYNAMIC_VIRTUAL_INTERFACE(s_shape);
+		//GTL__REFLECTION_VIRTUAL_BASE(s_shape);
+		//GTL__REFLECTION_MEMBERS(color, eLineType, strLineType, lineWeight, bVisible, bTransparent, cookie);
+
+		auto operator <=> (s_shape const&) const = default;
+
 		template < typename archive >
 		friend void serialize(archive& ar, s_shape& var, unsigned int const file_version) {
 			ar & var;
 		}
 		template < typename archive >
 		friend archive& operator & (archive& ar, s_shape& var) {
-			return ar & var.color & var.cookie & var.strLineType & var.lineWeight & var.eLineType & var.bVisible & var.bTransparent;
+			ar & var.color;
+			ar & var.cookie;
+			ar & var.strLineType;
+			ar & var.lineWeight;
+			ar & var.eLineType;
+			ar & var.bVisible;
+			ar & var.bTransparent;
+			return ar;
 		}
-		virtual bool FromJson(json_t& _j, string_t& layer);
+		virtual bool LoadFromCADJson(json_t& _j);
 
 		virtual eTYPE GetType() const = 0;
+		static string_t const& GetTypeName(eTYPE eType);
+
 		//virtual point_t PointAt(double t) const = 0;
 		virtual void FlipX() = 0;
 		virtual void FlipY() = 0;
@@ -295,7 +267,12 @@ namespace gtl::shape {
 
 		virtual void Draw(ICanvas& canvas) const = 0;
 
-		static std::unique_ptr<s_shape> CreateShapeFromName(std::string const& strEntityName);
+		virtual void PrintOut(std::wostream& os) const {
+			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetTypeName(GetType()), color.r, color.g, color.b, !bVisible?L"Invisible ":L"", bTransparent?L"Transparent ":L"");
+			fmt::print(os, L"lineType:{}, lineWeight:{}\n", strLineType, lineWeight);
+		}
+
+		static std::unique_ptr<s_shape> CreateShapeFromEntityName(std::string const& strEntityName);
 	};
 
 

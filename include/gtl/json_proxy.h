@@ -48,11 +48,32 @@
 #include "gtl/string/convert_codepage.h"
 
 
-//// from/to json
-//template < typename tjson, typename T >
-//void from_json(tjson const& j, T& object);
-//template < typename tjson, typename T >
-//void to_json(tjson& j, T const& object);
+// from/to json
+template < typename tjson, typename T >
+void from_json(tjson const& j, T& object);
+template < typename tjson, typename T >
+void to_json(tjson&& j, T const& object);
+
+template < typename tjson, gtlc::arithmetic T >
+void from_json(tjson const& j, T& value) {
+	value = j;
+}
+template < typename tjson, gtlc::arithmetic T >
+void to_json(tjson&& j, T const& value) {
+	j = value;
+}
+template < typename tjson, gtlc::string_elem tchar >
+void from_json(tjson const& j, std::basic_string<tchar>& str) {
+	str = j;
+}
+template < typename tjson, gtlc::string_elem tchar >
+void to_json(tjson&& j, std::basic_string<tchar> const& str) {
+	j = str;
+}
+template < typename tjson, gtlc::string_elem tchar >
+void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
+	j = sv;
+}
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -161,7 +182,7 @@ namespace gtl {
 				return j_.is_bool() ? j_.as_bool() : default_value;
 			}
 			else if constexpr (std::is_integral_v<T>) {
-				return j_.is_int64() ? j_.as_int64() : default_value;
+				return j_.is_int64() ? (T)j_.as_int64() : default_value;
 			}
 			else if constexpr (std::is_floating_point_v<T>) {
 				return j_.is_double() ? j_.as_double() : j_.is_int64() ? (double)j_.as_int64() : default_value;
@@ -249,6 +270,15 @@ namespace gtl {
 			}
 		}
 
+		////
+		//template < typename T > 
+		//friend void from_json(bjson const& j, std::vector<T>& container) {
+		//	container = boost::json::value_to<std::vector<T>>(j.json());
+		//}
+		//template < typename T > 
+		//friend void to_json(bjson&& j, std::vector<T> const& container) {
+		//	j.json() = boost::json::value_from(container);
+		//}
 
 	};
 

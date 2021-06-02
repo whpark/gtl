@@ -4,25 +4,19 @@
 
 using namespace std::literals;
 
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_layer, "layer")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_dot, "dot")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_line, "line")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_polyline, "polyline")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_circleXY, "circleXY")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_arcXY, "arcXY")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_ellipseXY, "ellipseXY")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_spline, "spline")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_text, "text")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_mtext, "mtext")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_hatch, "hatch")
+#ifdef _DEBUG
+#define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
+#else
+#define DEBUG_PRINT(...) 
+#endif
 
 namespace gtl::shape {
 
-	bool s_shape::FromJson(json_t& _j, string_t& layer) {
+	bool s_shape::LoadFromCADJson(json_t& _j) {
 		using namespace std::literals;
 		gtl::bjson<json_t> j(_j);
 		//color.cr = (int)j["color"sv];
-		layer = j["layer"sv];
+		strLayer = j["layer"sv];
 
 		lineWeight = j["lWeight"];
 		strLineType = j["lineType"];
@@ -44,12 +38,55 @@ namespace gtl::shape {
 		return true;
 	}
 
+	string_t const& s_shape::GetTypeName(eTYPE eType) {
+		static std::map<eTYPE, string_t> const map = {
+			{ eTYPE::none,				L"none" },
+			{ eTYPE::e3dface,			L"3dFace"s },
+			{ eTYPE::arc_xy,			L"ARC"s },
+			{ eTYPE::block,				L"BLOCK"s },
+			{ eTYPE::circle_xy,			L"CIRCLE"s },
+			{ eTYPE::dimension,			L"DIMENSION"s },
+			{ eTYPE::dimaligned,		L"DIMALIGNED"s },
+			{ eTYPE::dimlinear,			L"DIMLINEAR"s },
+			{ eTYPE::dimradial,			L"DIMRADIAL"s },
+			{ eTYPE::dimdiametric,		L"DIMDIAMETRIC"s },
+			{ eTYPE::dimangular,		L"DIMANGULAR"s },
+			{ eTYPE::dimangular3p,		L"DIMANGULAR3P"s },
+			{ eTYPE::dimordinate,		L"DIMORDINATE"s },
+			{ eTYPE::ellipse_xy,		L"ELLIPSE"s },
+			{ eTYPE::hatch,				L"HATCH"s },
+			{ eTYPE::image,				L"IMAGE"s },
+			{ eTYPE::insert,			L"INSERT"s },
+			{ eTYPE::leader,			L"LEADER"s },
+			{ eTYPE::line,				L"LINE"s },
+			{ eTYPE::lwpolyline,		L"LWPOLYLINE"s },
+			{ eTYPE::mtext,				L"MTEXT"s },
+			{ eTYPE::dot,				L"POINT"s },
+			{ eTYPE::polyline,			L"POLYLINE"s },
+			{ eTYPE::ray,				L"RAY"s },
+			{ eTYPE::solid,				L"SOLID"s },
+			{ eTYPE::spline,			L"SPLINE"s },
+			{ eTYPE::text,				L"TEXT"s },
+			{ eTYPE::trace,				L"TRACE"s },
+			{ eTYPE::underlay,			L"UNDERLAY"s },
+			{ eTYPE::vertex,			L"VERTEX"s },
+			{ eTYPE::viewport,			L"VIEWPORT"s },
+			{ eTYPE::xline,				L"XLINE"s },
+			{ eTYPE::layer,				L"LAYER"s },
+			{ eTYPE::drawing,			L"DRAWING"s },
+		};
 
-	std::unique_ptr<s_shape> s_shape::CreateShapeFromName(std::string const& strEntityName) {
+		auto iter = map.find(eType);
+		if (iter == map.end())
+			return L""s;
+		return iter->second;
+	}
+
+	std::unique_ptr<s_shape> s_shape::CreateShapeFromEntityName(std::string const& strEntityName) {
 		static std::map<std::string, std::function<std::unique_ptr<s_shape>()> > const mapCreator = {
-			//{ "3dFace"s,				nullptr },
+			{ "3dFace"s,				nullptr },
 			{ "ARC"s,					[](){ return std::make_unique<s_arcXY>(); } },
-			//{ "BLOCK"s,					nullptr },
+			{ "BLOCK"s,					nullptr },
 			{ "CIRCLE"s,				[](){ return std::make_unique<s_circleXY>(); } },
 			{ "DIMENSION"s,				nullptr },
 			{ "DIMALIGNED"s,			nullptr },
@@ -124,8 +161,8 @@ namespace gtl::shape {
 		}
 	}
 
-	bool s_drawing::FromJson(json_t& _j, string_t& layer) {
-		//s_shape::FromJson(_j, layer);
+	bool s_drawing::LoadFromCADJson(json_t& _j) {
+		//s_shape::LoadFromCADJson(_j);
 
 		gtl::bjson<json_t> jTOP(_j);
 
@@ -178,8 +215,7 @@ namespace gtl::shape {
 				bjson<json_t> j(item);
 
 				auto rLayer = std::make_unique<s_layer>();
-				string_t strLayer;
-				rLayer->FromJson(item, strLayer);
+				rLayer->LoadFromCADJson(item);
 
 				if (auto iterLineType = std::find_if(line_types.begin(), line_types.end(), [&rLayer](auto const& lt) { return lt.name == rLayer->strLineType; });
 					iterLineType != line_types.end()) {
@@ -202,8 +238,16 @@ namespace gtl::shape {
 				bjson<json_t> j(item);
 				auto rBlock = std::make_unique<s_block>();
 
-				string_t strDummy;
-				rBlock->FromJson(item, strDummy);
+				try {
+					rBlock->LoadFromCADJson(item);
+				} catch (std::exception& e) {
+					DEBUG_PRINT("{}\n", e.what());
+					continue;
+				} catch (...) {
+					DEBUG_PRINT("unknown\n");
+					continue;
+				}
+
 
 				if (auto iterLineType = std::find_if(line_types.begin(), line_types.end(), [&rBlock](auto const& lt) { return lt.name == rBlock->strLineType; });
 					iterLineType != line_types.end()) {
@@ -216,12 +260,20 @@ namespace gtl::shape {
 					bjson<json_t> j(jEntity);
 					std::string strEntityName = j["entityName"];
 
-					std::unique_ptr<s_shape> rShape = CreateShapeFromName(strEntityName);
+					std::unique_ptr<s_shape> rShape = CreateShapeFromEntityName(strEntityName);
 					if (!rShape)
 						continue;
 
-					string_t strLayer;
-					rShape->FromJson(jEntity, strLayer);
+					try {
+						rShape->LoadFromCADJson(jEntity);
+					} catch (std::exception& e) {
+						DEBUG_PRINT("{}\n", e.what());
+						continue;
+					} catch (...) {
+						DEBUG_PRINT("unknown\n");
+						continue;
+					}
+
 					switch (rShape->GetType()) {
 					case eTYPE::insert :
 						break;
@@ -245,32 +297,107 @@ namespace gtl::shape {
 				bjson<json_t> j(jEntity);
 				std::string strEntityName = j["entityName"];
 
-				std::unique_ptr<s_shape> rShape = CreateShapeFromName(strEntityName);
+				std::unique_ptr<s_shape> rShape = CreateShapeFromEntityName(strEntityName);
 				if (!rShape)
 					continue;
 
-				string_t strLayer;
-				rShape->FromJson(jEntity, strLayer);
-
-				auto* pLayer = mapLayers[strLayer];
-				if (!pLayer)
+				try {
+					rShape->LoadFromCADJson(jEntity);
+				} catch (std::exception& e) {
+					DEBUG_PRINT("{}\n", e.what());
 					continue;
+				} catch (...) {
+					DEBUG_PRINT("unknown\n");
+					continue;
+				}
 
-				switch (rShape->GetType()) {
-				case eTYPE::insert :
-					// todo :
-					if (s_insert* pInsert = dynamic_cast<s_insert*>(rShape.get()); pInsert) {
-						if (auto* pBlock = mapBlocks[pInsert->name]; !pBlock) {
-							// todo : position, scale...
-							rShape = pBlock->NewClone();
+				AddEntity(std::move(rShape), mapLayers, mapBlocks);
+			}
+		}
+
+		return true;
+	}
+
+	bool s_drawing::AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks) {
+		if (!rShape)
+			return false;
+
+		switch (rShape->GetType()) {
+		case eTYPE::insert :
+			// todo :
+			if (s_insert* pInsert = dynamic_cast<s_insert*>(rShape.get()); pInsert) {
+				auto iter = mapBlocks.find(pInsert->name);
+				if (iter == mapBlocks.end()) {
+					DEBUG_PRINT(L"No Block : {}\n", pInsert->name);
+					return false;
+				}
+				auto* pBlock = iter->second;
+				if (!pBlock) {
+					DEBUG_PRINT(L"Internal ERROR (Block Name : {})\n", pInsert->name);
+					return false;
+				}
+
+				ct_t ct;
+				// todo : 순서 확인 (scale->rotate ? or rotate->scale ?)
+				if (pInsert->xscale != 1.0) {
+					ct.mat_(0, 0) *= pInsert->xscale;
+					ct.mat_(0, 1) *= pInsert->xscale;
+					ct.mat_(0, 2) *= pInsert->xscale;
+				}
+				if (pInsert->yscale != 1.0) {
+					ct.mat_(1, 0) *= pInsert->yscale;
+					ct.mat_(1, 1) *= pInsert->yscale;
+					ct.mat_(1, 2) *= pInsert->yscale;
+				}
+				if (pInsert->zscale != 1.0) {
+					ct.mat_(2, 0) *= pInsert->zscale;
+					ct.mat_(2, 1) *= pInsert->zscale;
+					ct.mat_(2, 2) *= pInsert->zscale;
+				}
+
+				if (pInsert->angle != 0.0_rad) {
+					ct.mat_ = ct.GetRotatingMatrixXY(pInsert->angle) * ct.mat_;
+				}
+
+				ct.origin_ = pBlock->pt;
+
+				for (int y = 0; y < pInsert->nRow; y++) {
+					for (int x = 0; x < pInsert->nCol; x++) {
+
+						std::unique_ptr<s_block> rBlockNew { dynamic_cast<s_block*>(pBlock->NewClone().release()) };
+
+						ct.offset_.x = x*pInsert->spacingCol + pInsert->pt.x;
+						ct.offset_.y = y*pInsert->spacingRow + pInsert->pt.x;
+
+						for (auto const& rShape : rBlockNew->shapes) {
+							auto rShapeNew = rShape.NewClone();
+							rBlockNew->Transform(ct, ct.IsRightHanded());
+							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks)) {
+								DEBUG_PRINT("CANNOT Add Shape\n");
+								//return false;
+							}
 						}
 					}
-					break;
+				}
+			}
+			break;
+
+		default :
+			if (auto iter = mapLayers.find(rShape->strLayer); iter != mapLayers.end()) {
+				auto* pLayer = iter->second;
+				if (!pLayer) {
+					DEBUG_PRINT(L"Internal Error : Layer {}\n", rShape->strLayer);
+					return false;
 				}
 
 				pLayer->shapes.push_back(std::move(rShape));
 
+			} else {
+				DEBUG_PRINT(L"No Layer : {}\n", rShape->strLayer);
+				return false;
 			}
+
+			break;
 		}
 
 		return true;

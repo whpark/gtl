@@ -17,12 +17,10 @@ namespace gtl::test::reflection::MACRO {
 		std::string str2{"str2"};
 
 	private:
-		GTL_REFL__CLASS__BASE(CTestStruct)
+		GTL__REFLECTION_BASE(CTestStruct)
+
 	#if 1
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(str1),
-			GTL_REFL__MEMBERS(str2)
-		};
+		GTL__REFLECTION_MEMBERS(str1,str2)
 	#else
 		constexpr inline static const std::tuple member_tuple_s{
 			gtl::internal::pair{ "str1"sv, &this_t::str1 },
@@ -45,17 +43,14 @@ namespace gtl::test::reflection::MACRO {
 		CTestStruct test;
 
 	private:
-		GTL_REFL__CLASS__BASE(CTestClass)
+		GTL__REFLECTION_BASE(CTestClass)
 		
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(b1),
-			GTL_REFL__MEMBERS(b2),
-			GTL_REFL__MEMBERS(i, j),
-			GTL_REFL__MEMBERS(k, l),
-			GTL_REFL__MEMBERS(a, b, c),
-			GTL_REFL__MEMBERS(str, strU8),
-			GTL_REFL__MEMBERS(test)
-		};
+		GTL__REFLECTION_MEMBERS(b1, b2,
+								i, j,
+								k, l,
+								a, b, c,
+								str, strU8,
+								test);
 
 	};
 
@@ -69,11 +64,9 @@ namespace gtl::test::reflection::MACRO {
 		std::u8string strU8 { u8"strU8" };
 
 	private:
-		GTL_REFL__CLASS__DERIVED(CTestClassDerived, CTestStruct)
+		GTL__REFLECTION_DERIVED(CTestClassDerived, CTestStruct)
 
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(k, a, b, c, str, strU8)
-		};
+		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8);
 	};
 
 }
@@ -89,9 +82,7 @@ namespace gtl::test::reflection::CRTP {
 	public:
 		//using this_t = std::remove_cvref_t<decltype(*this)>;
 
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(str1, str2)
-		};
+		GTL__REFLECTION_MEMBERS(str1, str2);
 
 	};
 
@@ -106,15 +97,13 @@ namespace gtl::test::reflection::CRTP {
 		std::u8string strU8 { u8"strU8" };
 		CTestStruct test;
 
-		GTL_REFL__MEMBER_TABLE {
-			GTL_REFL__MEMBERS(b1),
-			GTL_REFL__MEMBERS(b2),
-			GTL_REFL__MEMBERS(i, j),
-			GTL_REFL__MEMBERS(k, l),
-			GTL_REFL__MEMBERS(a, b, c),
-			GTL_REFL__MEMBERS(str, strU8),
-			GTL_REFL__MEMBERS(test),
-		};
+		GTL__REFLECTION_MEMBERS(b1,
+								b2,
+								i, j,
+								k, l,
+								a, b, c,
+								str, strU8,
+								test);
 	};
 
 
@@ -126,9 +115,7 @@ namespace gtl::test::reflection::CRTP {
 		std::u8string strU8 { u8"strU8" };
 
 	private:
-		GTL_REFL__MEMBER_TABLE{
-			GTL_REFL__MEMBERS(k, a, b, c, str, strU8)
-		};
+		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8);
 	};
 
 }

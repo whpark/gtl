@@ -100,7 +100,7 @@ namespace gtl {
 		static inline map_t tableDynamicCreate_s;
 	};
 
-#define GTL_DYN__BASE(T_IDENTIFIER)\
+#define GTL__DYNAMIC_BASE(T_IDENTIFIER)\
 	static inline TDynamicCreateBase<this_t, T_IDENTIFIER> dynamicCreateBase_s;
 
 
@@ -118,11 +118,11 @@ namespace gtl {
 		static inline SDynamicCreateRegister dynamicCreateRegister_s;
 	};
 
-//#define GTL_DYN__CLASS(ID)\
+//#define GTL__DYNAMIC_CLASS(ID)\
 //	static inline TDynamicCreateHelper<this_t, ID, []() -> std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(); }> dynamicCreateDerived_s;
-#define GTL_DYN__CLASS(ID)\
+#define GTL__DYNAMIC_CLASS(ID)\
 	static inline TDynamicCreateHelper<this_t, ID, std::make_unique<this_t>> dynamicCreateDerived_s;
-#define GTL_DYN__CLASS_EMPLACE(ID, ...)\
+#define GTL__DYNAMIC_CLASS_EMPLACE(ID, ...)\
 	static inline TDynamicCreateHelper<this_t, ID, []()->std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(__VA_ARGS__); }> dynamicCreateDerived_s;
 
 

@@ -370,7 +370,7 @@ namespace gtl {
 			return ar & B.pts(0) & B.pts(1);
 		}
 		template < typename JSON > friend void from_json(JSON const& j, this_t& B) { B.pts(0) = j["pt0"]; B.pts(1) = j["pt1"]; }
-		template < typename JSON > friend void to_json(JSON& j, this_t const& B) { j["pt0"] = B.pts(0); j["pt1"] = B.pts(1); }
+		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) { j["pt0"] = B.pts(0); j["pt1"] = B.pts(1); }
 
 
 		bool CheckBoundary(point_t const& pt) {

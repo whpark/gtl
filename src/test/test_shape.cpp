@@ -3,37 +3,55 @@
 #include "gtl/gtl.h"
 
 #include "gtl/shape/shape.h"
-
+#include "fmt/chrono.h"
 
 using namespace std::literals;
 using namespace gtl::literals;
 
+#ifdef _DEBUG
+#define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
+#else
+#define DEBUG_PRINT(...) 
+#endif
+
 TEST(gtl_shape, basic) {
-	gtl::bjson jDXF;
-	jDXF.read(LR"(D:\Project\APS\InkPatternGenerator\samples\Cell 잉크젯 Test_dxf2007.dxf.json)");
-	//{
-	//	auto j = jDXF.json();
-	//	//auto& jObject = j.as_object();
-	//	//auto& header = jObject["header"];
-	//	auto jVars = jDXF["header"]["vars"];
-	//	for (auto var : jVars.json().as_object()) {
-	//		auto key = var.key();
-	//		auto v = var.value();
-	//	}
-	//	
-	//	//auto& varsObject = header.as_object();
-	//	//auto& varsArray = varsObject;
-	//	//for (auto const& i : jObject) {
-	//	//	auto key = i.key();
-	//	//	auto v = i.value();
-	//	//}
+	std::filesystem::path paths[] = {
+		LR"(D:\Project\APS\InkPatternGenerator\samples\Cell 잉크젯 Test_dxf2007.dxf.json)",
+		LR"(D:\Project\APS\InkPatternGenerator\samples\screw2012ascii.DXF.json)",
+		LR"(D:\Project\APS\InkPatternGenerator\samples\a.dwg.json)",
+	};
 
-	//}
+	for (auto path : paths) {
 
-	gtl::shape::s_drawing cad;
+		DEBUG_PRINT("path : {}\n", path.string());
 
-	std::wstring strLayer;
-	cad.FromJson(jDXF.json(), strLayer);
+		gtl::bjson jDXF;
+		jDXF.read(path);
+
+		gtl::shape::s_drawing cad;
+
+		cad.LoadFromCADJson(jDXF.json());
+
+		std::wofstream os(std::filesystem::path{path}+=L".txt");
+		cad.PrintOut(os);
+
+		{
+			using namespace gtl::shape;
+			std::ofstream ar(std::filesystem::path{path}+=L".shape");
+			boost::archive::text_oarchive oa(ar);
+			oa & cad;
+		}
+
+		{
+			gtl::shape::s_drawing cad2;
+			std::ifstream ar(std::filesystem::path{path}+=L".shape");
+			boost::archive::text_iarchive ia(ar);
+			ia & cad2;
+			EXPECT_EQ(cad, cad2);
+		}
+
+
+	}
 
 }
 
