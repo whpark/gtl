@@ -48,7 +48,7 @@
       <Filter>shape</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h">
-      <Filter>tinyspline</Filter>
+      <Filter>shape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

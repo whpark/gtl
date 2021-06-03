@@ -142,7 +142,8 @@ namespace gtl {
 		//friend class boost::serialization::access;
 		template < typename Archive >
 		friend void serialize(Archive &ar, CCoordTransChain& ct, unsigned int const version) {
-			ar & boost::serialization::base_object<base_t>(ct);
+			//ar & boost::serialization::base_object<base_t>(ct);
+			ar & (base_t&)ct;
 			ar & ct.chain_;
 		}
 
@@ -258,11 +259,12 @@ namespace gtl {
 			ar & ct;
 		}
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
-			ar & boost::serialization::base_object<base_t>(*this);
-			ar & scale_;
-			for (auto& v : mat_.val)
+			//ar & boost::serialization::base_object<base_t>(*this);
+			ar & (base_t&)B;
+			ar & B.scale_;
+			for (auto& v : B.mat_.val)
 				ar & v;
-			ar & origin_ & offset_;
+			ar & B.origin_ & B.offset_;
 			return ar;
 		}
 		template < typename JSON > friend void from_json(JSON const& j, this_t& B) {

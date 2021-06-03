@@ -38,42 +38,42 @@ namespace gtl::shape {
 		return true;
 	}
 
-	string_t const& s_shape::GetTypeName(eTYPE eType) {
-		static std::map<eTYPE, string_t> const map = {
-			{ eTYPE::none,				L"none" },
-			{ eTYPE::e3dface,			L"3dFace"s },
-			{ eTYPE::arc_xy,			L"ARC"s },
-			{ eTYPE::block,				L"BLOCK"s },
-			{ eTYPE::circle_xy,			L"CIRCLE"s },
-			{ eTYPE::dimension,			L"DIMENSION"s },
-			{ eTYPE::dimaligned,		L"DIMALIGNED"s },
-			{ eTYPE::dimlinear,			L"DIMLINEAR"s },
-			{ eTYPE::dimradial,			L"DIMRADIAL"s },
-			{ eTYPE::dimdiametric,		L"DIMDIAMETRIC"s },
-			{ eTYPE::dimangular,		L"DIMANGULAR"s },
-			{ eTYPE::dimangular3p,		L"DIMANGULAR3P"s },
-			{ eTYPE::dimordinate,		L"DIMORDINATE"s },
-			{ eTYPE::ellipse_xy,		L"ELLIPSE"s },
-			{ eTYPE::hatch,				L"HATCH"s },
-			{ eTYPE::image,				L"IMAGE"s },
-			{ eTYPE::insert,			L"INSERT"s },
-			{ eTYPE::leader,			L"LEADER"s },
-			{ eTYPE::line,				L"LINE"s },
-			{ eTYPE::lwpolyline,		L"LWPOLYLINE"s },
-			{ eTYPE::mtext,				L"MTEXT"s },
-			{ eTYPE::dot,				L"POINT"s },
-			{ eTYPE::polyline,			L"POLYLINE"s },
-			{ eTYPE::ray,				L"RAY"s },
-			{ eTYPE::solid,				L"SOLID"s },
-			{ eTYPE::spline,			L"SPLINE"s },
-			{ eTYPE::text,				L"TEXT"s },
-			{ eTYPE::trace,				L"TRACE"s },
-			{ eTYPE::underlay,			L"UNDERLAY"s },
-			{ eTYPE::vertex,			L"VERTEX"s },
-			{ eTYPE::viewport,			L"VIEWPORT"s },
-			{ eTYPE::xline,				L"XLINE"s },
-			{ eTYPE::layer,				L"LAYER"s },
-			{ eTYPE::drawing,			L"DRAWING"s },
+	string_t const& s_shape::GetShapeName(eSHAPE eType) {
+		static std::map<eSHAPE, string_t> const map = {
+			{ eSHAPE::none,				L"none" },
+			{ eSHAPE::e3dface,			L"3dFace"s },
+			{ eSHAPE::arc_xy,			L"ARC"s },
+			{ eSHAPE::block,			L"BLOCK"s },
+			{ eSHAPE::circle_xy,		L"CIRCLE"s },
+			{ eSHAPE::dimension,		L"DIMENSION"s },
+			{ eSHAPE::dimaligned,		L"DIMALIGNED"s },
+			{ eSHAPE::dimlinear,		L"DIMLINEAR"s },
+			{ eSHAPE::dimradial,		L"DIMRADIAL"s },
+			{ eSHAPE::dimdiametric,		L"DIMDIAMETRIC"s },
+			{ eSHAPE::dimangular,		L"DIMANGULAR"s },
+			{ eSHAPE::dimangular3p,		L"DIMANGULAR3P"s },
+			{ eSHAPE::dimordinate,		L"DIMORDINATE"s },
+			{ eSHAPE::ellipse_xy,		L"ELLIPSE"s },
+			{ eSHAPE::hatch,			L"HATCH"s },
+			{ eSHAPE::image,			L"IMAGE"s },
+			{ eSHAPE::insert,			L"INSERT"s },
+			{ eSHAPE::leader,			L"LEADER"s },
+			{ eSHAPE::line,				L"LINE"s },
+			{ eSHAPE::lwpolyline,		L"LWPOLYLINE"s },
+			{ eSHAPE::mtext,			L"MTEXT"s },
+			{ eSHAPE::dot,				L"POINT"s },
+			{ eSHAPE::polyline,			L"POLYLINE"s },
+			{ eSHAPE::ray,				L"RAY"s },
+			{ eSHAPE::solid,			L"SOLID"s },
+			{ eSHAPE::spline,			L"SPLINE"s },
+			{ eSHAPE::text,				L"TEXT"s },
+			{ eSHAPE::trace,			L"TRACE"s },
+			{ eSHAPE::underlay,			L"UNDERLAY"s },
+			{ eSHAPE::vertex,			L"VERTEX"s },
+			{ eSHAPE::viewport,			L"VIEWPORT"s },
+			{ eSHAPE::xline,			L"XLINE"s },
+			{ eSHAPE::layer,			L"LAYER"s },
+			{ eSHAPE::drawing,			L"DRAWING"s },
 		};
 
 		auto iter = map.find(eType);
@@ -274,8 +274,8 @@ namespace gtl::shape {
 						continue;
 					}
 
-					switch (rShape->GetType()) {
-					case eTYPE::insert :
+					switch (rShape->GetShapeType()) {
+					case eSHAPE::insert :
 						break;
 					}
 
@@ -322,8 +322,8 @@ namespace gtl::shape {
 		if (!rShape)
 			return false;
 
-		switch (rShape->GetType()) {
-		case eTYPE::insert :
+		switch (rShape->GetShapeType()) {
+		case eSHAPE::insert :
 			// todo :
 			if (s_insert* pInsert = dynamic_cast<s_insert*>(rShape.get()); pInsert) {
 				auto iter = mapBlocks.find(pInsert->name);
