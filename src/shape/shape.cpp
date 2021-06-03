@@ -23,13 +23,12 @@ namespace gtl::shape {
 
 		//eLineType = j["lineType"sv];
 		crIndex = j["color"].value_or(0);
+		color.cr = -1;
 		if (j["color24"].json().is_int64()) {
 			crIndex = 0;
 			color.cr = (int)j["color24"];
 		} else {
-			if (crIndex == 256) {
-				// todo :...
-			} else if ( (crIndex >= 0) and (crIndex < colorTable_s.size()) )
+			if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
 				color = colorTable_s[crIndex];
 		}
 		bVisible = j["visible"].value_or(true);
@@ -127,6 +126,9 @@ namespace gtl::shape {
 	}
 
 	void s_polyline::Draw(ICanvas& canvas) const {
+		if (pts.size())
+			canvas.MoveTo(pts[0]);
+
 		for (int iPt = 0; iPt < pts.size(); iPt++) {
 			polypoint_t pt0{pts[iPt]};
 			polypoint_t pt1;
@@ -372,6 +374,9 @@ namespace gtl::shape {
 						for (auto const& rShape : rBlockNew->shapes) {
 							auto rShapeNew = rShape.NewClone();
 							rBlockNew->Transform(ct, ct.IsRightHanded());
+							if (rShapeNew->crIndex == 0) {
+								rShapeNew->crIndex = pBlock->crIndex;
+							}
 							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks)) {
 								DEBUG_PRINT("CANNOT Add Shape\n");
 								//return false;
@@ -388,6 +393,19 @@ namespace gtl::shape {
 				if (!pLayer) {
 					DEBUG_PRINT(L"Internal Error : Layer {}\n", rShape->strLayer);
 					return false;
+				}
+
+				// color
+				if (rShape->color.cr == -1) {
+					int crIndex = rShape->crIndex;
+					if (crIndex == 256) {
+						crIndex = pLayer->crIndex;
+						rShape->color = pLayer->color;
+					}
+					if (rShape->color.cr == -1) {
+						if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
+							rShape->color = colorTable_s[crIndex];
+					}
 				}
 
 				pLayer->shapes.push_back(std::move(rShape));

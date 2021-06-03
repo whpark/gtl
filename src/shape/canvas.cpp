@@ -5,7 +5,7 @@
 
 namespace gtl::shape {
 
-	void ICanvas::Spline(int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
+	GTL_SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
 		if (pts.size() < 2)
 			return;
 
@@ -14,7 +14,7 @@ namespace gtl::shape {
 			len += pts[i].Distance(pts[i-1]);
 		}
 
-		double step = target_interpolation_inverval_ / len / 2.;
+		double step = canvas.target_interpolation_inverval_ / len / 2.;
 
 		tinyspline::BSpline bspline(pts.size(), 2, degree);
 		std::vector<tinyspline::real> points(pts.size()*degree);
@@ -37,9 +37,9 @@ namespace gtl::shape {
 		bspline.setKnots({knots.begin(), knots.end()});
 
 		point_t pt{bspline(0.0).result()};
-		MoveTo(pt);
+		canvas.MoveTo(pt);
 		for (double t{step}; t <= 1.0; t += step)
-			LineTo(point_t(bspline(0.0).result()));
+			canvas.LineTo(point_t(bspline(0.0).result()));
 	}
 
 }

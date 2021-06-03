@@ -208,7 +208,7 @@ namespace gtl::shape {
 			pt = ct(pt);
 		};
 		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
-			return rectBoundary.CheckBoundary(pt);
+			return rectBoundary.UpdateBoundary(pt);
 		};
 		virtual void Draw(ICanvas& canvas) const override {
 			canvas.MoveTo(pt);
@@ -260,8 +260,8 @@ namespace gtl::shape {
 		};
 		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
 			bool bModified{};
-			bModified |= rectBoundary.CheckBoundary(pt0);
-			bModified |= rectBoundary.CheckBoundary(pt1);
+			bModified |= rectBoundary.UpdateBoundary(pt0);
+			bModified |= rectBoundary.UpdateBoundary(pt1);
 			return bModified;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
@@ -319,7 +319,7 @@ namespace gtl::shape {
 		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
 			bool bModified{};
 			for (auto const& pt : pts)
-				bModified |= rectBoundary.CheckBoundary(pt);
+				bModified |= rectBoundary.UpdateBoundary(pt);
 			return bModified;
 		};
 		virtual void Draw(ICanvas& canvas) const override;
@@ -345,6 +345,7 @@ namespace gtl::shape {
 		friend archive& operator & (archive& ar, s_polyline& var) {
 			ar & boost::serialization::base_object<s_shape>(var);
 			ar & var.pts;
+			ar & var.bLoop;
 			return ar;
 		}
 
@@ -398,6 +399,7 @@ namespace gtl::shape {
 				pts.back() = PolyPointFrom(*iter);
 			}
 
+			bLoop = (j["flags"].value_or(0) & 1) != 0;
 			return true;
 		}
 	};
@@ -420,8 +422,8 @@ namespace gtl::shape {
 		}
 		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
 			bool bResult{};
-			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x-radius, ptCenter.y-radius, ptCenter.z));
-			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x+radius, ptCenter.y+radius, ptCenter.z));
+			bResult |= rectBoundary.UpdateBoundary(point_t(ptCenter.x-radius, ptCenter.y-radius, ptCenter.z));
+			bResult |= rectBoundary.UpdateBoundary(point_t(ptCenter.x+radius, ptCenter.y+radius, ptCenter.z));
 			return bResult;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
@@ -553,17 +555,17 @@ namespace gtl::shape {
 
 			arc.ptCenter.x = ptBulge.x + (arc.radius / h) * (ptCenterOfLine.x - ptBulge.x);
 			arc.ptCenter.y = ptBulge.y + (arc.radius / h) * (ptCenterOfLine.y - ptBulge.y);
-			arc.angle_start = atan2(pt0.y - arc.ptCenter.y, pt0.x - arc.ptCenter.x);
-			double dT1 = atan2(pt1.y - arc.ptCenter.y, pt1.x - arc.ptCenter.x);
+			arc.angle_start = rad_t::atan2(pt0.y - arc.ptCenter.y, pt0.x - arc.ptCenter.x);
+			rad_t dT1 = rad_t::atan2(pt1.y - arc.ptCenter.y, pt1.x - arc.ptCenter.x);
 			//arc.m_eDirection = (dBulge > 0) ? 1 : -1;
 			//arc.m_dTLength = (dBulge > 0) ? fabs(dT1-arc.m_dT0) : -fabs(dT1-arc.m_dT0);
 			if (bulge > 0) {
 				while (dT1 < arc.angle_start)
-					dT1 += std::numbers::pi*2;
+					dT1 += rad_t(std::numbers::pi*2);
 				arc.angle_length = dT1 - arc.angle_start;
 			} else {
 				while (dT1 > arc.angle_start)
-					dT1 -= std::numbers::pi*2;
+					dT1 -= rad_t(std::numbers::pi*2);
 				arc.angle_length = dT1 - arc.angle_start;
 			}
 
@@ -591,8 +593,8 @@ namespace gtl::shape {
 		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
 			// todo : ... upgrade
 			bool bResult{};
-			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x-radius, ptCenter.y-radiusH, ptCenter.z));
-			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x+radius, ptCenter.y+radiusH, ptCenter.z));
+			bResult |= rectBoundary.UpdateBoundary(point_t(ptCenter.x-radius, ptCenter.y-radiusH, ptCenter.z));
+			bResult |= rectBoundary.UpdateBoundary(point_t(ptCenter.x+radius, ptCenter.y+radiusH, ptCenter.z));
 			return bResult;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
@@ -682,7 +684,7 @@ namespace gtl::shape {
 		virtual bool GetBoundingRect(CRect2d& rect) const override {
 			bool b{};
 			for (auto& pt : ptsControl)
-				b = rect.CheckBoundary(pt);
+				b = rect.UpdateBoundary(pt);
 			return b;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
@@ -787,8 +789,8 @@ namespace gtl::shape {
 		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
 			// todo : upgrade.
 			bool b{};
-			b |= rectBoundary.CheckBoundary(pt0);
-			b |= rectBoundary.CheckBoundary(pt1);
+			b |= rectBoundary.UpdateBoundary(pt0);
+			b |= rectBoundary.UpdateBoundary(pt1);
 			return b;
 		}
 		virtual void Draw(ICanvas& canvas) const override {

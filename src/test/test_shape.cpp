@@ -16,7 +16,7 @@ using namespace gtl::literals;
 
 TEST(gtl_shape, basic) {
 	std::filesystem::path paths[] = {
-		//LR"(D:\Project\APS\InkPatternGenerator\samples\Cell 잉크젯 Test_dxf2007.dxf.json)",
+		LR"(D:\Project\APS\InkPatternGenerator\samples\Cell 잉크젯 Test_dxf2007.dxf.json)",
 		LR"(D:\Project\APS\InkPatternGenerator\samples\screw2012ascii.DXF.json)",
 		//LR"(D:\Project\APS\InkPatternGenerator\samples\a.dwg.json)",
 	};

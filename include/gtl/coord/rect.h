@@ -62,8 +62,8 @@ namespace gtl {
 		constexpr value_type& member(int i) { return data()[i]; }
 		constexpr value_type const& member(int i) const { return data()[i]; }
 
-		constexpr point_t& pts(int i = 0) { return (i == 0) ? *reinterpret_cast<point_t*>(&this->left) : *reinterpret_cast<point_t*>(&this->right); }
-		constexpr point_t const& pts(int i = 0) const { return (i == 0) ? *reinterpret_cast<point_t*>(&this->left) : *reinterpret_cast<point_t*>(&this->right); }
+		constexpr point_t& pts(int i = 0) { return (i == 0) ? *(point_t*)(&this->left) : *(point_t*)(&this->right); }
+		constexpr point_t const& pts(int i = 0) const { return (i == 0) ? *(point_t*)(&this->left) : *(point_t*)(&this->right); }
 
 		static_assert(2 <= dim and dim <= 3);
 
@@ -213,7 +213,11 @@ namespace gtl {
 
 		// returns true if rectangle has no area
 		bool IsRectEmpty() const {
-			return (this->left >= this->right) || (this->top >= this->bottom) || (this->front >= this->back);
+			if constexpr (dim == 3) {
+				return (this->left >= this->right) || (this->top >= this->bottom) || (this->front >= this->back);
+			} else {
+				return (this->left >= this->right) || (this->top >= this->bottom);
+			}
 		}
 		// returns true if rectangle is at (0,0,0) and has no area
 		bool IsRectNull() const {
@@ -373,7 +377,7 @@ namespace gtl {
 		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) { j["pt0"] = B.pts(0); j["pt1"] = B.pts(1); }
 
 
-		bool CheckBoundary(point_t const& pt) {
+		bool UpdateBoundary(point_t const& pt) {
 			bool bModified{};
 			for (int i = 0; i < pt.size(); i++) {
 				if (pts(0).member(i) > pt.member(i)) {
