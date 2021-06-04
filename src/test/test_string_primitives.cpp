@@ -657,7 +657,7 @@ TEST(gtl_string, tszto) {
 	//};
 
 	char* psz{};
-	auto v0 = gtl::tsztoi<int>("123456"sv, (char**)nullptr);
+	auto v0 = gtl::tsztoi<int>("123456"sv);
 	//auto v1 = gtl::tsztoi<int>(std::string_view("123456"s), nullptr, 0, 0);
 	//auto v2 = gtl::tsztoi((std::string_view)std::basic_string<char>("123456"), nullptr, 0, 0);
 	//EXPECT_EQ(123456, v2);

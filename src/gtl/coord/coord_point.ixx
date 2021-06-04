@@ -61,8 +61,8 @@ export namespace gtl {
 		constexpr auto* data() { return (reinterpret_cast<coord_t&>(*this)).data(); }
 		constexpr auto const* data() const { return (reinterpret_cast<coord_t const&>(*this)).data(); }
 		constexpr auto const size() const { return (reinterpret_cast<coord_t const&>(*this)).size(); }
-		constexpr value_type& member(int i) { return data()[i]; }
-		constexpr value_type const& member(int i) const { return data()[i]; }
+		constexpr value_type& member(size_t i) { return data()[i]; }
+		constexpr value_type const& member(size_t i) const { return data()[i]; }
 
 		static_assert(2 <= dim and dim <= 4);
 		//static_assert(sizeof(TPointT<T, dim>) == sizeof(coord_t));
@@ -91,7 +91,7 @@ export namespace gtl {
 		TPointT& operator = (std::vector<T> const& B) {
 			size_t n = std::min(size(), B.size());
 			for (size_t i = 0; i < n; i++) {
-				member((int)i) = B[i];
+				member(i) = B[i];
 			}
 			return *this;
 		}
