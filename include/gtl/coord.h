@@ -87,32 +87,59 @@ namespace gtl {
 		return ar.IsStoring() ? Coord2Archive<Archive, T_COORD>(coord, ar) : Archive2Coord<Archive, T_COORD>(ar, coord);
 	}
 
+	//-------------------------------------------------------------------------
+	// to Text, From Text
+
+	template < gtlc::string_elem tchar, gtlc::arithmetic T_NUMBER >
+	constexpr std::basic_string_view<tchar> GetDefaultFormatSpecifier(T_NUMBER) {
+		using namespace std::literals;
+		if constexpr (std::is_same_v<tchar, char>) {
+			return "{}";
+		}
+		else if constexpr (std::is_same_v<tchar, wchar_t>) {
+			return L"{}";
+		}
+		else if constexpr (std::is_same_v<tchar, char8_t>) {
+			return u8"{}";
+		}
+		else if constexpr (std::is_same_v<tchar, char16_t>) {
+			return u"{}";
+		}
+		else if constexpr (std::is_same_v<tchar, char32_t>) {
+			return U"{}";
+		}
+		else {
+			static_assert(false);
+		}
+	}
 
 	//-------------------------------------------------------------------------
 	// to Text, From Text
 	template < typename tchar_t, gtlc::coord T_COORD >
-	std::basic_string<tchar_t> ToString(const T_COORD& coord, const tchar_t* pszFMT = nullptr) {
+	std::basic_string<tchar_t> ToString(T_COORD const& coord, std::basic_string_view<tchar_t> svFMT = {}) {
 		std::basic_string<tchar_t> str;
-		if ( !pszFMT || !pszFMT[0] )
-			pszFMT = GetDefaultFormatSpecifier<tchar_t, typename T_COORD::value_type>(0);
+		if ( svFMT.empty() )
+			svFMT = GetDefaultFormatSpecifier<tchar_t, typename T_COORD::value_type>(0);
 
-		for (size_t i = 0; i < coord.data().size(); i++) {
+		for (size_t i = 0; i < coord.size(); i++) {
 			if (i) {
 				str += ',';
 				str += ' ';
 			}
-			str += Format(pszFMT, coord.data()[i]);
+			str += std::format(svFMT, coord.data()[i]);
 		}
 		return str;
 	}
-	template < typename tchar_t, gtlc::coord T_COORD >
-	std::optional<T_COORD> FromString(const tchar_t* psz) {
+	template < gtlc::coord T_COORD, typename tchar_t >
+	T_COORD FromString(std::basic_string_view<tchar_t> sv) {
 		T_COORD coord;
-		for (auto& v : coord.data()) {
-			if (!psz || !*psz)
-				return nullptr;
-			v = tszto_number<tchar_t, typename T_COORD::value_type>(psz, &psz);
-			if (*psz == ',') psz++;	// or....... if (*psz) psz++
+		tchar_t const* pos = sv.data();
+		tchar_t const* const end = sv.data() + sv.size();
+		for (auto& v : coord.arr()) {
+			if (pos >= end)
+				break;
+			v = tszto<typename T_COORD::value_type>(pos, end, &pos);
+			if (*pos == ',') pos++;	// or....... if (*pos) pos++
 		}
 		return coord;
 	}

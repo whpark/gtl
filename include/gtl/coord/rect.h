@@ -59,11 +59,15 @@ namespace gtl {
 		constexpr auto* data() { return (reinterpret_cast<coord_t&>(*this)).data(); }
 		constexpr auto const* data() const { return (reinterpret_cast<coord_t const&>(*this)).data(); }
 		constexpr auto const size() const { return (reinterpret_cast<coord_t const&>(*this)).size(); }
-		constexpr value_type& member(int i) { return data()[i]; }
-		constexpr value_type const& member(int i) const { return data()[i]; }
+		constexpr value_type& member(size_t i) { return data()[i]; }
+		constexpr value_type const& member(size_t i) const { return data()[i]; }
 
 		constexpr point_t& pts(int i = 0) { return (i == 0) ? *(point_t*)(&this->left) : *(point_t*)(&this->right); }
 		constexpr point_t const& pts(int i = 0) const { return (i == 0) ? *(point_t*)(&this->left) : *(point_t*)(&this->right); }
+		constexpr point_t& pt0() { return *(point_t*)(&this->left); }
+		constexpr point_t& pt1() { return *(point_t*)(&this->right); }
+		constexpr point_t const& pt0() const { return *(point_t*)(&this->left); }
+		constexpr point_t const& pt1() const { return *(point_t*)(&this->right); }
 
 		static_assert(2 <= dim and dim <= 3);
 
