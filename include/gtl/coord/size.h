@@ -100,8 +100,8 @@ namespace gtl {
 			} else if constexpr (gtlc::rect<T_COORD>) {
 				*this = (B.pt1 - B.pt0);
 			} else if constexpr (gtlc::wnd_rect<T_COORD>) {
-				cx = B.right - B.left;
-				cy = B.bottom - B.top;
+				this->cx = B.right - B.left;
+				this->cy = B.bottom - B.top;
 			} else static_assert(false);
 			return *this;
 		};
