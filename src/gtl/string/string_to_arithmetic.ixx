@@ -34,7 +34,7 @@ export namespace gtl {
 	/// @param radix 
 	/// @return number
 	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
-	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped = nullptr, int radix = 0, int cSplitter = 0);
+	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 
 	/// <summary>
@@ -51,7 +51,7 @@ export namespace gtl {
 	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
 	/// <returns>number value. (no overflow checked)</returns>
 	template < typename tvalue = int, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
-	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped = nullptr, int radix = 0, int cSplitter = 0);
+	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 	template < typename tvalue = int, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
 	inline [[nodiscard]] tvalue tsztoi(std::basic_string<tchar> const& str, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 	template < typename tvalue = int, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
@@ -98,7 +98,7 @@ export namespace gtl {
 	/// @param radix 
 	/// @return number
 	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
-	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped, int radix, int cSplitter) {
+	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped, int radix, tchar cSplitter) {
 		if constexpr (std::is_integral_v<tvalue>) {
 			return tsztoi<tvalue>(psz, pszEnd, pszStopped, radix, cSplitter);
 		} else {
@@ -121,7 +121,7 @@ export namespace gtl {
 	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
 	/// <returns>number value. (no overflow checked)</returns>
 	template < typename tvalue, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
-	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped, int radix, int cSplitter) {
+	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped, int radix, tchar cSplitter) {
 		if (svNumberString.empty())
 			return {};
 
@@ -279,47 +279,53 @@ export namespace gtl {
 		return value;
 	}
 
-	template < typename tvalue, typename tchar > requires std::is_floating_point_v<tvalue> && gtlc::string_elem<tchar>
-	inline tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped) {
+	template < std::floating_point tvalue, gtlc::string_elem tchar >
+	inline tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped, tchar cSplitter) {
 		if constexpr (sizeof(tchar) == sizeof(char)) {
-			tvalue value;
-			auto [ptr, ec] = std::from_chars(sv.data(), sv.data()+sv.size(), value, std::chars_format::general);
-			if (ppszStopped)
-				*ppszStopped = const_cast<tchar*>(ptr);
-			return value;
-		}
-		// ... not secure.
-		//else if constexpr (sizeof(tchar) == sizeof(wchar_t)) {
-		//	return wcstod((wchar_t const*)sv.data(), ppszStopped);
-		//}
-		else {
-			//std::string str;
-			//str.reserve(16);
-			char buf[1024];
-			char* str = buf;
-			char const* const end_str = buf+sizeof(buf)-1;
-			tchar const* pos = sv.data();
-			tchar const* end = sv.data() + sv.size();
-			while (pos < end && IsSpace(*pos))
-				pos++;
-			for (; (pos < end) and (str < end_str); pos++, str++) {
-				static_assert(std::is_unsigned_v<tchar>);
-				if (*pos > 127 || !std::strchr("+-.0123456789eE", *pos))
-					break;
-				*str += (char)*pos;
+			if (cSplitter == 0) {
+				// 주의!!!!!!! cSplitter 가 0일 경우에만..
+				tvalue value;
+				auto [ptr, ec] = std::from_chars(sv.data(), sv.data()+sv.size(), value, std::chars_format::general);
+				if (ppszStopped)
+					*ppszStopped = ptr;
+				return value;
 			}
-			*str = 0;
-			return tsztod<tvalue, char>(str, ppszStopped);
 		}
+
+		char buf[1024];
+		char* str = buf;
+		char const* const end_str = buf+sizeof(buf)-1;
+		tchar const* pos = sv.data();
+		tchar const* end = sv.data() + sv.size();
+		while (pos < end && IsSpace(*pos))
+			pos++;
+		for (; (pos < end) and (str < end_str); pos++) {
+			auto const c = *pos;
+			if (c == cSplitter)
+				continue;
+			//if constexpr (std::is_unsigned_v<tchar>) {
+			//	if (c > 127)
+			//		break;
+			//}
+			//else {
+			//	if (c <= 0)
+			//		break;
+			//}
+			if ((c > 127) or (c <= 0) or !std::strchr("+-.0123456789eE", c))
+				break;
+			*str++ += (char)*pos;
+		}
+		*str = 0;
+		return tsztod<tvalue, char>(std::string_view{buf, str+1}, ppszStopped, 0);
 	}
 
-	template < typename tvalue, typename tchar > requires std::is_floating_point_v<tvalue> && gtlc::string_elem<tchar>
-	inline tvalue tsztod(std::basic_string<tchar> const& str, tchar const** ppszStopped) {
-		return tsztod<tvalue, tchar>((std::basic_string_view<tchar>)str, ppszStopped);
+	template < std::floating_point tvalue, gtlc::string_elem tchar>
+	inline tvalue tsztod(std::basic_string<tchar> const& str, tchar const** ppszStopped, tchar cSplitter) {
+		return tsztod<tvalue, tchar>((std::basic_string_view<tchar>)str, ppszStopped, cSplitter);
 	}
-	template < typename tvalue, typename tchar > requires std::is_floating_point_v<tvalue> && gtlc::string_elem<tchar>
-	inline tvalue tsztod(tchar const* psz, tchar const** ppszStopped) {
-		return tsztod<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz+tszlen(psz) }, ppszStopped);
+	template < std::floating_point tvalue, gtlc::string_elem tchar>
+	inline tvalue tsztod(tchar const* psz, tchar const** ppszStopped, tchar cSplitter) {
+		return tsztod<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz+tszlen(psz) }, ppszStopped, cSplitter);
 	}
 
 
