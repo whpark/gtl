@@ -16,9 +16,9 @@ using namespace gtl::literals;
 
 TEST(gtl_shape, basic) {
 	std::filesystem::path paths[] = {
-		LR"(D:\Project\APS\InkPatternGenerator\samples\Cell 잉크젯 Test_dxf2007.dxf.json)",
-		LR"(D:\Project\APS\InkPatternGenerator\samples\screw2012ascii.DXF.json)",
-		//LR"(D:\Project\APS\InkPatternGenerator\samples\a.dwg.json)",
+		LR"xx(shape_test/bridge.dxf.json)xx",
+		LR"xx(shape_test/cube.dxf.json)xx",
+		LR"xx(shape_test/diamond.dxf.json)xx",
 	};
 
 	for (auto path : paths) {
@@ -53,12 +53,5 @@ TEST(gtl_shape, basic) {
 
 	}
 
-	if (0) {
-		std::ifstream ar(LR"xx(D:\Project\APS\InkPatternGenerator\Project\Drawings.shape)xx", std::ios_base::binary);
-		boost::archive::text_iarchive ia(ar);
-
-		gtl::shape::s_drawing cad;
-		ia & cad;
-	}
 }
 

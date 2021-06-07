@@ -90,7 +90,6 @@ namespace gtl::shape {
 		virtual void LineTo_Target(point_t const& ptTargetSystem) = 0;
 
 		virtual void PreDraw(s_shape const&) = 0;
-		virtual void PostDraw(s_shape const&) = 0;
 
 		void MoveTo(point_t pt) {
 			pt = Trans(pt);
@@ -167,10 +166,8 @@ namespace gtl::shape {
 
 	public:
 		//virtual void PreDraw(s_shape const& shape) {}
-		//virtual void PostDraw(s_shape const& shape) {}
 
 		virtual void PreDraw(s_shape const&) override {}
-		virtual void PostDraw(s_shape const&) override {}
 
 		virtual void MoveTo_Target(point_t const& pt) override {
 			// Scanner Jump To
@@ -203,13 +200,13 @@ namespace gtl::shape {
 		virtual void PreDraw(s_shape const& shape) override {
 			color_ = ColorS(shape.color);
 		}
-		virtual void PostDraw(s_shape const&) override {
-		}
 
 		// Primative, returns End Position.
 		virtual void MoveTo_Target(point_t const& pt) override {}
 		virtual void LineTo_Target(point_t const& pt) override {
 			cv::line(img_, ptLast_, pt, color_, (int)line_thickness_, line_type_);
+			//cv::line(img_, cv::Point(ptLast_.x, ptLast_.y), cv::Point(pt.x, pt.y), color_, (int)line_thickness_, line_type_);
+			//cv::line(img_, cv::Point2d(ptLast_.x, ptLast_.y), cv::Point2d(pt.x, pt.y), color_, (int)line_thickness_, line_type_);
 		}
 
 		//inline auto ColorS() { return ColorS(cr_); }
@@ -220,6 +217,23 @@ namespace gtl::shape {
 		//virtual void LineRelTo(const point_t& pt, bool bShowDirection = false) { LineTo(m_ptLast + pt, bShowDirection); }
 		//virtual void ArcRelTo(const point_t& ptCenter, deg_t dTLength) { ArcTo(m_ptLast + ptCenter, dTLength); }
 	};
+
+
+	//=============================================================================================================================
+	// ICanvas : Interface of Canvas
+	class CCanvasMat_RoundDown : public CCanvasMat {
+	public:
+		using base_t = CCanvasMat;
+	public:
+		using base_t::base_t;
+
+		// Primative, returns End Position.
+		virtual void LineTo_Target(point_t const& pt) override {
+			cv::line(img_, cv::Point((int)ptLast_.x, (int)ptLast_.y), cv::Point((int)pt.x, (int)pt.y), color_, (int)line_thickness_, line_type_);
+		}
+	};
+
+
 
 	////-----------------------------------------------------------------------------
 	//// ICanvas : Interface of Canvas
@@ -251,8 +265,6 @@ namespace gtl::shape {
 	//	virtual void PreDraw() {
 	//		//m_iOrder = 0;
 	//		memset(m_ptLast.val, 0xff, sizeof(m_ptLast.val));	// not zero. set INVALID_VALUE
-	//	}
-	//	virtual void PostDraw() {
 	//	}
 
 	//	//void ShowDirection(bool bShow = true, bool bShowOrder = true, COLORREF crArrow = RGB(255, 0, 0), int iArrowSize = 16, int iArrowThickness = 1) {

@@ -1,0 +1,50 @@
+Type:LAYER - Color(ff,ff,ff), lineType:CONTINUOUS, lineWeight:31
+Type:LAYER - Color(ff,ff,ff), lineType:CONTINUOUS, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,-0.5,0) - pt1(0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,-0.5,0) - pt1(0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,0.5,0) - pt1(-0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,0.5,0) - pt1(-0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,-0.5,0) - pt1(-0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,-0.5,0) - pt1(-0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,0.5,0) - pt1(0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,0.5,0) - pt1(0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,-0.5,0) - pt1(-0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,-0.5,0) - pt1(-0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,0.5,0) - pt1(-0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,0.5,0) - pt1(-0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,-0.5,0) - pt1(0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,-0.5,0) - pt1(0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,0.5,0) - pt1(0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,0.5,0) - pt1(0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,-0.5,0) - pt1(0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,-0.5,0) - pt1(0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,-0.5,0) - pt1(-0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,-0.5,0) - pt1(-0.5,-0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,0.5,0) - pt1(0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,0.5,0) - pt1(0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(0.5,0.5,0) - pt1(-0.5,0.5,0)
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+	pt0(-0.5,0.5,0) - pt1(-0.5,0.5,0)

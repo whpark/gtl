@@ -12,6 +12,23 @@ using namespace std::literals;
 
 namespace gtl::shape {
 
+	void s_shape::Draw(ICanvas& canvas) const {
+		canvas.PreDraw(*this);
+	}
+	void s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
+		rect_t rectBoundary;
+		rectBoundary.left = DBL_MAX;
+		rectBoundary.right = DBL_MAX;
+		//rectBoundary.front = DBL_MAX;
+		rectBoundary.top = -DBL_MAX;
+		rectBoundary.bottom = -DBL_MAX;
+		//rectBoundary.back = -DBL_MAX;
+		UpdateBoundary(rectBoundary);
+		if (rectBoundary.IntersectRect(rectROI).IsRectEmpty())
+			return;
+		Draw(canvas);
+	}
+
 	bool s_shape::LoadFromCADJson(json_t& _j) {
 		using namespace std::literals;
 		gtl::bjson<json_t> j(_j);
@@ -76,8 +93,10 @@ namespace gtl::shape {
 		};
 
 		auto iter = map.find(eType);
-		if (iter == map.end())
-			return L""s;
+		if (iter == map.end()) {
+			static auto const empty = L""s;
+			return empty;
+		}
 		return iter->second;
 	}
 
@@ -126,6 +145,8 @@ namespace gtl::shape {
 	}
 
 	void s_polyline::Draw(ICanvas& canvas) const {
+		s_shape::Draw(canvas);
+
 		if (pts.size())
 			canvas.MoveTo(pts[0]);
 
@@ -293,7 +314,12 @@ namespace gtl::shape {
 		// Entities
 		{
 			auto jEntities = jTOP["mainBlock"].json().as_array();
-
+			rectBoundary.left = DBL_MAX;
+			rectBoundary.top = DBL_MAX;
+			//rectBoundary.front = DBL_MAX;
+			rectBoundary.right = -DBL_MAX;
+			rectBoundary.bottom = -DBL_MAX;
+			//rectBoundary.back = DBL_MAX;
 			// block entities
 			for (auto& jEntity : jEntities) {
 				bjson<json_t> j(jEntity);
@@ -305,6 +331,7 @@ namespace gtl::shape {
 
 				try {
 					rShape->LoadFromCADJson(jEntity);
+					//rShape->UpdateBoundary(rectBoundary);
 				} catch (std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
@@ -313,14 +340,14 @@ namespace gtl::shape {
 					continue;
 				}
 
-				AddEntity(std::move(rShape), mapLayers, mapBlocks);
+				AddEntity(std::move(rShape), mapLayers, mapBlocks, rectBoundary);
 			}
 		}
 
 		return true;
 	}
 
-	bool s_drawing::AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks) {
+	bool s_drawing::AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectB) {
 		if (!rShape)
 			return false;
 
@@ -377,7 +404,7 @@ namespace gtl::shape {
 							if (rShapeNew->crIndex == 0) {
 								rShapeNew->crIndex = pBlock->crIndex;
 							}
-							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks)) {
+							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks, rectB)) {
 								DEBUG_PRINT("CANNOT Add Shape\n");
 								//return false;
 							}
@@ -408,6 +435,7 @@ namespace gtl::shape {
 					}
 				}
 
+				rShape->UpdateBoundary(rectB);
 				pLayer->shapes.push_back(std::move(rShape));
 
 			} else {

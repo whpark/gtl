@@ -71,6 +71,7 @@ namespace gtl::shape {
 	using char_t = wchar_t;
 	using string_t = std::wstring;
 	using point_t = CPoint3d;
+	using rect_t = CRect3d;
 	struct line_t { point_t beg, end; };
 	using json_t = boost::json::value;
 
@@ -113,7 +114,7 @@ namespace gtl::shape {
 
 	using color_t = color_rgba_t;
 
-	constexpr color_t const CR_DEFAULT = RGBA(255, 255, 255);
+	constexpr color_t const CR_DEFAULT = ColorRGBA(255, 255, 255);
 
 	enum class eSHAPE {
 		none = -1,
@@ -264,9 +265,10 @@ namespace gtl::shape {
 		virtual void FlipY() = 0;
 		virtual void FlipZ() = 0;
 		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
-		virtual bool GetBoundingRect(CRect2d&) const = 0;
+		virtual bool UpdateBoundary(rect_t&) const = 0;
 
-		virtual void Draw(ICanvas& canvas) const = 0;
+		virtual void Draw(ICanvas& canvas) const;
+		virtual void DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
 
 		virtual void PrintOut(std::wostream& os) const {
 			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetShapeName(GetShapeType()), color.r, color.g, color.b, !bVisible?L"Invisible ":L"", bTransparent?L"Transparent ":L"");
