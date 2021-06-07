@@ -28,7 +28,7 @@ export namespace gtl::shape {
 	using color_t = color_rgba_t;
 
 	enum class eSHAPE : uint8_t { none, layer, dot, line, polyline, spline, circle, arc, ellipse, text, mtext, nSHAPE };
-	constexpr color_t const CR_DEFAULT = RGBA(255, 255, 255);
+	constexpr color_t const CR_DEFAULT = ColorRGBA(255, 255, 255);
 
 	struct hatching_t {
 		uint32_t eFlag{};
