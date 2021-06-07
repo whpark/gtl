@@ -109,7 +109,7 @@ namespace gtl {
 				this->y = RoundOrForward<T>(B.cy);
 				if constexpr (dim >= 3 and gtlc::has__cz<T_COORD>)
 					this->z = RoundOrForward<T>(B.cz);
-			} else if constexpr (dim >= 3 and gtlc::wnd_rect<T_COORD>) {
+			} else if constexpr (gtlc::wnd_rect<T_COORD>) {
 				this->x = B.left;
 				this->y = B.top;
 				//z = {};
