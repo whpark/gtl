@@ -109,6 +109,9 @@ export namespace gtl {
 					this->cz = RoundOrForward<T>(B.z);
 			} else if constexpr (gtlc::rect<T_COORD>) {
 				*this = (B.pt1 - B.pt0);
+			} else if constexpr (gtlc::wnd_rect<T_COORD>) {
+				this->cx = B.right - B.left;
+				this->cy = B.bottom - B.top;
 			} else static_assert(false);
 			return *this;
 		};
