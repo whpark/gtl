@@ -153,7 +153,7 @@ namespace gtl::shape {
 
 	//=============================================================================================================================
 	// IQDeviceScanner : Interface of Canvas
-	class ICanvasScanner : public ICanvas {
+	class GTL_SHAPE_CLASS ICanvasScanner : public ICanvas {
 		friend class ICanvas;
 	protected:
 		ct_t::mat_t matTrans_ = ct_t::mat_t::eye();
@@ -181,7 +181,7 @@ namespace gtl::shape {
 
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
-	class CCanvasMat : public ICanvas {
+	class GTL_SHAPE_CLASS CCanvasMat : public ICanvas {
 	public:
 		cv::Mat& img_;
 
@@ -221,7 +221,7 @@ namespace gtl::shape {
 
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
-	class CCanvasMat_RoundDown : public CCanvasMat {
+	class GTL_SHAPE_CLASS CCanvasMat_RoundDown : public CCanvasMat {
 	public:
 		using base_t = CCanvasMat;
 	public:
