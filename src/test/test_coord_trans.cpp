@@ -4,7 +4,7 @@ import gtl;
 
 using namespace std::literals;
 using namespace gtl::literals;
-
+#if 0
 TEST(gtl_coord_trans, ct2) {
 	using namespace gtl;
 	{
@@ -64,3 +64,4 @@ TEST(gtl_coord_trans, ct3) {
 
 
 }
+#endif

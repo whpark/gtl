@@ -33,7 +33,7 @@ export namespace gtl {
 	/// @param pszEnd 
 	/// @param radix 
 	/// @return number
-	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
+	template < typename tvalue, typename tchar > requires gtlc::arithmetic<tvalue> and gtlc::string_elem<tchar>
 	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 
@@ -50,24 +50,24 @@ export namespace gtl {
 	/// <param name="radix">radix</param>
 	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
 	/// <returns>number value. (no overflow checked)</returns>
-	template < typename tvalue = int, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue = int, typename tchar > requires std::integral<tvalue> && gtlc::string_elem<tchar>
 	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < typename tvalue = int, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue = int, typename tchar > requires std::integral<tvalue> && gtlc::string_elem<tchar>
 	inline [[nodiscard]] tvalue tsztoi(std::basic_string<tchar> const& str, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < typename tvalue = int, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue = int, typename tchar > requires std::integral<tvalue> && gtlc::string_elem<tchar>
 	GTL_DEPR_SEC inline [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < typename tvalue = int, typename tchar, size_t size > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue = int, typename tchar, size_t size > requires std::integral<tvalue> && gtlc::string_elem<tchar>
 	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
-	template < typename tvalue = double, typename tchar > requires std::is_floating_point_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue = double, typename tchar > requires std::floating_point<tvalue> && gtlc::string_elem<tchar>
 	[[deprecated("NOT A STANDARD CONVERTING !")]] constexpr tvalue _tsztod(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
 
-	template < typename tvalue = double, typename tchar > requires std::is_floating_point_v<tvalue> && gtlc::string_elem<tchar>
-	inline [[nodiscard]] tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped = nullptr);
-	template < typename tvalue = double, typename tchar > requires std::is_floating_point_v<tvalue> && gtlc::string_elem<tchar>
-	inline [[nodiscard]] tvalue tsztod(std::basic_string<tchar> const& str, tchar const** ppszStopped = nullptr);
-	template < typename tvalue = double, typename tchar > requires std::is_floating_point_v<tvalue> && gtlc::string_elem<tchar>
-	inline [[nodiscard]] tvalue tsztod(tchar const* psz, tchar const** ppszStopped = nullptr);
+	template < typename tvalue = double, typename tchar > requires std::floating_point<tvalue> && gtlc::string_elem<tchar>
+	[[nodiscard]] tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
+	template < typename tvalue = double, typename tchar > requires std::floating_point<tvalue> && gtlc::string_elem<tchar>
+	inline [[nodiscard]] tvalue tsztod(std::basic_string<tchar> const& str, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
+	template < typename tvalue = double, typename tchar > requires std::floating_point<tvalue> && gtlc::string_elem<tchar>
+	inline [[nodiscard]] tvalue tsztod(tchar const* psz, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
 
 
 };	// namespace gtl;
@@ -97,7 +97,7 @@ export namespace gtl {
 	/// @param pszEnd 
 	/// @param radix 
 	/// @return number
-	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
+	template < typename tvalue, typename tchar > requires gtlc::arithmetic<tvalue> and gtlc::string_elem<tchar>
 	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped, int radix, tchar cSplitter) {
 		if constexpr (std::is_integral_v<tvalue>) {
 			return tsztoi<tvalue>(psz, pszEnd, pszStopped, radix, cSplitter);
@@ -120,7 +120,7 @@ export namespace gtl {
 	/// <param name="radix">radix</param>
 	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
 	/// <returns>number value. (no overflow checked)</returns>
-	template < typename tvalue, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue, typename tchar > requires std::integral<tvalue> && gtlc::string_elem<tchar>
 	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped, int radix, tchar cSplitter) {
 		if (svNumberString.empty())
 			return {};
@@ -193,21 +193,21 @@ export namespace gtl {
 		return value;
 	}
 
-	template < typename tvalue, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue, typename tchar > requires std::integral<tvalue> && gtlc::string_elem<tchar>
 	inline [[nodiscard]] tvalue tsztoi(std::basic_string<tchar> const& str, tchar const** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>((std::basic_string_view<tchar>)str, ppszStopped, radix, cSplitter);
 	}
-	template < typename tvalue, typename tchar > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue, typename tchar > requires std::integral<tvalue> && gtlc::string_elem<tchar>
 	GTL_DEPR_SEC inline [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar const** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz + tszlen(psz) }, ppszStopped, radix, cSplitter);
 	}
-	template < typename tvalue, typename tchar, size_t size > requires std::is_integral_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue, typename tchar, size_t size > requires std::integral<tvalue> && gtlc::string_elem<tchar>
 	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar const** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ sz, sz + tszlen(sz, size) }, ppszStopped, radix, cSplitter);
 	}
 
 
-	template < typename tvalue, typename tchar > requires std::is_floating_point_v<tvalue> && gtlc::string_elem<tchar>
+	template < typename tvalue, typename tchar > requires std::floating_point<tvalue> && gtlc::string_elem<tchar>
 	[[deprecated("NOT STANDARD CONVERTING !")]] constexpr tvalue _tsztod(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped, tchar cSplitter) {
 		if (!psz)
 			return {};
@@ -279,8 +279,8 @@ export namespace gtl {
 		return value;
 	}
 
-	template < std::floating_point tvalue, gtlc::string_elem tchar >
-	inline tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped, tchar cSplitter) {
+	template < typename tvalue, typename tchar > requires std::floating_point<tvalue> and gtlc::string_elem<tchar>
+	tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped, tchar cSplitter) {
 		if constexpr (sizeof(tchar) == sizeof(char)) {
 			if (cSplitter == 0) {
 				// 주의!!!!!!! cSplitter 가 0일 경우에만..
@@ -319,11 +319,11 @@ export namespace gtl {
 		return tsztod<tvalue, char>(std::string_view{buf, str+1}, ppszStopped, 0);
 	}
 
-	template < std::floating_point tvalue, gtlc::string_elem tchar>
+	template < typename tvalue, typename tchar > requires std::floating_point<tvalue> and gtlc::string_elem<tchar>
 	inline tvalue tsztod(std::basic_string<tchar> const& str, tchar const** ppszStopped, tchar cSplitter) {
 		return tsztod<tvalue, tchar>((std::basic_string_view<tchar>)str, ppszStopped, cSplitter);
 	}
-	template < std::floating_point tvalue, gtlc::string_elem tchar>
+	template < typename tvalue, typename tchar > requires std::floating_point<tvalue> and gtlc::string_elem<tchar>
 	inline tvalue tsztod(tchar const* psz, tchar const** ppszStopped, tchar cSplitter) {
 		return tsztod<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz+tszlen(psz) }, ppszStopped, cSplitter);
 	}

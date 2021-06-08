@@ -10,6 +10,7 @@ module;
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <cmath>
 #include <memory>
 #include <deque>
 #include <span>
@@ -18,19 +19,20 @@ module;
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
-#include "boost/ptr_container/ptr_container.hpp"
+//#include "boost/ptr_container/ptr_container.hpp"
 //#include "boost/serialization/base_object.hpp"
 //#include "boost/archive/polymorphic_xml_iarchive.hpp"
 //#include "boost/archive/polymorphic_xml_oarchive.hpp"
 
 //#include "opencv2/opencv.hpp"
-#include "opencv2/opencv_modules.hpp"
-#include "opencv2/core.hpp"
+//#include "opencv2/opencv_modules.hpp"
+//#include "opencv2/core.hpp"
 
 export module gtl:coord_trans;
 import :concepts;
 import :coord_point;
 import :coord_size;
+//import :matrix;
 
 export namespace gtl {
 
@@ -132,7 +134,7 @@ export namespace gtl {
 		virtual [[nodiscard]] bool IsRightHanded() const = 0;
 	};
 
-
+#if 0
 	//-----------------------------------------------------------------------------
 //	template < std::floating_point T >
 	class CCoordTransChain : public ICoordTrans {
@@ -235,8 +237,9 @@ export namespace gtl {
 		}
 
 	};
+#endif
 
-
+#if 0
 	//-----------------------------------------------------------------------------
 	/// @brief class TCoordTransDim 
 	/// TARGET = scale * mat ( SOURCE - origin ) + offset
@@ -247,6 +250,7 @@ export namespace gtl {
 		using this_t = TCoordTransDim;
 		using base_t = ICoordTrans;
 		using mat_t = cv::Matx<double, dim, dim>;
+		//using mat_t = TMatrix<double, dim, dim>;
 		using point_t = TPointT<double, dim>;
 
 	public:
@@ -383,6 +387,7 @@ export namespace gtl {
 
 			// Check.
 			double d = cv::determinant(matS);
+			//double d = matS.determinant();
 			if (fabs(d) <= dMinDeterminant)
 				return false;
 
@@ -391,6 +396,7 @@ export namespace gtl {
 			mat_ = matT * matS.inv();
 
 			scale_ = fabs(cv::determinant(mat_));
+			//scale_ = fabs(mat_.determinant());
 			mat_ /= scale_;
 
 			if (!bCalcScale)
@@ -436,6 +442,7 @@ export namespace gtl {
 			}
 			// Check.
 			double d = cv::determinant(matS);
+			//double d = matS.determinant();
 			if (fabs(d) <= dMinDeterminant)
 				return false;
 
@@ -449,6 +456,7 @@ export namespace gtl {
 			mat_ = matT * matS.inv();
 
 			scale_ = cv::determinant(mat_);
+			//scale_ = mat_.determinant();
 			mat_ /= scale_;
 
 			if (!bCalcScale)
@@ -462,7 +470,7 @@ export namespace gtl {
 
 		static inline [[nodiscard]] mat_t GetRotatingMatrix(rad_t angle) requires (dim == 2) {
 			double c{cos(angle)}, s{sin(angle)};
-			return mat_t(c, -s, s, c);
+			return mat_t{c, -s, s, c};
 		}
 		static inline [[nodiscard]] mat_t GetRotatingMatrixXY(rad_t angle) requires (dim >= 3) {
 			double c{cos(angle)}, s{sin(angle)};
@@ -550,11 +558,15 @@ export namespace gtl {
 		}
 		virtual [[nodiscard]] bool IsRightHanded() const override {
 			return cv::determinant(mat_) >= 0;
+			//return mat_.determinant() >= 0;
 		}
 
 		TCoordTransDim& operator *= (TCoordTransDim const& B) {
 			// 순서 바꾸면 안됨.
+			//offset_		= scale_ * mat_ * (B.offset_ - origin_) + offset_;
+			auto t = mat_*(B.offset_-origin_);
 			offset_		= scale_ * mat_ * (B.offset_ - origin_) + offset_;
+
 			origin_		= B.origin_;
 			mat_		= mat_ * B.mat_;
 			scale_		= scale_ * B.scale_;
@@ -577,6 +589,7 @@ export namespace gtl {
 	template TCoordTransDim<3>;
 	using CCoordTrans3d = TCoordTransDim<3>;
 
+#endif
 
 	//GTL_CLASS CCoordTrans2d;
 	//GTL_CLASS CCoordTrans3d;

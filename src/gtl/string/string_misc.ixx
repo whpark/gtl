@@ -587,7 +587,7 @@ export namespace gtl {
 			}
 
 			// check end point
-			tchar* pHexEnd{};
+			tchar const* pHexEnd{};
 			char32_t v{};
 			if constexpr (max_digit_len != 0) {
 				v = tsztoi<char32_t>(std::basic_string_view<tchar>{pos, pos+max_digit_len}, &pHexEnd, radix);
