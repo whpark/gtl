@@ -71,6 +71,7 @@ namespace gtl::shape {
 	using char_t = wchar_t;
 	using string_t = std::wstring;
 	using point_t = CPoint3d;
+	using rect_t = CRect3d;
 	struct line_t { point_t beg, end; };
 	using json_t = boost::json::value;
 
@@ -113,8 +114,46 @@ namespace gtl::shape {
 
 	using color_t = color_rgba_t;
 
-	enum class eSHAPE : uint8_t { none, layer, dot, line, polyline, spline, circle, arc, ellipse, text, mtext, nSHAPE };
-	constexpr color_t const CR_DEFAULT = RGBA(255, 255, 255);
+	constexpr color_t const CR_DEFAULT = ColorRGBA(255, 255, 255);
+
+	enum class eSHAPE {
+		none = -1,
+		e3dface = 0,
+		arc_xy,
+		block,
+		circle_xy,
+		dimension,
+		dimaligned,
+		dimlinear,
+		dimradial,
+		dimdiametric,
+		dimangular,
+		dimangular3p,
+		dimordinate,
+		ellipse_xy,
+		hatch,
+		image,
+		insert,
+		leader,
+		line,
+		lwpolyline,
+		mtext,
+		dot,
+		polyline,
+		ray,
+		solid,
+		spline,
+		text,
+		trace,
+		underlay,
+		vertex,
+		viewport,
+		xline,
+
+		layer = 127,
+		drawing = 128,
+
+	};
 
 	using variable_t = boost::variant<string_t, int, double, point_t>;
 
@@ -176,44 +215,6 @@ namespace gtl::shape {
 	/// @brief shape interface class
 	struct GTL_SHAPE_CLASS s_shape {
 	public:
-		enum class eTYPE {
-			none = -1,
-			e3dface = 0,
-			arc_xy,
-			block,
-			circle_xy,
-			dimension,
-			dimaligned,
-			dimlinear,
-			dimradial,
-			dimdiametric,
-			dimangular,
-			dimangular3p,
-			dimordinate,
-			ellipse_xy,
-			hatch,
-			image,
-			insert,
-			leader,
-			line,
-			lwpolyline,
-			mtext,
-			dot,
-			polyline,
-			ray,
-			solid,
-			spline,
-			text,
-			trace,
-			underlay,
-			vertex,
-			viewport,
-			xline,
-
-			layer = 127,
-			drawing = 128,
-
-		};
 	protected:
 		friend struct s_drawing;
 		int crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
@@ -255,20 +256,22 @@ namespace gtl::shape {
 		}
 		virtual bool LoadFromCADJson(json_t& _j);
 
-		virtual eTYPE GetType() const = 0;
-		static string_t const& GetTypeName(eTYPE eType);
+		virtual eSHAPE GetShapeType() const = 0;
+		string_t const& GetShapeName() const { return GetShapeName(GetShapeType()); }
+		static string_t const& GetShapeName(eSHAPE eType);
 
 		//virtual point_t PointAt(double t) const = 0;
 		virtual void FlipX() = 0;
 		virtual void FlipY() = 0;
 		virtual void FlipZ() = 0;
 		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
-		virtual bool GetBoundingRect(CRect2d&) const = 0;
+		virtual bool UpdateBoundary(rect_t&) const = 0;
 
-		virtual void Draw(ICanvas& canvas) const = 0;
+		virtual void Draw(ICanvas& canvas) const;
+		virtual void DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
 
 		virtual void PrintOut(std::wostream& os) const {
-			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetTypeName(GetType()), color.r, color.g, color.b, !bVisible?L"Invisible ":L"", bTransparent?L"Transparent ":L"");
+			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetShapeName(GetShapeType()), color.r, color.g, color.b, !bVisible?L"Invisible ":L"", bTransparent?L"Transparent ":L"");
 			fmt::print(os, L"lineType:{}, lineWeight:{}\n", strLineType, lineWeight);
 		}
 

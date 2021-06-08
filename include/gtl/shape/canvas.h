@@ -41,6 +41,8 @@ namespace gtl::shape {
 	//	GTL__DYNAMIC_VIRTUAL_BASE(CCoordSystem)
 	//};
 
+	extern GTL_SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
+
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
 	class ICanvas {
@@ -88,7 +90,6 @@ namespace gtl::shape {
 		virtual void LineTo_Target(point_t const& ptTargetSystem) = 0;
 
 		virtual void PreDraw(s_shape const&) = 0;
-		virtual void PostDraw(s_shape const&) = 0;
 
 		void MoveTo(point_t pt) {
 			pt = Trans(pt);
@@ -113,10 +114,10 @@ namespace gtl::shape {
 		}
 		virtual void Arc(point_t const& ptCenter, double radius, deg_t t0, deg_t tLength) {
 			int n = Round(tLength * std::numbers::pi * radius / target_interpolation_inverval_);
-			auto t1 = t0+tLength;
-			MoveTo(point_t{cos(t0), sin(t0), .0}+ptCenter);
+			deg_t t1 = t0+tLength;
+			MoveTo(radius * point_t{cos(t0), sin(t0), .0}+ptCenter);
 			for (int i = 1; i <= n; i++) {
-				rad_t t {std::lerp(t0, t1, (double)i/n)};
+				deg_t t {std::lerp(t0, t1, (double)i/n)};
 				constexpr static auto m2pi = std::numbers::pi*2;
 				double c = radius * cos(t);
 				double s = radius * sin(t);
@@ -128,18 +129,20 @@ namespace gtl::shape {
 			CCoordTrans2d ct;
 			ct.Init(1.0, (rad_t)tFirstAxis, point_t{}, ptCenter);
 
-			rad_t t1 = t0 + tLength;
+			deg_t t1 = t0 + tLength;
 			MoveTo(ct(point_t{cos(t0), sin(t0)}));
 			int n = Round(tLength * std::numbers::pi * std::max(radius1, radius2) / target_interpolation_inverval_);
 			for (int i = 0; i <= n; i++) {
-				rad_t t {std::lerp(t0, t1, (double)i/n)};
+				deg_t t {std::lerp(t0, t1, (double)i/n)};
 				constexpr static auto m2pi = std::numbers::pi*2;
 				double c = cos(t);
 				double s = sin(t);
 				LineTo(ct(point_t{radius1*c, radius2*s}));
 			}
 		}
-		virtual void Spline(int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
+		virtual void Spline(int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
+			Canvas_Spline(*this, degree, pts, knots, bLoop);
+		}
 
 	//public:
 	//	virtual rad_t CalcArcInterval(double radius, double target_resolution) {
@@ -150,7 +153,7 @@ namespace gtl::shape {
 
 	//=============================================================================================================================
 	// IQDeviceScanner : Interface of Canvas
-	class ICanvasScanner : public ICanvas {
+	class GTL_SHAPE_CLASS ICanvasScanner : public ICanvas {
 		friend class ICanvas;
 	protected:
 		ct_t::mat_t matTrans_ = ct_t::mat_t::eye();
@@ -163,10 +166,8 @@ namespace gtl::shape {
 
 	public:
 		//virtual void PreDraw(s_shape const& shape) {}
-		//virtual void PostDraw(s_shape const& shape) {}
 
 		virtual void PreDraw(s_shape const&) override {}
-		virtual void PostDraw(s_shape const&) override {}
 
 		virtual void MoveTo_Target(point_t const& pt) override {
 			// Scanner Jump To
@@ -180,7 +181,7 @@ namespace gtl::shape {
 
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
-	class CCanvasMat : public ICanvas {
+	class GTL_SHAPE_CLASS CCanvasMat : public ICanvas {
 	public:
 		cv::Mat& img_;
 
@@ -199,13 +200,13 @@ namespace gtl::shape {
 		virtual void PreDraw(s_shape const& shape) override {
 			color_ = ColorS(shape.color);
 		}
-		virtual void PostDraw(s_shape const&) override {
-		}
 
 		// Primative, returns End Position.
 		virtual void MoveTo_Target(point_t const& pt) override {}
 		virtual void LineTo_Target(point_t const& pt) override {
 			cv::line(img_, ptLast_, pt, color_, (int)line_thickness_, line_type_);
+			//cv::line(img_, cv::Point(ptLast_.x, ptLast_.y), cv::Point(pt.x, pt.y), color_, (int)line_thickness_, line_type_);
+			//cv::line(img_, cv::Point2d(ptLast_.x, ptLast_.y), cv::Point2d(pt.x, pt.y), color_, (int)line_thickness_, line_type_);
 		}
 
 		//inline auto ColorS() { return ColorS(cr_); }
@@ -216,6 +217,23 @@ namespace gtl::shape {
 		//virtual void LineRelTo(const point_t& pt, bool bShowDirection = false) { LineTo(m_ptLast + pt, bShowDirection); }
 		//virtual void ArcRelTo(const point_t& ptCenter, deg_t dTLength) { ArcTo(m_ptLast + ptCenter, dTLength); }
 	};
+
+
+	//=============================================================================================================================
+	// ICanvas : Interface of Canvas
+	class GTL_SHAPE_CLASS CCanvasMat_RoundDown : public CCanvasMat {
+	public:
+		using base_t = CCanvasMat;
+	public:
+		using base_t::base_t;
+
+		// Primative, returns End Position.
+		virtual void LineTo_Target(point_t const& pt) override {
+			cv::line(img_, cv::Point((int)ptLast_.x, (int)ptLast_.y), cv::Point((int)pt.x, (int)pt.y), color_, (int)line_thickness_, line_type_);
+		}
+	};
+
+
 
 	////-----------------------------------------------------------------------------
 	//// ICanvas : Interface of Canvas
@@ -247,8 +265,6 @@ namespace gtl::shape {
 	//	virtual void PreDraw() {
 	//		//m_iOrder = 0;
 	//		memset(m_ptLast.val, 0xff, sizeof(m_ptLast.val));	// not zero. set INVALID_VALUE
-	//	}
-	//	virtual void PostDraw() {
 	//	}
 
 	//	//void ShowDirection(bool bShow = true, bool bShowOrder = true, COLORREF crArrow = RGB(255, 0, 0), int iArrowSize = 16, int iArrowThickness = 1) {

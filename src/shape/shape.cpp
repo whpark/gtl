@@ -12,6 +12,23 @@ using namespace std::literals;
 
 namespace gtl::shape {
 
+	void s_shape::Draw(ICanvas& canvas) const {
+		canvas.PreDraw(*this);
+	}
+	void s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
+		rect_t rectBoundary;
+		rectBoundary.left = DBL_MAX;
+		rectBoundary.right = DBL_MAX;
+		//rectBoundary.front = DBL_MAX;
+		rectBoundary.top = -DBL_MAX;
+		rectBoundary.bottom = -DBL_MAX;
+		//rectBoundary.back = -DBL_MAX;
+		UpdateBoundary(rectBoundary);
+		if (rectBoundary.IntersectRect(rectROI).IsRectEmpty())
+			return;
+		Draw(canvas);
+	}
+
 	bool s_shape::LoadFromCADJson(json_t& _j) {
 		using namespace std::literals;
 		gtl::bjson<json_t> j(_j);
@@ -23,13 +40,12 @@ namespace gtl::shape {
 
 		//eLineType = j["lineType"sv];
 		crIndex = j["color"].value_or(0);
+		color.cr = -1;
 		if (j["color24"].json().is_int64()) {
 			crIndex = 0;
 			color.cr = (int)j["color24"];
 		} else {
-			if (crIndex == 256) {
-				// todo :...
-			} else if ( (crIndex >= 0) and (crIndex < colorTable_s.size()) )
+			if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
 				color = colorTable_s[crIndex];
 		}
 		bVisible = j["visible"].value_or(true);
@@ -38,47 +54,49 @@ namespace gtl::shape {
 		return true;
 	}
 
-	string_t const& s_shape::GetTypeName(eTYPE eType) {
-		static std::map<eTYPE, string_t> const map = {
-			{ eTYPE::none,				L"none" },
-			{ eTYPE::e3dface,			L"3dFace"s },
-			{ eTYPE::arc_xy,			L"ARC"s },
-			{ eTYPE::block,				L"BLOCK"s },
-			{ eTYPE::circle_xy,			L"CIRCLE"s },
-			{ eTYPE::dimension,			L"DIMENSION"s },
-			{ eTYPE::dimaligned,		L"DIMALIGNED"s },
-			{ eTYPE::dimlinear,			L"DIMLINEAR"s },
-			{ eTYPE::dimradial,			L"DIMRADIAL"s },
-			{ eTYPE::dimdiametric,		L"DIMDIAMETRIC"s },
-			{ eTYPE::dimangular,		L"DIMANGULAR"s },
-			{ eTYPE::dimangular3p,		L"DIMANGULAR3P"s },
-			{ eTYPE::dimordinate,		L"DIMORDINATE"s },
-			{ eTYPE::ellipse_xy,		L"ELLIPSE"s },
-			{ eTYPE::hatch,				L"HATCH"s },
-			{ eTYPE::image,				L"IMAGE"s },
-			{ eTYPE::insert,			L"INSERT"s },
-			{ eTYPE::leader,			L"LEADER"s },
-			{ eTYPE::line,				L"LINE"s },
-			{ eTYPE::lwpolyline,		L"LWPOLYLINE"s },
-			{ eTYPE::mtext,				L"MTEXT"s },
-			{ eTYPE::dot,				L"POINT"s },
-			{ eTYPE::polyline,			L"POLYLINE"s },
-			{ eTYPE::ray,				L"RAY"s },
-			{ eTYPE::solid,				L"SOLID"s },
-			{ eTYPE::spline,			L"SPLINE"s },
-			{ eTYPE::text,				L"TEXT"s },
-			{ eTYPE::trace,				L"TRACE"s },
-			{ eTYPE::underlay,			L"UNDERLAY"s },
-			{ eTYPE::vertex,			L"VERTEX"s },
-			{ eTYPE::viewport,			L"VIEWPORT"s },
-			{ eTYPE::xline,				L"XLINE"s },
-			{ eTYPE::layer,				L"LAYER"s },
-			{ eTYPE::drawing,			L"DRAWING"s },
+	string_t const& s_shape::GetShapeName(eSHAPE eType) {
+		static std::map<eSHAPE, string_t> const map = {
+			{ eSHAPE::none,				L"none" },
+			{ eSHAPE::e3dface,			L"3dFace"s },
+			{ eSHAPE::arc_xy,			L"ARC"s },
+			{ eSHAPE::block,			L"BLOCK"s },
+			{ eSHAPE::circle_xy,		L"CIRCLE"s },
+			{ eSHAPE::dimension,		L"DIMENSION"s },
+			{ eSHAPE::dimaligned,		L"DIMALIGNED"s },
+			{ eSHAPE::dimlinear,		L"DIMLINEAR"s },
+			{ eSHAPE::dimradial,		L"DIMRADIAL"s },
+			{ eSHAPE::dimdiametric,		L"DIMDIAMETRIC"s },
+			{ eSHAPE::dimangular,		L"DIMANGULAR"s },
+			{ eSHAPE::dimangular3p,		L"DIMANGULAR3P"s },
+			{ eSHAPE::dimordinate,		L"DIMORDINATE"s },
+			{ eSHAPE::ellipse_xy,		L"ELLIPSE"s },
+			{ eSHAPE::hatch,			L"HATCH"s },
+			{ eSHAPE::image,			L"IMAGE"s },
+			{ eSHAPE::insert,			L"INSERT"s },
+			{ eSHAPE::leader,			L"LEADER"s },
+			{ eSHAPE::line,				L"LINE"s },
+			{ eSHAPE::lwpolyline,		L"LWPOLYLINE"s },
+			{ eSHAPE::mtext,			L"MTEXT"s },
+			{ eSHAPE::dot,				L"POINT"s },
+			{ eSHAPE::polyline,			L"POLYLINE"s },
+			{ eSHAPE::ray,				L"RAY"s },
+			{ eSHAPE::solid,			L"SOLID"s },
+			{ eSHAPE::spline,			L"SPLINE"s },
+			{ eSHAPE::text,				L"TEXT"s },
+			{ eSHAPE::trace,			L"TRACE"s },
+			{ eSHAPE::underlay,			L"UNDERLAY"s },
+			{ eSHAPE::vertex,			L"VERTEX"s },
+			{ eSHAPE::viewport,			L"VIEWPORT"s },
+			{ eSHAPE::xline,			L"XLINE"s },
+			{ eSHAPE::layer,			L"LAYER"s },
+			{ eSHAPE::drawing,			L"DRAWING"s },
 		};
 
 		auto iter = map.find(eType);
-		if (iter == map.end())
-			return L""s;
+		if (iter == map.end()) {
+			static auto const empty = L""s;
+			return empty;
+		}
 		return iter->second;
 	}
 
@@ -127,6 +145,11 @@ namespace gtl::shape {
 	}
 
 	void s_polyline::Draw(ICanvas& canvas) const {
+		s_shape::Draw(canvas);
+
+		if (pts.size())
+			canvas.MoveTo(pts[0]);
+
 		for (int iPt = 0; iPt < pts.size(); iPt++) {
 			polypoint_t pt0{pts[iPt]};
 			polypoint_t pt1;
@@ -274,8 +297,8 @@ namespace gtl::shape {
 						continue;
 					}
 
-					switch (rShape->GetType()) {
-					case eTYPE::insert :
+					switch (rShape->GetShapeType()) {
+					case eSHAPE::insert :
 						break;
 					}
 
@@ -291,7 +314,12 @@ namespace gtl::shape {
 		// Entities
 		{
 			auto jEntities = jTOP["mainBlock"].json().as_array();
-
+			rectBoundary.left = DBL_MAX;
+			rectBoundary.top = DBL_MAX;
+			//rectBoundary.front = DBL_MAX;
+			rectBoundary.right = -DBL_MAX;
+			rectBoundary.bottom = -DBL_MAX;
+			//rectBoundary.back = DBL_MAX;
 			// block entities
 			for (auto& jEntity : jEntities) {
 				bjson<json_t> j(jEntity);
@@ -303,6 +331,7 @@ namespace gtl::shape {
 
 				try {
 					rShape->LoadFromCADJson(jEntity);
+					//rShape->UpdateBoundary(rectBoundary);
 				} catch (std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
@@ -311,19 +340,19 @@ namespace gtl::shape {
 					continue;
 				}
 
-				AddEntity(std::move(rShape), mapLayers, mapBlocks);
+				AddEntity(std::move(rShape), mapLayers, mapBlocks, rectBoundary);
 			}
 		}
 
 		return true;
 	}
 
-	bool s_drawing::AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks) {
+	bool s_drawing::AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectB) {
 		if (!rShape)
 			return false;
 
-		switch (rShape->GetType()) {
-		case eTYPE::insert :
+		switch (rShape->GetShapeType()) {
+		case eSHAPE::insert :
 			// todo :
 			if (s_insert* pInsert = dynamic_cast<s_insert*>(rShape.get()); pInsert) {
 				auto iter = mapBlocks.find(pInsert->name);
@@ -372,7 +401,10 @@ namespace gtl::shape {
 						for (auto const& rShape : rBlockNew->shapes) {
 							auto rShapeNew = rShape.NewClone();
 							rBlockNew->Transform(ct, ct.IsRightHanded());
-							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks)) {
+							if (rShapeNew->crIndex == 0) {
+								rShapeNew->crIndex = pBlock->crIndex;
+							}
+							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks, rectB)) {
 								DEBUG_PRINT("CANNOT Add Shape\n");
 								//return false;
 							}
@@ -390,6 +422,20 @@ namespace gtl::shape {
 					return false;
 				}
 
+				// color
+				if (rShape->color.cr == -1) {
+					int crIndex = rShape->crIndex;
+					if (crIndex == 256) {
+						crIndex = pLayer->crIndex;
+						rShape->color = pLayer->color;
+					}
+					if (rShape->color.cr == -1) {
+						if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
+							rShape->color = colorTable_s[crIndex];
+					}
+				}
+
+				rShape->UpdateBoundary(rectB);
 				pLayer->shapes.push_back(std::move(rShape));
 
 			} else {

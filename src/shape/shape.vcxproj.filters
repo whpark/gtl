@@ -41,13 +41,13 @@
     <ClInclude Include="..\..\3rdparty\tinyspline\tinysplinecxx.h">
       <Filter>tinyspline</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h">
-      <Filter>shape</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\shape_others.h">
       <Filter>shape</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\color_table.h">
+      <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h">
       <Filter>shape</Filter>
     </ClInclude>
   </ItemGroup>

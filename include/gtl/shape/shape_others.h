@@ -62,7 +62,7 @@ namespace gtl::shape {
 		s_layer(s_layer&&) = default;
 		s_layer(string_t const& name) : name(name) {}
 
-		virtual eTYPE GetType() const { return eTYPE::layer; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::layer; }
 		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
 		virtual void FlipX() override { for (auto& shape : shapes) shape.FlipX(); }
 		virtual void FlipY() override { for (auto& shape : shapes) shape.FlipY(); }
@@ -71,17 +71,21 @@ namespace gtl::shape {
 			for (auto& shape : shapes)
 				shape.Transform(ct, bRightHanded);
 		}
-		virtual bool GetBoundingRect(CRect2d& rect) const override {
+		virtual bool UpdateBoundary(rect_t& rect) const override {
 			bool r{};
 			for (auto& shape : shapes)
-				r |= shape.GetBoundingRect(rect);
+				r |= shape.UpdateBoundary(rect);
 			return r;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			for (auto& shape : shapes) {
-				canvas.PreDraw(shape);
 				shape.Draw(canvas);
-				canvas.PostDraw(shape);
+			}
+		}
+		virtual void DrawROI(ICanvas& canvas, rect_t const& rectROI) const override {
+			for (auto& shape : shapes) {
+				shape.DrawROI(canvas, rectROI);
 			}
 		}
 		virtual void PrintOut(std::wostream& os) const override {
@@ -160,7 +164,7 @@ namespace gtl::shape {
 		string_t layer;
 		point_t pt;
 
-		virtual eTYPE GetType() const { return eTYPE::block; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::block; }
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_block);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(s_block, s_layer);
@@ -198,7 +202,7 @@ namespace gtl::shape {
 	struct GTL_SHAPE_CLASS s_dot : public s_shape {
 		point_t pt;
 
-		virtual eTYPE GetType() const { return eTYPE::dot; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::dot; }
 
 		//virtual point_t PointAt(double t) const override { return pt; };
 		virtual void FlipX() override { pt.x = -pt.x; }
@@ -207,10 +211,11 @@ namespace gtl::shape {
 		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
 			pt = ct(pt);
 		};
-		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
-			return rectBoundary.CheckBoundary(pt);
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
+			return rectBoundary.UpdateBoundary(pt);
 		};
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			canvas.MoveTo(pt);
 			canvas.LineTo(pt);
 		}
@@ -249,7 +254,7 @@ namespace gtl::shape {
 	struct GTL_SHAPE_CLASS s_line : public s_shape {
 		point_t pt0, pt1;
 
-		virtual eTYPE GetType() const { return eTYPE::line; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::line; }
 
 		//virtual point_t PointAt(double t) const override { return lerp(pt0, pt1, t); }
 		virtual void FlipX() override { pt0.x = -pt0.x; pt1.x = -pt1.x; }
@@ -258,13 +263,14 @@ namespace gtl::shape {
 		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
 			pt0 = ct(pt0); pt1 = ct(pt1);
 		};
-		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			bool bModified{};
-			bModified |= rectBoundary.CheckBoundary(pt0);
-			bModified |= rectBoundary.CheckBoundary(pt1);
+			bModified |= rectBoundary.UpdateBoundary(pt0);
+			bModified |= rectBoundary.UpdateBoundary(pt1);
 			return bModified;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			canvas.Line(pt0, pt1);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
@@ -302,7 +308,7 @@ namespace gtl::shape {
 		bool bLoop{};
 		std::vector<polypoint_t> pts;
 
-		virtual eTYPE GetType() const { return eTYPE::polyline; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::polyline; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual void FlipX() override { for (auto& pt : pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } }
@@ -316,10 +322,10 @@ namespace gtl::shape {
 				for (auto& pt : pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } 
 			}
 		};
-		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			bool bModified{};
 			for (auto const& pt : pts)
-				bModified |= rectBoundary.CheckBoundary(pt);
+				bModified |= rectBoundary.UpdateBoundary(pt);
 			return bModified;
 		};
 		virtual void Draw(ICanvas& canvas) const override;
@@ -345,6 +351,7 @@ namespace gtl::shape {
 		friend archive& operator & (archive& ar, s_polyline& var) {
 			ar & boost::serialization::base_object<s_shape>(var);
 			ar & var.pts;
+			ar & var.bLoop;
 			return ar;
 		}
 
@@ -368,7 +375,7 @@ namespace gtl::shape {
 	struct GTL_SHAPE_CLASS s_lwpolyline : public s_polyline {
 		int dummy{};
 
-		virtual eTYPE GetType() const { return eTYPE::lwpolyline; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::lwpolyline; }
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_lwpolyline);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(s_lwpolyline, s_polyline);
@@ -398,6 +405,7 @@ namespace gtl::shape {
 				pts.back() = PolyPointFrom(*iter);
 			}
 
+			bLoop = (j["flags"].value_or(0) & 1) != 0;
 			return true;
 		}
 	};
@@ -407,7 +415,7 @@ namespace gtl::shape {
 		double radius{};
 		deg_t angle_length{360_deg};	// 회전 방향.
 
-		virtual eTYPE GetType() const { return eTYPE::circle_xy; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::circle_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual void FlipX() override { ptCenter.x = -ptCenter.x; angle_length = -angle_length; }
@@ -418,13 +426,14 @@ namespace gtl::shape {
 			if (!bRightHanded)
 				angle_length = -angle_length;
 		}
-		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			bool bResult{};
-			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x-radius, ptCenter.y-radius, ptCenter.z));
-			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x+radius, ptCenter.y+radius, ptCenter.z));
+			bResult |= rectBoundary.UpdateBoundary(point_t(ptCenter.x-radius, ptCenter.y-radius, ptCenter.z));
+			bResult |= rectBoundary.UpdateBoundary(point_t(ptCenter.x+radius, ptCenter.y+radius, ptCenter.z));
 			return bResult;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			canvas.Arc(ptCenter, radius, 0._deg, angle_length);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
@@ -462,7 +471,7 @@ namespace gtl::shape {
 	struct GTL_SHAPE_CLASS s_arcXY : public s_circleXY {
 		deg_t angle_start{};
 
-		virtual eTYPE GetType() const { return eTYPE::arc_xy; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::arc_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual void FlipX() override { s_circleXY::FlipX(); angle_start = AdjustAngle(180._deg - angle_start); }
@@ -474,11 +483,12 @@ namespace gtl::shape {
 			if (!bRightHanded)
 				angle_start = -angle_start;
 		}
-		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			// todo : ... upgrade?
-			return s_circleXY::GetBoundingRect(rectBoundary);
+			return s_circleXY::UpdateBoundary(rectBoundary);
 		}
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			canvas.Arc(ptCenter, radius, angle_start, angle_length);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
@@ -553,17 +563,17 @@ namespace gtl::shape {
 
 			arc.ptCenter.x = ptBulge.x + (arc.radius / h) * (ptCenterOfLine.x - ptBulge.x);
 			arc.ptCenter.y = ptBulge.y + (arc.radius / h) * (ptCenterOfLine.y - ptBulge.y);
-			arc.angle_start = atan2(pt0.y - arc.ptCenter.y, pt0.x - arc.ptCenter.x);
-			double dT1 = atan2(pt1.y - arc.ptCenter.y, pt1.x - arc.ptCenter.x);
+			arc.angle_start = rad_t::atan2(pt0.y - arc.ptCenter.y, pt0.x - arc.ptCenter.x);
+			rad_t dT1 = rad_t::atan2(pt1.y - arc.ptCenter.y, pt1.x - arc.ptCenter.x);
 			//arc.m_eDirection = (dBulge > 0) ? 1 : -1;
 			//arc.m_dTLength = (dBulge > 0) ? fabs(dT1-arc.m_dT0) : -fabs(dT1-arc.m_dT0);
 			if (bulge > 0) {
 				while (dT1 < arc.angle_start)
-					dT1 += std::numbers::pi*2;
+					dT1 += rad_t(std::numbers::pi*2);
 				arc.angle_length = dT1 - arc.angle_start;
 			} else {
 				while (dT1 > arc.angle_start)
-					dT1 -= std::numbers::pi*2;
+					dT1 -= rad_t(std::numbers::pi*2);
 				arc.angle_length = dT1 - arc.angle_start;
 			}
 
@@ -576,7 +586,7 @@ namespace gtl::shape {
 		double radiusH{};
 		deg_t angle_first_axis{};
 
-		virtual eTYPE GetType() const { return eTYPE::ellipse_xy; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::ellipse_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual void FlipX() override { s_arcXY::FlipX(); angle_first_axis = 180._deg - angle_first_axis; }
@@ -588,14 +598,15 @@ namespace gtl::shape {
 			if (!bRightHanded)
 				angle_first_axis = -angle_first_axis;
 		}
-		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			// todo : ... upgrade
 			bool bResult{};
-			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x-radius, ptCenter.y-radiusH, ptCenter.z));
-			bResult |= rectBoundary.CheckBoundary(point_t(ptCenter.x+radius, ptCenter.y+radiusH, ptCenter.z));
+			bResult |= rectBoundary.UpdateBoundary(point_t(ptCenter.x-radius, ptCenter.y-radiusH, ptCenter.z));
+			bResult |= rectBoundary.UpdateBoundary(point_t(ptCenter.x+radius, ptCenter.y+radiusH, ptCenter.z));
 			return bResult;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			canvas.Ellipse(ptCenter, radius, radiusH, angle_first_axis, angle_start, angle_length);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
@@ -666,7 +677,7 @@ namespace gtl::shape {
 		double toleranceControlPoint{0.0000001};
 		double toleranceFitPoint{0.0000001};
 
-		virtual eTYPE GetType() const { return eTYPE::spline; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::spline; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual void FlipX() override { for (auto& pt : ptsControl) pt.x = -pt.x; for (auto& pt : ptsFit) pt.x = -pt.x; ptNormal.x = -ptNormal.x; vStart.x = -vStart.x; vEnd.x = -vEnd.x; }
@@ -679,13 +690,14 @@ namespace gtl::shape {
 			for (auto& pt : ptsControl)
 				pt = ct(pt);
 		}
-		virtual bool GetBoundingRect(CRect2d& rect) const override {
+		virtual bool UpdateBoundary(rect_t& rect) const override {
 			bool b{};
 			for (auto& pt : ptsControl)
-				b = rect.CheckBoundary(pt);
+				b = rect.UpdateBoundary(pt);
 			return b;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			canvas.Spline(degree, ptsControl, knots, false);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
@@ -774,7 +786,7 @@ namespace gtl::shape {
 		eALIGN_HORZ alignHorz{eALIGN_HORZ::left};
 		eALIGN_VERT alignVert{eALIGN_VERT::base_line};
 	
-		virtual eTYPE GetType() const { return eTYPE::text; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::text; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual void FlipX() override { pt0.x = -pt0.x; pt1.x = -pt1.x; }
@@ -784,14 +796,15 @@ namespace gtl::shape {
 			pt0 = ct(pt0);
 			pt1 = ct(pt1);
 		}
-		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			// todo : upgrade.
 			bool b{};
-			b |= rectBoundary.CheckBoundary(pt0);
-			b |= rectBoundary.CheckBoundary(pt1);
+			b |= rectBoundary.UpdateBoundary(pt0);
+			b |= rectBoundary.UpdateBoundary(pt1);
 			return b;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			// todo :
 		}
 
@@ -865,15 +878,16 @@ namespace gtl::shape {
 		void SetAttachPoint(eATTACH eAttach) { alignVert = (eALIGN_VERT)eAttach; }
 		double interlin{};
 
-		virtual eTYPE GetType() const { return eTYPE::mtext; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::mtext; }
 
 		//virtual point_t PointAt(double t) const override {};
 		//virtual void FlipX() override {}
 		//virtual void FlipY() override {}
 		//virtual void FlipY() override {}
 		//virtual void Transform(CCoordTrans3d const&, bool bRightHanded) override { return true; };
-		//virtual bool GetBoundingRect(CRect2d& rectBoundary) const override { return true; };
+		//virtual bool UpdateBoundary(rect_t& rectBoundary) const override { return true; };
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			// todo : draw mtext
 		}
 
@@ -918,7 +932,7 @@ namespace gtl::shape {
 
 		std::vector<s_polyline> boundaries;
 
-		virtual eTYPE GetType() const { return eTYPE::hatch; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::hatch; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual void FlipX() override { for (auto& b : boundaries) b.FlipX(); }
@@ -926,14 +940,15 @@ namespace gtl::shape {
 		virtual void FlipZ() override { for (auto& b : boundaries) b.FlipZ(); }
 		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
 		};
-		virtual bool GetBoundingRect(CRect2d& rectBoundary) const override {
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			bool b{};
 			for (auto const& bound : boundaries) {
-				b |= bound.GetBoundingRect(rectBoundary);
+				b |= bound.UpdateBoundary(rectBoundary);
 			}
 			return b;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			// todo : draw hatch
 		}
 
@@ -1035,15 +1050,17 @@ namespace gtl::shape {
 			return true;
 		}
 
-		virtual eTYPE GetType() const { return eTYPE::insert; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::insert; }
 
 		//virtual point_t PointAt(double t) const = 0;
 		virtual void FlipX() override {};
 		virtual void FlipY() override {};
 		virtual void FlipZ() override {};
 		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) override {};
-		virtual bool GetBoundingRect(CRect2d&) const override { return false; };
-		virtual void Draw(ICanvas& canvas) const override {};
+		virtual bool UpdateBoundary(rect_t&) const override { return false; };
+		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
+		};
 
 		virtual void PrintOut(std::wostream& os) const override {
 			s_shape::PrintOut(os);
@@ -1054,10 +1071,10 @@ namespace gtl::shape {
 
 
 	struct GTL_SHAPE_CLASS s_drawing : public s_shape {
-
 		std::map<std::string, variable_t> vars;
 		boost::ptr_deque<line_type_t> line_types;
 		//boost::ptr_deque<s_block> blocks;
+		rect_t rectBoundary;
 		boost::ptr_deque<s_layer> layers;
 
 		//s_drawing() = default;
@@ -1066,7 +1083,7 @@ namespace gtl::shape {
 		//s_drawing& operator = (s_drawing const&) = default;
 		//s_drawing& operator = (s_drawing &&) = default;
 
-		virtual eTYPE GetType() const { return eTYPE::drawing; }
+		virtual eSHAPE GetShapeType() const { return eSHAPE::drawing; }
 
 		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
 		virtual void FlipX() override { for (auto& layer : layers) layer.FlipX(); }
@@ -1076,15 +1093,21 @@ namespace gtl::shape {
 			for (auto& layer : layers)
 				layer.Transform(ct, bRightHanded);
 		}
-		virtual bool GetBoundingRect(CRect2d& rect) const override {
+		virtual bool UpdateBoundary(rect_t& rect) const override {
 			bool r{};
 			for (auto& layer : layers)
-				r |= layer.GetBoundingRect(rect);
+				r |= layer.UpdateBoundary(rect);
 			return r;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
+			s_shape::Draw(canvas);
 			for (auto& layer : layers) {
 				layer.Draw(canvas);
+			}
+		}
+		virtual void DrawROI(ICanvas& canvas, rect_t const& rectROI) const override {
+			for (auto& layer : layers) {
+				layer.DrawROI(canvas, rectROI);
 			}
 		}
 		virtual void PrintOut(std::wostream& os) const override {
@@ -1108,6 +1131,7 @@ namespace gtl::shape {
 			ar & var.vars;
 			ar & var.line_types;
 			//ar & var.blocks;
+			ar & var.rectBoundary;
 			ar & var.layers;
 
 			return ar;
@@ -1124,11 +1148,16 @@ namespace gtl::shape {
 			return layers.front();
 		}
 
-		bool AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks);
+		bool AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectBoundary);
 
 	public:
 		virtual bool LoadFromCADJson(json_t& _j) override;
 
+		void clear() {
+			vars.clear();
+			line_types.clear();
+			layers.clear();
+		}
 	};
 
 

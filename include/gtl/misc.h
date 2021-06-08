@@ -338,7 +338,7 @@ namespace gtl {
 			return ar;
 		}
 	};
-	constexpr static inline color_rgba_t RGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a = {}) {
+	constexpr static inline color_rgba_t ColorRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a = {}) {
 		return color_rgba_t{.r = r, .g = g, .b = b, .a = a};
 	}
 
@@ -371,7 +371,7 @@ namespace gtl {
 			return ar;
 		}
 	};
-	constexpr static inline color_bgra_t BGRA(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
+	constexpr static inline color_bgra_t ColorBGRA(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
 		return color_bgra_t{ .b = b, .g = g, .r = r, .a = a };
 	}
 
@@ -404,7 +404,7 @@ namespace gtl {
 			return ar;
 		}
 	};
-	constexpr static inline color_abgr_t ABGR(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
+	constexpr static inline color_abgr_t ColorABGR(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
 		return color_abgr_t{ .a = a, .b = b, .g = g, .r = r };
 	}
 

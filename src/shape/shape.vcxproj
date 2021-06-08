@@ -110,6 +110,16 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>echo /*---- Copy *.lib to /lib ----*/
+xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
+echo /*---- Copy Target to /bin ----*/
+xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>deploy</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -135,6 +145,16 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>echo /*---- Copy *.lib to /lib ----*/
+xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
+echo /*---- Copy Target to /bin ----*/
+xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>deploy</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -156,6 +176,16 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>echo /*---- Copy *.lib to /lib ----*/
+xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
+echo /*---- Copy Target to /bin ----*/
+xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>deploy</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -181,6 +211,16 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>echo /*---- Copy *.lib to /lib ----*/
+xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
+echo /*---- Copy Target to /bin ----*/
+xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
+</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>deploy</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\3rdparty\tinyspline\parson.h" />

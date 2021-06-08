@@ -160,7 +160,9 @@ namespace gtl::concepts {
 	/// @brief is__coord
 	template < typename T_COORD > concept coord2 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 2> >;
 	template < typename T_COORD > concept coord3 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 3> >;
-	template < typename T_COORD > concept coord = coord2<T_COORD> or coord3<T_COORD>;
+	template < typename T_COORD > concept coord_rect2 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 4> >;
+	template < typename T_COORD > concept coord_rect3 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 6> >;
+	template < typename T_COORD > concept coord = coord2<T_COORD> or coord3<T_COORD> or coord_rect2<T_COORD> or coord_rect3<T_COORD>;
 
 	template < typename T_COORD, typename T > concept tcoord2 = std::is_same_v< typename T_COORD::coord_t, std::array<T, 2> >;
 	template < typename T_COORD, typename T > concept tcoord3 = std::is_same_v< typename T_COORD::coord_t, std::array<T, 3> >;
