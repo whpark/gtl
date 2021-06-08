@@ -227,8 +227,8 @@ namespace gtl::shape {
 		bool bVisible{};
 		bool bTransparent{};
 		//std::optional<hatching_t> hatch;
-		//boost::optional<cookie_t> cookie;
-		cookie_t cookie;
+		boost::optional<cookie_t> cookie;
+		//cookie_t cookie;
 
 	public:
 		virtual ~s_shape() {}
