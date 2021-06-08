@@ -15,7 +15,7 @@ namespace gtl::shape {
 	void s_shape::Draw(ICanvas& canvas) const {
 		canvas.PreDraw(*this);
 	}
-	void s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
+	bool s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
 		rect_t rectBoundary;
 		rectBoundary.left = DBL_MAX;
 		rectBoundary.right = DBL_MAX;
@@ -25,8 +25,9 @@ namespace gtl::shape {
 		//rectBoundary.back = -DBL_MAX;
 		UpdateBoundary(rectBoundary);
 		if (rectBoundary.IntersectRect(rectROI).IsRectEmpty())
-			return;
+			return false;
 		Draw(canvas);
+		return true;
 	}
 
 	bool s_shape::LoadFromCADJson(json_t& _j) {

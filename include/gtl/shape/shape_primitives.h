@@ -268,7 +268,7 @@ namespace gtl::shape {
 		virtual bool UpdateBoundary(rect_t&) const = 0;
 
 		virtual void Draw(ICanvas& canvas) const;
-		virtual void DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
+		virtual bool DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
 
 		virtual void PrintOut(std::wostream& os) const {
 			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetShapeName(GetShapeType()), color.r, color.g, color.b, !bVisible?L"Invisible ":L"", bTransparent?L"Transparent ":L"");
