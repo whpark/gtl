@@ -16,6 +16,7 @@ module;
 #include <string>
 #include <string_view>
 #include <optional>
+#include <format>
 
 #include "gtl/_config.h"
 #include "gtl/_macro.h"

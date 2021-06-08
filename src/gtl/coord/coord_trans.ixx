@@ -10,7 +10,10 @@ module;
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <memory>
+#include <deque>
 #include <span>
+#include <optional>
 
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
@@ -20,7 +23,9 @@ module;
 //#include "boost/archive/polymorphic_xml_iarchive.hpp"
 //#include "boost/archive/polymorphic_xml_oarchive.hpp"
 
-#include "opencv2/opencv.hpp"
+//#include "opencv2/opencv.hpp"
+#include "opencv2/opencv_modules.hpp"
+#include "opencv2/core.hpp"
 
 export module gtl:coord_trans;
 import :concepts;
