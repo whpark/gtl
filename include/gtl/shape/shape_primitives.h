@@ -153,6 +153,18 @@ namespace gtl::shape {
 		layer = 127,
 		drawing = 128,
 
+		user_defined_1 = 256,
+		user_defined_2,
+		user_defined_3,
+		user_defined_4,
+		user_defined_5,
+		user_defined_6,
+		user_defined_7,
+		user_defined_8,
+		user_defined_9,
+		user_defined_10,
+		user_defined_11,
+		user_defined_12,
 	};
 
 	using variable_t = boost::variant<string_t, int, double, point_t>;
