@@ -41,6 +41,7 @@ namespace gtl::shape {
 	//	GTL__DYNAMIC_VIRTUAL_BASE(CCoordSystem)
 	//};
 
+	class ICanvas;
 	extern GTL_SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
 
 	//=============================================================================================================================
@@ -90,6 +91,7 @@ namespace gtl::shape {
 		virtual void LineTo_Target(point_t const& ptTargetSystem) = 0;
 
 		virtual void PreDraw(s_shape const&) = 0;
+		//virtual void Draw(s_shape const&);
 
 		void MoveTo(point_t pt) {
 			pt = Trans(pt);
@@ -221,15 +223,35 @@ namespace gtl::shape {
 
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
-	class GTL_SHAPE_CLASS CCanvasMat_RoundDown : public CCanvasMat {
+	template < bool round_down_line = true, bool round_down_arc = true >
+	class CCanvasMat_RoundDown : public CCanvasMat {
 	public:
 		using base_t = CCanvasMat;
+		struct {
+			bool arc;
+			bool line;
+		} round_down;
 	public:
 		using base_t::base_t;
 
 		// Primative, returns End Position.
 		virtual void LineTo_Target(point_t const& pt) override {
-			cv::line(img_, cv::Point((int)ptLast_.x, (int)ptLast_.y), cv::Point((int)pt.x, (int)pt.y), color_, (int)line_thickness_, line_type_);
+			if constexpr (round_down_line) {
+				cv::line(img_, cv::Point((int)ptLast_.x, (int)ptLast_.y), cv::Point((int)pt.x, (int)pt.y), color_, (int)line_thickness_, line_type_);
+			} else {
+				CCanvasMat::LineTo_Target(pt);
+			}
+		}
+
+		virtual void Arc(point_t const& ptCenter, double radius, deg_t t0, deg_t tLength) override {
+			if constexpr (round_down_arc) {
+				point_t ptC = Trans(ptCenter);
+				CPoint3i ptCi((int)ptC.x, (int)ptC.y, (int)ptC.z);	// RoundDrop
+				ptC = TransI(ptCi);
+				ICanvas::Arc(ptC, radius, t0, tLength);
+			} else {
+				ICanvas::Arc(ptCenter, radius, t0, tLength);
+			}
 		}
 	};
 
