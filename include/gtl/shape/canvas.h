@@ -194,7 +194,8 @@ namespace gtl::shape {
 		int line_type_ = cv::LINE_8;
 
 	public:
-		CCanvasMat(cv::Mat& img) : img_(img) {
+		CCanvasMat(cv::Mat& img, ct_t const& ct) : img_(img) {
+			SetCT(ct);
 		}
 		virtual ~CCanvasMat() {
 		}
