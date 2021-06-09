@@ -802,7 +802,7 @@ namespace gtl::shape {
 			// todo : upgrade.
 			bool b{};
 			b |= rectBoundary.UpdateBoundary(pt0);
-			b |= rectBoundary.UpdateBoundary(pt1);
+			//b |= rectBoundary.UpdateBoundary(pt1);
 			return b;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
