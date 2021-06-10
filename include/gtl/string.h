@@ -88,7 +88,9 @@ namespace gtl {
 
 	public:
 		// returns psz
-		//operator tchar const*() const					{ return this->c_str(); }
+	#if GTL_USE_WINDOWS_API
+		operator tchar const*() const					{ return this->c_str(); }
+	#endif
 
 		// returns string_view
 		operator std::basic_string_view<tchar>() const {

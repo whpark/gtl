@@ -26,13 +26,13 @@
 namespace gtl {
 #pragma pack(push, 8)
 
-	class GTL_CLASS null_mutex;
-	class GTL_CLASS recursive_shared_mutex;
+	//class GTL_CLASS null_mutex;
+	//class GTL_CLASS recursive_shared_mutex;
 
 
 	//------------------------------------------------------------------------
 	/// @brief null mutex
-	class GTL_CLASS null_mutex {
+	class null_mutex {
 	public:
 		null_mutex() noexcept { }
 		~null_mutex() noexcept { }
@@ -55,7 +55,7 @@ namespace gtl {
 
 	//------------------------------------------------------------------------
 	/// @brief recursive shared mutex
-	class GTL_CLASS recursive_shared_mutex {
+	class recursive_shared_mutex {
 	private:
 		std::shared_mutex m_mtx;
 

@@ -10,39 +10,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "gtl/serial_port.h"
-
-#ifdef _WINDOWS
+#include "gtl/mutex.h"
+#include "gtl/win_util/serial_port.h"
+#include "gtl/win_util/win_util.h"
 
 #include "gtl/string.h"
-//#include "boost/asio/serial_port.hpp"
 
-
-namespace gtl {
-
-	std::wstring GetErrorMessage(DWORD dwLastError) {
-		std::wstring str;
-		LPVOID lpMsgBuf;
-		FormatMessage( 
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-			FORMAT_MESSAGE_FROM_SYSTEM | 
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			dwLastError,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-			(LPTSTR) &lpMsgBuf,
-			0,
-			NULL 
-		);
-
-		str = (LPCTSTR)lpMsgBuf;
-		// Free the buffer.
-		LocalFree( lpMsgBuf );
-
-		TrimRight(str);
-
-		return str;
-	}
+namespace gtl::win_util {
 
 	using tchar = wchar_t;
 
@@ -319,7 +293,7 @@ namespace gtl {
 		if (m_bLog) {
 			auto strs = ConvDataToHexString<wchar_t>({buf, nReadTotal}, 16);
 			for (const auto& str : strs) {
-				m_log.Log(L"Serial Read    : %s", str);
+				m_log.Log(L"Serial Read    : {}", str);
 			}
 		}
 
@@ -337,7 +311,7 @@ namespace gtl {
 		//CancelIoEx(m_hComm, NULL);
 		// Write
 		if (!WriteFile(m_hComm, buf, nSize, &dwSize, &m_overlappedW) && (GetLastError() != ERROR_IO_PENDING)) {
-			m_log.LogTag(L"E", L"Error : %d, %s\n", GetLastError(), GetErrorMessage(GetLastError()));
+			m_log.LogTag(L"E", L"Error : {}, {}\n", GetLastError(), GetErrorMessage(GetLastError()));
 			return 0;
 		}
 
@@ -356,7 +330,7 @@ namespace gtl {
 		if (m_bLog) {
 			auto strs = ConvDataToHexString<tchar>({(uint8_t*)_buf, (size_t)nSize}, 16, ' ', true, '|');
 			for (const auto& str : strs)
-				m_log.Log(L"Serial Written : %s", str);
+				m_log.Log(L"Serial Written : {}", str);
 		}
 
 		return dwSize;
@@ -407,8 +381,5 @@ namespace gtl {
 		return strsPort;
 	}
 
-
 }
 
-
-#endif	// _WINDOWS
