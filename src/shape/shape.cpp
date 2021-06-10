@@ -15,18 +15,14 @@ namespace gtl::shape {
 	void s_shape::Draw(ICanvas& canvas) const {
 		canvas.PreDraw(*this);
 	}
-	void s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
+	bool s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
 		rect_t rectBoundary;
-		rectBoundary.left = DBL_MAX;
-		rectBoundary.right = DBL_MAX;
-		//rectBoundary.front = DBL_MAX;
-		rectBoundary.top = -DBL_MAX;
-		rectBoundary.bottom = -DBL_MAX;
-		//rectBoundary.back = -DBL_MAX;
+		rectBoundary.SetRectEmptyForMinMax2d();
 		UpdateBoundary(rectBoundary);
-		if (rectBoundary.IntersectRect(rectROI).IsRectEmpty())
-			return;
+		if (!rectBoundary.IntersectRect(rectROI).IsRectHavingLength2d())
+			return false;
 		Draw(canvas);
+		return true;
 	}
 
 	bool s_shape::LoadFromCADJson(json_t& _j) {
@@ -314,12 +310,7 @@ namespace gtl::shape {
 		// Entities
 		{
 			auto jEntities = jTOP["mainBlock"].json().as_array();
-			rectBoundary.left = DBL_MAX;
-			rectBoundary.top = DBL_MAX;
-			//rectBoundary.front = DBL_MAX;
-			rectBoundary.right = -DBL_MAX;
-			rectBoundary.bottom = -DBL_MAX;
-			//rectBoundary.back = DBL_MAX;
+			rectBoundary.SetRectEmptyForMinMax2d();
 			// block entities
 			for (auto& jEntity : jEntities) {
 				bjson<json_t> j(jEntity);

@@ -221,6 +221,9 @@ namespace gtl {
 				return (this->left >= this->right) || (this->top >= this->bottom);
 			}
 		}
+		bool IsRectHavingLength2d() const {
+			return (Width() > 0) or (Height() > 0);
+		}
 		// returns true if rectangle is at (0,0,0) and has no area
 		bool IsRectNull() const {
 			return (pts(0) == point_t{}) and (pts(1) == point_t{});
@@ -260,6 +263,8 @@ namespace gtl {
 		void SetRect(point_t const& pt, size_t const& size)			{ pts(0) = pt; pts(1) = pt+size; }
 		void SetRect(point_t const& pt0, point_t const& pt1)		{ pts(0) = pt0; pts(1) = pt1; }
 		void SetRectEmpty()											{ SetRect(); }
+		void SetRectEmptyForMinMax()								{ pt0().SetAll(DBL_MAX); pt1().SetAll(-DBL_MAX); }
+		void SetRectEmptyForMinMax2d()								{ this->left = this->top = DBL_MAX; this->right = this->bottom = -DBL_MAX; }
 
 		// infflate the rectangles's width, height and depth
 		this_t& InflateRect(T x, T y)						requires (dim == 2) { this->left -= x; this->top -= y; this->right += x; this->bottom += y; return *this; }

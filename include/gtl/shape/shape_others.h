@@ -83,10 +83,12 @@ namespace gtl::shape {
 				shape.Draw(canvas);
 			}
 		}
-		virtual void DrawROI(ICanvas& canvas, rect_t const& rectROI) const override {
+		virtual bool DrawROI(ICanvas& canvas, rect_t const& rectROI) const override {
+			bool result{};
 			for (auto& shape : shapes) {
-				shape.DrawROI(canvas, rectROI);
+				result |= shape.DrawROI(canvas, rectROI);
 			}
+			return result;
 		}
 		virtual void PrintOut(std::wostream& os) const override {
 			s_shape::PrintOut(os);
@@ -800,7 +802,7 @@ namespace gtl::shape {
 			// todo : upgrade.
 			bool b{};
 			b |= rectBoundary.UpdateBoundary(pt0);
-			b |= rectBoundary.UpdateBoundary(pt1);
+			//b |= rectBoundary.UpdateBoundary(pt1);
 			return b;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
@@ -1105,10 +1107,12 @@ namespace gtl::shape {
 				layer.Draw(canvas);
 			}
 		}
-		virtual void DrawROI(ICanvas& canvas, rect_t const& rectROI) const override {
+		virtual bool DrawROI(ICanvas& canvas, rect_t const& rectROI) const override {
+			bool result{};
 			for (auto& layer : layers) {
-				layer.DrawROI(canvas, rectROI);
+				result |= layer.DrawROI(canvas, rectROI);
 			}
+			return result;
 		}
 		virtual void PrintOut(std::wostream& os) const override {
 			for (auto& layer : layers) {

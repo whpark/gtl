@@ -44,6 +44,7 @@ namespace gtl {
 		// Constructors
 		ICoordTrans() { }
 		virtual ~ICoordTrans() { }
+		auto operator <=> (ICoordTrans const&) const = default;
 
 		GTL__DYNAMIC_VIRTUAL_INTERFACE(ICoordTrans);
 
@@ -155,6 +156,7 @@ namespace gtl {
 		//virtual ~TCoordTransChain() { }
 		CCoordTransChain(CCoordTransChain const& B) = default;
 		CCoordTransChain& operator = (CCoordTransChain const& B) = default;
+		auto operator <=> (CCoordTransChain const&) const = default;
 
 		CCoordTransChain& operator *= (CCoordTransChain const& B)	{
 			for (auto const& ct : chain_) 
@@ -308,6 +310,8 @@ namespace gtl {
 
 		TCoordTransDim(TCoordTransDim const& B) = default;
 		TCoordTransDim& operator = (TCoordTransDim const& B) = default;
+
+		auto operator <=> (TCoordTransDim const&) const = default;
 
 		//bool operator == (const TCoordTransDim& B) const { return (scale_ == B.scale_) && (mat_ == B.mat_) && (origin_ == B.origin_) && (offset_ == B.offset_); }
 		//bool operator != (const TCoordTransDim& B) const { return !(*this == B); }

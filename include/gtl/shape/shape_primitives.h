@@ -153,6 +153,18 @@ namespace gtl::shape {
 		layer = 127,
 		drawing = 128,
 
+		user_defined_1 = 256,
+		user_defined_2,
+		user_defined_3,
+		user_defined_4,
+		user_defined_5,
+		user_defined_6,
+		user_defined_7,
+		user_defined_8,
+		user_defined_9,
+		user_defined_10,
+		user_defined_11,
+		user_defined_12,
 	};
 
 	using variable_t = boost::variant<string_t, int, double, point_t>;
@@ -227,8 +239,8 @@ namespace gtl::shape {
 		bool bVisible{};
 		bool bTransparent{};
 		//std::optional<hatching_t> hatch;
-		//boost::optional<cookie_t> cookie;
-		cookie_t cookie;
+		boost::optional<cookie_t> cookie;
+		//cookie_t cookie;
 
 	public:
 		virtual ~s_shape() {}
@@ -268,7 +280,7 @@ namespace gtl::shape {
 		virtual bool UpdateBoundary(rect_t&) const = 0;
 
 		virtual void Draw(ICanvas& canvas) const;
-		virtual void DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
+		virtual bool DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
 
 		virtual void PrintOut(std::wostream& os) const {
 			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetShapeName(GetShapeType()), color.r, color.g, color.b, !bVisible?L"Invisible ":L"", bTransparent?L"Transparent ":L"");
