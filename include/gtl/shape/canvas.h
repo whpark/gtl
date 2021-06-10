@@ -115,7 +115,7 @@ namespace gtl::shape {
 			LineTo(pt1);
 		}
 		virtual void Arc(point_t const& ptCenter, double radius, deg_t t0, deg_t tLength) {
-			int n = Round(tLength * std::numbers::pi * radius / target_interpolation_inverval_);
+			int n = Round(std::abs(tLength * std::numbers::pi * radius / target_interpolation_inverval_));
 			deg_t t1 = t0+tLength;
 			MoveTo(radius * point_t{cos(t0), sin(t0), .0}+ptCenter);
 			for (int i = 1; i <= n; i++) {
