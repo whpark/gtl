@@ -7,23 +7,22 @@
 // PWH
 // 2019.01.15.
 // 2019.07.24. QL -> GTL
+// 2021.06.10. gtl->gtl::win_util. NOT TESTED.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "gtl/_default.h"
 
-#ifdef _WINDOWS
-
-//#include "gtl/_pre_lib_util.h"
 #include "gtl/time.h"
 #include "gtl/log.h"
 #include "gtl/mutex.h"
 
+#include "gtl/win_util/_lib_gtl_win_util.h"
 
-namespace gtl {
+namespace gtl::win_util {
 #pragma pack(push, 8)
 
-	class GTL_CLASS XComm {
+	class GTL_WINUTIL_CLASS XComm {
 	public:
 		enum eCONTROL_CHAR : uint8_t {
 			ACK = 0x06,
@@ -119,6 +118,4 @@ namespace gtl {
 
 
 #pragma pack(pop)
-}	// namespace gtl
-
-#endif	// _WINDOWS
+}	// namespace gtl::win_util

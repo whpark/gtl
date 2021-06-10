@@ -122,6 +122,138 @@ namespace gtl {
 
 	};
 
+	// Write Log
+	template < typename tchar_t >
+	void CSimpleLog::_Log(const std::basic_string_view<tchar_t> svMask, const std::basic_string_view<tchar_t> svText) {
+		auto now = std::chrono::system_clock::now();
+
+	#if defined(_DEBUG) and defined(_WINDOWS)
+		if (m_bTraceOut) {
+			if constexpr(sizeof(tchar_t) == sizeof(char)) {
+				OutputDebugStringA((const char*)svText.data());
+				OutputDebugStringA("\r\n");
+			} else if (sizeof(tchar_t) == sizeof(wchar_t)) {
+				OutputDebugStringW((wchar_t const*)svText.data());
+				OutputDebugStringW(L"\r\n");
+			}
+		}
+	#endif
+
+		if (!OpenFile(now) || !m_ar)
+			return;
+		if (!m_strTagFilter.empty() && !svMask.empty()) {
+			if constexpr (std::is_same_v<tchar_t, CString::value_type>) {
+				if (!m_strTagFilter.find(svMask))
+					return;
+			} else {
+				if (!m_strTagFilter.find(CString(svMask)))
+					return;
+			}
+		}
+
+		do {
+			if constexpr (std::is_same_v<tchar_t, char>) {
+				if (m_funcFormatterA) {
+					m_funcFormatterA(*this, *m_ar, now, svMask, svText);
+					break;
+				}
+			} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
+				if (m_funcFormatterW) {
+					m_funcFormatterW(*this, *m_ar, now, svMask, svText);
+					break;
+				}
+			} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
+				if (m_funcFormatterU8) {
+					m_funcFormatterU8(*this, *m_ar, now, svMask, svText);
+					break;
+				}
+			} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
+				if (m_funcFormatterU16) {
+					m_funcFormatterU16(*this, *m_ar, now, svMask, svText);
+					break;
+				}
+			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
+				if (m_funcFormatterU32) {
+					m_funcFormatterU32(*this, *m_ar, now, svMask, svText);
+					break;
+				}
+			} else {
+				static_assert(false);
+			}
+
+			time_t t = std::chrono::system_clock::to_time_t(now);
+			tm st{};
+		#ifdef _WINDOWS
+			localtime_s(&st, &t);
+		#else
+			st = *std::localtime(&t);
+		#endif
+			auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(now - std::chrono::system_clock::from_time_t(t));
+			
+			//auto st = CSysTime(now).GetLocalSystemTime();
+
+			if constexpr (std::is_same_v<tchar_t, char>) {
+				m_ar->WriteString("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : ",
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
+								  svMask.size(), svMask);
+			} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
+				m_ar->WriteString(TEXT_W("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
+								  svMask.size(), svMask);
+			} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
+				m_ar->WriteString(TEXT_u8("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
+								  svMask.size(), svMask);
+			} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
+				m_ar->WriteString(TEXT_u("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
+								  svMask.size(), svMask);
+			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
+				m_ar->WriteString(TEXT_U("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
+								  svMask.size(), svMask);
+			} else {
+				static_assert(false);
+			}
+
+			const tchar_t* posHead = svText.data();
+			const tchar_t* posEnd = svText.data() + svText.size();
+			const tchar_t* posNext = nullptr;
+			for (const tchar_t* pos = posHead; pos && (pos < posEnd); pos = posNext+1) {
+				if (pos != posHead) {
+					pos++;
+					if (m_ar->GetCodepage() == eCODEPAGE::UCS2)
+						m_ar->WriteString(L"\t");
+					else
+						m_ar->WriteString("\t");
+				}
+				auto svPos = std::basic_string_view<tchar_t>(pos, posEnd);
+				auto ipos = svPos.find('\n');
+				posNext = (ipos == svPos.npos) ? posEnd : pos+ipos;
+				size_t len = posNext-pos;
+
+				if constexpr (std::is_same_v<tchar_t, char>) {
+					m_ar->WriteString("{1:{0}}\r\n", len, pos);
+				} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
+					m_ar->WriteString(L"{1:{0}\r\n", len, pos);
+				} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
+					m_ar->WriteString(u8"{1:{0}\r\n", len, pos);
+				}
+			}
+
+
+		} while (false);
+
+
+		if (m_bCloseFileAfterWrite)
+			CloseFile();
+	}
+
+	template void CSimpleLog::_Log<char>(const std::basic_string_view<char> svMask, const std::basic_string_view<char> svText);
+	template void CSimpleLog::_Log<wchar_t>(const std::basic_string_view<wchar_t> svMask, const std::basic_string_view<wchar_t> svText);
+	template void CSimpleLog::_Log<char8_t>(const std::basic_string_view<char8_t> svMask, const std::basic_string_view<char8_t> svText);
+	template void CSimpleLog::_Log<char16_t>(const std::basic_string_view<char16_t> svMask, const std::basic_string_view<char16_t> svText);
+	template void CSimpleLog::_Log<char32_t>(const std::basic_string_view<char32_t> svMask, const std::basic_string_view<char32_t> svText);
 
 	//-----------------------------------------------------------------------------
 	// Simple Log Interface
