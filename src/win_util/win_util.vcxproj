@@ -264,6 +264,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ListCtrlEd.cpp" />
+    <ClCompile Include="MatHelper.cpp" />
     <ClCompile Include="serial_port.cpp" />
     <ClCompile Include="TMDialog.cpp" />
     <ClCompile Include="win_util.cpp" />
@@ -280,6 +281,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\win_util\ListCtrlEd.h" />
+    <ClInclude Include="..\..\include\gtl\win_util\MatHelper.h" />
     <ClInclude Include="..\..\include\gtl\win_util\serial_port.h" />
     <ClInclude Include="..\..\include\gtl\win_util\TMDialog.h" />
     <ClInclude Include="..\..\include\gtl\win_util\win_util.h" />

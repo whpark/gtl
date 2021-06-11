@@ -113,6 +113,20 @@ namespace gtl::shape {
 	}
 
 	using color_t = color_rgba_t;
+	template < typename tjson >
+	void from_json(tjson const& j, color_t& object) {
+		object.r = j[0];
+		object.g = j[1];
+		object.b = j[2];
+		object.a = j[3];
+	}
+	template < typename tjson >
+	void to_json(tjson&& j, color_t const& object) {
+		j[0] = object.r;
+		j[1] = object.g;
+		j[2] = object.b;
+		j[3] = object.a;
+	}
 
 	constexpr color_t const CR_DEFAULT = ColorRGBA(255, 255, 255);
 
