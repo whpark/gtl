@@ -90,6 +90,12 @@ export namespace gtl {
 		constexpr value_type const& at(size_t row, size_t col) const {
 			return mat_[row*cols + col];
 		}
+		constexpr value_type& operator () (size_t index) requires (rows == 1 or cols == 1) {
+			return mat_[index];
+		}
+		constexpr value_type const& operator () (size_t index) const requires (rows == 1 or cols == 1) {
+			return mat_[index];
+		}
 
 		constexpr TMatrix& operator += (const TMatrix& B) { for (size_t i{}; i < m*n; i++) mat_[i] += B.mat_[i]; return *this; }
 		constexpr TMatrix& operator -= (const TMatrix& B) { for (size_t i{}; i < m*n; i++) mat_[i] -= B.mat_[i]; return *this; }
@@ -286,6 +292,123 @@ export namespace gtl {
 				sum = Col(0,i);
 				for (ptrdiff_t j = i+1; j < dim; j++) sum -= A(i,j) * Col(0,j);
 				Col(0,i) = sum / A(i,i);
+			}
+		}
+
+		bool eigen(TMatrix<T, 1, cols>& E_value, TMatrix<T, rows, cols>& E_Vector) const {
+
+			auto A(*this);
+
+			if (!jacobi(A, E_value, E_Vector))
+				return false;
+
+			eigsrt(E_value, E_Vector);
+		}
+
+		/* Eigen values & Eigen Vectors of Real Symmetric matrix A[m_nN][m_nN]
+		* 1994. 9. 7.
+		*/
+		friend bool jacobi(TMatrix& A, TMatrix& d, TMatrix& V, int nIteration = 50) {
+			constexpr int const dim = rows;
+			T tresh{}, theta{}, tau{}, t{}, sm{}, s{}, h{}, g{}, c{};
+
+			dim = A.m_nN;
+			TMatrix<T, 1, dim> b;
+			TMatrix<T, 1, dim> z;
+
+			auto Rotate = [&](auto& A, auto& i, auto& j, auto& k, auto& l) {
+				g = A(i,j);
+				h = A(k,l);
+				A(i,j) = g - s*(h + g*tau);
+				A(k,l) = h + s*(g - h*tau);
+			};
+
+			for (size_t ip = 0; ip < dim; ip++) {
+				for (size_t iq = 0; iq < dim; iq++) V(ip,iq) = .0;
+				V(ip,ip) = 1.0;
+			}
+			for (size_t ip = 0; ip < dim; ip++) {
+				b(0,ip) = d(0,ip) = A(ip,ip);
+				z(0,ip) = .0;
+			}
+
+			for (size_t i = 0; i < nIteration; i++) {
+				sm = .0;
+
+				for (size_t ip = 0; ip < dim-1; ip++)
+					for (size_t iq = ip+1; iq < dim; iq++)
+						sm += std::abs(A(ip,iq));
+				if (sm == .0)
+					return true;
+
+				if (i < 3) tresh = 0.2 * sm / (dim*dim);
+				else tresh = .0;
+
+				for (size_t ip = 0; ip < dim-1; ip++) {
+					for (size_t iq = ip+1; iq < dim; iq ++) {
+						g = 100.0 * std::abs(A(ip,iq));
+						if ( (i > 3) && (std::abs(d(0,ip))+g == std::abs(d(0,ip)))
+							&& (std::abs(d(0,iq))+g == std::abs(d(0,iq))) )
+							A(ip,iq) = .0;
+						else
+							if (std::abs(A(ip,iq)) > tresh) {
+								h = d(0,iq) - d(0,ip);
+								if ( fabs(h) + g == fabs(h) ) t = A(ip,iq)/h;
+								else {
+									theta = 0.5 * h / A(ip,iq);
+									t = 1.0 / ( std::abs(theta) + sqrt(1.0 + theta*theta) );
+									if (theta < .0) t = -t;
+								}
+								c = 1.0 / sqrt(1 + t*t);
+								s = t*c;
+								tau = s / (1.0 + c);
+								h = t * A(ip,iq);
+								z(0,ip) -= h;
+								z(0,iq) += h;
+								d(0,ip) -= h;
+								d(0,iq) += h;
+								A(ip,iq) = .0;
+
+								for (size_t j = 0; j < ip; j++) Rotate(A, j, ip, j, iq);
+								for (size_t j = ip + 1; j < iq; j++) Rotate(A, ip, j, j, iq);
+								for (size_t j = iq + 1; j < dim; j++) Rotate(A, ip, j, iq, j);
+								for (size_t j = 0; j < dim; j++) Rotate(V, j, ip, j, iq);
+							}
+					}
+				}
+				for (size_t ip = 0; ip < dim; ip++) {
+					b(0,ip) += z(0,ip);
+					d(0,ip) = b(0,ip);
+					z(0,ip) =.0;
+				}
+			}
+			return false; // !! Too many iterations in routine JACOBI
+		}
+
+		/* Sorting the Eigen values & Eigen vectors
+		*   from Jacobi() in Ascending Order
+		* 1994. 9. 7. -> 1995. 3. 28.
+		*/
+		friend void eigsrt(TMatrix<T, 1, cols>& d, TMatrix& V) {
+			constexpr int const dim = rows;
+			T p{};
+			size_t k;
+
+			for (size_t i {}; i < dim - 1; i++) {
+				p = d(0,k=i);
+
+				for (size_t j = i + 1; j < dim; j ++)
+					if (d(0,j) >= p) p = d(0,k=j);
+
+				if (k != i) {
+					d(0,k) = d(0,i);
+					d(0,i) = p;
+					for (size_t j = 0; j < dim; j++) {
+						p = V(j,i);
+						V(j,i) = V(j,k);
+						V(j,k) = p;
+					}
+				}
 			}
 		}
 	};
