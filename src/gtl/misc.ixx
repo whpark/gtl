@@ -19,6 +19,8 @@ module;
 #include <bitset>
 #include <algorithm>
 #include <string>
+#include <chrono>
+#include <format>
 
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
@@ -423,6 +425,121 @@ export namespace gtl {
 	template < typename eT, typename T = int >	constexpr eT enum_next(eT e)	{ static_assert(sizeof(eT) == sizeof(T)); return (eT)((T&)e+1); }
 	template < typename eT, typename T = int >	constexpr eT enum_prev(eT e)	{ static_assert(sizeof(eT) == sizeof(T)); return (eT)((T&)e-1); }
 
+
+	//-------------------------------------------------------------------------
+	/// @brief StopWatch
+	/// @tparam tclock 
+	template < typename tchar, class ttraits = std::char_traits<tchar>, typename tclock = std::chrono::steady_clock >
+	class TStopWatch {
+	protected:
+		tclock::time_point t0 { tclock::now() };
+		std::basic_ostream<tchar>& os;
+		thread_local inline static int depth {-1};
+
+		//struct item {
+		//	tclock::time_point t0;
+		//	tclock::time_point t1;
+		//	std::string str;
+		//};
+		//std::deque<item> laps;
+		constexpr static auto& GetDefaultOutStream() {
+			if constexpr (gtlc::is_one_of<tchar, char, char8_t>) {
+				return std::cout;
+			} else if constexpr (gtlc::is_one_of<tchar, wchar_t, char16_t>) {
+				return std::wcout;
+			}
+		}
+
+	public:
+		TStopWatch(std::basic_ostream<tchar>& os = GetDefaultOutStream()) : os(os) {
+			depth++;
+		}
+		~TStopWatch() {
+			depth--;
+		}
+
+		tclock::time_point GetLastTick() const { return t0; };
+
+	public:
+		void Start() {
+			t0 = tclock::now();
+		}
+		void Stop() {}
+
+	public:
+		template < typename ... Args >
+		void Lap(Args&& ... args) {
+			auto t = tclock::now();
+			if constexpr (gtlc::is_one_of<tchar, char>) {
+				os << std::format("STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
+				os << std::format(u8"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
+				os << std::format(u"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
+				os << std::format(U"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
+				os << std::format(L"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+			} else {
+				static_assert(false);
+			}
+			os << std::format(std::forward<Args>(args)...);
+			os << (tchar)'\n';
+			t0 = tclock::now();
+		}
+	};
+
+
+	namespace win_util {
+		//-------------------------------------------------------------------------
+		/// @brief StopWatch
+		/// @tparam tclock 
+		template < typename tchar, class ttraits = std::char_traits<tchar> >
+		struct TDebugOutputStreamBuf : public std::basic_streambuf<tchar, ttraits> {
+		public:
+			using base_t = std::basic_streambuf<tchar, ttraits>;
+
+			std::basic_string<tchar> str;
+
+			virtual ~TDebugOutputStreamBuf() {
+				OutputBuf();
+			}
+			void OutputBuf() {
+				if (str.empty())
+					return;
+				if constexpr (gtlc::is_one_of<tchar, wchar_t, char16_t>) {
+					OutputDebugStringW((wchar_t const*)str.c_str());
+				} else if constexpr (gtlc::is_one_of<tchar, char, char8_t>) {
+					OutputDebugStringA((char const*)str.c_str());
+				} else {
+					static_assert(false);
+				}
+			}
+			virtual base_t::int_type overflow(base_t::int_type c) override {
+				str += (tchar)c;
+				if (c == '\n') {
+					OutputBuf();
+					str.clear();
+				}
+				return 1;//traits_type::eof();
+			}
+		};
+
+		//-------------------------------------------------------------------------
+		/// @brief StopWatch
+		template < typename tchar >
+		class TStopWatch : public gtl::TStopWatch<tchar, std::char_traits<tchar>> {
+		public:
+			std::basic_ostream<tchar> os;
+			TDebugOutputStreamBuf<tchar> osbuf;
+			using base_t = gtl::TStopWatch<tchar, std::char_traits<tchar>>;
+
+			TStopWatch() : os(&osbuf), base_t(os) {};
+		};
+
+		using CStopWatchA = TStopWatch<char>;
+		using CStopWatchW = TStopWatch<wchar_t>;
+	}
 
 	//-------------------------------------------------------------------------
 	// axis
