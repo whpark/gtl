@@ -17,11 +17,11 @@
 namespace gtl::shape {
 #pragma pack(push, 8)
 
+#pragma warning(push)
+#pragma warning(disable: 4275)
 
 	//=============================================================================================================================
 	// CoordSystem
-
-	using ct_t = CCoordTrans3d;
 
 	////-------------------------------------------------------------------------
 	///// @brief 3점(or 2점) 얼라인.
@@ -47,8 +47,8 @@ namespace gtl::shape {
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
 	class ICanvas {
-	protected:
-		std::unique_ptr<ICoordTrans> rCT_, rCTI_;
+	public:
+		CCoordTransChain ct_, ctI_;
 		point_t ptLast_{};
 
 	public:
@@ -61,13 +61,15 @@ namespace gtl::shape {
 
 	public:
 		ICanvas() = default;
-		ICanvas(ICanvas const&) = default;
+		ICanvas(ICanvas const& B) {
+			*this = B;
+		}
 		ICanvas(ICanvas &&) = default;
-		ICanvas(ICoordTrans const& ct) : rCT_ {new_clone(ct)} {
-			rCTI_ = ct.GetInverse();
+		ICanvas(ICoordTrans const& ct) {
+			SetCT(ct);
 		}
 		virtual ~ICanvas() {}
-		ICanvas& operator = (ICanvas const&) = default;
+		ICanvas& operator = (ICanvas const& B) = default;
 		ICanvas& operator = (ICanvas &&) = default;
 
 		virtual void Init() {
@@ -77,15 +79,19 @@ namespace gtl::shape {
 		}
 
 		void SetCT(ICoordTrans const& ct) {
-			rCT_ = ct.NewClone();
-			rCTI_ = ct.GetInverse();
+			if (auto* pCT = dynamic_cast<CCoordTransChain const*>(&ct); pCT) {
+				ct_ = *pCT;
+				ct_.GetInv(ctI_);
+			} else {
+				ct_.clear();
+				ct_ *= ct;
+
+			}
 		}
-		ICoordTrans const* GetCT() { return rCT_.get(); }
-		ICoordTrans const* GetCTI() { return rCTI_.get(); }
 
 		// Scratching
-		point_t Trans(point_t const& pt) { return (*rCT_)(pt); }
-		point_t TransI(point_t const& pt) { return (*rCTI_)(pt); }
+		point_t Trans(point_t const& pt) const { return ct_(pt); }
+		point_t TransI(point_t const& pt) const { return ctI_(pt); }
 
 		virtual void MoveTo_Target(point_t const& ptTargetSystem) = 0;
 		virtual void LineTo_Target(point_t const& ptTargetSystem) = 0;
@@ -157,8 +163,6 @@ namespace gtl::shape {
 	// IQDeviceScanner : Interface of Canvas
 	class GTL_SHAPE_CLASS ICanvasScanner : public ICanvas {
 		friend class ICanvas;
-	protected:
-		ct_t::mat_t matTrans_ = ct_t::mat_t::eye();
 
 	public:
 		ICanvasScanner() {
@@ -194,11 +198,8 @@ namespace gtl::shape {
 		int line_type_ = cv::LINE_8;
 
 	public:
-		CCanvasMat(cv::Mat& img, ct_t const& ct) : img_(img) {
-			SetCT(ct);
-		}
-		virtual ~CCanvasMat() {
-		}
+		CCanvasMat(cv::Mat& img, ICoordTrans const& ct) : img_(img), ICanvas(ct) { }
+		virtual ~CCanvasMat() { }
 
 		virtual void PreDraw(s_shape const& shape) override {
 			color_ = ColorS(shape.color);
@@ -395,7 +396,8 @@ namespace gtl::shape {
 	//GTL_API std::vector<point_t> AddLaserOffsetToLine(std::span<point_t const> pts, double dThickness, bool bLoop);
 
 
+#pragma warning(pop)
+#pragma pack(pop)
 }
 
 
-#pragma pack(pop)

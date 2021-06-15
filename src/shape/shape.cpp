@@ -260,6 +260,7 @@ namespace gtl::shape {
 				try {
 					rBlock->LoadFromCADJson(item);
 				} catch (std::exception& e) {
+					e;
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -286,6 +287,7 @@ namespace gtl::shape {
 					try {
 						rShape->LoadFromCADJson(jEntity);
 					} catch (std::exception& e) {
+						e;
 						DEBUG_PRINT("{}\n", e.what());
 						continue;
 					} catch (...) {
@@ -324,6 +326,7 @@ namespace gtl::shape {
 					rShape->LoadFromCADJson(jEntity);
 					//rShape->UpdateBoundary(rectBoundary);
 				} catch (std::exception& e) {
+					e;
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -357,7 +360,7 @@ namespace gtl::shape {
 					return false;
 				}
 
-				ct_t ct;
+				CCoordTrans3d ct;
 				// todo : 순서 확인 (scale->rotate ? or rotate->scale ?)
 				if (pInsert->xscale != 1.0) {
 					ct.mat_(0, 0) *= pInsert->xscale;
