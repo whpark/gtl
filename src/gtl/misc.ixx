@@ -490,7 +490,7 @@ export namespace gtl {
 	};
 
 
-	namespace win_util {
+	namespace win_util { // Temporary util gtl::win_util
 		//-------------------------------------------------------------------------
 		/// @brief StopWatch
 		/// @tparam tclock 

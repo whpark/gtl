@@ -182,6 +182,24 @@ export namespace gtl {
 			return newChain;
 		}
 
+		[[nodiscard]] CCoordTransChain operator * (ICoordTrans const& B) const {
+			CCoordTransChain newChain;
+			for (auto const& ct : chain_) {
+				newChain.chain_.push_back(std::move(ct.NewClone()));
+			}
+			newChain.chain_.push_back(std::move(B.NewClone()));
+			return newChain;
+		}
+
+		friend [[nodiscard]] CCoordTransChain operator * (ICoordTrans const& A, CCoordTransChain const& B) {
+			CCoordTransChain newChain;
+			newChain.chain_.push_back(std::move(A.NewClone()));
+			for (auto const& ct : B.chain_) {
+				newChain.chain_.push_back(std::move(ct.NewClone()));
+			}
+			return newChain;
+		}
+
 		virtual std::unique_ptr<ICoordTrans> GetInverse() const override {
 			auto inv = std::make_unique<CCoordTransChain>();
 			for (auto iter = chain_.rbegin(); iter != chain_.rend(); iter++) {
