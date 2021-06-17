@@ -103,8 +103,8 @@ namespace gtl::win_util {
 	inline static bool SaveMat(std::ostream& file, cv::Mat const& mat) {
 		uint8_t buf[4] = { 3, 'm', 'a', 't' };
 		file.write((char const*)buf, sizeof(buf));
-		file.write((char const*)&mat.cols, sizeof(mat.cols));
 		file.write((char const*)&mat.rows, sizeof(mat.rows));
+		file.write((char const*)&mat.cols, sizeof(mat.cols));
 		int type = mat.type();
 		file.write((char const*)&type, sizeof(type));
 		for (int i = 0; i < mat.rows; i++) {
