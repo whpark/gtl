@@ -368,6 +368,9 @@ namespace gtl::shape {
 			bLoop = (j["flags"].value_or(0) & 1) != 0;
 			return true;
 		}
+
+		boost::ptr_deque<s_shape> Split() const;
+
 	};
 
 	struct GTL_SHAPE_CLASS s_lwpolyline : public s_polyline {

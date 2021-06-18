@@ -146,31 +146,18 @@ namespace gtl::shape {
 		if (pts.size())
 			canvas.MoveTo(pts[0]);
 
-		for (int iPt = 0; iPt < pts.size(); iPt++) {
-			polypoint_t pt0{pts[iPt]};
-			polypoint_t pt1;
-			bool bLast = false;
-			if (bLoop) {
-				if (iPt == pts.size()-1) {
-					pt1 = pts[0];
-					bLast = true;
-				} else {
-					pt1 = pts[iPt+1];
-				}
-			} else {
-				if (iPt == pts.size()-1)
-					break;
-				bLast = iPt == pts.size()-2;
-				pt1 = pts[iPt+1];
-			}
-
-			double dBulge = pt0.Bulge();
-
-			if (dBulge == 0.0) {
+		auto nPt = pts.size();
+		if (!bLoop)
+			nPt--;
+		for (int iPt = 0; iPt < nPt; iPt++) {
+			auto iPt2 = (iPt+1) % pts.size();
+			auto pt0 = pts[iPt];
+			auto pt1 = pts[iPt2];
+			if (pt0.Bulge() == 0.0) {
 				canvas.LineTo(pt1);
 			} else {
 				canvas.LineTo(pt0);
-				s_arcXY arc = s_arcXY::GetFromBulge(dBulge, pt0, pt1);
+				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
 				(s_shape&)arc = *(s_shape*)this;
 
 				arc.Draw(canvas);
@@ -178,6 +165,31 @@ namespace gtl::shape {
 				canvas.LineTo(pt1);
 			}
 		}
+	}
+
+	boost::ptr_deque<s_shape> s_polyline::Split() const {
+		boost::ptr_deque<s_shape> shapes;
+
+		auto nPt = pts.size();
+		if (!bLoop)
+			nPt--;
+		for (int iPt = 0; iPt < nPt; iPt++) {
+			auto iPt2 = (iPt+1) % pts.size();
+			auto pt0 = pts[iPt];
+			auto pt1 = pts[iPt2];
+			if (pt0.Bulge() == 0.0) {
+				auto rLine = std::make_unique<s_line>();
+				(s_shape&)*rLine = (s_shape const&)*this;
+				rLine->pt0 = pt0;
+				rLine->pt1 = pt1;
+				shapes.push_back(std::move(rLine));
+			} else {
+				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
+				(s_shape&)arc = *(s_shape*)this;
+				shapes.push_back(arc.NewClone());
+			}
+		}
+		return shapes;
 	}
 
 	bool s_drawing::LoadFromCADJson(json_t& _j) {
