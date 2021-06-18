@@ -719,8 +719,11 @@ namespace gtl {
 	/// <returns>number value. (no overflow checked)</returns>
 	template < std::integral tvalue, gtlc::string_elem tchar>
 	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped, int radix, tchar cSplitter) {
-		if (svNumberString.empty())
+		if (svNumberString.empty()) {
+			if (ppszStopped)
+				*ppszStopped = svNumberString.data();
 			return {};
+		}
 
 		tchar const* psz = svNumberString.data();
 		tchar const* const pszEnd = svNumberString.data() + svNumberString.size();
@@ -729,8 +732,11 @@ namespace gtl {
 		while ((psz < pszEnd) && IsSpace(*psz))
 			psz++;
 
-		if (psz >= pszEnd)
+		if (psz >= pszEnd) {
+			if (ppszStopped)
+				*ppszStopped = psz;
 			return {};
+		}
 
 		// Check sign (+/-)
 		bool bMinus{};

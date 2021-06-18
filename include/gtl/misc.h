@@ -466,15 +466,15 @@ namespace gtl {
 		void Lap(Args&& ... args) {
 			auto t = tclock::now();
 			if constexpr (gtlc::is_one_of<tchar, char>) {
-				os << std::format("STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format("STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
-				os << std::format(u8"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format(u8"STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
-				os << std::format(u"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format(u"STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
-				os << std::format(U"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format(U"STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
-				os << std::format(L"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format(L"STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else {
 				static_assert(false);
 			}
