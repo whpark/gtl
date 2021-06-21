@@ -257,6 +257,13 @@ namespace gtl::shape {
 		//cookie_t cookie;
 
 	public:
+		enum class eLINE_WIDTH : int {
+			ByLayer = 29,
+			ByBlock = 30,
+			Default = 31
+		};
+
+	public:
 		virtual ~s_shape() {}
 
 		GTL__DYNAMIC_VIRTUAL_INTERFACE(s_shape);
@@ -292,6 +299,8 @@ namespace gtl::shape {
 		virtual void FlipZ() = 0;
 		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
 		virtual bool UpdateBoundary(rect_t&) const = 0;
+		int GetLineWidthInUM() const { return GetLineWidthInUM(lineWeight); }
+		static int GetLineWidthInUM(int lineWeight);
 
 		virtual void Draw(ICanvas& canvas) const;
 		virtual bool DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
@@ -304,6 +313,8 @@ namespace gtl::shape {
 		static std::unique_ptr<s_shape> CreateShapeFromEntityName(std::string const& strEntityName);
 	};
 
+
+	GTL_SHAPE_API void CohenSutherlandLineClip(gtl::CRect2d roi, gtl::CPoint2d& pt0, gtl::CPoint2d& pt1);
 
 #pragma pack(pop)
 }
