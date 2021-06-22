@@ -385,7 +385,7 @@ namespace gtl::shape {
 				auto value = var.value();
 				if (value.is_string()) {
 					auto& str = value.as_string();
-					vars[std::string(key.data(), key.size())] = gtl::ToString<gtl::shape::char_t, char>(std::string{str.data(), str.size()});
+					vars[std::string(key.data(), key.size())] = gtl::ToString<gtl::shape::char_t, char8_t>(std::u8string{(char8_t const*)str.data(), str.size()});
 				} else if (value.is_int64()) {
 					vars[std::string(key.data(), key.size())] = (int)value.as_int64();
 				} else if (value.is_double()) {
