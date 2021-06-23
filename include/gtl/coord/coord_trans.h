@@ -61,7 +61,7 @@ namespace gtl {
 
 		/// @brief pt -> pt2
 		/// @return 
-		point3_t operator () (point3_t const& pt) const {
+		[[ nodiscard ]] point3_t operator () (point3_t const& pt) const {
 			return Trans(pt);
 		}
 

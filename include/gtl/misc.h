@@ -131,6 +131,9 @@ namespace gtl {
 				m_cleaner();
 			m_cleaner = nullptr;
 		}
+		void Release() {
+			m_cleaner = nullptr;
+		}
 	};
 
 
