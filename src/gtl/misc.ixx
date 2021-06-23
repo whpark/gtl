@@ -132,6 +132,11 @@ export namespace gtl {
 			if (m_cleaner)
 				m_cleaner();
 		}
+		void Trigger() {
+			if (m_cleaner)
+				m_cleaner();
+			m_cleaner = nullptr;
+		}
 	};
 
 
