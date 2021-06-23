@@ -225,6 +225,8 @@ namespace gtl {
 	template < gtlc::string_elem tchar > inline void MakeUpper(tchar& c) {
 		c = ToUpper(c);
 	}
+
+
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c) {
 		return (c >= '0') && (c <= '9');
 	}
