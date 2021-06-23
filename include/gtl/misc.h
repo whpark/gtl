@@ -117,6 +117,19 @@ namespace gtl {
 	};
 
 
+	/// @brief RAI helper
+	struct CTrigger {
+		std::function<void()> m_cleaner;
+		CTrigger(std::function<void()> cleaner) : m_cleaner(cleaner) {}
+		~CTrigger() {
+			if (m_cleaner)
+				m_cleaner();
+		}
+	};
+
+
+
+
 	//-------------------------------------------------------------------------
 	// Variable Init
 	template < gtlc::trivially_copyable T >
