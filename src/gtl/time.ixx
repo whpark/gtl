@@ -37,7 +37,7 @@ export namespace gtl {
 
 	//class GTL_CLASS CSysTime;
 
-	//using system_clock_t = std::chrono::system_clock;
+	using system_clock_t = std::chrono::system_clock;
 
 	using sec_t = std::chrono::duration<double>;
 	using msec_t = std::chrono::duration<double, std::ratio<1, 1'000>>;
@@ -106,7 +106,7 @@ export namespace gtl {
 		// 초 단위
 		sec_t GetTotalSec() const { return base_t::time_since_epoch(); }
 
-#if (GTL_USE_WINDOWS_API)
+#if defined(_WINDOWS) and (GTL_USE_WINDOWS_API)
 		TSysTime(FILETIME ft) :
 			base_t(tclock::duration(std::bit_cast<typename base_t::rep>(ft) - eSysTimeToFileTime))
 		{

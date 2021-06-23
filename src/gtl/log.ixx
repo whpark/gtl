@@ -311,39 +311,36 @@ namespace gtl {
 				static_assert(false);
 			}
 
-			auto st = CSysTime(now).GetLocalSystemTime();
-
-			//auto GetFMT_Header = []() -> const tchar_t* {
-			//	if constexpr (std::is_same_v<tchar_t, char>) {
-			//		return "%04d/%02d/%02d, %02d:%02d:%02d.%03d [%.*s] :";
-			//	} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
-			//		return L"%04d/%02d/%02d, %02d:%02d:%02d.%03d [%.*s] :";
-			//	} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
-			//		return _U8("%04d/%02d/%02d, %02d:%02d:%02d.%03d [%.*s] :");
-			//	} else {
-			//		static_assert(false);
-			//	}
-			//};
+			time_t t = std::chrono::system_clock::to_time_t(now);
+			tm st{};
+		#ifdef _WINDOWS
+			localtime_s(&st, &t);
+		#else
+			st = *std::localtime(&t);
+		#endif
+			auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(now - std::chrono::system_clock::from_time_t(t));
+			
+			//auto st = CSysTime(now).GetLocalSystemTime();
 
 			if constexpr (std::is_same_v<tchar_t, char>) {
 				m_ar->WriteString("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : ",
-									st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
-									svMask.size(), svMask);
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
+								  svMask.size(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
 				m_ar->WriteString(TEXT_W("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-								  st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
 								  svMask.size(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
 				m_ar->WriteString(TEXT_u8("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-								  st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
 								  svMask.size(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
 				m_ar->WriteString(TEXT_u("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-								  st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
 								  svMask.size(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
 				m_ar->WriteString(TEXT_U("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-								  st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
 								  svMask.size(), svMask);
 			} else {
 				static_assert(false);

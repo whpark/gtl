@@ -227,10 +227,14 @@ export namespace gtl {
 			boost::json::error_code ec;
 			boost::json::stream_parser p;
 			std::string line;
+			size_t nLine{};
 			while (std::getline(is, line)) {
+				nLine++;
 				p.write(line, ec);
-				if (ec)
+				if (ec) {
+					throw std::ios_base::failure(std::format("line {}", nLine), ec);
 					return false;
+				}
 			}
 			p.finish(ec);
 			if (ec)

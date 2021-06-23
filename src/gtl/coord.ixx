@@ -47,12 +47,14 @@ export namespace gtl {
 
 	using CSize3d	= TSize3<double>;
 	using CSize2d	= TSize2<double>;
+	using CPoint4d	= TPoint4<double>;
 	using CPoint3d	= TPoint3<double>;
 	using CPoint2d	= TPoint2<double>;
 	using CRect3d	= TRect3<double>;
 	using CRect2d	= TRect2<double>;
 	using CSize3i	= TSize3<int>;
 	using CSize2i	= TSize2<int>;
+	using CPoint4i	= TPoint4<int>;
 	using CPoint3i	= TPoint3<int>;
 	using CPoint2i	= TPoint2<int>;
 	using CRect3i	= TRect3<int>;
@@ -140,10 +142,10 @@ export namespace gtl {
 		T_COORD coord;
 		tchar_t const* pos = sv.data();
 		tchar_t const* const end = sv.data() + sv.size();
-		for (auto& v : coord.data()) {
+		for (auto& v : coord.arr()) {
 			if (pos >= end)
 				break;
-			v = tszto<tchar_t, typename T_COORD::value_type>(pos, end, &pos);
+			v = tszto<typename T_COORD::value_type>(pos, end, &pos);
 			if (*pos == ',') pos++;	// or....... if (*pos) pos++
 		}
 		return coord;

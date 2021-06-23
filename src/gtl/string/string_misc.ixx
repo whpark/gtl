@@ -211,12 +211,12 @@ export namespace gtl {
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar ToLower(tchar c) {
 		if (c < 'A')
 			return c;
-	
+
 		if (c <= 'Z')
 			return c - 'A' + 'a';
-	
+
 		using namespace gtl::charset;
-	
+
 		if constexpr (sizeof(tchar) >= sizeof(char16_t)) {
 			// Latin-1
 			if (c < rangeUL_latin1_g.first)
@@ -238,7 +238,7 @@ export namespace gtl {
 				}
 			}
 		}
-	
+
 		if constexpr (sizeof(tchar) >= sizeof(char32_t)) {
 			for (auto const& [range, map] : mapUL32) {
 				if (c < range.first)
@@ -258,9 +258,9 @@ export namespace gtl {
 			return c;
 		if (c <= 'z')
 			return c - 'a' + 'A';
-	
+
 		using namespace gtl::charset;
-	
+
 		if constexpr (sizeof(tchar) >= sizeof(char16_t)) {
 			//// Latin-1
 			//if (c < rangeLU_latin1_g.first) {
@@ -287,7 +287,7 @@ export namespace gtl {
 				}
 			}
 		}
-	
+
 		if constexpr (sizeof(tchar) >= sizeof(char32_t)) {
 			for (auto const& [range, map] : mapLU32) {
 				if (c < range.first)
@@ -322,13 +322,6 @@ export namespace gtl {
 		}
 	}
 
-	template < gtlc::string_elem tchar > inline void MakeLower(tchar& c) {
-		c = ToLower(c);
-	}
-	template < gtlc::string_elem tchar > inline void MakeUpper(tchar& c) {
-		c = ToUpper(c);
-	}
-
 	template < gtlc::string_elem tchar > inline [[nodiscard]] std::basic_string<tchar> ToLower(std::basic_string_view<tchar> sv) {
 		std::basic_string<tchar> str;
 		str.reserve(sv.size());
@@ -350,6 +343,13 @@ export namespace gtl {
 	template < gtlc::string_elem tchar > inline void MakeUpper(std::basic_string<tchar>& str) {
 		for (auto& c : str)
 			MakeUpper(c);
+	}
+
+	template < gtlc::string_elem tchar > inline void MakeLower(tchar& c) {
+		c = ToLower(c);
+	}
+	template < gtlc::string_elem tchar > inline void MakeUpper(tchar& c) {
+		c = ToUpper(c);
 	}
 
 

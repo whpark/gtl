@@ -29,7 +29,6 @@ export namespace gtl {
 	class tlength_mm_t {	// represents length in mm
 	public:
 		using value_type = T;
-
 		T dValue{};
 
 		tlength_mm_t(T v) : dValue(v) { }

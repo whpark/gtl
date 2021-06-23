@@ -204,7 +204,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
     <ClInclude Include="..\..\include\gtl\_macro.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="archiv.ixx" />
+    <ClCompile Include="archive.ixx" />
     <ClCompile Include="concepts.ixx" />
     <ClCompile Include="coord.ixx" />
     <ClCompile Include="coord\coord_point.ixx" />

@@ -138,7 +138,12 @@ export namespace gtl {
 				m_cleaner();
 			m_cleaner = nullptr;
 		}
+		void Release() {
+			m_cleaner = nullptr;
+		}
 	};
+
+
 
 
 	//-------------------------------------------------------------------------
@@ -489,15 +494,15 @@ export namespace gtl {
 		void Lap(Args&& ... args) {
 			auto t = tclock::now();
 			if constexpr (gtlc::is_one_of<tchar, char>) {
-				os << std::format("STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format("STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
-				os << std::format(u8"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format(u8"STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
-				os << std::format(u"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format(u"STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
-				os << std::format(U"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format(U"STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
-				os << std::format(L"STOP_WATCH - {0:{1}}{2}", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
+				os << std::format(L"STOP_WATCH - {0:{1}}{2} ", ' ', depth*4, std::chrono::duration_cast<std::chrono::milliseconds>(t-t0));
 			} else {
 				static_assert(false);
 			}
@@ -507,57 +512,6 @@ export namespace gtl {
 		}
 	};
 
-
-	namespace win_util { // Temporary util gtl::win_util
-		//-------------------------------------------------------------------------
-		/// @brief StopWatch
-		/// @tparam tclock 
-		template < typename tchar, class ttraits = std::char_traits<tchar> >
-		struct TDebugOutputStreamBuf : public std::basic_streambuf<tchar, ttraits> {
-		public:
-			using base_t = std::basic_streambuf<tchar, ttraits>;
-
-			std::basic_string<tchar> str;
-
-			virtual ~TDebugOutputStreamBuf() {
-				OutputBuf();
-			}
-			void OutputBuf() {
-				if (str.empty())
-					return;
-				if constexpr (gtlc::is_one_of<tchar, wchar_t, char16_t>) {
-					OutputDebugStringW((wchar_t const*)str.c_str());
-				} else if constexpr (gtlc::is_one_of<tchar, char, char8_t>) {
-					OutputDebugStringA((char const*)str.c_str());
-				} else {
-					static_assert(false);
-				}
-			}
-			virtual base_t::int_type overflow(base_t::int_type c) override {
-				str += (tchar)c;
-				if (c == '\n') {
-					OutputBuf();
-					str.clear();
-				}
-				return 1;//traits_type::eof();
-			}
-		};
-
-		//-------------------------------------------------------------------------
-		/// @brief StopWatch
-		template < typename tchar >
-		class TStopWatch : public gtl::TStopWatch<tchar, std::char_traits<tchar>> {
-		public:
-			std::basic_ostream<tchar> os;
-			TDebugOutputStreamBuf<tchar> osbuf;
-			using base_t = gtl::TStopWatch<tchar, std::char_traits<tchar>>;
-
-			TStopWatch() : os(&osbuf), base_t(os) {};
-		};
-
-		using CStopWatchA = TStopWatch<char>;
-		using CStopWatchW = TStopWatch<wchar_t>;
-	}
 
 	//-------------------------------------------------------------------------
 	// axis

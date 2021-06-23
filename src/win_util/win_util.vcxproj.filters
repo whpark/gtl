@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="[ MFC Framework ]">
+      <UniqueIdentifier>{11817d40-a175-40f9-b467-f1c347c95281}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="win_util">
+      <UniqueIdentifier>{355f6653-44ff-4664-97d7-5d1c4679a7ac}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="ListCtrlEd.cpp">
+      <Filter>win_util</Filter>
+    </ClCompile>
+    <ClCompile Include="MatHelper.cpp">
+      <Filter>win_util</Filter>
+    </ClCompile>
+    <ClCompile Include="serial_port.cpp">
+      <Filter>win_util</Filter>
+    </ClCompile>
+    <ClCompile Include="TMDialog.cpp">
+      <Filter>win_util</Filter>
+    </ClCompile>
+    <ClCompile Include="win_util.cpp">
+      <Filter>win_util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\win_util.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="win_util.def">
+      <Filter>[ MFC Framework ]</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\_lib_gtl_win_util.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\ListCtrlEd.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\MatHelper.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\serial_port.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\TMDialog.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\win_util.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="win_util.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

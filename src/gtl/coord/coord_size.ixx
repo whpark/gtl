@@ -17,7 +17,7 @@ module;
 #include "gtl/_macro.h"
 
 //#include "boost/ptr_container/ptr_container.hpp"
-#include "boost/serialization/serialization.hpp"
+//#include "boost/serialization/serialization.hpp"
 //#include "boost/serialization/export.hpp"
 
 export module gtl:coord_size;

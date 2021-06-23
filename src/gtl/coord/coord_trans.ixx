@@ -48,6 +48,7 @@ export namespace gtl {
 		// Constructors
 		ICoordTrans() { }
 		virtual ~ICoordTrans() { }
+		auto operator <=> (ICoordTrans const&) const = default;
 
 		GTL__DYNAMIC_VIRTUAL_INTERFACE(ICoordTrans);
 
@@ -160,6 +161,7 @@ export namespace gtl {
 		//virtual ~TCoordTransChain() { }
 		CCoordTransChain(CCoordTransChain const& B) = default;
 		CCoordTransChain& operator = (CCoordTransChain const& B) = default;
+		auto operator <=> (CCoordTransChain const&) const = default;
 
 		CCoordTransChain& operator *= (CCoordTransChain const& B)	{
 			for (auto const& ct : chain_) 
@@ -209,6 +211,17 @@ export namespace gtl {
 				}
 			}
 			return std::move(inv);
+		}
+		bool GetInv(CCoordTransChain& ctI) const {
+			ctI.chain_.clear();
+			for (auto iter = chain_.rbegin(); iter != chain_.rend(); iter++) {
+				if (auto r = iter->GetInverse(); r) {
+					ctI.chain_.push_back(std::move(r));
+				} else {
+					return false;
+				}
+			}
+			return true;
 		}
 
 
@@ -333,6 +346,8 @@ export namespace gtl {
 
 		TCoordTransDim(TCoordTransDim const& B) = default;
 		TCoordTransDim& operator = (TCoordTransDim const& B) = default;
+
+		auto operator <=> (TCoordTransDim const&) const = default;
 
 		//bool operator == (const TCoordTransDim& B) const { return (scale_ == B.scale_) && (mat_ == B.mat_) && (origin_ == B.origin_) && (offset_ == B.offset_); }
 		//bool operator != (const TCoordTransDim& B) const { return !(*this == B); }
@@ -488,7 +503,7 @@ export namespace gtl {
 
 		static inline [[nodiscard]] mat_t GetRotatingMatrix(rad_t angle) requires (dim == 2) {
 			double c{cos(angle)}, s{sin(angle)};
-			return mat_t{c, -s, s, c};
+			return mat_t(c, -s, s, c);
 		}
 		static inline [[nodiscard]] mat_t GetRotatingMatrixXY(rad_t angle) requires (dim >= 3) {
 			double c{cos(angle)}, s{sin(angle)};
@@ -581,8 +596,6 @@ export namespace gtl {
 
 		TCoordTransDim& operator *= (TCoordTransDim const& B) {
 			// 순서 바꾸면 안됨.
-			//offset_		= scale_ * mat_ * (B.offset_ - origin_) + offset_;
-			auto t = mat_*(B.offset_-origin_);
 			offset_		= scale_ * mat_ * (B.offset_ - origin_) + offset_;
 
 			origin_		= B.origin_;
