@@ -19,6 +19,7 @@
 #include <iostream>
 #include <format>
 #include <chrono>
+#include <functional>
 #include "gtl/concepts.h"
 
 namespace gtl::internal {
@@ -124,6 +125,11 @@ namespace gtl {
 		~CTrigger() {
 			if (m_cleaner)
 				m_cleaner();
+		}
+		void Trigger() {
+			if (m_cleaner)
+				m_cleaner();
+			m_cleaner = nullptr;
 		}
 	};
 
