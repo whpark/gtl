@@ -32,6 +32,9 @@
     <ClCompile Include="TMDialog.cpp">
       <Filter>win_util</Filter>
     </ClCompile>
+    <ClCompile Include="MatHelper.cpp">
+      <Filter>win_util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\win_util.rc2">
@@ -67,6 +70,9 @@
       <Filter>win_util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\win_util\ListCtrlEd.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\MatHelper.h">
       <Filter>win_util</Filter>
     </ClInclude>
   </ItemGroup>

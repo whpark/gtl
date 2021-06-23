@@ -5,11 +5,11 @@
 
 #pragma once
 
-#define NOMINMAX
 #pragma warning(push)
 #pragma warning(disable: 5104 5105)
+
+#define NOMINMAX
 #include <windows.h>
-#pragma warning(pop)
 
 #include "gtest/gtest.h"
 #include "benchmark/benchmark.h"
@@ -30,3 +30,4 @@
 #include "boost/archive/binary_oarchive.hpp"
 #include "boost/serialization/export.hpp"
 
+#pragma warning(pop)

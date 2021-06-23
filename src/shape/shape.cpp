@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include <functional>
 #include "gtl/shape/shape.h"
 
@@ -11,6 +11,184 @@ using namespace std::literals;
 #endif
 
 namespace gtl::shape {
+
+	//// from openCV
+	//bool clipLine(gtl::CSize2i size, gtl::CPoint2d& pt1, gtl::CPoint2d& pt2) {
+	//	if( size.cx <= 0 || size.cy <= 0 )
+	//		return false;
+
+	//	auto right = size.cx-1, bottom = size.cy-1;
+	//	auto &x1 = pt1.x, &y1 = pt1.y, &x2 = pt2.x, &y2 = pt2.y;
+
+	//	int c1 = (x1 < 0) + (x1 > right) * 2 + (y1 < 0) * 4 + (y1 > bottom) * 8;
+	//	int c2 = (x2 < 0) + (x2 > right) * 2 + (y2 < 0) * 4 + (y2 > bottom) * 8;
+
+	//	if( (c1 & c2) == 0 && (c1 | c2) != 0 )
+	//	{
+	//		int64 a;
+	//		if( c1 & 12 )
+	//		{
+	//			a = c1 < 8 ? 0 : bottom;
+	//			x1 += (int64)((double)(a - y1) * (x2 - x1) / (y2 - y1));
+	//			y1 = a;
+	//			c1 = (x1 < 0) + (x1 > right) * 2;
+	//		}
+	//		if( c2 & 12 )
+	//		{
+	//			a = c2 < 8 ? 0 : bottom;
+	//			x2 += (int64)((double)(a - y2) * (x2 - x1) / (y2 - y1));
+	//			y2 = a;
+	//			c2 = (x2 < 0) + (x2 > right) * 2;
+	//		}
+	//		if( (c1 & c2) == 0 && (c1 | c2) != 0 )
+	//		{
+	//			if( c1 )
+	//			{
+	//				a = c1 == 1 ? 0 : right;
+	//				y1 += (int64)((double)(a - x1) * (y2 - y1) / (x2 - x1));
+	//				x1 = a;
+	//				c1 = 0;
+	//			}
+	//			if( c2 )
+	//			{
+	//				a = c2 == 1 ? 0 : right;
+	//				y2 += (int64)((double)(a - x2) * (y2 - y1) / (x2 - x1));
+	//				x2 = a;
+	//				c2 = 0;
+	//			}
+	//		}
+
+	//		//assert( (c1 & c2) != 0 || (x1 | y1 | x2 | y2) >= 0 );
+	//	}
+
+	//	return (c1 | c2) == 0;
+	//}
+
+	// Cohenâ€“Sutherland clipping algorithm clips a line from
+	// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
+	// diagonal from (xmin, ymin) to (xmax, ymax).
+	void CohenSutherlandLineClip(gtl::CRect2d roi, gtl::CPoint2d& pt0, gtl::CPoint2d& pt1) {
+		enum fOUT_CODE : uint8_t {
+			INSIDE	= 0b0000,
+			LEFT	= 0b0001,
+			RIGHT	= 0b0010,
+			BOTTOM	= 0b0100,
+			TOP		= 0b1000,
+		};
+
+		auto& x0 = pt0.x;
+		auto& y0 = pt0.y;
+		auto& x1 = pt1.x;
+		auto& y1 = pt1.y;
+
+		// Compute the bit code for a point (x, y) using the clip
+		// bounded diagonally by (xmin, ymin), and (xmax, ymax)
+		auto ComputeOutCode = [&roi](auto x, auto y) -> fOUT_CODE {
+			fOUT_CODE code {};
+			if (x < roi.left)
+				(uint8_t&)code |= fOUT_CODE::LEFT;
+			else if (x >= roi.right)
+				(uint8_t&)code |= fOUT_CODE::RIGHT;
+			if (y < roi.top)
+				(uint8_t&)code |= fOUT_CODE::BOTTOM;
+			else if (y >= roi.bottom)
+				(uint8_t&)code |= fOUT_CODE::TOP;
+			return code;
+		};
+
+		// compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
+		auto outcode0 = ComputeOutCode(x0, y0);
+		auto outcode1 = ComputeOutCode(x1, y1);
+		bool accept = false;
+
+		while (true) {
+			if (!(outcode0 | outcode1)) {
+				// bitwise OR is 0: both points inside window; trivially accept and exit loop
+				accept = true;
+				break;
+			} else if (outcode0 & outcode1) {
+				// bitwise AND is not 0: both points share an outside zone (LEFT, RIGHT, TOP,
+				// or BOTTOM), so both must be outside window; exit loop (accept is false)
+				break;
+			} else {
+				// failed both tests, so calculate the line segment to clip
+				// from an outside point to an intersection with clip edge
+				double x, y;
+
+				// At least one endpoint is outside the clip rectangle; pick it.
+				auto outcodeOut = outcode1 > outcode0 ? outcode1 : outcode0;
+
+				// Now find the intersection point;
+				// use formulas:
+				//   slope = (y1 - y0) / (x1 - x0)
+				//   x = x0 + (1 / slope) * (ym - y0), where ym is ymin or ymax
+				//   y = y0 + slope * (xm - x0), where xm is xmin or xmax
+				// No need to worry about divide-by-zero because, in each case, the
+				// outcode bit being tested guarantees the denominator is non-zero
+				if (outcodeOut & TOP) {           // point is above the clip window
+					x = x0 + (x1 - x0) * (roi.bottom - y0) / (y1 - y0);
+					y = roi.bottom;
+				} else if (outcodeOut & BOTTOM) { // point is below the clip window
+					x = x0 + (x1 - x0) * (roi.top - y0) / (y1 - y0);
+					y = roi.top;
+				} else if (outcodeOut & RIGHT) {  // point is to the right of clip window
+					y = y0 + (y1 - y0) * (roi.right - x0) / (x1 - x0);
+					x = roi.right;
+				} else if (outcodeOut & LEFT) {   // point is to the left of clip window
+					y = y0 + (y1 - y0) * (roi.left - x0) / (x1 - x0);
+					x = roi.left;
+				}
+
+				// Now we move outside point to intersection point to clip
+				// and get ready for next pass.
+				if (outcodeOut == outcode0) {
+					x0 = x;
+					y0 = y;
+					outcode0 = ComputeOutCode(x0, y0);
+				} else {
+					x1 = x;
+					y1 = y;
+					outcode1 = ComputeOutCode(x1, y1);
+				}
+			}
+		}
+	}
+
+
+	int s_shape::GetLineWidthInUM(int lineWeight) {
+		static int const widths[] = {
+			   0,
+			  50,
+			  90,
+			 130,
+			 150,
+			 180,
+			 200,
+			 250,
+			 300,
+			 350,
+			 400,
+			 500,
+			 530,
+			 600,
+			 700,
+			 800,
+			 900,
+			1000,
+			1060,
+			1200,
+			1400,
+			1580,
+			2000,
+			2110,
+		};
+
+		if ( (lineWeight >= 0) and (lineWeight < std::size(widths)) ) {
+			return widths[lineWeight];
+		}
+
+		return 0;
+	};
 
 	void s_shape::Draw(ICanvas& canvas) const {
 		canvas.PreDraw(*this);
@@ -146,31 +324,18 @@ namespace gtl::shape {
 		if (pts.size())
 			canvas.MoveTo(pts[0]);
 
-		for (int iPt = 0; iPt < pts.size(); iPt++) {
-			polypoint_t pt0{pts[iPt]};
-			polypoint_t pt1;
-			bool bLast = false;
-			if (bLoop) {
-				if (iPt == pts.size()-1) {
-					pt1 = pts[0];
-					bLast = true;
-				} else {
-					pt1 = pts[iPt+1];
-				}
-			} else {
-				if (iPt == pts.size()-1)
-					break;
-				bLast = iPt == pts.size()-2;
-				pt1 = pts[iPt+1];
-			}
-
-			double dBulge = pt0.Bulge();
-
-			if (dBulge == 0.0) {
+		auto nPt = pts.size();
+		if (!bLoop)
+			nPt--;
+		for (int iPt = 0; iPt < nPt; iPt++) {
+			auto iPt2 = (iPt+1) % pts.size();
+			auto pt0 = pts[iPt];
+			auto pt1 = pts[iPt2];
+			if (pt0.Bulge() == 0.0) {
 				canvas.LineTo(pt1);
 			} else {
 				canvas.LineTo(pt0);
-				s_arcXY arc = s_arcXY::GetFromBulge(dBulge, pt0, pt1);
+				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
 				(s_shape&)arc = *(s_shape*)this;
 
 				arc.Draw(canvas);
@@ -178,6 +343,31 @@ namespace gtl::shape {
 				canvas.LineTo(pt1);
 			}
 		}
+	}
+
+	boost::ptr_deque<s_shape> s_polyline::Split() const {
+		boost::ptr_deque<s_shape> shapes;
+
+		auto nPt = pts.size();
+		if (!bLoop)
+			nPt--;
+		for (int iPt = 0; iPt < nPt; iPt++) {
+			auto iPt2 = (iPt+1) % pts.size();
+			auto pt0 = pts[iPt];
+			auto pt1 = pts[iPt2];
+			if (pt0.Bulge() == 0.0) {
+				auto rLine = std::make_unique<s_line>();
+				(s_shape&)*rLine = (s_shape const&)*this;
+				rLine->pt0 = pt0;
+				rLine->pt1 = pt1;
+				shapes.push_back(std::move(rLine));
+			} else {
+				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
+				(s_shape&)arc = *(s_shape*)this;
+				shapes.push_back(arc.NewClone());
+			}
+		}
+		return shapes;
 	}
 
 	bool s_drawing::LoadFromCADJson(json_t& _j) {
@@ -195,7 +385,7 @@ namespace gtl::shape {
 				auto value = var.value();
 				if (value.is_string()) {
 					auto& str = value.as_string();
-					vars[std::string(key.data(), key.size())] = gtl::ToString<gtl::shape::char_t, char>(std::string{str.data(), str.size()});
+					vars[std::string(key.data(), key.size())] = gtl::ToString<gtl::shape::char_t, char8_t>(std::u8string{(char8_t const*)str.data(), str.size()});
 				} else if (value.is_int64()) {
 					vars[std::string(key.data(), key.size())] = (int)value.as_int64();
 				} else if (value.is_double()) {
@@ -260,6 +450,7 @@ namespace gtl::shape {
 				try {
 					rBlock->LoadFromCADJson(item);
 				} catch (std::exception& e) {
+					e;
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -286,6 +477,7 @@ namespace gtl::shape {
 					try {
 						rShape->LoadFromCADJson(jEntity);
 					} catch (std::exception& e) {
+						e;
 						DEBUG_PRINT("{}\n", e.what());
 						continue;
 					} catch (...) {
@@ -324,6 +516,7 @@ namespace gtl::shape {
 					rShape->LoadFromCADJson(jEntity);
 					//rShape->UpdateBoundary(rectBoundary);
 				} catch (std::exception& e) {
+					e;
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -357,8 +550,8 @@ namespace gtl::shape {
 					return false;
 				}
 
-				ct_t ct;
-				// todo : ¼ø¼­ È®ÀÎ (scale->rotate ? or rotate->scale ?)
+				CCoordTrans3d ct;
+				// todo : ìˆœì„œ í™•ì¸ (scale->rotate ? or rotate->scale ?)
 				if (pInsert->xscale != 1.0) {
 					ct.mat_(0, 0) *= pInsert->xscale;
 					ct.mat_(0, 1) *= pInsert->xscale;
@@ -392,8 +585,13 @@ namespace gtl::shape {
 						for (auto const& rShape : rBlockNew->shapes) {
 							auto rShapeNew = rShape.NewClone();
 							rBlockNew->Transform(ct, ct.IsRightHanded());
+							// color
 							if (rShapeNew->crIndex == 0) {
 								rShapeNew->crIndex = pBlock->crIndex;
+							}
+							// line Width
+							if (rShapeNew->lineWeight == (int)eLINE_WIDTH::ByBlock) {
+								rShapeNew->lineWeight = pBlock->lineWeight;
 							}
 							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks, rectB)) {
 								DEBUG_PRINT("CANNOT Add Shape\n");
@@ -424,6 +622,11 @@ namespace gtl::shape {
 						if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
 							rShape->color = colorTable_s[crIndex];
 					}
+				}
+
+				// line Width
+				if (rShape->lineWeight == (int)eLINE_WIDTH::ByLayer) {
+					rShape->lineWeight = pLayer->lineWeight;
 				}
 
 				rShape->UpdateBoundary(rectB);

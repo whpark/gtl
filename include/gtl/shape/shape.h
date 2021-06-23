@@ -31,10 +31,6 @@
 			typedef CRect3d					rect_t;
 			typedef std::vector<s_line>		s_lines;
 
-			typedef CCoordTrans3d			ct_t;
-
-
-
 */
 ///////////////////////////////////////////////////////////////////////////////
 

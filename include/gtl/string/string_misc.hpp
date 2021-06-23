@@ -196,6 +196,29 @@ namespace gtl {
 		}
 	}
 
+	template < gtlc::string_elem tchar > inline [[nodiscard]] std::basic_string<tchar> ToLower(std::basic_string_view<tchar> sv) {
+		std::basic_string<tchar> str;
+		str.reserve(sv.size());
+		for (auto c : sv)
+			str += ToLower(c);
+		return str;
+	}
+	template < gtlc::string_elem tchar > inline [[nodiscard]] std::basic_string<tchar> ToUpper(std::basic_string_view<tchar> sv) {
+		std::basic_string<tchar> str;
+		str.reserve(sv.size());
+		for (auto c : sv)
+			str += ToUpper(c);
+		return str;
+	}
+	template < gtlc::string_elem tchar > inline void MakeLower(std::basic_string<tchar>& str) {
+		for (auto& c : str)
+			MakeLower(c);
+	}
+	template < gtlc::string_elem tchar > inline void MakeUpper(std::basic_string<tchar>& str) {
+		for (auto& c : str)
+			MakeUpper(c);
+	}
+
 	template < gtlc::string_elem tchar > inline void MakeLower(tchar& c) {
 		c = ToLower(c);
 	}

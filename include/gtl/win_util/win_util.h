@@ -55,6 +55,54 @@ namespace gtl::win_util {
 	GTL_WINUTIL_API gtl::CString GetErrorMessage(CException& e);
 	GTL_WINUTIL_API gtl::CString GetErrorMessage(DWORD dwLastError);
 
+	//-------------------------------------------------------------------------
+	/// @brief StopWatch
+	/// @tparam tclock 
+	template < typename tchar, class ttraits = std::char_traits<tchar> >
+	struct TDebugOutputStreamBuf : public std::basic_streambuf<tchar, ttraits> {
+	public:
+		using base_t = std::basic_streambuf<tchar, ttraits>;
+
+		std::basic_string<tchar> str;
+
+		virtual ~TDebugOutputStreamBuf() {
+			OutputBuf();
+		}
+		void OutputBuf() {
+			if (str.empty())
+				return;
+			if constexpr (gtlc::is_one_of<tchar, wchar_t, char16_t>) {
+				OutputDebugStringW((wchar_t const*)str.c_str());
+			} else if constexpr (gtlc::is_one_of<tchar, char, char8_t>) {
+				OutputDebugStringA((char const*)str.c_str());
+			} else {
+				static_assert(false);
+			}
+		}
+		virtual base_t::int_type overflow(base_t::int_type c) override {
+			str += (tchar)c;
+			if (c == '\n') {
+				OutputBuf();
+				str.clear();
+			}
+			return 1;//traits_type::eof();
+		}
+	};
+
+	//-------------------------------------------------------------------------
+	/// @brief StopWatch
+	template < typename tchar >
+	class TStopWatch : public gtl::TStopWatch<tchar, std::char_traits<tchar>> {
+	public:
+		std::basic_ostream<tchar> os;
+		TDebugOutputStreamBuf<tchar> osbuf;
+		using base_t = gtl::TStopWatch<tchar, std::char_traits<tchar>>;
+
+		TStopWatch() : os(&osbuf), base_t(os) {};
+	};
+
+	using CStopWatchA = TStopWatch<char>;
+	using CStopWatchW = TStopWatch<wchar_t>;
 
 #pragma pack(pop)
 }
