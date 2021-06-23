@@ -21,6 +21,7 @@ module;
 #include <string>
 #include <chrono>
 #include <format>
+#include <functional>
 
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
@@ -120,6 +121,17 @@ export namespace gtl {
 
 	public:
 		void CleanUp() { if (m_cleaner) m_cleaner(); m_cleaner = nullptr; }
+	};
+
+
+	/// @brief RAI helper
+	struct CTrigger {
+		std::function<void()> m_cleaner;
+		CTrigger(std::function<void()> cleaner) : m_cleaner(cleaner) {}
+		~CTrigger() {
+			if (m_cleaner)
+				m_cleaner();
+		}
 	};
 
 
