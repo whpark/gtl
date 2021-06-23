@@ -22,6 +22,7 @@ module;
 #include <chrono>
 #include <format>
 #include <functional>
+#include <iostream>
 
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
