@@ -2,9 +2,11 @@
 
 import gtl;
 
+
 using namespace std::literals;
 using namespace gtl::literals;
-#if 0
+
+#if 1
 TEST(gtl_coord_trans, ct2) {
 	using namespace gtl;
 	{
@@ -42,7 +44,9 @@ TEST(gtl_coord_trans, ct2) {
 
 
 }
+#endif
 
+#if 1
 TEST(gtl_coord_trans, ct3) {
 	using namespace gtl;
 	CPoint3d pt{1, 2, 3};

@@ -19,14 +19,12 @@ module;
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
-//#include "boost/ptr_container/ptr_container.hpp"
-//#include "boost/serialization/base_object.hpp"
-//#include "boost/archive/polymorphic_xml_iarchive.hpp"
-//#include "boost/archive/polymorphic_xml_oarchive.hpp"
+#include "boost/ptr_container/ptr_container.hpp"
+#include "boost/serialization/base_object.hpp"
+#include "boost/archive/polymorphic_xml_iarchive.hpp"
+#include "boost/archive/polymorphic_xml_oarchive.hpp"
 
-//#include "opencv2/opencv.hpp"
-//#include "opencv2/opencv_modules.hpp"
-//#include "opencv2/core.hpp"
+#include "opencv2/opencv.hpp"
 
 export module gtl:coord_trans;
 import :concepts;
@@ -66,7 +64,7 @@ export namespace gtl {
 
 		/// @brief pt -> pt2
 		/// @return 
-		point3_t operator () (point3_t const& pt) const {
+		[[ nodiscard ]] point3_t operator () (point3_t const& pt) const {
 			return Trans(pt);
 		}
 
@@ -134,7 +132,8 @@ export namespace gtl {
 		virtual [[nodiscard]] bool IsRightHanded() const = 0;
 	};
 
-#if 0
+
+#if 1
 	//-----------------------------------------------------------------------------
 //	template < std::floating_point T >
 	class CCoordTransChain : public ICoordTrans {
@@ -257,7 +256,8 @@ export namespace gtl {
 	};
 #endif
 
-#if 0
+
+#if 1
 	//-----------------------------------------------------------------------------
 	/// @brief class TCoordTransDim 
 	/// TARGET = scale * mat ( SOURCE - origin ) + offset
@@ -601,10 +601,10 @@ export namespace gtl {
 	//template GTL_CLASS TCoordTransChain<double>;
 	//using CCoordTransChain = TCoordTransChain<double>;
 
-	template TCoordTransDim<2>;
+	//template TCoordTransDim<2>;
 	using CCoordTrans2d = TCoordTransDim<2>;
 
-	template TCoordTransDim<3>;
+	//template TCoordTransDim<3>;
 	using CCoordTrans3d = TCoordTransDim<3>;
 
 #endif
