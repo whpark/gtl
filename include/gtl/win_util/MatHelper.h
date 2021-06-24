@@ -153,7 +153,46 @@ namespace gtl::win_util {
 
 	//-----------------------------------------------------------------------------
 	// Mat to DC
-	bool GTL_WINUTIL_API CalcViewPosition(cv::Size const& sizeView, CRect const& rectView, CRect& rectImage/* out */, CRect& rectDst/* out */);	// image size -> display rect and source rect
+	template < typename TRECT >
+	bool CalcViewPosition(cv::Size const& sizeView, TRECT const& rectView, TRECT& rectImage/* out */, TRECT& rectDst/* out */)	// image size -> display rect and source rect
+	{
+		if (rectView.IsRectEmpty()) {
+			rectImage.SetRectEmpty();
+			rectDst.SetRectEmpty();
+			return false;
+		}
+		auto wDest = rectView.Width();
+		auto hDest = rectView.Height();
+
+		if (wDest >= sizeView.width) {
+			rectDst.left = rectView.left + (wDest - sizeView.width) / 2;
+			rectDst.right = rectDst.left + sizeView.width;
+			rectImage.left = 0;
+			rectImage.right = sizeView.width;
+		}
+		else if (wDest < sizeView.width) {
+			rectDst.left = rectView.left;
+			rectDst.right = rectView.right;
+			rectImage.left = (sizeView.width - wDest) / 2;
+			rectImage.right = rectImage.left + wDest;
+		}
+
+		if (hDest >= sizeView.height) {
+			rectDst.top = rectView.top + (hDest - sizeView.height) / 2;
+			rectDst.bottom = rectDst.top + sizeView.height;
+			rectImage.top = 0;
+			rectImage.bottom = sizeView.height;
+		}
+		else if (hDest < sizeView.height) {
+			rectDst.top = rectView.top;
+			rectDst.bottom = rectView.bottom;
+			rectImage.top = (sizeView.height - hDest) / 2;
+			rectImage.bottom = rectImage.top + hDest;
+		}
+
+		return true;
+
+	}
 	bool GTL_WINUTIL_API MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect);
 	bool GTL_WINUTIL_API MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, CBitmap const& mask);	// mask : monochrome bitmap, background of img value must be zero.
 	bool GTL_WINUTIL_API MatToDCTransparent (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, COLORREF crTransparent);

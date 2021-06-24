@@ -290,42 +290,6 @@ namespace gtl::win_util {
 		return true;
 	}
 
-	bool CalcViewPosition(cv::Size const& sizeView, CRect const& rectView, CRect& rectImage, CRect& rectDst) {
-		if (rectView.IsRectEmpty()) {
-			rectImage.SetRectEmpty();
-			rectDst.SetRectEmpty();
-			return false;
-		}
-		auto wDest = rectView.Width();
-		auto hDest = rectView.Height();
-
-		if (wDest >= sizeView.width) {
-			rectDst.left = rectView.left + (wDest - sizeView.width)/2;
-			rectDst.right = rectDst.left + sizeView.width;
-			rectImage.left = 0;
-			rectImage.right = sizeView.width;
-		} else if (wDest < sizeView.width) {
-			rectDst.left = rectView.left;
-			rectDst.right = rectView.right;
-			rectImage.left = (sizeView.width - wDest)/2;
-			rectImage.right = rectImage.left + wDest;
-		}
-
-		if (hDest >= sizeView.height) {
-			rectDst.top = rectView.top + (hDest - sizeView.height)/2;
-			rectDst.bottom = rectDst.top + sizeView.height;
-			rectImage.top = 0;
-			rectImage.bottom = sizeView.height;
-		} else if (hDest < sizeView.height) {
-			rectDst.top = rectView.top;
-			rectDst.bottom = rectView.bottom;
-			rectImage.top = (sizeView.height - hDest)/2;
-			rectImage.bottom = rectImage.top + hDest;
-		}
-
-		return true;
-	}
-
 	bool MatToDCTransparent(cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, COLORREF crTransparent) {
 		if (img.empty() || !dc.m_hDC || rect.IsRectEmpty())
 			return false;

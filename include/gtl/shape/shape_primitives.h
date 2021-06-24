@@ -44,25 +44,6 @@
 
 //export module shape;
 
-namespace gtl {
-
-	template < typename archive >
-	void serialize(archive& ar, gtl::mm_t& len, unsigned int const file_version) {
-		ar & len.dValue;
-	}
-
-	template < typename archive >
-	void serialize(archive& ar, gtl::deg_t& len, unsigned int const file_version) {
-		ar & len.dValue;
-	}
-
-	template < typename archive >
-	void serialize(archive& ar, gtl::rad_t& len, unsigned int const file_version) {
-		ar & len.dValue;
-	}
-
-};
-
 namespace gtl::shape {
 #pragma pack(push, 8)
 
@@ -200,7 +181,7 @@ namespace gtl::shape {
 			ar & (ptrdiff_t&)var.ptr;
 			ar & var.buffer;
 			ar & var.str;
-			decltype(duration)::rep count{};
+			decltype(var.duration)::rep count{};
 			if constexpr (archive::is_saving()) {
 				count = var.duration.count();
 			}
