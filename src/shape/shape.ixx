@@ -40,20 +40,23 @@ export import :primitives;
 export import :others;
 export import :canvas;
 
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_shape, "shape")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_layer, "layer")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_dot, "dot")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_line, "line")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_polyline, "polyline")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_lwpolyline, "lwpolyline")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_circleXY, "circleXY")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_arcXY, "arcXY")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_ellipseXY, "ellipseXY")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_spline, "spline")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_text, "text")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_mtext, "mtext")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_hatch, "hatch")
-BOOST_CLASS_EXPORT_GUID(gtl::shape::s_drawing, "drawing")
+export {
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_shape, "shape")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_layer, "layer")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_dot, "dot")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_line, "line")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_polyline, "polyline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_lwpolyline, "lwpolyline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_circleXY, "circleXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_arcXY, "arcXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_ellipseXY, "ellipseXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_spline, "spline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_text, "text")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_mtext, "mtext")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_hatch, "hatch")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_drawing, "drawing")
+
+}
 
 #ifdef _DEBUG
 #define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
