@@ -19,7 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="canvas.ixx" />
+    <ClCompile Include="color_table.ixx" />
     <ClCompile Include="shape.ixx" />
+    <ClCompile Include="shape_others.ixx" />
+    <ClCompile Include="shape_primitives.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\gtl\gtl.vcxproj">
@@ -108,8 +112,9 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableModules>true</EnableModules>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -117,7 +122,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Message>deploy</Message>
@@ -140,8 +145,9 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableModules>true</EnableModules>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -151,7 +157,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Message>deploy</Message>
@@ -172,8 +178,9 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableModules>true</EnableModules>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -181,7 +188,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Message>deploy</Message>
@@ -204,8 +211,9 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableModules>true</EnableModules>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -215,7 +223,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Message>deploy</Message>

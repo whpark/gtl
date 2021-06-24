@@ -1,228 +1,536 @@
 module;
 
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <vector>
 #include <deque>
+#include <string>
+#include <string_view>
 
 #include "gtl/gtl.h"
 
-//#include "gtl/unit.h"
-//#include "gtl/coord.h"
+#include "gtl/_config.h"
+#include "gtl/_macro.h"
 
-export module gtl_shape;
+#include "opencv2/opencv.hpp"
 
+#include "fmt/format.h"
+
+#include "boost/json.hpp"
+#include "boost/variant.hpp"
+#include "boost/ptr_container/ptr_deque.hpp"
+#include "boost/ptr_container/serialize_ptr_deque.hpp"
+#include "boost/serialization/vector.hpp"
+#include "boost/serialization/string.hpp"
+#include "boost/serialization/optional.hpp"
+#include "boost/serialization/map.hpp"
+#include "boost/serialization/variant.hpp"
+#include "boost/serialization/serialization.hpp"
+#include "boost/archive/text_iarchive.hpp"
+#include "boost/archive/text_oarchive.hpp"
+#include "boost/archive/binary_iarchive.hpp"
+#include "boost/archive/binary_oarchive.hpp"
+#include "boost/serialization/export.hpp"
+
+export module gtls;
 import gtl;
+export import :color_table;
+export import :primitives;
+export import :others;
+export import :canvas;
 
-using namespace std::literals;
-using namespace gtl::literals;
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_shape, "shape")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_layer, "layer")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_dot, "dot")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_line, "line")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_polyline, "polyline")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_lwpolyline, "lwpolyline")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_circleXY, "circleXY")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_arcXY, "arcXY")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_ellipseXY, "ellipseXY")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_spline, "spline")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_text, "text")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_mtext, "mtext")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_hatch, "hatch")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::s_drawing, "drawing")
+
+#ifdef _DEBUG
+#define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
+#else
+#define DEBUG_PRINT(...) 
+#endif
+
+namespace gtl::shape {
+	using namespace std::literals;
+	using namespace gtl::literals;
+
+}
+namespace gtl {
+	//template < typename archive >
+	//void serialize(archive& ar, color_rgba_t& cr, unsigned int const file_version) {
+	//	ar & cr.cr;
+	//}
+}
 
 export namespace gtl::shape {
 
-	using point_t = CPoint3d;
-	struct line_t { point_t beg, end; };
-	struct polypoint_t : public point_t {
-		double bulge{};
-	};
+	void s_shape::Draw(ICanvas& canvas) const {
+		canvas.PreDraw(*this);
+	}
+	bool s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
+		rect_t rectBoundary;
+		rectBoundary.SetRectEmptyForMinMax2d();
+		UpdateBoundary(rectBoundary);
+		if (!rectBoundary.IntersectRect(rectROI).IsRectHavingLength2d())
+			return false;
+		Draw(canvas);
+		return true;
+	}
 
-	using color_t = color_rgba_t;
+	bool s_shape::LoadFromCADJson(json_t& _j) {
+		using namespace std::literals;
+		gtl::bjson<json_t> j(_j);
+		//color.cr = (int)j["color"sv];
+		strLayer = j["layer"sv];
 
-	enum class eSHAPE : uint8_t { none, layer, dot, line, polyline, spline, circle, arc, ellipse, text, mtext, nSHAPE };
-	constexpr color_t const CR_DEFAULT = ColorRGBA(255, 255, 255);
+		lineWeight = j["lWeight"];
+		strLineType = j["lineType"];
 
-	struct hatching_t {
-		uint32_t eFlag{};
-		double dInterval{};
-	};
-
-	struct s_shape {
-		color_t color;
-		std::optional<hatching_t> hatch;
-	};
-
-	struct s_dot : public s_shape {
-		point_t pt;
-	};
-
-	struct s_line : public s_shape {
-		point_t pt0, pt1;
-	};
-
-	struct s_polyline : public s_shape {
-		std::vector<polypoint_t> pts;
-	};
-
-	struct s_circle : public s_shape {
-		point_t center;
-		double radius{};
-		deg_t angle_length{360_deg};	// 회전 방향.
-	};
-
-	struct s_arc : public s_circle {
-		deg_t angle_start{};
-	};
-
-	struct s_ellipse : public s_arc {
-		double radius2{};
-		deg_t angle_first_axis{};
-	};
-
-	struct s_spline : public s_shape {
-	};
-
-	struct s_text : public s_shape {
-	};
-
-	struct s_mtext : public s_shape {
-	};
-
-#if 0
-	/// @brief Shape class
-	class CShape : public s_shape {
-	public:
-		eSHAPE const eShape_;
-
-		// Constructor
-	protected:
-		CShape(eSHAPE eShape, color_t cr = CR_DEFAULT) : eShape_(eShape), s_shape{cr} {
+		//eLineType = j["lineType"sv];
+		crIndex = j["color"].value_or(0);
+		color.cr = -1;
+		if (j["color24"].json().is_int64()) {
+			crIndex = 0;
+			color.cr = (int)j["color24"];
+		} else {
+			if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
+				color = colorTable_s[crIndex];
 		}
-	public:
-		CShape(const CShape& B) = delete;
-		virtual ~CShape(void) {
-		}
+		bVisible = j["visible"].value_or(true);
+		bTransparent = j["transparency"].value_or(0) != false;
 
-	public:
-		GTL__DYNAMIC_VIRTUAL_INTERFACE;
-		GTL__DYNAMIC_BASE(eSHAPE);
+		return true;
+	}
 
-	public:
-		// default assign operator
-		CShape& operator = (const CShape& B) { return CopyFrom(B); }
-		virtual CShape& CopyFrom(const CShape& B) {
-			if (this == &B)
-				return *this;
-			if (eShape_ != B.eShape_)
-				throw std::invalid_argument(fmt::format("Cannot copy from {} to {}", B.eShape_, eShape_));
-
-			return *this;
-		}
-		virtual CShape& CopyAttrFrom(const CShape& B) {
-			if (this == &B)
-				return *this;
-			m_cr = B.m_cr;
-			m_eHatching = B.m_eHatching;
-			m_dHatching = B.m_dHatching;
-			return *this;
-		}
-
-		virtual CArchive& Serialize(CArchive& ar) {
-			if (ar.IsStoring()) {
-				ar << m_cr;
-				ar << m_eHatching;
-				ar << m_dHatching;
-				//ar << m_strCookie;
-			} else {
-				ar >> m_cr;
-				ar >> m_eHatching;
-				ar >> m_dHatching;
-				//ar >> m_strCookie;
-			}
-			return ar;
-		}
-
-	public:
-		BOOL operator == (const CShape& B) const { return Compare(B); }
-
-		// Attributes
-		static LPCTSTR GetShapeName(eSHAPE eShape);
-		virtual LPCTSTR GetShapeName() const;
-		eSHAPE GetShape() const { return m_eShape; }
-		COLORREF GetColor() const { return m_cr; }
-		virtual COLORREF SetColor(COLORREF cr);
-
-		virtual DWORD GetHatching() const { return m_eHatching; }
-		virtual double GetHatchingDensity() const { return m_dHatching; }
-		virtual void SetHatching(DWORD eHatching = SH_NONE, double dHatching = 0.0) { m_eHatching = eHatching; m_dHatching = dHatching; }
-
-		virtual CString Print() const = NULL;
-
-	public:
-		// Operations
-		virtual CPoint2d GetCenterPoint() const { TRectD rect; GetBoundingRect(rect); return rect.CenterPoint(); };
-	private:
-		void GetPointsConst(TList<TLineD>& lines) const { GetPoints(lines); }	// Helper
-	public:
-		virtual void GetPoints(TList<TLineD>& lines) const = NULL;						// Bounding Rect계산용. Add Points incrementally. DO NOT RESET pts (DO NOT CALL pts.DeleteAll())
-		virtual void GetPoints(TList<TLineD>& lines) { GetPointsConst(lines) ; }			// Bounding Rect계산용. Add Points incrementally. DO NOT RESET pts (DO NOT CALL pts.DeleteAll())
-		virtual BOOL SetFromPoints(const TLineD& line) { return FALSE; }
-		virtual void GetBoundingRect(TRectD& rect, BOOL bResetRect = TRUE) const;
-		virtual BOOL GetStartEndPoint(CPoint2d& pt0, CPoint2d& pt1) const = NULL;
-		virtual BOOL Compare(const CShape& B) const;
-
-		virtual BOOL AddLaserOffset(double dThickness) = NULL;
-
-		// Transform Operations
-		virtual void Revert() = NULL;														// 가공 순서 Reverse
-		virtual void AddOffset(const CPoint2d& ptOffset) = NULL;								// Object Center 이동.
-		virtual void FlipX(const CPoint2d& ptCenter) = NULL;									// Object Center 중심으로 Y축 반전. (X값 변경)
-		virtual void FlipY(const CPoint2d& ptCenter) = NULL;									// Object Center 중심으로 X축 반전. (Y값 변경)
-		virtual void Rotate(rad_t dTheta, const CPoint2d& ptCenter) = NULL;					// Object Center 중심으로 회전
-		virtual void Resize(double dScale, const CPoint2d& ptCenter) = NULL;					// Object Center 중심으로 크기 변환
-		virtual void Resize(double dScaleX, double dScaleY, const CPoint2d& ptCenter) = NULL;// Object Center 중심으로 크기 변환
-		virtual BOOL Deflate(double dSizeX, double dSizeY) = NULL;							// 줄어드는 양. (원 Size가 10일경우, 2을 넣으면 8가 됨. 양쪽으로 2 씩 줄일 경우, *2 해서, 4를 넣어야 함)
-		virtual BOOL ClipByRect(const CRect2d& rect, TRefList<CShape>& objects) = NULL;	// by 이범호
-		enum eSORT_DIRECTION {
-			SD_AS_IS, SD_ANY,
-			SD_RIGHT, SD_LEFT, SD_UP, SD_DOWN,
-			SD_RIGHT_UP, SD_RIGHT_DOWN, SD_LEFT_UP, SD_LEFT_DOWN,
-			SD_UP_RIGHT, SD_UP_LEFT, SD_DOWN_RIGHT, SD_DOWN_LEFT,
-			SD_CCW, SD_CW,
-			nSD
+	string_t const& s_shape::GetShapeName(eSHAPE eType) {
+		using namespace std::literals;
+		static std::map<eSHAPE, string_t> const map = {
+			{ eSHAPE::none,				L"none" },
+			{ eSHAPE::e3dface,			L"3dFace"s },
+			{ eSHAPE::arc_xy,			L"ARC"s },
+			{ eSHAPE::block,			L"BLOCK"s },
+			{ eSHAPE::circle_xy,		L"CIRCLE"s },
+			{ eSHAPE::dimension,		L"DIMENSION"s },
+			{ eSHAPE::dimaligned,		L"DIMALIGNED"s },
+			{ eSHAPE::dimlinear,		L"DIMLINEAR"s },
+			{ eSHAPE::dimradial,		L"DIMRADIAL"s },
+			{ eSHAPE::dimdiametric,		L"DIMDIAMETRIC"s },
+			{ eSHAPE::dimangular,		L"DIMANGULAR"s },
+			{ eSHAPE::dimangular3p,		L"DIMANGULAR3P"s },
+			{ eSHAPE::dimordinate,		L"DIMORDINATE"s },
+			{ eSHAPE::ellipse_xy,		L"ELLIPSE"s },
+			{ eSHAPE::hatch,			L"HATCH"s },
+			{ eSHAPE::image,			L"IMAGE"s },
+			{ eSHAPE::insert,			L"INSERT"s },
+			{ eSHAPE::leader,			L"LEADER"s },
+			{ eSHAPE::line,				L"LINE"s },
+			{ eSHAPE::lwpolyline,		L"LWPOLYLINE"s },
+			{ eSHAPE::mtext,			L"MTEXT"s },
+			{ eSHAPE::dot,				L"POINT"s },
+			{ eSHAPE::polyline,			L"POLYLINE"s },
+			{ eSHAPE::ray,				L"RAY"s },
+			{ eSHAPE::solid,			L"SOLID"s },
+			{ eSHAPE::spline,			L"SPLINE"s },
+			{ eSHAPE::text,				L"TEXT"s },
+			{ eSHAPE::trace,			L"TRACE"s },
+			{ eSHAPE::underlay,			L"UNDERLAY"s },
+			{ eSHAPE::vertex,			L"VERTEX"s },
+			{ eSHAPE::viewport,			L"VIEWPORT"s },
+			{ eSHAPE::xline,			L"XLINE"s },
+			{ eSHAPE::layer,			L"LAYER"s },
+			{ eSHAPE::drawing,			L"DRAWING"s },
 		};
-		virtual void ChangeDirection(eSORT_DIRECTION eDirection, const CPoint2d& ptCenter = CPoint2d()) = NULL;
-		static LPCTSTR GetDirectionName(eSORT_DIRECTION eDirection);
 
-	public:
-		// Drawing
-		virtual BOOL Draw(ISCanvas& canvas) const = NULL;
+		auto iter = map.find(eType);
+		if (iter == map.end()) {
+			static auto const empty = L""s;
+			return empty;
+		}
+		return iter->second;
+	}
 
-	public:
-		// Hepler
-		static BOOL GetBoundingRect(TRectD& rect, const CPoint2d& pt, BOOL bResetRect = TRUE);
-		static BOOL GetBoundingRect(TRectD& rect, const TLineD& pts, BOOL bResetRect = TRUE);
-		static BOOL GetBoundingRect(TRectD& rect, const TList<TLineD>& lines, BOOL bResetRect = TRUE);
-		static BOOL GetBoundingRect(TRectD& rect, const TRectD& rectObject, BOOL bResetRect = TRUE);
+	std::unique_ptr<s_shape> s_shape::CreateShapeFromEntityName(std::string const& strEntityName) {
+		using namespace std::literals;
+		static std::map<std::string, std::function<std::unique_ptr<s_shape>()> > const mapCreator = {
+			{ "3dFace"s,				nullptr },
+			{ "ARC"s,					[](){ return std::make_unique<s_arcXY>(); } },
+			{ "BLOCK"s,					nullptr },
+			{ "CIRCLE"s,				[](){ return std::make_unique<s_circleXY>(); } },
+			{ "DIMENSION"s,				nullptr },
+			{ "DIMALIGNED"s,			nullptr },
+			{ "DIMLINEAR"s,				nullptr },
+			{ "DIMRADIAL"s,				nullptr },
+			{ "DIMDIAMETRIC"s,			nullptr },
+			{ "DIMANGULAR"s,			nullptr },
+			{ "DIMANGULAR3P"s,			nullptr },
+			{ "DIMORDINATE"s,			nullptr },
+			{ "ELLIPSE"s,				[](){ return std::make_unique<s_ellipseXY>(); } },
+			{ "HATCH"s,					[](){ return std::make_unique<s_hatch>(); } },
+			{ "IMAGE"s,					nullptr },
+			{ "INSERT"s,				[](){ return std::make_unique<s_insert>(); } },
+			{ "LEADER"s,				nullptr },
+			{ "LINE"s,					[](){ return std::make_unique<s_line>(); } },
+			{ "LWPOLYLINE"s,			[](){ return std::make_unique<s_lwpolyline>(); } },
+			{ "MTEXT"s,					[](){ return std::make_unique<s_mtext>(); } },
+			{ "POINT"s,					[](){ return std::make_unique<s_dot>(); } },
+			{ "POLYLINE"s,				[](){ return std::make_unique<s_polyline>(); } },
+			{ "RAY"s,					nullptr },
+			{ "SOLID"s,					nullptr },
+			{ "SPLINE"s,				[](){ return std::make_unique<s_spline>(); } },
+			{ "TEXT"s,					[](){ return std::make_unique<s_text>(); } },
+			{ "TRACE"s,					nullptr },
+			{ "UNDERLAY"s,				nullptr },
+			{ "VERTEX"s,				nullptr },
+			{ "VIEWPORT"s,				nullptr },
+			{ "XLINE"s,					nullptr },
+		};
 
-		static BOOL MergeLines(TRefList<CShape>& objects, double dMaxSizeX = 0.0, double dMaxSizeY = 0.0);	// 시작/끝점이 겹치는 line object 를 하나로 합침
-	};
+		auto iter = mapCreator.find(strEntityName);
+		if (iter == mapCreator.end())
+			return {};
+		auto& creator = iter->second;
+		if (creator)
+			return creator();
+		return {};
+	}
 
-	typedef CShape* PShapeObject;
+	void s_polyline::Draw(ICanvas& canvas) const {
+		s_shape::Draw(canvas);
 
-	//-----------------------------------------------------------------------------
+		if (pts.size())
+			canvas.MoveTo(pts[0]);
 
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_PXPY(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_PXNY(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_NXPY(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_NXNY(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_PYPX(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_PYNX(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_NYPX(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectTolerance_NYNX(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
+		auto nPt = pts.size();
+		if (!bLoop)
+			nPt--;
+		for (int iPt = 0; iPt < nPt; iPt++) {
+			auto iPt2 = (iPt+1) % pts.size();
+			auto pt0 = pts[iPt];
+			auto pt1 = pts[iPt2];
+			if (pt0.Bulge() == 0.0) {
+				canvas.LineTo(pt1);
+			} else {
+				canvas.LineTo(pt0);
+				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
+				(s_shape&)arc = *(s_shape*)this;
 
-	AFX_EXT_API_SHAPE int CompareObjectX(const CShape& ob1, const CShape& ob2);
-	AFX_EXT_API_SHAPE int CompareObjectY(const CShape& ob1, const CShape& ob2);
-	AFX_EXT_API_SHAPE int CompareObjectXD(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareObjectYD(const CShape& ob1, const CShape& ob2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareArcX(const CShape& arc1, const CShape& arc2);
-	AFX_EXT_API_SHAPE int CompareArcY(const CShape& arc1, const CShape& arc2);
-	AFX_EXT_API_SHAPE int CompareLineX(const CShape& line1, const CShape& line2);
-	AFX_EXT_API_SHAPE int CompareLineY(const CShape& line1, const CShape& line2);
-	AFX_EXT_API_SHAPE int CompareLineXD(const CShape& line1, const CShape& line2, void* pdToleranceLineDistance);
-	AFX_EXT_API_SHAPE int CompareLineYD(const CShape& line1, const CShape& line2, void* pdToleranceLineDistance);
+				arc.Draw(canvas);
 
-	//-----------------------------------------------------------------------------
-	BOOL AFX_EXT_API_SHAPE AddLaserOffsetToLine(const TLineD& pts, TLineD& ptsResult, double dThickness, BOOL bLoop);
+				canvas.LineTo(pt1);
+			}
+		}
+	}
 
-#endif
+	boost::ptr_deque<s_shape> s_polyline::Split() const {
+		boost::ptr_deque<s_shape> shapes;
+
+		auto nPt = pts.size();
+		if (!bLoop)
+			nPt--;
+		for (int iPt = 0; iPt < nPt; iPt++) {
+			auto iPt2 = (iPt+1) % pts.size();
+			auto pt0 = pts[iPt];
+			auto pt1 = pts[iPt2];
+			if (pt0.Bulge() == 0.0) {
+				auto rLine = std::make_unique<s_line>();
+				(s_shape&)*rLine = (s_shape const&)*this;
+				rLine->pt0 = pt0;
+				rLine->pt1 = pt1;
+				shapes.push_back(std::move(rLine));
+			} else {
+				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
+				(s_shape&)arc = *(s_shape*)this;
+				shapes.push_back(arc.NewClone());
+			}
+		}
+		return shapes;
+	}
+
+	bool s_drawing::LoadFromCADJson(json_t& _j) {
+		//s_shape::LoadFromCADJson(_j);
+
+		gtl::bjson<json_t> jTOP(_j);
+
+		// header
+		{
+			auto jHeader = jTOP["header"];
+			auto jVars = jHeader["vars"].json().as_object();
+			vars.clear();
+			for (auto& var : jVars) {
+				auto key = var.key();
+				auto value = var.value();
+				if (value.is_string()) {
+					auto& str = value.as_string();
+					vars[std::string(key.data(), key.size())] = gtl::ToString<gtl::shape::char_t, char8_t>(std::u8string{(char8_t const*)str.data(), str.size()});
+				} else if (value.is_int64()) {
+					vars[std::string(key.data(), key.size())] = (int)value.as_int64();
+				} else if (value.is_double()) {
+					vars[std::string(key.data(), key.size())] = value.as_double();
+				}
+			}
+		}
+
+		// line types
+		{
+			line_types.clear();
+			auto jLineTypes = jTOP["lineTypes"].json().as_array();
+			for (auto& item : jLineTypes) {
+				bjson<json_t> jLT(item);
+				auto lt = std::make_unique<line_type_t>();
+				lt->name = jLT["name"];
+				lt->flags = jLT["flags"];
+				lt->description = jLT["desc"];
+				if (jLT["path"].json().is_array()) {
+					for (auto& jp : jLT["path"].json().as_array()) {
+						lt->path.push_back(jp.is_double() ? jp.as_double() : jp.as_int64());
+					}
+				}
+				line_types.push_back(std::move(lt));
+			}
+		}
+
+		// layers
+		std::map<string_t, s_layer*> mapLayers;	// cache
+		{
+			layers.clear();
+			//layers.push_back(std::make_unique<s_layer>(L"0"));
+
+			auto jLayers = jTOP["layers"].json().as_array();
+			for (auto& item : jLayers) {
+				bjson<json_t> j(item);
+
+				auto rLayer = std::make_unique<s_layer>();
+				rLayer->LoadFromCADJson(item);
+
+				if (auto iterLineType = std::find_if(line_types.begin(), line_types.end(), [&rLayer](auto const& lt) { return lt.name == rLayer->strLineType; });
+					iterLineType != line_types.end()) {
+
+					rLayer->pLineType = &(*iterLineType);
+				}
+
+				mapLayers[rLayer->name] = rLayer.get();
+				layers.push_back(std::move(rLayer));
+			}
+		}
+
+		// block
+		boost::ptr_deque<s_block> blocks;
+		std::map<string_t, s_block*> mapBlocks;
+		{
+			blocks.clear();
+			auto jBlocks = jTOP["blocks"].json().as_array();
+			for (auto& item : jBlocks) {
+				bjson<json_t> j(item);
+				auto rBlock = std::make_unique<s_block>();
+
+				try {
+					rBlock->LoadFromCADJson(item);
+				} catch (std::exception& e) {
+					e;
+					DEBUG_PRINT("{}\n", e.what());
+					continue;
+				} catch (...) {
+					DEBUG_PRINT("unknown\n");
+					continue;
+				}
+
+
+				if (auto iterLineType = std::find_if(line_types.begin(), line_types.end(), [&rBlock](auto const& lt) { return lt.name == rBlock->strLineType; });
+					iterLineType != line_types.end()) {
+
+					rBlock->pLineType = &(*iterLineType);
+				}
+
+				// block entities
+				for (auto& jEntity : j["entities"].json().as_array()) {
+					bjson<json_t> j(jEntity);
+					std::string strEntityName = j["entityName"];
+
+					std::unique_ptr<s_shape> rShape = CreateShapeFromEntityName(strEntityName);
+					if (!rShape)
+						continue;
+
+					try {
+						rShape->LoadFromCADJson(jEntity);
+					} catch (std::exception& e) {
+						e;
+						DEBUG_PRINT("{}\n", e.what());
+						continue;
+					} catch (...) {
+						DEBUG_PRINT("unknown\n");
+						continue;
+					}
+
+					switch (rShape->GetShapeType()) {
+					case eSHAPE::insert :
+						break;
+					}
+
+					rBlock->shapes.push_back(std::move(rShape));
+				}
+
+				mapBlocks[rBlock->name] = rBlock.get();
+				blocks.push_back(std::move(rBlock));
+			}
+		}
+
+
+		// Entities
+		{
+			auto jEntities = jTOP["mainBlock"].json().as_array();
+			rectBoundary.SetRectEmptyForMinMax2d();
+			// block entities
+			for (auto& jEntity : jEntities) {
+				bjson<json_t> j(jEntity);
+				std::string strEntityName = j["entityName"];
+
+				std::unique_ptr<s_shape> rShape = CreateShapeFromEntityName(strEntityName);
+				if (!rShape)
+					continue;
+
+				try {
+					rShape->LoadFromCADJson(jEntity);
+					//rShape->UpdateBoundary(rectBoundary);
+				} catch (std::exception& e) {
+					e;
+					DEBUG_PRINT("{}\n", e.what());
+					continue;
+				} catch (...) {
+					DEBUG_PRINT("unknown\n");
+					continue;
+				}
+
+				AddEntity(std::move(rShape), mapLayers, mapBlocks, rectBoundary);
+			}
+		}
+
+		return true;
+	}
+
+	bool s_drawing::AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectB) {
+		if (!rShape)
+			return false;
+
+		switch (rShape->GetShapeType()) {
+		case eSHAPE::insert :
+			// todo :
+			if (s_insert* pInsert = dynamic_cast<s_insert*>(rShape.get()); pInsert) {
+				auto iter = mapBlocks.find(pInsert->name);
+				if (iter == mapBlocks.end()) {
+					DEBUG_PRINT(L"No Block : {}\n", pInsert->name);
+					return false;
+				}
+				auto* pBlock = iter->second;
+				if (!pBlock) {
+					DEBUG_PRINT(L"Internal ERROR (Block Name : {})\n", pInsert->name);
+					return false;
+				}
+
+				CCoordTrans3d ct;
+				// todo : 순서 확인 (scale->rotate ? or rotate->scale ?)
+				if (pInsert->xscale != 1.0) {
+					ct.mat_(0, 0) *= pInsert->xscale;
+					ct.mat_(0, 1) *= pInsert->xscale;
+					ct.mat_(0, 2) *= pInsert->xscale;
+				}
+				if (pInsert->yscale != 1.0) {
+					ct.mat_(1, 0) *= pInsert->yscale;
+					ct.mat_(1, 1) *= pInsert->yscale;
+					ct.mat_(1, 2) *= pInsert->yscale;
+				}
+				if (pInsert->zscale != 1.0) {
+					ct.mat_(2, 0) *= pInsert->zscale;
+					ct.mat_(2, 1) *= pInsert->zscale;
+					ct.mat_(2, 2) *= pInsert->zscale;
+				}
+
+				if (pInsert->angle != 0.0_rad) {
+					ct.mat_ = ct.GetRotatingMatrixXY(pInsert->angle) * ct.mat_;
+				}
+
+				ct.origin_ = pBlock->pt;
+
+				for (int y = 0; y < pInsert->nRow; y++) {
+					for (int x = 0; x < pInsert->nCol; x++) {
+
+						std::unique_ptr<s_block> rBlockNew { dynamic_cast<s_block*>(pBlock->NewClone().release()) };
+
+						ct.offset_.x = x*pInsert->spacingCol + pInsert->pt.x;
+						ct.offset_.y = y*pInsert->spacingRow + pInsert->pt.x;
+
+						for (auto const& rShape : rBlockNew->shapes) {
+							auto rShapeNew = rShape.NewClone();
+							rBlockNew->Transform(ct, ct.IsRightHanded());
+							// color
+							if (rShapeNew->crIndex == 0) {
+								rShapeNew->crIndex = pBlock->crIndex;
+							}
+							// line Width
+							if (rShapeNew->lineWeight == (int)eLINE_WIDTH::ByBlock) {
+								rShapeNew->lineWeight = pBlock->lineWeight;
+							}
+							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks, rectB)) {
+								DEBUG_PRINT("CANNOT Add Shape\n");
+								//return false;
+							}
+						}
+					}
+				}
+			}
+			break;
+
+		default :
+			if (auto iter = mapLayers.find(rShape->strLayer); iter != mapLayers.end()) {
+				auto* pLayer = iter->second;
+				if (!pLayer) {
+					DEBUG_PRINT(L"Internal Error : Layer {}\n", rShape->strLayer);
+					return false;
+				}
+
+				// color
+				if (rShape->color.cr == -1) {
+					int crIndex = rShape->crIndex;
+					if (crIndex == 256) {
+						crIndex = pLayer->crIndex;
+						rShape->color = pLayer->color;
+					}
+					if (rShape->color.cr == -1) {
+						if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
+							rShape->color = colorTable_s[crIndex];
+					}
+				}
+
+				// line Width
+				if (rShape->lineWeight == (int)eLINE_WIDTH::ByLayer) {
+					rShape->lineWeight = pLayer->lineWeight;
+				}
+
+				rShape->UpdateBoundary(rectB);
+				pLayer->shapes.push_back(std::move(rShape));
+
+			} else {
+				DEBUG_PRINT(L"No Layer : {}\n", rShape->strLayer);
+				return false;
+			}
+
+			break;
+		}
+
+		return true;
+	}
+
 
 }
+
+export namespace gtls = gtl::shape;

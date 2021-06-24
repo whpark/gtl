@@ -38,6 +38,12 @@ export namespace gtl {
 
 		[[ nodiscard ]] auto operator <=> (tlength_mm_t const& ) const = default;
 		[[ nodiscard ]] auto operator <=> (T b) const { return dValue <=> b; }
+
+		template < typename archive >
+		friend void serialize(archive& ar, tlength_mm_t& len, unsigned int const file_version) {
+			ar & len.dValue;
+		}
+
 	};
 	using mm_t = tlength_mm_t<double>;
 
@@ -133,6 +139,12 @@ export namespace gtl {
 		static tangle_rad_t atan2(value_type y, value_type x)	{ return tangle_rad_t(::atan2(y, x)); }
 		static tangle_rad_t asin(value_type v)				{ return tangle_rad_t(::asin(v)); }
 		static tangle_rad_t acos(value_type v)				{ return tangle_rad_t(::acos(v)); }
+
+		template < typename archive >
+		friend void serialize(archive& ar, tangle_rad_t& len, unsigned int const file_version) {
+			ar & len.dValue;
+		}
+
 	};
 
 	template < std::floating_point tvalue_t >
@@ -188,6 +200,12 @@ export namespace gtl {
 		static tangle_deg_t atan2(value_type y, value_type x)	{ return tangle_rad_t<value_type>::atan2(y, x); }
 		static tangle_deg_t asin(value_type v)				{ return tangle_rad_t<value_type>::asin(v); }
 		static tangle_deg_t acos(value_type v)				{ return tangle_rad_t<value_type>::acos(v); }
+
+		template < typename archive >
+		friend void serialize(archive& ar, tangle_deg_t& len, unsigned int const file_version) {
+			ar & len.dValue;
+		}
+
 	};
 	template < std::floating_point tvalue_t >
 	inline tangle_rad_t<tvalue_t>::tangle_rad_t(tangle_deg_t<tvalue_t> const& b) : dValue(deg2rad(b.dValue)) {}
