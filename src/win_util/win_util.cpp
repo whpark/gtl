@@ -1,65 +1,18 @@
+
 // win_util.cpp : Defines the initialization routines for the DLL.
 //
 
-#include "pch.h"
 #include "framework.h"
-#include "gtl/win_util/win_util.h"
-
-#include <algorithm>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#include <Iphlpapi.h>
 #pragma comment(lib, "IPHLPAPI.lib")
-
-#include <PSApi.h>
-#include <WinSvc.h>
-
 #pragma comment(lib, "PSApi.lib")
 
-WARNING_DISABLE(4018)
+//#ifdef _DEBUG
+//#define new DEBUG_NEW
+//#endif
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-
-namespace gtl::win_util {
-
-	CString GetErrorMessage(CException& e) {
-		CString str;
-		e.GetErrorMessage(str.GetBuffer(1024), 1024);
-		str.ReleaseBuffer();
-		str.TrimRight();
-		return str;
-	}
-
-	CString GetErrorMessage(DWORD dwLastError) {
-		CString str;
-		LPVOID lpMsgBuf;
-		FormatMessage( 
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-			FORMAT_MESSAGE_FROM_SYSTEM | 
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			dwLastError,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-			(LPTSTR) &lpMsgBuf,
-			0,
-			NULL 
-		);
-
-		str = (LPCTSTR)lpMsgBuf;
-		str.TrimRight();
-
-		// Free the buffer.
-		LocalFree( lpMsgBuf );
-
-		return str;
-	}
-
-}
+//namespace gtl::win_util {
+//
+//}
 
 #if 0
 

@@ -1,5 +1,8 @@
 module;
 
+#include <compare>
+#include <string>
+
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
@@ -18,3 +21,6 @@ export import :reflection;
 export import :dynamic;
 export import :mutex;
 export import :rand;
+export import :matrix;
+export import :mat_helper;
+export import :log;

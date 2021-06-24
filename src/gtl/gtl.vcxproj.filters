@@ -110,9 +110,6 @@
     <ClCompile Include="log.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="serial_port.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gtl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -123,6 +120,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="archive.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mat_helper.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

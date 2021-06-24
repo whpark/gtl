@@ -167,6 +167,7 @@ xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
 echo /*---- Copy *.ifc to /bin ----*/
 xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)\"
 </Command>
+      <Message>deploy</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -196,6 +197,7 @@ xcopy /y "$(OutDir)$(TargetName).lib" "$(SolutionDir)lib\"
 echo /*---- Copy *.ifc to /bin ----*/
 xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)\"
 </Command>
+      <Message>deploy</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -218,11 +220,11 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
     <ClCompile Include="json_proxy.ixx" />
     <ClCompile Include="log.ixx" />
     <ClCompile Include="matrix.ixx" />
+    <ClCompile Include="mat_helper.ixx" />
     <ClCompile Include="misc.ixx" />
     <ClCompile Include="mutex.ixx" />
     <ClCompile Include="rand.ixx" />
     <ClCompile Include="reflection.ixx" />
-    <ClCompile Include="serial_port.ixx" />
     <ClCompile Include="string.ixx" />
     <ClCompile Include="string\string_convert_codepage.ixx" />
     <ClCompile Include="string\string_convert_codepage_kssm.ixx" />

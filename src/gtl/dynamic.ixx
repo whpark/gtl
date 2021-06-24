@@ -15,7 +15,7 @@ module;
 #include <map>
 #include <functional>
 #include <stdexcept>
-
+#include <filesystem>
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
@@ -26,6 +26,11 @@ import :reflection;
 
 export namespace gtl {
 
+
+	class SimpleLog {
+	public:
+		std::filesystem::path path;
+	};
 
 	namespace internal {
 

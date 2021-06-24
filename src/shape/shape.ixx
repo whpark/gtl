@@ -10,7 +10,7 @@ module;
 //#include "gtl/unit.h"
 //#include "gtl/coord.h"
 
-export module shape;
+export module gtl_shape;
 
 import gtl;
 

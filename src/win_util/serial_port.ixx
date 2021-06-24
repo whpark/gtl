@@ -15,28 +15,21 @@ module;
 #include <vector>
 #include <deque>
 #include <string_view>
+#include <fstream>	// for gtl:log
 #include <filesystem>
+
+#include "framework.h"
 
 #define FMT_HEADER_ONLY
 #include "fmt/format.h"
 
-#include "gtl/_config.h"
-#include "gtl/_macro.h"
+export module gtlw:SerialPort;
+import gtl;
+import :misc;
 
-#if (GTL_USE_WINDOWS_API)
-	#define NOMINMAX
-	#include <windows.h>
-#endif
+export namespace gtl::win_util {
 
-export module gtl:serial_port;
-import :time;
-import :log;
-import :mutex;
-
-
-#if (GTL_USE_WINDOWS_API)
-
-export namespace gtl {
+	using tchar = wchar_t;
 
 	class XComm {
 	public:
@@ -131,37 +124,6 @@ export namespace gtl {
 		static std::vector<std::wstring> FindSerialPorts();
 
 	};
-
-
-}	// namespace gtl
-
-namespace gtl {
-
-	std::wstring GetErrorMessage(DWORD dwLastError) {
-		std::wstring str;
-		LPVOID lpMsgBuf;
-		FormatMessage( 
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-			FORMAT_MESSAGE_FROM_SYSTEM | 
-			FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			dwLastError,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-			(LPTSTR) &lpMsgBuf,
-			0,
-			NULL 
-		);
-
-		str = (LPCTSTR)lpMsgBuf;
-		// Free the buffer.
-		LocalFree( lpMsgBuf );
-
-		TrimRight(str);
-
-		return str;
-	}
-
-	using tchar = wchar_t;
 
 	bool XComm::Open(uint32_t nPort/*1 base*/, const SETTING& setting) {
 		if (nPort < 1)
@@ -524,9 +486,6 @@ namespace gtl {
 		return strsPort;
 	}
 
-
 }
 
-
-#endif	// #if (GTL_USE_WINDOWS_API)
 
