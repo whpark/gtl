@@ -360,6 +360,21 @@ namespace gtl {
 
 			return std::make_unique<TCoordTransDim>(scale, mat, offset_, origin_);
 		}
+		bool GetInv(TCoordTransDim& ctI) const {
+			// Scale
+			double scale = 1/scale_;
+			if (!std::isfinite(scale))
+				return false;
+
+			// Matrix
+			bool bOK {};
+			auto mat = mat_.inv(0, &bOK);
+			if (!bOK)
+				return false;
+
+			ctI.Init(scale, mat, offset_, origin_);
+			return true;
+		}
 
 		//-------------------------------------------------------------------------
 		// Setting
