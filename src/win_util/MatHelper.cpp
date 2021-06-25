@@ -230,14 +230,16 @@ namespace gtl::win_util {
 
 		auto const type = img.type();
 
-		int pixel_size = 1;
-		if (type == CV_8UC3) {
-			pixel_size = 3;
-		} else if (type == CV_8UC1) {
-			pixel_size = 1;
-		} else {
+		constexpr int pixel_size = 3;
+		if (type != CV_8UC3)
 			return false;
-		}
+		//if (type == CV_8UC3) {
+		//	pixel_size = 3;
+		//} else if (type == CV_8UC1) {
+		//	pixel_size = 1;
+		//} else {
+		//	return false;
+		//}
 
 		BYTE const* pImage = nullptr;
 		int cx = gtl::AdjustAlign32(img.cols);
@@ -263,34 +265,35 @@ namespace gtl::win_util {
 				pImage = img.ptr<BYTE>(0);
 			}
 
-			thread_local static struct BMP {
-				bool bPaletteInitialized{false};
-				BITMAPINFO bmpInfo{};
-				RGBQUAD dummy[255];
-			} bmp;
-			bmp.bmpInfo.bmiHeader.biSize = (pixel_size) == 1 ? sizeof(bmp) : sizeof(bmp.bmpInfo);
-			bmp.bmpInfo.bmiHeader.biWidth = cx;
-			bmp.bmpInfo.bmiHeader.biHeight = -cy;
-			bmp.bmpInfo.bmiHeader.biPlanes = 1;
-			bmp.bmpInfo.bmiHeader.biBitCount = 8*pixel_size;
-			bmp.bmpInfo.bmiHeader.biCompression = BI_RGB;
-			bmp.bmpInfo.bmiHeader.biSizeImage = cx * cy * pixel_size;
-			bmp.bmpInfo.bmiHeader.biXPelsPerMeter = 0;
-			bmp.bmpInfo.bmiHeader.biYPelsPerMeter = 0;
-			bmp.bmpInfo.bmiHeader.biClrUsed = 0;
-			bmp.bmpInfo.bmiHeader.biClrImportant = 0;
-			if (pixel_size == 1) {
-				if (!bmp.bPaletteInitialized) {
-					for (uint8_t i = 0; i < (uint8_t)256; i++) {
-						(COLORREF&)bmp.bmpInfo.bmiColors[i] = RGB(i, i, i);
-					}
-					bmp.bPaletteInitialized = true;
-				}
-			}
+			//thread_local static struct BMP {
+			//	bool bPaletteInitialized{false};
+			//	BITMAPINFO bmpInfo{};
+			//	RGBQUAD dummy[255];
+			//} bmp;
+			BITMAPINFO bmpInfo{};
+			bmpInfo.bmiHeader.biSize = sizeof(bmpInfo);
+			bmpInfo.bmiHeader.biWidth = cx;
+			bmpInfo.bmiHeader.biHeight = -cy;
+			bmpInfo.bmiHeader.biPlanes = 1;
+			bmpInfo.bmiHeader.biBitCount = 8*pixel_size;
+			bmpInfo.bmiHeader.biCompression = BI_RGB;
+			bmpInfo.bmiHeader.biSizeImage = cx * cy * pixel_size;
+			bmpInfo.bmiHeader.biXPelsPerMeter = 0;
+			bmpInfo.bmiHeader.biYPelsPerMeter = 0;
+			bmpInfo.bmiHeader.biClrUsed = 0;
+			bmpInfo.bmiHeader.biClrImportant = 0;
+			//if (pixel_size == 1) {
+			//	if (!bmp.bPaletteInitialized) {
+			//		for (uint32_t i = 0; i < 255; i++) {
+			//			(COLORREF&)bmp.bmpInfo.bmiColors[i] = RGB(i, i, i);
+			//		}
+			//		bmp.bPaletteInitialized = true;
+			//	}
+			//}
 
 			SetDIBitsToDevice(dc, 
 								rectTarget.left, rectTarget.top, std::min(rectTarget.Width(), sizeEffective.width), std::min(rectTarget.Height(), sizeEffective.height), 
-								0, 0, 0, img.rows, pImage, &bmp.bmpInfo, DIB_RGB_COLORS);
+								0, 0, 0, img.rows, pImage, &bmpInfo, pixel_size == 1 ? DIB_PAL_COLORS : DIB_RGB_COLORS);
 
 			pImage = nullptr;
 		} catch (...) {
