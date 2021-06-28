@@ -39,6 +39,7 @@ BEGIN_MESSAGE_MAP(CtestwinView, CFormView)
 	ON_WM_SIZE()
 	ON_WM_DRAWITEM()
 	ON_BN_CLICKED(IDC_TEST_MAT_TIME, &CtestwinView::OnBnClickedTestMatTime)
+	ON_BN_CLICKED(IDC_TEST_LARGE_BITMAP, &CtestwinView::OnBnClickedTestLargeBitmap)
 END_MESSAGE_MAP()
 
 // CtestwinView construction/destruction
@@ -161,7 +162,7 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 
 			static cv::Mat img;
 			if (img.empty()) {
-				img = cv::Mat::zeros(1256, 1256, CV_8UC1);
+				img = cv::Mat::zeros(1'200, 120, CV_8UC1);
 				for (int row{}; row < img.rows; row++) {
 					auto v = row;
 					if (row < 100)
@@ -180,7 +181,7 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 
 			static cv::Mat img3;
 			if (img3.empty()) {
-				img3 = cv::Mat::zeros(1256, 1256, CV_8UC3);
+				img3 = cv::Mat::zeros(1'200, 120, CV_8UC3);
 				for (int row{}; row < img3.rows; row++) {
 					auto v = row%256;
 					img3.row(row) = cv::Scalar(v, v, v);
@@ -224,4 +225,41 @@ void CtestwinView::OnBnClickedTestMatTime() {
 	gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
 	cv::cvtColor(img3, img3, cv::COLOR_GRAY2BGR);
 	sw.Lap("1256x1256 1ch -> 3ch");
+}
+
+
+void CtestwinView::OnBnClickedTestLargeBitmap() {
+	CWaitCursor wc;
+
+	CImage img;
+	if (!img.Create(15'000, 20'000, 1))
+		return ;
+	std::vector<RGBQUAD> palette;
+	palette.assign(2, {});
+	palette.back() = (RGBQUAD&)gtl::ColorBGRA(255, 255, 255, 0);
+	img.SetColorTable(0, std::size(palette), palette.data());
+
+	CDC dc;
+	dc.Attach(img.GetDC());
+
+	static cv::Mat mat;
+	if (mat.empty()) {
+		mat = cv::Mat::zeros(img.GetHeight(), img.GetWidth(), CV_8UC1);
+		for (int row{}; row < mat.rows; row++) {
+			auto v = ((row/1'000)%2) ? 0 : 255;
+
+			mat.row(row) = v;
+		}
+	}
+	gtlw::MatToDC(mat, mat.size(), dc, CRect(0, 0, mat.cols, mat.rows));
+	dc.Detach();
+	img.ReleaseDC();
+
+	img.Save(_T("Z:\\Downloads\\a.bmp"));
+
+	{
+		cv::Mat mat = cv::imread("Z:\\Downloads\\a.bmp");
+		auto s =mat.size();
+	}
+
 }

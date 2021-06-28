@@ -303,9 +303,12 @@ namespace gtl::win_util {
 			bmpInfo.bmiHeader.biClrUsed = pixel_size == 1 ? 256 : 0;
 			bmpInfo.bmiHeader.biClrImportant = pixel_size == 1 ? 256 : 0;
 
-			SetDIBitsToDevice(dc, 
-								rectTarget.left, rectTarget.top, std::min(rectTarget.Width(), sizeEffective.width), std::min(rectTarget.Height(), sizeEffective.height), 
-								0, 0, 0, img.rows, pImage, &bmpInfo, /*pixel_size == 1 ? DIB_PAL_COLORS : */DIB_RGB_COLORS);
+			CRect rectSrc(0, 0, sizeEffective.width, sizeEffective.height);
+			CRect rectDst(rectTarget);
+			CalcViewPosition(sizeEffective, rectTarget, rectSrc, rectDst);
+			SetDIBitsToDevice(dc,
+								rectDst.left, rectDst.top, rectDst.Width(), rectDst.Height(),
+								rectSrc.left, rectSrc.top, 0, img.rows, pImage, &bmpInfo, /*pixel_size == 1 ? DIB_PAL_COLORS : */DIB_RGB_COLORS);
 
 			pImage = nullptr;
 		} catch (...) {

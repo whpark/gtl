@@ -108,6 +108,7 @@
 #define IDC_VIEW1                       1000
 #define IDC_VIEW3                       1001
 #define IDC_TEST_MAT_TIME               1002
+#define IDC_TEST_LARGE_BITMAP           1003
 
 // Next default values for new objects
 // 
