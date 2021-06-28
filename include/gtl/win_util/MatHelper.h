@@ -193,7 +193,7 @@ namespace gtl::win_util {
 		return true;
 
 	}
-	bool GTL_WINUTIL_API MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect);
+	bool GTL_WINUTIL_API MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, std::span<RGBQUAD> palette = {});
 	bool GTL_WINUTIL_API MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, CBitmap const& mask);	// mask : monochrome bitmap, background of img value must be zero.
 	bool GTL_WINUTIL_API MatToDCTransparent (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, COLORREF crTransparent);
 	bool GTL_WINUTIL_API MatToDCAlphaBlend  (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, BLENDFUNCTION blend);

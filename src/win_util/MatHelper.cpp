@@ -228,7 +228,7 @@ namespace gtl::win_util {
 	}
 
 
-	bool MatToDC(cv::Mat const& img, cv::Size const& sizeEffective, CDC& dc, CRect const& rectTarget) {
+	bool MatToDC(cv::Mat const& img, cv::Size const& sizeEffective, CDC& dc, CRect const& rectTarget, std::span<RGBQUAD> palette) {
 
 		auto const type = img.type();
 
@@ -263,17 +263,35 @@ namespace gtl::win_util {
 			struct BMP {
 				bool bPaletteInitialized{false};
 				BITMAPINFO bmpInfo{};
-				RGBQUAD dummy[256-1]{};
+				RGBQUAD dummy[256-1]{};	// starting from bmpInfo
 			};
-			thread_local static std::unique_ptr<BMP> bmp = std::make_unique<BMP>();
-			if (!bmp->bPaletteInitialized && pixel_size == 1) {
-				bmp->bPaletteInitialized = true;
-				for (uint32_t i = 0; i < 256; i++) {
-					(gtl::color_bgra_t&)bmp->bmpInfo.bmiColors[i] = ColorBGRA(i, i, i);
+			thread_local static BMP bmp;
+			std::optional<BMP> rBMP_Local;
+			BMP* pBMP = &bmp;
+			if (pixel_size == 1) {
+
+				if (!palette.empty()) {
+					rBMP_Local.emplace();
+					auto& b = rBMP_Local.value();
+					auto n = std::min(std::size(b.dummy)+1, palette.size());
+					for (size_t i{}; i < n; i++) {
+						b.bmpInfo.bmiColors[i] = palette[i];
+					}
+					b.bPaletteInitialized = n > 0;
+					pBMP = &(*rBMP_Local);
 				}
+
+				if (!pBMP->bPaletteInitialized) {
+					pBMP->bPaletteInitialized = true;
+					auto n = std::size(pBMP->dummy)+1;
+					for (size_t i {}; i < n; i++) {
+						(gtl::color_bgra_t&)pBMP->bmpInfo.bmiColors[i] = ColorBGRA(i, i, i);
+					}
+				}
+
 			}
-			BITMAPINFO& bmpInfo = bmp->bmpInfo;
-			bmpInfo.bmiHeader.biSize = sizeof(bmpInfo);
+			BITMAPINFO& bmpInfo = pBMP->bmpInfo;
+			bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
 			bmpInfo.bmiHeader.biWidth = cx;
 			bmpInfo.bmiHeader.biHeight = -cy;
 			bmpInfo.bmiHeader.biPlanes = 1;

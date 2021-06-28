@@ -163,8 +163,18 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 			if (img.empty()) {
 				img = cv::Mat::zeros(1256, 1256, CV_8UC1);
 				for (int row{}; row < img.rows; row++) {
-					auto v = row%256;
-					img.row(row) = cv::Scalar(v, v, v);
+					auto v = row;
+					if (row < 100)
+						v = 0;
+					else if (row < 200)
+						v = 1;
+					else if (row < 300)
+						v = 254;
+					else if (row < 400)
+						v = 255;
+					else 
+						v = row % 256;
+					img.row(row) = v;
 				}
 			}
 
@@ -177,9 +187,17 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 				}
 			}
 
+			static std::vector<RGBQUAD> palette;
+			if (palette.empty()) {
+				palette.assign(256, {});
+				for (size_t i{}; i < 256; i++) {
+					palette[i] = (RGBQUAD const&)(gtl::ColorBGRA(0,0,i));
+				}
+			}
+
 			gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
 			if (nIDCtl == IDC_VIEW1) {
-				gtlw::MatToDC(img, img.size(), dc, rect);
+				gtlw::MatToDC(img, img.size(), dc, rect, palette);
 				sw.Lap("1 byte image");
 			}
 			else {
