@@ -57,7 +57,7 @@ namespace gtl::win_util {
 
 		return true;
 	}
-	inline static bool ReadMat(std::istream& file, cv::Mat& mat) {
+	static inline bool ReadMat(std::istream& file, cv::Mat& mat) {
 		auto ReadVar = [&file, &mat] (auto& var) -> bool {
 			return (bool)file.read((char*)&var, sizeof(var));
 		};
@@ -100,7 +100,7 @@ namespace gtl::win_util {
 
 		return true;
 	}
-	inline static bool SaveMat(std::ostream& file, cv::Mat const& mat) {
+	static inline bool SaveMat(std::ostream& file, cv::Mat const& mat) {
 		uint8_t buf[4] = { 3, 'm', 'a', 't' };
 		file.write((char const*)buf, sizeof(buf));
 		file.write((char const*)&mat.rows, sizeof(mat.rows));

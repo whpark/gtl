@@ -172,7 +172,7 @@ namespace gtl {
 
 	private:
 		template < typename tchar >
-		constexpr inline static eCODEPAGE GetCodepage(eCODEPAGE codepage) {
+		constexpr static inline eCODEPAGE GetCodepage(eCODEPAGE codepage) {
 			if (codepage == eCODEPAGE::DEFAULT__OR_USE_MBCS_CODEPAGE) {	// wrong or default value
 				if constexpr (gtlc::is_same_utf<tchar, char>) {
 					return eMBCS_Codepage_g;

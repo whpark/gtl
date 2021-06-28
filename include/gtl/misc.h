@@ -450,7 +450,7 @@ namespace gtl {
 	protected:
 		tclock::time_point t0 { tclock::now() };
 		std::basic_ostream<tchar>& os;
-		thread_local inline static int depth {-1};
+		thread_local static inline int depth {-1};
 
 		//struct item {
 		//	tclock::time_point t0;
