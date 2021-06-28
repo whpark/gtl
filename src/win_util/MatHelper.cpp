@@ -1,6 +1,8 @@
 #include "pch.h"
 
 #include "gtl/win_util/MatHelper.h"
+#include "spdlog/spdlog.h"
+#include "spdlog/stopwatch.h"
 
 namespace gtl::win_util {
 
@@ -230,18 +232,18 @@ namespace gtl::win_util {
 
 		auto const type = img.type();
 
-		constexpr int pixel_size = 3;
-		if (type != CV_8UC3)
-			return false;
-		//if (type == CV_8UC3) {
-		//	pixel_size = 3;
-		//} else if (type == CV_8UC1) {
-		//	pixel_size = 1;
-		//} else {
+		int pixel_size = 3;
+		//if (type != CV_8UC3)
 		//	return false;
-		//}
+		if (type == CV_8UC3) {
+			pixel_size = 3;
+		} else if (type == CV_8UC1) {
+			pixel_size = 1;
+		} else {
+			return false;
+		}
 
-		BYTE const* pImage = nullptr;
+		uint8_t const* pImage = nullptr;
 		int cx = gtl::AdjustAlign32(img.cols);
 		int cy = img.rows;
 
@@ -265,12 +267,19 @@ namespace gtl::win_util {
 				pImage = img.ptr<BYTE>(0);
 			}
 
-			//thread_local static struct BMP {
-			//	bool bPaletteInitialized{false};
-			//	BITMAPINFO bmpInfo{};
-			//	RGBQUAD dummy[255];
-			//} bmp;
-			BITMAPINFO bmpInfo{};
+			struct BMP {
+				bool bPaletteInitialized{false};
+				BITMAPINFO bmpInfo{};
+				RGBQUAD dummy[256-1]{};
+			};
+			thread_local static std::unique_ptr<BMP> bmp = std::make_unique<BMP>();
+			if (!bmp->bPaletteInitialized && pixel_size == 1) {
+				bmp->bPaletteInitialized = true;
+				for (uint32_t i = 0; i < 256; i++) {
+					(gtl::color_bgra_t&)bmp->bmpInfo.bmiColors[i] = ColorBGRA(i, i, i);
+				}
+			}
+			BITMAPINFO& bmpInfo = bmp->bmpInfo;
 			bmpInfo.bmiHeader.biSize = sizeof(bmpInfo);
 			bmpInfo.bmiHeader.biWidth = cx;
 			bmpInfo.bmiHeader.biHeight = -cy;
@@ -280,20 +289,12 @@ namespace gtl::win_util {
 			bmpInfo.bmiHeader.biSizeImage = cx * cy * pixel_size;
 			bmpInfo.bmiHeader.biXPelsPerMeter = 0;
 			bmpInfo.bmiHeader.biYPelsPerMeter = 0;
-			bmpInfo.bmiHeader.biClrUsed = 0;
-			bmpInfo.bmiHeader.biClrImportant = 0;
-			//if (pixel_size == 1) {
-			//	if (!bmp.bPaletteInitialized) {
-			//		for (uint32_t i = 0; i < 255; i++) {
-			//			(COLORREF&)bmp.bmpInfo.bmiColors[i] = RGB(i, i, i);
-			//		}
-			//		bmp.bPaletteInitialized = true;
-			//	}
-			//}
+			bmpInfo.bmiHeader.biClrUsed = pixel_size == 1 ? 256 : 0;
+			bmpInfo.bmiHeader.biClrImportant = pixel_size == 1 ? 256 : 0;
 
-			SetDIBitsToDevice(dc, 
+			auto r = SetDIBitsToDevice(dc, 
 								rectTarget.left, rectTarget.top, std::min(rectTarget.Width(), sizeEffective.width), std::min(rectTarget.Height(), sizeEffective.height), 
-								0, 0, 0, img.rows, pImage, &bmpInfo, pixel_size == 1 ? DIB_PAL_COLORS : DIB_RGB_COLORS);
+								0, 0, 0, img.rows, pImage, &bmpInfo, /*pixel_size == 1 ? DIB_PAL_COLORS : */DIB_RGB_COLORS);
 
 			pImage = nullptr;
 		} catch (...) {
