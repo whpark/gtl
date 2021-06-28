@@ -38,6 +38,7 @@ BEGIN_MESSAGE_MAP(CtestwinView, CFormView)
 	ON_WM_TIMER()
 	ON_WM_SIZE()
 	ON_WM_DRAWITEM()
+	ON_BN_CLICKED(IDC_TEST_MAT_TIME, &CtestwinView::OnBnClickedTestMatTime)
 END_MESSAGE_MAP()
 
 // CtestwinView construction/destruction
@@ -176,7 +177,7 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 				}
 			}
 
-			gtlw::TStopWatch<char, std::chrono::microseconds> sw;
+			gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
 			if (nIDCtl == IDC_VIEW1) {
 				gtlw::MatToDC(img, img.size(), dc, rect);
 				sw.Lap("1 byte image");
@@ -192,4 +193,17 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 	}
 
 	CFormView::OnDrawItem(nIDCtl, lpDrawItemStruct);
+}
+
+
+void CtestwinView::OnBnClickedTestMatTime() {
+	cv::Mat img3;
+	img3 = cv::Mat::zeros(1256, 1256, CV_8UC1);
+	for (int row{}; row < img3.rows; row++) {
+		img3.row(row) = row%256;
+	}
+
+	gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
+	cv::cvtColor(img3, img3, cv::COLOR_GRAY2BGR);
+	sw.Lap("1256x1256 1ch -> 3ch");
 }
