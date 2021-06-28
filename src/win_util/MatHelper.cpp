@@ -232,16 +232,9 @@ namespace gtl::win_util {
 
 		auto const type = img.type();
 
-		int pixel_size = 3;
-		//if (type != CV_8UC3)
-		//	return false;
-		if (type == CV_8UC3) {
-			pixel_size = 3;
-		} else if (type == CV_8UC1) {
-			pixel_size = 1;
-		} else {
+		int pixel_size = (type == CV_8UC3) ? 3 : ((type == CV_8UC1) ? 1 : 0);
+		if (pixel_size <= 0)
 			return false;
-		}
 
 		uint8_t const* pImage = nullptr;
 		int cx = gtl::AdjustAlign32(img.cols);
@@ -292,7 +285,7 @@ namespace gtl::win_util {
 			bmpInfo.bmiHeader.biClrUsed = pixel_size == 1 ? 256 : 0;
 			bmpInfo.bmiHeader.biClrImportant = pixel_size == 1 ? 256 : 0;
 
-			auto r = SetDIBitsToDevice(dc, 
+			SetDIBitsToDevice(dc, 
 								rectTarget.left, rectTarget.top, std::min(rectTarget.Width(), sizeEffective.width), std::min(rectTarget.Height(), sizeEffective.height), 
 								0, 0, 0, img.rows, pImage, &bmpInfo, /*pixel_size == 1 ? DIB_PAL_COLORS : */DIB_RGB_COLORS);
 
