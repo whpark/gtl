@@ -109,6 +109,9 @@
 #define IDC_VIEW3                       1001
 #define IDC_TEST_MAT_TIME               1002
 #define IDC_TEST_LARGE_BITMAP           1003
+#define IDC_TEST_SAVE_BMP24             1004
+#define IDC_TEST_SAVE_BMP8              1005
+#define IDC_TEST_LOAD_BMP               1006
 
 // Next default values for new objects
 // 
