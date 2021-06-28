@@ -18,7 +18,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shape", "src\shape\shape.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "win_util", "src\win_util\win_util.vcxproj", "{5F0D7BD9-E1EC-45D1-96B9-2EA611944D5E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_win", "test_win\test_win.vcxproj", "{0F115BD6-A104-41EB-8F5D-194C4E66DD0C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_win", "src\test_win\test_win.vcxproj", "{0F115BD6-A104-41EB-8F5D-194C4E66DD0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
