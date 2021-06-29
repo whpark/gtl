@@ -486,17 +486,17 @@ namespace gtl {
 		template < typename ... Args >
 		void Lap(Args&& ... args) {
 			auto t = tclock::now();
-		#define GTL__PRINT_FMT_STOPWATCH "STOP_WATCH [ "
+		#define GTL__PRINT_FMT_STOPWATCH "STOP_WATCH {:{}}[ "
 			if constexpr (gtlc::is_one_of<tchar, char>) {
-				os << std::format(GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
-				os << std::format(u8"" GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(u8"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
-				os << std::format(u"" GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(u"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
-				os << std::format(U"" GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(U"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
-				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else {
 				static_assert(false);
 			}
@@ -504,17 +504,17 @@ namespace gtl {
 
 			os << std::format(std::forward<Args>(args)...);
 
-		#define GTL__PRINT_FMT_STOPWATCH " ] {0:{1}}{2}\n"
+		#define GTL__PRINT_FMT_STOPWATCH " ] {}\n"
 			if constexpr (gtlc::is_one_of<tchar, char>) {
-				os << std::format(GTL__PRINT_FMT_STOPWATCH, ' ', depth*4, std::chrono::duration_cast<tresolution>(t-t0));
+				os << std::format(GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
-				os << std::format(u8"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4, std::chrono::duration_cast<tresolution>(t - t0));
+				os << std::format(u8"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
-				os << std::format(u"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4, std::chrono::duration_cast<tresolution>(t - t0));
+				os << std::format(u"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
-				os << std::format(U"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4, std::chrono::duration_cast<tresolution>(t - t0));
+				os << std::format(U"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
-				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4, std::chrono::duration_cast<tresolution>(t - t0));
+				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else {
 				static_assert(false);
 			}

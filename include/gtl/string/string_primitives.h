@@ -13,6 +13,7 @@
 #define GTL_HEADER__BASIC_STRING
 
 #include "gtl/_lib_gtl.h"
+#include "gtl/_default.h"
 #include "gtl/concepts.h"
 
 #if !defined(__cpp_lib_concepts)

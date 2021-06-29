@@ -235,6 +235,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h" />
     <ClInclude Include="..\..\include\gtl\json_proxy.h" />
     <ClInclude Include="..\..\include\gtl\log.h" />
+    <ClInclude Include="..\..\include\gtl\mat_helper.h" />
     <ClInclude Include="..\..\include\gtl\misc.h" />
     <ClInclude Include="..\..\include\gtl\mutex.h" />
     <ClInclude Include="..\..\include\gtl\rand.h" />
@@ -265,6 +266,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp" />
     <ClCompile Include="json_proxy.cpp" />
     <ClCompile Include="log.cpp" />
+    <ClCompile Include="mat_helper.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

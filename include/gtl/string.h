@@ -22,6 +22,7 @@
 #include <concepts>
 
 #include "_lib_gtl.h"
+#include "_config.h"
 #include "concepts.h"
 #include "string/string_primitives.h"
 #include "string/convert_codepage.h"
@@ -88,9 +89,9 @@ namespace gtl {
 
 	public:
 		// returns psz
-	#if GTL_USE_WINDOWS_API
+	//#if GTL_USE_WINDOWS_API
 		operator tchar const*() const					{ return this->c_str(); }
-	#endif
+	//#endif
 
 		// returns string_view
 		operator std::basic_string_view<tchar>() const {
