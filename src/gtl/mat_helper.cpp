@@ -43,9 +43,8 @@ namespace gtl {
 					cv::cuda::GpuMat dst;
 					cv::cvtColor(cv::cuda::GpuMat(imgSrc), dst, eCode);
 					dst.download(imgDest);
-					return TRUE;
-				}
-				catch (...) {
+					return true;
+				} catch (...) {
 					//TRACE((GTL__FUNCSIG " - Error\n").c_str());
 				}
 			}
@@ -53,9 +52,9 @@ namespace gtl {
 			cvtColor(imgSrc, imgDest, eCode);
 		}
 		catch (...) {
-			return FALSE;
+			return false;
 		}
-		return TRUE;
+		return true;
 	}
 
 	bool ResizeImage(cv::Mat const& imgSrc, cv::Mat& imgDest, double dScale, int eInterpolation) {
@@ -66,7 +65,7 @@ namespace gtl {
 					cv::cuda::GpuMat dst;
 					cv::resize(cv::cuda::GpuMat(imgSrc), dst, cv::Size(), dScale, dScale, eInterpolation);
 					dst.download(imgDest);
-					return TRUE;
+					return true;
 				}
 				catch (...) {
 					//TRACE((GTL__FUNCSIG " - Error\n").c_str());
@@ -76,9 +75,9 @@ namespace gtl {
 			resize(imgSrc, imgDest, cv::Size(), dScale, dScale, eInterpolation);
 		}
 		catch (...) {
-			return FALSE;
+			return false;
 		}
-		return TRUE;
+		return true;
 	}
 
 	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, cv::Mat& matResult, int method) {
@@ -99,9 +98,9 @@ namespace gtl {
 			matchTemplate(img, imgTempl, matResult, method);
 		}
 		catch (...) {
-			return FALSE;
+			return false;
 		}
-		return TRUE;
+		return true;
 	}
 
 	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, CPoint2d& ptBest, double& dMinMax, double& dRate, double dScale, int eInterpolation) {
@@ -146,34 +145,34 @@ namespace gtl {
 			}
 
 			switch (method) {
-			case cv::TM_SQDIFF:
-			case cv::TM_SQDIFF_NORMED:
+			case cv::TM_SQDIFF :
+			case cv::TM_SQDIFF_NORMED :
 				ptBest = ptMin;
 				break;
-			case cv::TM_CCORR:
-			case cv::TM_CCORR_NORMED:
-			case cv::TM_CCOEFF:
-			case cv::TM_CCOEFF_NORMED:
+			case cv::TM_CCORR :
+			case cv::TM_CCORR_NORMED :
+			case cv::TM_CCOEFF :
+			case cv::TM_CCOEFF_NORMED :
 				ptBest = ptMax;
 				break;
 			}
 
 			switch (method) {
-			case cv::TM_SQDIFF:
+			case cv::TM_SQDIFF :
 				dMinMax = dMin;
-				dRate = (dMax - dMin) / dMax;
+				dRate = (dMax-dMin) / dMax;
 				break;
-			case cv::TM_SQDIFF_NORMED:
+			case cv::TM_SQDIFF_NORMED :
 				dMinMax = dMin;
-				dRate = (dMax - dMin) / dMax;
+				dRate = (dMax-dMin) / dMax;
 				break;
-			case cv::TM_CCORR:
-			case cv::TM_CCOEFF:
+			case cv::TM_CCORR :
+			case cv::TM_CCOEFF :
 				dMinMax = dMax;
 				dRate = dMax;
 				break;
-			case cv::TM_CCORR_NORMED:
-			case cv::TM_CCOEFF_NORMED:
+			case cv::TM_CCORR_NORMED :
+			case cv::TM_CCOEFF_NORMED :
 				dMinMax = dMax;
 				dRate = dMax;
 				break;
@@ -183,20 +182,19 @@ namespace gtl {
 				dRate = 0;
 
 			if (dScale == 0.0) {
-				ptBest.x += imgTempl.cols / 2;
-				ptBest.y += imgTempl.rows / 2;
-			}
-			else {
-				ptBest.x = ptBest.x / dScale + imgTempl.cols / 2;
-				ptBest.y = ptBest.y / dScale + imgTempl.rows / 2;
+				ptBest.x += imgTempl.cols/2;
+				ptBest.y += imgTempl.rows/2;
+			} else {
+				ptBest.x = ptBest.x / dScale + imgTempl.cols/2;
+				ptBest.y = ptBest.y / dScale + imgTempl.rows/2;
 			}
 
-		}
-		catch (...) {
+		} catch (...) {
 			return false;
 		}
 		return true;
 	}
+
 
 	bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Mat const& matMask) {
 		try {
@@ -213,16 +211,16 @@ namespace gtl {
 	}
 
 	bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Scalar const& crTransparent) {
-		if (imgTarget.empty() || (imgSource.type() != imgTarget.type()) || (imgSource.size() != imgTarget.size())) {
+		if (imgTarget.empty() || (imgSource.type() != imgTarget.type()) || (imgSource.size() != imgTarget.size()) ) {
 			return false;
 		}
-		if ((imgSource.channels() != 3) || (imgSource.depth() != CV_8U))
+		if ( (imgSource.channels() != 3) || (imgSource.depth() != CV_8U) )
 			return false;
 
 		cv::Vec3b cr;
-		cr[0] = (BYTE)crTransparent[0];
-		cr[1] = (BYTE)crTransparent[1];
-		cr[2] = (BYTE)crTransparent[2];
+		cr[0] = (uint8_t)crTransparent[0];
+		cr[1] = (uint8_t)crTransparent[1];
+		cr[2] = (uint8_t)crTransparent[2];
 
 		for (int y = 0; y < imgSource.rows; y++) {
 			const cv::Vec3b* ptr = imgSource.ptr<cv::Vec3b>(y);
@@ -721,4 +719,5 @@ namespace gtl {
 	//=============================================================================
 	//
 
-}	// namespace gtl::win_util
+}	// namespace gtl
+

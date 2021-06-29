@@ -62,13 +62,12 @@ namespace gtl {
 	}
 #endif
 
-	static inline bool ReadMat(std::istream& file, cv::Mat& mat) {
-		auto ReadVar = [&file, &mat](auto& var) -> bool {
-			return (bool)file.read((char*)&var, sizeof(var));
+	static inline bool ReadMat(std::istream& is, cv::Mat& mat) {
+		auto ReadVar = [&is, &mat](auto& var) -> bool {
+			return (bool)is.read((char*)&var, sizeof(var));
 		};
 
 		do {
-			int rows{}, cols{}, type{};
 			// read sign
 			{
 				uint8_t buf[3];
@@ -83,13 +82,14 @@ namespace gtl {
 					break;
 			}
 
+			int rows{}, cols{}, type{};
 			if (!ReadVar(rows)) break;
 			if (!ReadVar(cols)) break;
 			if (!ReadVar(type)) break;
 
-			if ((rows < 0) || (cols < 0))
+			if ( (rows < 0) || (cols < 0) )
 				break;
-			if ((rows == 0) || (cols == 0)) {
+			if ( (rows == 0) || (cols == 0) ) {
 				mat.release();
 				return true;
 			}
@@ -99,7 +99,7 @@ namespace gtl {
 				break;
 
 			for (int i = 0; i < rows; i++)
-				file.read((char*)mat.ptr(i), (mat.cols * mat.elemSize()));	// step -> (cols*elemSize())
+				is.read((char*)mat.ptr(i), (mat.cols*mat.elemSize()));	// step -> (cols*elemSize())
 
 			return true;
 
@@ -107,15 +107,15 @@ namespace gtl {
 
 		return false;
 	}
-	static inline bool SaveMat(std::ostream& file, cv::Mat const& mat) {
+	static inline bool SaveMat(std::ostream& os, cv::Mat const& mat) {
 		uint8_t buf[4] = { 3, 'm', 'a', 't' };
-		file.write((char const*)buf, sizeof(buf));
-		file.write((char const*)&mat.rows, sizeof(mat.rows));
-		file.write((char const*)&mat.cols, sizeof(mat.cols));
+		os.write((char const*)buf, sizeof(buf));
+		os.write((char const*)&mat.rows, sizeof(mat.rows));
+		os.write((char const*)&mat.cols, sizeof(mat.cols));
 		int type = mat.type();
-		file.write((char const*)&type, sizeof(type));
+		os.write((char const*)&type, sizeof(type));
 		for (int i = 0; i < mat.rows; i++) {
-			file.write((char*)mat.ptr(i), mat.cols * mat.elemSize());	// step -> (cols*elemSize())
+			os.write((char*)mat.ptr(i), mat.cols*mat.elemSize());	// step -> (cols*elemSize())
 		}
 
 		return true;
@@ -131,21 +131,21 @@ namespace gtl {
 		bool bottomLeftOrigin = false, bool bOutline = true)
 	{
 		gtl::CStringA str(psz);
-		cv::Size size = cv::getTextSize((LPCSTR)str, fontFace, fontScale, thickness, NULL);
+		CSize2i size { cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
 
 		if (bOutline) {
 			cv::Scalar crBkgnd;
 			crBkgnd = cv::Scalar(255, 255, 255) - color;
 			//if (crBkgnd == Scalar(0, 0, 0))
 			//	crBkgnd = Scalar(1, 1, 1);
-			int iShift = std::max(1, thickness / 2);
-			cv::putText(img, str, CPoint2i(org) - CSize2i(size) / 2 + CPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, CPoint2i(org) - CSize2i(size) / 2 + CPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, CPoint2i(org) - CSize2i(size) / 2 + CPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, CPoint2i(org) - CSize2i(size) / 2 + CPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			int iShift = std::max(1, thickness/2);
+			cv::putText(img, str, org-size/2+CPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+CPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+CPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+CPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
 		}
 
-		cv::putText(img, str, CPoint2i(org) - CSize2i(size) / 2, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
+		cv::putText(img, str, org-size/2, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
 	}
 
 
