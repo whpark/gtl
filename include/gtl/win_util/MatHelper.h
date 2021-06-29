@@ -144,12 +144,12 @@ namespace gtl::win_util {
 
 	//-----------------------------------------------------------------------------
 	// Mat 
-	bool GTL_WINUTIL_API CheckGPU(bool bUse);
-	bool GTL_WINUTIL_API IsGPUEnabled();
-	bool GTL_WINUTIL_API ConvertColor(cv::Mat const& imgSrc, cv::Mat& imgDest, int eCode);
-	bool GTL_WINUTIL_API ResizeImage(cv::Mat const& imgSrc, cv::Mat& imgDest, double dScale, int eInterpolation = cv::INTER_LINEAR/*, int eScaleDownMethod = cv::INTER_AREA*/);
-	bool GTL_WINUTIL_API MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, cv::Mat& matResult, int method);
-	bool GTL_WINUTIL_API MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, CPoint2d& ptBest, double& dMinMax, double& dRate, double dScale = 0.0, int eInterpolation = cv::INTER_LINEAR);
+	GTL_WINUTIL_API bool CheckGPU(bool bUse);
+	GTL_WINUTIL_API bool IsGPUEnabled();
+	GTL_WINUTIL_API bool ConvertColor(cv::Mat const& imgSrc, cv::Mat& imgDest, int eCode);
+	GTL_WINUTIL_API bool ResizeImage(cv::Mat const& imgSrc, cv::Mat& imgDest, double dScale, int eInterpolation = cv::INTER_LINEAR/*, int eScaleDownMethod = cv::INTER_AREA*/);
+	GTL_WINUTIL_API bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, cv::Mat& matResult, int method);
+	GTL_WINUTIL_API bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, CPoint2d& ptBest, double& dMinMax, double& dRate, double dScale = 0.0, int eInterpolation = cv::INTER_LINEAR);
 
 	//-----------------------------------------------------------------------------
 	// Mat to DC
@@ -193,12 +193,23 @@ namespace gtl::win_util {
 		return true;
 
 	}
-	bool GTL_WINUTIL_API MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, std::span<RGBQUAD> palette = {});
-	bool GTL_WINUTIL_API MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, CBitmap const& mask);	// mask : monochrome bitmap, background of img value must be zero.
-	bool GTL_WINUTIL_API MatToDCTransparent (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, COLORREF crTransparent);
-	bool GTL_WINUTIL_API MatToDCAlphaBlend  (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, BLENDFUNCTION blend);
-	bool GTL_WINUTIL_API MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Mat const& matMask);
-	bool GTL_WINUTIL_API MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Scalar const& crTransparent);
+	GTL_WINUTIL_API bool MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, std::span<RGBQUAD> palette = {});
+	GTL_WINUTIL_API bool MatToDC            (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, CBitmap const& mask);	// mask : monochrome bitmap, background of img value must be zero.
+	GTL_WINUTIL_API bool MatToDCTransparent (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, COLORREF crTransparent);
+	GTL_WINUTIL_API bool MatToDCAlphaBlend  (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, BLENDFUNCTION blend);
+	GTL_WINUTIL_API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Mat const& matMask);
+	GTL_WINUTIL_API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Scalar const& crTransparent);
+
+	GTL_WINUTIL_API bool SaveBitmap(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<RGBQUAD> palette);
+	inline cv::Mat LoadImage(std::filesystem::path const& path) {
+		cv::Mat img;
+		auto buf = FileToBuffer<uint8_t>(path);
+		if (!buf)
+			return img;
+
+		img = cv::imdecode(*buf, 0);
+		return img;
+	}
 
 
 #pragma pack(pop)

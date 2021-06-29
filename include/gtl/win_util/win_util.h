@@ -91,7 +91,7 @@ namespace gtl::win_util {
 
 	//-------------------------------------------------------------------------
 	/// @brief StopWatch
-	template < typename tchar, typename tresolution = std::chrono::microseconds >
+	template < typename tchar, typename tresolution = std::chrono::duration<double> >
 	class TStopWatch : public gtl::TStopWatch<tchar, tresolution > {
 	public:
 		std::basic_ostream<tchar> os;

@@ -30,6 +30,11 @@
 
 
 
+#include "opencv2/opencv.hpp"
+
+#include "gtl/gtl.h"
+#include "gtl/win_util/win_util.h"
+#include "gtl/win_util/MatHelper.h"
 
 
 

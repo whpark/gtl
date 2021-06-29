@@ -42,6 +42,7 @@ public:
 #endif
 
 protected:
+	cv::Mat m_bitmap;
 
 // Generated message map functions
 protected:
@@ -55,9 +56,10 @@ public:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnBnClickedTestMatTime();
 	afx_msg void OnBnClickedTestLargeBitmap();
-	afx_msg void OnBnClickedTestSaveBmp24();
-	afx_msg void OnBnClickedTestSaveBmp8();
-	afx_msg void OnBnClickedTestLoadBmp();
+	afx_msg void OnBnClickedTestSaveBMP_24BPP();
+	afx_msg void OnBnClickedTestSaveBMP_1BPP();
+	afx_msg void OnBnClickedTestSaveBMP_nBPP();
+	afx_msg void OnBnClickedTestLoadBMP();
 };
 
 #ifndef _DEBUG  // debug version in test_winView.cpp

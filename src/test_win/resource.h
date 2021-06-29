@@ -110,8 +110,14 @@
 #define IDC_TEST_MAT_TIME               1002
 #define IDC_TEST_LARGE_BITMAP           1003
 #define IDC_TEST_SAVE_BMP24             1004
+#define IDC_TEST_SAVE_BMP_24BPP         1004
 #define IDC_TEST_SAVE_BMP8              1005
+#define IDC_TEST_SAVE_BMP_1BPP          1005
 #define IDC_TEST_LOAD_BMP               1006
+#define IDC_TEST_SAVE_BMP_nBPP          1007
+#define IDC_VIEW_BMP                    1008
+#define IDC_TEST_SAVE_BMP_24BPP2        1009
+#define IDC_TEST_SAVE_BMP_COLOR_PALETTE 1009
 
 // Next default values for new objects
 // 

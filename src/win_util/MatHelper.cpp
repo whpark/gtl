@@ -395,6 +395,101 @@ namespace gtl::win_util {
 	}
 
 
+	bool SaveBitmap(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<RGBQUAD> palette) {
+	#pragma pack(push, 2)
+		struct BMP_FILE_HEADER {
+			char sign[2]{ 'B', 'M' };
+			DWORD sizeFile{};
+			WORD reserved1{};
+			WORD reserved2{};
+			DWORD offsetData{};
+		};
+	#pragma pack(pop)
+
+		if (img.empty())
+			return false;
+
+		auto type = img.type();
+
+		auto cx = img.cols;
+		auto cy = img.rows;
+		int pixel_size = (type == CV_8UC3) ? 3 : ((type == CV_8UC1) ? 1 : 0);
+		if (pixel_size <= 0)
+			return false;
+
+		std::ofstream f(path, std::ios_base::binary);
+		if (!f)
+			return false;
+
+		BMP_FILE_HEADER fh;
+		BITMAPINFOHEADER header;
+
+		header.biSize = sizeof(header);
+		header.biWidth = cx;
+		header.biHeight = -cy;
+		header.biPlanes = 1;
+		header.biCompression = BI_RGB;
+		header.biSizeImage = 0;//cx * cy * pixel_size;
+		header.biXPelsPerMeter = 0;
+		header.biYPelsPerMeter = 0;
+		if (pixel_size == 3) {
+			auto width32 = gtl::AdjustAlign32(cx * 3);
+			fh.offsetData = sizeof(fh) + sizeof(header) + palette.size()*sizeof(palette[0]);
+			fh.sizeFile = fh.offsetData + width32 * cy;
+			header.biBitCount = 8 * pixel_size;
+			header.biClrUsed = header.biClrImportant = 0;
+
+			f.write((char const*)&fh, sizeof(fh));
+			f.write((char const*)&header, sizeof(header));
+			char redundant[4];
+			size_t sr = width32 - (cx * 3);
+			for (int y{}; y < img.rows; y++) {
+				auto* ptr = img.ptr<cv::Vec3b>(y);
+				f.write((char const*)ptr, 3 * img.cols);
+				f.write(redundant, sr);
+			}
+		}
+		else if (type == CV_8UC1) {
+			if ( (nBPP != 1) and /*(nBPP != 2) and */(nBPP != 4) and (nBPP != 8) )
+				return false;
+			auto width = (cx * nBPP + 7) / 8;
+			auto width32 = gtl::AdjustAlign32(width);
+			fh.offsetData = sizeof(fh) + sizeof(header) + (0x01ul<<nBPP)*4;
+			fh.sizeFile = fh.offsetData + width32 *cy;
+			header.biBitCount = nBPP;
+			header.biClrUsed = header.biClrImportant = palette.size();
+
+			f.write((char const*)&fh, sizeof(fh));
+			f.write((char const*)&header, sizeof(header));
+
+			f.write((char const*)palette.data(), palette.size()*sizeof(palette[0]));
+
+			std::vector<uint8_t> line((size_t)width32, 0);
+			std::vector<uint8_t> pal((size_t)256, 0);
+			for (size_t i{}; i < palette.size(); i++) {
+				pal[palette[i].rgbRed] = i;
+			}
+
+			for (int y{}; y < img.rows; y++) {
+				auto* ptr = img.ptr<uint8_t>(y);
+
+				memset(line.data(), 0, line.size());
+				int d = (8/nBPP);
+				for (int x{}; x < img.cols; x++) {
+					int col = x / d;
+					int shift = (nBPP * x)%8;
+					line[col] |= pal[ptr[x]] << shift;
+				}
+
+				f.write((char const*)line.data(), width32);
+			}
+
+		}
+
+		return true;
+	}
+
+
 	//=============================================================================
 	//
 
