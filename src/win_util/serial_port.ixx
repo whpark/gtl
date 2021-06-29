@@ -72,10 +72,10 @@ export namespace gtl::win_util {
 			bool bXOnOff = false;
 		};
 
-		constexpr inline static size_t const MAX_RECV_BUF = 1000;
-		constexpr inline static size_t const MAX_SEND_BUF = 1000;
+		constexpr static inline size_t const MAX_RECV_BUF = 1000;
+		constexpr static inline size_t const MAX_SEND_BUF = 1000;
 
-		constexpr inline static size_t RECV_ENQ_TIME = 30;
+		constexpr static inline size_t RECV_ENQ_TIME = 30;
 
 	public:
 		CSimpleLog m_log;

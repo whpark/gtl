@@ -172,9 +172,9 @@ export namespace gtl {
 		//	return fmt::format(sv, fmt::localtime(t));
 		//}
 
-		constexpr inline static const TSysTime::rep eTimeToSysTime = 10'000'000;	// --> 초단위로 변경
+		constexpr static inline const TSysTime::rep eTimeToSysTime = 10'000'000;	// --> 초단위로 변경
 		// for Windows only
-		constexpr inline static const TSysTime::rep eSysTimeToFileTime = 116'444'736'000'000'000; //== __std_fs_file_time_epoch_adjustment;	// 1601/01/01~1970/01/01, 134774 days, 1 tick = 100 ns
+		constexpr static inline const TSysTime::rep eSysTimeToFileTime = 116'444'736'000'000'000; //== __std_fs_file_time_epoch_adjustment;	// 1601/01/01~1970/01/01, 134774 days, 1 tick = 100 ns
 
 
 		static_assert(tclock::duration::period::num == 1);

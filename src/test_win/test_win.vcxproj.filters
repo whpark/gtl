@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="[ MFC Framework ]">
+      <UniqueIdentifier>{c5a8471a-19e7-47a3-86a3-0ee1171c0bd3}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="calendarbar.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildFrm.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassView.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="FileView.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputWnd.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertiesWnd.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="test_win.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="test_winDoc.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="test_winView.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewTree.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="calendarbar.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildFrm.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassView.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="FileView.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputWnd.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesWnd.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="test_win.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="test_winDoc.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="test_winView.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewTree.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="testwin.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\file_view.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\file_view_hc.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\class_view.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\class_view_hc.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\fileview.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\fileview_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\classview.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\classview_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\explorer.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\explorer_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\sort.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\sort_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\menuimages.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\menuimages_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\output_wnd.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\output_wnd_hc.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\properties_wnd.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\properties_wnd_hc.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\properties.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\properties_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\nav_large.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\nav_large_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\pages.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\pages_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\pages_small.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\pages_small_hc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\info.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\userimages.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\test_winDoc.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\test_win.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Toolbar256.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\testwin.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

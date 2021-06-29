@@ -177,7 +177,7 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 #define I_GTL__REFLECTION_MEMBER(var)	gtl::internal::pair{ std::string_view{#var}, &this_t::var }
 
 #define GTL__REFLECTION_MEMBERS(...) \
-	constexpr inline static const std::tuple member_tuple_s {\
+	constexpr static inline const std::tuple member_tuple_s {\
 		GTL__RECURSIVE_MACRO_COMMA(I_GTL__REFLECTION_MEMBER, __VA_ARGS__)\
 	};
 

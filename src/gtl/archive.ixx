@@ -1074,5 +1074,23 @@ export namespace gtl {
 	using CArchive = TArchive<std::fstream, true, true>;
 
 
+	template < typename T > requires (std::is_trivial_v<T>)
+	std::optional<std::vector<T>> FileToBuffer(std::filesystem::path path) {
+		std::ifstream f(path, std::ios_base::binary);
+		if (!f.seekg(0, std::ios_base::end))
+			return {};
+		auto len = f.tellg();
+		if (len < 0)
+			return {};
+		if (len == 0)
+			return std::vector<T>{};
+		auto nItem = len / sizeof(T);
+		std::vector<T> buf((size_t)nItem, T{});
+		f.seekg(0, std::ios_base::beg);
+		f.read((char*)buf.data(), buf.size()*sizeof(T));
+		return std::move(buf);
+	}
+
+
 }	// namespace gtl;
 

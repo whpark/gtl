@@ -10,18 +10,19 @@
 
 module;
 
+#include <span>
 #include "opencv2/opencv.hpp"
 #include "framework.h"
 
 export module gtlw:MatHelper;
 import gtl;
 
-namespace gtl::win_util {
+export namespace gtl::win_util {
 
 	//-----------------------------------------------------------------------------
 	// Mat to DC
 	bool MatToDC(cv::Mat const& _img, cv::Size const& sizeView, CDC& dc, CRect const& rect, CBitmap const& mask);
-	bool MatToDC(cv::Mat const& img, cv::Size const& sizeEffective, CDC& dc, CRect const& rectTarget);
+	bool MatToDC(cv::Mat const& img, cv::Size const& sizeEffective, CDC& dc, CRect const& rectTarget, std::span<RGBQUAD> palette = {});
 	bool MatToDCTransparent(cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, COLORREF crTransparent);
 	bool MatToDCAlphaBlend(cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, BLENDFUNCTION blend);
 
@@ -65,7 +66,7 @@ namespace gtl::win_util {
 	}
 
 
-	bool MatToDC(cv::Mat const& img, cv::Size const& sizeEffective, CDC& dc, CRect const& rectTarget) {
+	bool MatToDC(cv::Mat const& img, cv::Size const& sizeEffective, CDC& dc, CRect const& rectTarget, std::span<RGBQUAD> palette) {
 
 		auto const type = img.type();
 
@@ -100,17 +101,35 @@ namespace gtl::win_util {
 			struct BMP {
 				bool bPaletteInitialized{false};
 				BITMAPINFO bmpInfo{};
-				RGBQUAD dummy[256-1]{};
+				RGBQUAD dummy[256-1]{};	// starting from bmpInfo
 			};
-			thread_local static std::unique_ptr<BMP> bmp = std::make_unique<BMP>();
-			if (!bmp->bPaletteInitialized && pixel_size == 1) {
-				bmp->bPaletteInitialized = true;
-				for (uint32_t i = 0; i < 256; i++) {
-					(gtl::color_bgra_t&)bmp->bmpInfo.bmiColors[i] = ColorBGRA(i, i, i);
+			thread_local static BMP bmp;
+			std::optional<BMP> rBMP_Local;
+			BMP* pBMP = &bmp;
+			if (pixel_size == 1) {
+
+				if (!palette.empty()) {
+					rBMP_Local.emplace();
+					auto& b = rBMP_Local.value();
+					auto n = std::min(std::size(b.dummy)+1, palette.size());
+					for (size_t i{}; i < n; i++) {
+						b.bmpInfo.bmiColors[i] = palette[i];
+					}
+					b.bPaletteInitialized = n > 0;
+					pBMP = &(*rBMP_Local);
 				}
+
+				if (!pBMP->bPaletteInitialized) {
+					pBMP->bPaletteInitialized = true;
+					auto n = std::size(pBMP->dummy)+1;
+					for (size_t i {}; i < n; i++) {
+						(gtl::color_bgra_t&)pBMP->bmpInfo.bmiColors[i] = ColorBGRA(i, i, i);
+					}
+				}
+
 			}
-			BITMAPINFO& bmpInfo = bmp->bmpInfo;
-			bmpInfo.bmiHeader.biSize = sizeof(bmpInfo);
+			BITMAPINFO& bmpInfo = pBMP->bmpInfo;
+			bmpInfo.bmiHeader.biSize = sizeof(bmpInfo.bmiHeader);
 			bmpInfo.bmiHeader.biWidth = cx;
 			bmpInfo.bmiHeader.biHeight = -cy;
 			bmpInfo.bmiHeader.biPlanes = 1;
@@ -122,9 +141,12 @@ namespace gtl::win_util {
 			bmpInfo.bmiHeader.biClrUsed = pixel_size == 1 ? 256 : 0;
 			bmpInfo.bmiHeader.biClrImportant = pixel_size == 1 ? 256 : 0;
 
-			SetDIBitsToDevice(dc, 
-								rectTarget.left, rectTarget.top, std::min(rectTarget.Width(), sizeEffective.width), std::min(rectTarget.Height(), sizeEffective.height), 
-								0, 0, 0, img.rows, pImage, &bmpInfo, /*pixel_size == 1 ? DIB_PAL_COLORS : */DIB_RGB_COLORS);
+			CRect rectSrc(0, 0, sizeEffective.width, sizeEffective.height);
+			CRect rectDst(rectTarget);
+			CalcViewPosition(sizeEffective, rectTarget, rectSrc, rectDst);
+			SetDIBitsToDevice(dc,
+								rectDst.left, rectDst.top, rectDst.Width(), rectDst.Height(),
+								rectSrc.left, rectSrc.top, 0, img.rows, pImage, &bmpInfo, /*pixel_size == 1 ? DIB_PAL_COLORS : */DIB_RGB_COLORS);
 
 			pImage = nullptr;
 		} catch (...) {

@@ -370,7 +370,7 @@ export namespace gtl {
 			return ar;
 		}
 	};
-	constexpr static inline color_rgba_t ColorRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a = {}) {
+	constexpr color_rgba_t ColorRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a = {}) {
 		return color_rgba_t{.r = r, .g = g, .b = b, .a = a};
 	}
 
@@ -403,7 +403,7 @@ export namespace gtl {
 			return ar;
 		}
 	};
-	constexpr static inline color_bgra_t ColorBGRA(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
+	constexpr color_bgra_t ColorBGRA(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
 		return color_bgra_t{ .b = b, .g = g, .r = r, .a = a };
 	}
 
@@ -436,7 +436,7 @@ export namespace gtl {
 			return ar;
 		}
 	};
-	constexpr static inline color_abgr_t ColorABGR(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
+	constexpr color_abgr_t ColorABGR(uint8_t b, uint8_t g, uint8_t r, uint8_t a = {}) {
 		return color_abgr_t{ .a = a, .b = b, .g = g, .r = r };
 	}
 
@@ -457,7 +457,7 @@ export namespace gtl {
 	protected:
 		tclock::time_point t0 { tclock::now() };
 		std::basic_ostream<tchar>& os;
-		thread_local inline static int depth {-1};
+		thread_local static inline int depth {-1};
 
 		//struct item {
 		//	tclock::time_point t0;
@@ -493,17 +493,17 @@ export namespace gtl {
 		template < typename ... Args >
 		void Lap(Args&& ... args) {
 			auto t = tclock::now();
-		#define GTL__PRINT_FMT_STOPWATCH "STOP_WATCH [ "
+		#define GTL__PRINT_FMT_STOPWATCH "STOP_WATCH {:{}}[ "
 			if constexpr (gtlc::is_one_of<tchar, char>) {
-				os << std::format(GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
-				os << std::format(u8"" GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(u8"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
-				os << std::format(u"" GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(u"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
-				os << std::format(U"" GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(U"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
-				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH);
+				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else {
 				static_assert(false);
 			}
@@ -511,17 +511,17 @@ export namespace gtl {
 
 			os << std::format(std::forward<Args>(args)...);
 
-		#define GTL__PRINT_FMT_STOPWATCH " ] {0:{1}}{2}\n"
+		#define GTL__PRINT_FMT_STOPWATCH " ] {}\n"
 			if constexpr (gtlc::is_one_of<tchar, char>) {
-				os << std::format(GTL__PRINT_FMT_STOPWATCH, ' ', depth*4, std::chrono::duration_cast<tresolution>(t-t0));
+				os << std::format(GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t-t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
-				os << std::format(u8"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4, std::chrono::duration_cast<tresolution>(t - t0));
+				os << std::format(u8"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
-				os << std::format(u"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4, std::chrono::duration_cast<tresolution>(t - t0));
+				os << std::format(u"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
-				os << std::format(U"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4, std::chrono::duration_cast<tresolution>(t - t0));
+				os << std::format(U"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
-				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4, std::chrono::duration_cast<tresolution>(t - t0));
+				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else {
 				static_assert(false);
 			}
@@ -571,7 +571,7 @@ export namespace gtl {
 		if (svName.find('z') != svName.npos or svName.find('Z') != svName.npos) return (eAXIS)(static_cast<int>(eAXIS::Z)*eNegative);
 		return eAXIS::NONE;
 	}
-	constexpr static inline std::basic_string_view<char> GetDirectionName(eAXIS eDirection) {
+	constexpr std::basic_string_view<char> GetDirectionName(eAXIS eDirection) {
 		using namespace std::literals;
 		switch (eDirection) {
 		case eAXIS::NONE : return ""sv;

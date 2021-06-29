@@ -48,7 +48,7 @@ export namespace gtl {
 	// Dynamic Creation. (Create using IDENTIFIER_DN)
 	//
 	// 2013.12.05. s_DYNAMIC_CREATE 변수의 위치를 CDYNAMIC_CREATE의 멤버변수로 두었다가 BaseClass 의 멤버로 옮김. DLL 로 만들 때, CLASS 내부의 static 변수는 Export 되지 않음.
-	// 2018.12.    static 함수내부의 static 변수로 옮김. class 내의 static 변수로 있으면.... multiple instatiation 발생. (또는 multiple initialization). inline static 도 동일한 현상 발생.
+	// 2018.12.    static 함수내부의 static 변수로 옮김. class 내의 static 변수로 있으면.... multiple instatiation 발생. (또는 multiple initialization). static inline 도 동일한 현상 발생.
 	//             static 변수의 초기화 순서도 문제가 됨. 일단 static 함수내의 static 변수로 있으면 상관 없음..... 그래서 구현이 복잡해짐.
 	// 2019.11.20. MACRO -> CRTP
 	// 2021.01.19. renewal. CRTP -> MACRO + nested class
