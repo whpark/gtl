@@ -227,6 +227,87 @@ namespace gtl {
 		return img;
 	}
 
+#pragma pack(push, 1)
+	struct BMP_FILE_HEADER {
+		char sign[2]{ 'B', 'M' };
+		uint32_t sizeFile{};
+		uint16_t reserved1{};
+		uint16_t reserved2{};
+		uint32_t offsetData{};
+	};
+	struct BITMAP_HEADER {
+		uint32_t		size;
+		int32_t			width;
+		int32_t			height;
+		uint16_t		planes;
+		uint16_t		nBPP;
+		uint32_t		compression;
+		uint32_t		sizeImage;
+		int32_t			XPelsPerMeter;
+		int32_t			YPelsPerMeter;
+		uint32_t		nColorUsed;
+		uint32_t		nColorImportant;
+	};
+
+	using float_fix_point_2_30_t = int32_t;
+	struct cie_xyz_t {
+		float_fix_point_2_30_t x, y, z;
+	};
+	struct cie_xyz_rgb {
+		cie_xyz_t r, g, b;
+	};
+
+	struct BITMAP_V4_HEADER {
+		uint32_t		size;
+		int32_t			width;
+		int32_t			height;
+		uint16_t		planes;
+		uint16_t		nBPP;
+		uint32_t		compression;
+		uint32_t		sizeImage;
+		int32_t			XPelsPerMeter;
+		int32_t			YPelsPerMeter;
+		uint32_t		nColorUsed;
+		uint32_t		nColorImportant;
+		uint32_t		maskRed;
+		uint32_t		maskGreen;
+		uint32_t		maskBlue;
+		uint32_t		maskAlpha;
+		uint32_t		cstype;
+		cie_xyz_rgb		endpoints;
+		uint32_t		gammaRed;
+		uint32_t		gammaGreen;
+		uint32_t		gammaBlue;
+	};
+
+	struct BITMAP_V5_HEADER {
+		uint32_t		size;
+		uint32_t		width;
+		uint32_t		height;
+		uint16_t		planes;
+		uint16_t		nBPP;
+		uint32_t		compression;
+		uint32_t		sizeImage;
+		uint32_t		XPelsPerMeter;
+		uint32_t		YPelsPerMeter;
+		uint32_t		nColorUsed;
+		uint32_t		nColorImportant;
+		uint32_t		maskRed;
+		uint32_t		maskGreen;
+		uint32_t		maskBlue;
+		uint32_t		maskAlpha;
+		uint32_t		cstype;
+		cie_xyz_rgb		endpoints;
+		uint32_t		gammaRed;
+		uint32_t		gammaGreen;
+		uint32_t		gammaBlue;
+		uint32_t		intent;
+		uint32_t		profileData;
+		uint32_t		profileSize;
+		uint32_t		reserved;
+	};
+#pragma pack(pop)
+
 
 #pragma pack(pop)
 }

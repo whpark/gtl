@@ -36,7 +36,7 @@
 #include "gtl/win_util/win_util.h"
 #include "gtl/win_util/MatHelper.h"
 
-
+using namespace std::literals;
 
 
 

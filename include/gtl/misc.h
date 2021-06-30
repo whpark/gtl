@@ -471,6 +471,20 @@ namespace gtl {
 			depth++;
 		}
 		~TStopWatch() {
+			if constexpr (gtlc::is_one_of<tchar, char>) {
+				Lap("end");
+			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
+				Lap(u8"end");
+			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
+				Lap(u"end");
+			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
+				Lap(U"end");
+			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
+				Lap(L"end");
+			} else {
+				static_assert(false);
+			}
+			os.flush();
 			depth--;
 		}
 

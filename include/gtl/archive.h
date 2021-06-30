@@ -143,7 +143,6 @@ namespace gtl {
 			} else {
 				Write(&v, sizeof(v));
 			}
-			return *this;
 		}
 
 
@@ -173,28 +172,27 @@ namespace gtl {
 			if constexpr (bSWAP_BYTE_ORDER) {
 				if constexpr (gtlc::is_array<TYPE>) {
 					if constexpr (std::is_integral_v < std::remove_cvref_t<decltype(TYPE{}[0]) >> ) {
-						this->ReadInts(std::data(v), std::size(v));
+						return this->ReadInts(std::data(v), std::size(v));
 					}
 					else if constexpr (std::is_floating_point_v < std::remove_cvref_t<decltype(TYPE{}[0]) >> ) {
-						this->Read(std::data(v), sizeof(v));
+						return this->Read(std::data(v), sizeof(v));
 					}
 					else {
 						static_assert(false, "Object Type cannot be Serialized directly.");
 					}
 				}
 				else if constexpr (std::is_integral_v<TYPE>) {
-					this->ReadInts(&v, 1);
+					return this->ReadInts(&v, 1);
 				}
 				else if constexpr (std::is_floating_point_v<TYPE>) {
-					this->Read(&v, sizeof(v));
+					return this->Read(&v, sizeof(v));
 				}
 				else {
 					static_assert(false, "Object Type cannot be Serialized directly.");
 				}
 			} else {
-				Read(&v, sizeof(v));
+				return Read(&v, sizeof(v));
 			}
-			return *this;
 		}
 
 
