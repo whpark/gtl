@@ -14,6 +14,24 @@
 #include <source_location>
 #include "gtl/_config.h"
 
+namespace gtl {
+
+	// aliases (어디에 두지?...)
+	using int8  = int8_t;
+	using int16 = int16_t;
+	using int32 = int32_t;
+	using int64 = int64_t;
+	using uint8  = uint8_t;
+	using uint16 = uint16_t;
+	using uint32 = uint32_t;
+	using uint64 = uint64_t;
+
+	using uchar = unsigned char;
+	using uint = uint32_t;	// conflicts with cv::
+
+
+}
+
 #define GTL_DEPR_SEC [[deprecated("NOT Secure")]]
 
 // until c++20 source_location

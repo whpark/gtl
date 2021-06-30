@@ -203,14 +203,14 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 				}
 			}
 
-			gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
+			//gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
 			if (nIDCtl == IDC_VIEW1) {
 				gtlw::MatToDC(img, img.size(), dc, rect, palette);
-				sw.Lap("1 byte image");
+				//sw.Lap("1 byte image");
 			}
 			else if (nIDCtl == IDC_VIEW3) {
 				gtlw::MatToDC(img3, img3.size(), dc, rect);
-				sw.Lap("3 byte image");
+				//sw.Lap("3 byte image");
 			}
 			else if (nIDCtl == IDC_VIEW_BMP) {
 				if (!m_bitmap.empty()) {
@@ -223,10 +223,9 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 						img = m_bitmap;
 					}
 					gtlw::MatToDC(img, img.size(), dc, rect);
-					sw.Lap("Bitmap");
+					//sw.Lap("Bitmap");
 				}
 			}
-
 		}
 		return;
 
@@ -354,21 +353,21 @@ void CtestwinView::OnBnClickedTestSaveBMP_nBPP() {
 	if (1) {
 		std::vector<gtl::color_bgra_t> palette{(size_t)2, gtl::color_bgra_t{}};
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(L"Z:\\Downloads\\8-1bpp.bmp", mat, 1, palette);
+		gtl::SaveBitmapMat(L"D:\\Downloads\\8-1bpp.bmp", mat, 1, palette);
 		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 1);
 	}
 
 	if (1) {
 		std::vector<gtl::color_bgra_t> palette{(size_t)16, gtl::color_bgra_t{}};
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(L"Z:\\Downloads\\8-4bpp.bmp", mat, 4, palette);
+		gtl::SaveBitmapMat(L"D:\\Downloads\\8-4bpp.bmp", mat, 4, palette);
 		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 4);
 	}
 
 	if (1) {
 		std::vector<gtl::color_bgra_t> palette{(size_t)256, gtl::color_bgra_t{}};
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(L"Z:\\Downloads\\8-8bpp.bmp", mat, 8, palette);
+		gtl::SaveBitmapMat(L"D:\\Downloads\\8-8bpp.bmp", mat, 8, palette);
 		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 8);
 	}
 }
@@ -381,9 +380,17 @@ void CtestwinView::OnBnClickedTestLoadBMP() {
 
 	CWaitCursor wc;
 
-	cv::Mat img = gtl::LoadImageMat((LPCTSTR)dlg.GetPathName());
-	if (img.empty())
+	gtlw::CStopWatchA sw;
+
+	cv::Mat img;
+	img = gtl::LoadImageMat((LPCTSTR)dlg.GetPathName());
+	sw.Lap("LoadImageMat");
+	if (img.empty()) {
+		if (m_bitmap.cols* m_bitmap.rows >= 20'000*20'000)
+			m_bitmap.release();
 		img = gtl::LoadBitmapMat((LPCTSTR)dlg.GetPathName());
+		sw.Lap("LoadBitmapMat -- ");
+	}
 	if (img.empty()) {
 		MessageBox(_T("Failed"));
 		return;

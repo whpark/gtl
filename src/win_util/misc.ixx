@@ -77,11 +77,11 @@ export namespace gtl::win_util {
 	template < typename tchar, typename tresolution = std::chrono::duration<double> >
 	class TStopWatch : public gtl::TStopWatch<tchar, tresolution > {
 	public:
-		std::basic_ostream<tchar> os;
-		TDebugOutputStreamBuf<tchar> osbuf;
+		static inline TDebugOutputStreamBuf<tchar> osbuf;
+		static inline std::basic_ostream<tchar> os{&osbuf};	// !! Destruction Order ... (<- static inline)
 		using base_t = gtl::TStopWatch<tchar, tresolution>;
 
-		TStopWatch() : os(&osbuf), base_t(os) {};
+		TStopWatch() : /*os(&osbuf),*/ base_t(os) {};
 	};
 
 	using CStopWatchA = TStopWatch<char>;
