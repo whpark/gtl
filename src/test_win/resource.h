@@ -116,8 +116,9 @@
 #define IDC_TEST_LOAD_BMP               1006
 #define IDC_TEST_SAVE_BMP_nBPP          1007
 #define IDC_VIEW_BMP                    1008
-#define IDC_TEST_SAVE_BMP_24BPP2        1009
 #define IDC_TEST_SAVE_BMP_COLOR_PALETTE 1009
+#define IDC_MFCEDITBROWSE1              1010
+#define IDC_FOLDER_WORKING              1010
 
 // Next default values for new objects
 // 
@@ -125,7 +126,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        312
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1003
+#define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

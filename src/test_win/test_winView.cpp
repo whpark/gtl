@@ -66,6 +66,9 @@ void CtestwinView::OnInitialUpdate() {
 	CFormView::OnInitialUpdate();
 	ResizeParentToFit();
 
+	auto strFolder = theApp.GetProfileString(_T("misc"), _T("WokringFolder"), _T(""));
+	SetDlgItemText(IDC_FOLDER_WORKING, strFolder);
+
 }
 
 
@@ -110,21 +113,10 @@ void CtestwinView::OnContextMenu(CWnd* /* pWnd */, CPoint point) {
 // CtestwinView diagnostics
 
 #ifdef _DEBUG
-void CtestwinView::AssertValid() const {
-	CFormView::AssertValid();
-}
-
-void CtestwinView::Dump(CDumpContext& dc) const {
-	CFormView::Dump(dc);
-}
-
-CtestwinDoc* CtestwinView::GetDocument() const // non-debug version is inline
-{
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CtestwinDoc)));
-	return (CtestwinDoc*)m_pDocument;
-}
+void CtestwinView::AssertValid() const { CFormView::AssertValid(); }
+void CtestwinView::Dump(CDumpContext& dc) const { CFormView::Dump(dc); }
+CtestwinDoc* CtestwinView::GetDocument() const { ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CtestwinDoc))); return (CtestwinDoc*)m_pDocument; }
 #endif //_DEBUG
-
 
 // CtestwinView message handlers
 
@@ -266,10 +258,12 @@ void CtestwinView::OnBnClickedTestLargeBitmap() {
 	dc.Detach();
 	img.ReleaseDC();
 
-	img.Save(_T("Z:\\Downloads\\a.bmp"));
+	auto folder = GetWorkingFolder();
+
+	img.Save((folder / _T("a.bmp")).c_str());
 
 	{
-		cv::Mat mat = cv::imread("Z:\\Downloads\\a.bmp");
+		cv::Mat mat = cv::imread((folder / "\\a.bmp").string());
 		auto s =mat.size();
 	}
 
@@ -289,7 +283,8 @@ void CtestwinView::OnBnClickedTestSaveBMP_24BPP() {
 		}
 	}
 
-	gtl::SaveBitmapMat(L"Z:\\Downloads\\24.bmp", mat, 24, {});
+	auto folder = GetWorkingFolder();
+	gtl::SaveBitmapMat(folder / L"24.bmp", mat, 24, {});
 
 }
 
@@ -315,7 +310,8 @@ void CtestwinView::OnBnClickedTestSaveBMP_1BPP() {
 	std::vector<gtl::color_bgra_t> palette;
 	palette.push_back({});
 	palette.push_back(gtl::ColorBGRA(255, 255, 255, 0));
-	gtl::SaveBitmapMat(L"Z:\\Downloads\\8-1bpp.bmp", mat, 1, palette);
+	auto folder = GetWorkingFolder();
+	gtl::SaveBitmapMat(folder / "8 - 1bpp.bmp", mat, 1, palette);
 
 }
 
@@ -341,25 +337,26 @@ void CtestwinView::OnBnClickedTestSaveBMP_nBPP() {
 	}
 
 	sw.Lap("ImageCreated rows = {}, cols = {}", mat.rows, mat.cols);
+	auto folder = GetWorkingFolder();
 
 	if (1) {
 		std::vector<gtl::color_bgra_t> palette{(size_t)2, gtl::color_bgra_t{}};
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(L"D:\\Downloads\\8-1bpp.bmp", mat, 1, palette);
+		gtl::SaveBitmapMat(folder / L"8-1bpp.bmp", mat, 1, palette);
 		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 1);
 	}
 
 	if (1) {
 		std::vector<gtl::color_bgra_t> palette{(size_t)16, gtl::color_bgra_t{}};
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(L"D:\\Downloads\\8-4bpp.bmp", mat, 4, palette);
+		gtl::SaveBitmapMat(folder / L"8-4bpp.bmp", mat, 4, palette);
 		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 4);
 	}
 
 	if (1) {
 		std::vector<gtl::color_bgra_t> palette{(size_t)256, gtl::color_bgra_t{}};
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(L"D:\\Downloads\\8-8bpp.bmp", mat, 8, palette);
+		gtl::SaveBitmapMat(folder / L"8-8bpp.bmp", mat, 8, palette);
 		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 8);
 	}
 }
