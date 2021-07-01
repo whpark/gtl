@@ -835,7 +835,7 @@ namespace gtl {
 		else {
 			bFlipY = true;
 		}
-		if ((cx <= 0) or (cy <= 0) or (cx * (uint64_t)cy >= 0xffff'ff00ull))
+		if ((cx <= 0) or (cy <= 0) or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull))
 			return img;
 
 		std::vector<cv::Vec3b> palette;
