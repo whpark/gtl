@@ -43,6 +43,14 @@ public:
 
 protected:
 	cv::Mat m_bitmap;
+	std::filesystem::path GetWorkingFolder() {
+		CString strFolder;
+		GetDlgItemText(IDC_FOLDER_WORKING, strFolder);
+
+		theApp.WriteProfileString(_T("misc"), _T("WorkingFolder"), strFolder);
+
+		return (LPCTSTR)strFolder;
+	}
 
 // Generated message map functions
 protected:

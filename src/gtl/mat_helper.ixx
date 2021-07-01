@@ -380,9 +380,9 @@ export namespace gtl {
 			return false;
 
 		cv::Vec3b cr;
-		cr[0] = (uint8_t)crTransparent[0];
-		cr[1] = (uint8_t)crTransparent[1];
-		cr[2] = (uint8_t)crTransparent[2];
+		cr[0] = (uint8)crTransparent[0];
+		cr[1] = (uint8)crTransparent[1];
+		cr[2] = (uint8)crTransparent[2];
 
 		for (int y = 0; y < imgSource.rows; y++) {
 			const cv::Vec3b* ptr = imgSource.ptr<cv::Vec3b>(y);
@@ -398,7 +398,7 @@ export namespace gtl {
 
 	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {
 		cv::Mat img;
-		if (auto buf = FileToBuffer<uint8_t>(path); buf) {
+		if (auto buf = FileToBuffer<uint8>(path); buf) {
 			try {
 				img = cv::imdecode(*buf, -1);
 			}
@@ -830,16 +830,20 @@ export namespace gtl {
 
 	namespace internal {
 
-		template < bool bLoopUnrolling = true, bool bMultiThreaded = false >
-		bool MatFromBitmapFile(std::istream& f, cv::Mat& img, int nBPP, std::vector<cv::Vec3b> palette) {
-			if (img.type() != CV_8UC3)
+		template < typename telement = cv::Vec3b, bool bLoopUnrolling = true, bool bMultiThreaded = false >
+		bool MatFromBitmapFile(std::istream& f, cv::Mat& img, int nBPP, std::vector<telement> palette) {
+			//auto type = img.type();
+			//if ( (type != CV_8UC3) and (type != CV_8UC4) and (type != CV_8UC1) )
+			//	return false;
+			size_t s = img.elemSize();
+			if (sizeof(telement) != img.elemSize())
 				return false;
 
 			int width32 = (img.cols * nBPP + 31) / 32 * 4;
 			int pixel_per_byte = (8/nBPP);
-			int nColPixel = img.cols/ pixel_per_byte * pixel_per_byte;
+			int nColPixel = pixel_per_byte ? img.cols/ pixel_per_byte * pixel_per_byte : img.cols;
 
-			using Func_UnPackSingleRow = std::function<void(int y, std::vector<uint8> const& line, cv::Vec3b* ptr, std::vector<cv::Vec3b> const& palette)>;
+			using Func_UnPackSingleRow = std::function<void(int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette)>;
 			Func_UnPackSingleRow UnPackSingleRow;
 
 			if ((nBPP == 24) or (nBPP == 32)) {
@@ -848,13 +852,15 @@ export namespace gtl {
 				for (int y{}; y < img.rows; y++) {
 					if (!f.read((char*)line.data(), line.size()))
 						return false;
-					auto* ptr = img.ptr<cv::Vec3b>(y);
+					auto* ptr = img.ptr<telement>(y);
 
 					for (int x{}; x < img.cols; x++) {
 						int xc = x * nByte;
-						ptr[x][0] = line[xc + 0];
-						ptr[x][1] = line[xc + 1];
-						ptr[x][2] = line[xc + 2];
+						if constexpr (std::is_same_v<telement, cv::Vec3b>) {
+							ptr[x][0] = line[xc + 0];
+							ptr[x][1] = line[xc + 1];
+							ptr[x][2] = line[xc + 2];
+						}
 					}
 
 				}
@@ -867,7 +873,7 @@ export namespace gtl {
 				if (nBPP == 1) {
 					if (palette.size() < 2)
 						return false;
-					UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, cv::Vec3b* ptr, std::vector<cv::Vec3b> const& palette) {
+					UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette) {
 						int x{};
 						for (; x < nColPixel; x += pixel_per_byte) {
 							int col = x / pixel_per_byte;
@@ -889,7 +895,7 @@ export namespace gtl {
 				else if (nBPP == 4) {
 					if (palette.size() < 16)
 						return false;
-					UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, cv::Vec3b* ptr, std::vector<cv::Vec3b> const& palette) {
+					UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette) {
 						int x{};
 						for (; x < nColPixel; x += 2) {
 							int col = x / 2;
@@ -905,7 +911,7 @@ export namespace gtl {
 				else if (nBPP == 8) {
 					if (palette.size() < 256)
 						return false;
-					UnPackSingleRow = [img_cols = img.cols](int y, std::vector<uint8> const& line, cv::Vec3b* ptr, std::vector<cv::Vec3b> const& palette) {
+					UnPackSingleRow = [img_cols = img.cols](int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette) {
 						for (int x{}; x < img_cols; x++) {
 							ptr[x] = palette[line[x]];
 						}
@@ -921,14 +927,14 @@ export namespace gtl {
 					return false;
 
 				if (nBPP == 8) {
-					UnPackSingleRow = [img_cols = img.cols](int y, std::vector<uint8> const& line, cv::Vec3b* ptr, std::vector<cv::Vec3b> const& palette) {
+					UnPackSingleRow = [img_cols = img.cols](int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette) {
 						for (int x{}; x < img_cols; x++) {
 							ptr[x] = palette[line[x]];
 						}
 					};
 				} else {
 					uint8 mask = (0x01 << nBPP) - 1;
-					UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, mask](int y, std::vector<uint8> const& line, cv::Vec3b* ptr, std::vector<cv::Vec3b> const& palette) {
+					UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, mask](int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette) {
 						for (int x{}; x < img_cols; x++) {
 							int col = x / pixel_per_byte;
 							int shift = 8 - ((x * nBPP) % 8);
@@ -996,7 +1002,7 @@ export namespace gtl {
 							}
 						}
 
-						UnPackSingleRow(pBuf->y, pBuf->line, img.ptr<cv::Vec3b>(pBuf->y), palette);
+						UnPackSingleRow(pBuf->y, pBuf->line, img.ptr<telement>(pBuf->y), palette);
 						pBuf->y = -1;
 						pBuf->y.notify_one();
 
@@ -1023,7 +1029,7 @@ export namespace gtl {
 				for (int y{}; y < img.rows; y++) {
 					if (!f.read((char*)line.data(), line.size()))
 						return false;
-					auto* ptr = img.ptr<cv::Vec3b>(y);
+					auto* ptr = img.ptr<telement>(y);
 
 					UnPackSingleRow(y, line, ptr, palette);
 				}
@@ -1034,13 +1040,13 @@ export namespace gtl {
 
 	}	// namespace internal
 
-		/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
-		/// @param path 
-		/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
-		/// @param nBPP 
-		/// @param palette 
-		/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
-		/// @return 
+	/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
+	/// @param path 
+	/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
+	/// @param nBPP 
+	/// @param palette 
+	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
+	/// @return 
 	cv::Mat LoadBitmapMat(std::filesystem::path const& path) {
 		cv::Mat img;
 
@@ -1057,14 +1063,14 @@ export namespace gtl {
 		if (!f.read((char*)&sizeHeader, sizeof(sizeHeader)))
 			return img;
 		switch (sizeHeader) {
-			case sizeof(BITMAP_HEADER) :
-				case sizeof(BITMAP_V4_HEADER) :
-				case sizeof(BITMAP_V5_HEADER) :
-				header.size = sizeHeader;
-				f.read(((char*)&header) + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
-				break;
-				default:
-					return img;
+		case sizeof(BITMAP_HEADER) :
+		case sizeof(BITMAP_V4_HEADER) :
+		case sizeof(BITMAP_V5_HEADER) :
+			header.size = sizeHeader;
+			f.read(((char*)&header) + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
+			break;
+		default:
+			return img;
 		}
 
 		if (header.compression or (header.planes != 1))
@@ -1079,7 +1085,7 @@ export namespace gtl {
 		else {
 			bFlipY = true;
 		}
-		if ((cx <= 0) or (cy <= 0) or (cx * (uint64_t)cy >= 0xffff'ff00ull))
+		if ((cx <= 0) or (cy <= 0) or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull))
 			return img;
 
 		std::vector<cv::Vec3b> palette;
@@ -1095,11 +1101,33 @@ export namespace gtl {
 		if (!f.seekg(fh.offsetData))
 			return img;
 
-		img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC3);
+		bool bGrayScale {};
+		if (header.nBPP <= 8) {
+			bGrayScale = true;
+			for (auto const& v : palette) {
+				if ((v[0] != v[1]) and (v[1] != v[2])) {
+					bGrayScale = false;
+					break;
+				}
+			}
+		}
+
+		img = cv::Mat::zeros(cv::Size(cx, cy), bGrayScale ? CV_8UC1 : CV_8UC3);
 		constexpr bool bLoopUnrolling = true;
 		constexpr bool bMultiThreaded = true;
-		if (!gtl::internal::MatFromBitmapFile<bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, palette)) {
-			img.release();
+		if (bGrayScale) {
+			std::vector<uint8> paletteG(palette.size(), 0);
+			for (size_t i{}; i < palette.size(); i++)
+				paletteG[i] = palette[i][0];
+
+			if (!gtl::internal::MatFromBitmapFile<uint8, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, paletteG)) {
+				img.release();
+			}
+		}
+		else {
+			if (!gtl::internal::MatFromBitmapFile<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, palette)) {
+				img.release();
+			}
 		}
 		if (bFlipY) {
 			cv::flip(img, img, 0);

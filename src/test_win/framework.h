@@ -29,7 +29,7 @@
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
 
-
+#include "gtl/gtl.h"
 #include "opencv2/opencv.hpp"
 
 
