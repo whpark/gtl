@@ -11,6 +11,8 @@ export import :TMDialog;
 export import :ListCtrlEd;
 export import :MatHelper;
 export import :SerialPort;
+export import :ProgressDlg;
+
 
 export namespace gtl::win_util {
 
