@@ -52,6 +52,9 @@ namespace gtl::internal {
 
 export namespace gtl {
 
+	//! @brief call back function for progress dialog or something like...
+	using callback_progress_t = std::function<bool (int iPercent, bool bDone, bool bError)>;
+
 	////-------------------------------------------------------------------------
 	//// countof
 	//template < typename T, size_t n > constexpr auto countof(const T (&arr)[n]) { return n; }

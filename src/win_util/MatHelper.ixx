@@ -11,10 +11,14 @@
 module;
 
 #include <span>
+#include <filesystem>
 #include "opencv2/opencv.hpp"
 #include "framework.h"
 
+#include <afxstat_.h>
+
 export module gtlw:MatHelper;
+import :ProgressDlg;
 import gtl;
 
 export namespace gtl::win_util {
@@ -123,7 +127,7 @@ export namespace gtl::win_util {
 					pBMP->bPaletteInitialized = true;
 					auto n = std::size(pBMP->dummy)+1;
 					for (size_t i {}; i < n; i++) {
-						(gtl::color_bgra_t&)pBMP->bmpInfo.bmiColors[i] = ColorBGRA(i, i, i);
+						(gtl::color_bgra_t&)pBMP->bmpInfo.bmiColors[i] = ColorBGRA((uint8_t)i, (uint8_t)i, (uint8_t)i);
 					}
 				}
 
@@ -195,5 +199,43 @@ export namespace gtl::win_util {
 		return dc.AlphaBlend(rectDst.left, rectDst.top, rectDst.Width(), rectDst.Height(), &dcMem, rectSrc.left, rectSrc.top, rectSrc.Width(), rectSrc.Height(), blend) != FALSE;
 	}
 
+	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false) {
+		//AFX_MANAGE_STATE(AfxGetStaticModuleState());
+		CProgressDlg dlgProgress;
+		dlgProgress.m_strMessage.Format(_T("Saving : %s"), path.wstring().c_str());
 
-}
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, palette, false, dlgProgress.m_calback);
+
+		auto r = dlgProgress.DoModal();
+
+		dlgProgress.m_rThreadWorker->join();
+
+		bool bResult = (r == IDOK);
+		if (!bResult)
+			std::filesystem::remove(path);
+
+		return bResult;
+	};
+
+	cv::Mat LoadBitmapMatProgress(std::filesystem::path const& path) {
+		//AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		cv::Mat img;
+		CProgressDlg dlgProgress;
+		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
+
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &dlgProgress]() { img = gtl::LoadBitmapMat(path, dlgProgress.m_calback); });
+		auto r = dlgProgress.DoModal();
+		dlgProgress.m_rThreadWorker->join();
+
+		bool bResult = (r == IDOK);
+		if (!bResult)
+			img.release();
+
+		return img;
+	}
+
+	//=============================================================================
+	//
+
+}	// namespace gtl::win_util

@@ -34,7 +34,7 @@ export namespace gtl {
 	/// @param radix 
 	/// @return number
 	template < typename tvalue, typename tchar > requires gtlc::arithmetic<tvalue> and gtlc::string_elem<tchar>
-	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
+	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 
 	/// <summary>
@@ -98,11 +98,11 @@ export namespace gtl {
 	/// @param radix 
 	/// @return number
 	template < typename tvalue, typename tchar > requires gtlc::arithmetic<tvalue> and gtlc::string_elem<tchar>
-	tvalue tszto(const tchar* psz, tchar const* pszEnd, tchar** pszStopped, int radix, tchar cSplitter) {
+	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped, int radix, tchar cSplitter) {
 		if constexpr (std::is_integral_v<tvalue>) {
-			return tsztoi<tvalue>(psz, pszEnd, pszStopped, radix, cSplitter);
+			return tsztoi<tvalue>(std::basic_string_view<tchar>{psz, pszEnd}, ppszStopped, radix, cSplitter);
 		} else {
-			return tsztod<tvalue>(psz, pszEnd, pszStopped, cSplitter);
+			return tsztod<tvalue>(std::basic_string_view<tchar>{psz, pszEnd}, ppszStopped, cSplitter);
 		}
 	}
 

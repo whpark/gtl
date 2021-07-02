@@ -29,6 +29,7 @@ module;
 
 export module gtl:coord;
 import :concepts;
+import :string_to_arithmetic;
 export import :coord_point;
 export import :coord_size;
 export import :coord_rect;
@@ -92,7 +93,6 @@ export namespace gtl {
 	Archive& SerializeCoord(Archive& ar, T_COORD& coord) {
 		return ar.IsStoring() ? Coord2Archive<Archive, T_COORD>(coord, ar) : Archive2Coord<Archive, T_COORD>(ar, coord);
 	}
-
 
 	//-------------------------------------------------------------------------
 	// to Text, From Text

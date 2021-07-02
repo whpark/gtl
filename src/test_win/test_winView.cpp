@@ -17,10 +17,6 @@
 
 #include <chrono>
 
-import gtl;
-import gtlw;
-import gtls;
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -41,9 +37,11 @@ BEGIN_MESSAGE_MAP(CtestwinView, CFormView)
 	ON_WM_SIZE()
 	ON_WM_DRAWITEM()
 	ON_BN_CLICKED(IDC_TEST_MAT_TIME, &CtestwinView::OnBnClickedTestMatTime)
-	ON_BN_CLICKED(IDC_TEST_LARGE_BITMAP, &CtestwinView::OnBnClickedTestLargeBitmap)
-	ON_BN_CLICKED(IDC_TEST_SAVE_BMP_24BPP, &CtestwinView::OnBnClickedTestSaveBMP_24BPP)
+	ON_BN_CLICKED(IDC_TEST_SAVE_CIMAGE, &CtestwinView::OnBnClickedTestSaveCImage)
 	ON_BN_CLICKED(IDC_TEST_SAVE_BMP_1BPP, &CtestwinView::OnBnClickedTestSaveBMP_1BPP)
+	ON_BN_CLICKED(IDC_TEST_SAVE_BMP_4BPP, &CtestwinView::OnBnClickedTestSaveBMP_4BPP)
+	ON_BN_CLICKED(IDC_TEST_SAVE_BMP_8BPP, &CtestwinView::OnBnClickedTestSaveBMP_8BPP)
+	ON_BN_CLICKED(IDC_TEST_SAVE_BMP_24BPP, &CtestwinView::OnBnClickedTestSaveBMP_24BPP)
 	ON_BN_CLICKED(IDC_TEST_SAVE_BMP_nBPP, &CtestwinView::OnBnClickedTestSaveBMP_nBPP)
 	ON_BN_CLICKED(IDC_TEST_LOAD_BMP, &CtestwinView::OnBnClickedTestLoadBMP)
 END_MESSAGE_MAP()
@@ -74,9 +72,11 @@ void CtestwinView::OnInitialUpdate() {
 	CFormView::OnInitialUpdate();
 	ResizeParentToFit();
 
-	auto strFolder = theApp.GetProfileString(_T("misc"), _T("WokringFolder"), _T(""));
+	auto strFolder = theApp.GetProfileString(_T("misc"), _T("WorkingFolder"), _T("\\Temp\\"));
 	SetDlgItemText(IDC_FOLDER_WORKING, strFolder);
 
+	auto strMatSize = theApp.GetProfileString(_T("misc"), _T("MatSize"), _T("20000,20000"));
+	SetDlgItemText(IDC_MAT_SIZE, strMatSize);
 }
 
 
@@ -228,27 +228,37 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 
 
 void CtestwinView::OnBnClickedTestMatTime() {
+	auto size = GetMatSize();
+	if (size.width < 1'000) size.width = 1'000;
+	if (size.height < 1'000) size.height = 1'000;
+
 	cv::Mat img3;
-	img3 = cv::Mat::zeros(1256, 1256, CV_8UC1);
+	img3 = cv::Mat::zeros(size, CV_8UC1);
 	for (int row{}; row < img3.rows; row++) {
 		img3.row(row) = row%256;
 	}
 
-	gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
+	gtlw::CStopWatchA sw;
 	cv::cvtColor(img3, img3, cv::COLOR_GRAY2BGR);
 	sw.Lap("1256x1256 1ch -> 3ch");
 }
 
-void CtestwinView::OnBnClickedTestLargeBitmap() {
+void CtestwinView::OnBnClickedTestSaveCImage() {
 	CWaitCursor wc;
 
 	CImage img;
-	if (!img.Create(20'000, 20'000, 1))
+	auto size = GetMatSize();
+	if (size.width < 1'000) size.width = 1'000;
+	if (size.height < 1'000) size.height = 1'000;
+
+	if (!img.Create(size.width, size.height, 1))
 		return ;
 	std::vector<RGBQUAD> palette;
 	palette.assign(2, {});
 	palette.back() = (RGBQUAD&)gtl::ColorBGRA(255, 255, 255, 0);
 	img.SetColorTable(0, (UINT)std::size(palette), palette.data());
+
+	gtlw::CStopWatchA sw;
 
 	CDC dc;
 	dc.Attach(img.GetDC());
@@ -262,28 +272,97 @@ void CtestwinView::OnBnClickedTestLargeBitmap() {
 			mat.row(row) = v;
 		}
 	}
+	sw.Lap("Prepare");
 	gtlw::MatToDC(mat, mat.size(), dc, CRect(0, 0, mat.cols, mat.rows));
+	sw.Lap("MatToDC");
 	dc.Detach();
 	img.ReleaseDC();
 
 	auto folder = GetWorkingFolder();
 
 	img.Save((folder / _T("a.bmp")).c_str());
+	sw.Lap("Save as a.bmp. {}x{} 1 bpp", img.GetWidth(), img.GetHeight());
 
 	{
 		cv::Mat mat = cv::imread((folder / "\\a.bmp").string());
-		auto s =mat.size();
+		auto s = mat.size();
+		sw.Lap("imread {}x{}", mat.cols, mat.rows);
 	}
-
 }
 
-void CtestwinView::OnBnClickedTestSaveBMP_24BPP() {
+cv::Mat CtestwinView::CreateSampleImage(cv::Size size) {
+	static cv::Mat mat;
+	if (mat.size() == size)
+		return mat;
 
+	gtlw::CStopWatchA sw;
+	mat = cv::Mat::zeros(size, CV_8UC1);
+	for (int row{}; row < mat.rows; row++) {
+		auto v = ((row / 1'000) % 2) ? 0 : 255;
+
+		auto r = mat.row(row);
+		r = v;//cv::Scalar(0, 0, v);
+		r.col(0) = 255;
+		r.col(1) = 0;
+		r.col(r.cols - 2) = 0;
+		r.col(r.cols - 1) = 255;
+
+		cv::Rect rect(row % r.cols/*¡íc¨ù¡¾*/, 0, mat.cols / 5, 1);
+		rect = gtl::GetSafeROI(rect, r.size());
+		if (!rect.empty())
+			r(rect) = ~r(rect);
+	}
+	sw.Lap("ImageCreated rows = {}, cols = {}", mat.rows, mat.cols);
+	return mat;
+}
+
+bool CtestwinView::WriteSampleImage(std::filesystem::path const& folder, cv::Mat const& mat, int nBPP) {
+	gtlw::CStopWatchA sw;
+
+	std::vector<gtl::color_bgra_t> palette{ (nBPP <= 8) ? (size_t)(0x01 << nBPP) : (size_t)0, gtl::color_bgra_t{} };
+	if (!palette.empty())
+		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
+
+	auto path = folder / std::format(L"{}x{}-{}bpp.bmp", mat.cols, mat.rows, nBPP);
+	bool bResult = gtlw::SaveBitmapMatProgress(path, mat, nBPP, palette, false);
+
+	sw.Lap("{}rows = {}, cols = {} {}bpp", bResult ? "" : "FAILED ", mat.rows, mat.cols, nBPP);
+
+	return bResult;
+};
+
+
+void CtestwinView::TestSaveBMP(int nBPP) {
 	CWaitCursor wc;
 
+	auto size = GetMatSize();
+	if (size.width < 1'000) size.width = 1'000;
+	if (size.height < 1'000) size.height = 1'000;
+
+	gtlw::CStopWatchA sw;
+
+	cv::Mat mat = CreateSampleImage(size);
+
+	auto folder = GetWorkingFolder();
+
+	if (!WriteSampleImage(folder, mat, nBPP)) {
+		return;
+	}
+}
+
+void CtestwinView::OnBnClickedTestSaveBMP_1BPP()  { TestSaveBMP( 1);}
+void CtestwinView::OnBnClickedTestSaveBMP_4BPP()  { TestSaveBMP( 4);}
+void CtestwinView::OnBnClickedTestSaveBMP_8BPP()  { TestSaveBMP( 8);}
+void CtestwinView::OnBnClickedTestSaveBMP_24BPP() {
+	CWaitCursor wc;
+
+	auto size = GetMatSize();
+	if (size.width < 1'000) size.width = 1'000;
+	if (size.height < 1'000) size.height = 1'000;
+
 	static cv::Mat mat;
-	if (mat.empty()) {
-		mat = cv::Mat::zeros(30'000, 30'000, CV_8UC3);
+	if (mat.empty() or mat.size() != size) {
+		mat = cv::Mat::zeros(size, CV_8UC3);
 		for (int row{}; row < mat.rows; row++) {
 			auto v = ((row / 1'000) % 2) ? 0 : 255;
 
@@ -292,100 +371,43 @@ void CtestwinView::OnBnClickedTestSaveBMP_24BPP() {
 	}
 
 	auto folder = GetWorkingFolder();
-	gtl::SaveBitmapMat(folder / L"24.bmp", mat, 24, {});
-
-}
-
-void CtestwinView::OnBnClickedTestSaveBMP_1BPP() {
-
-	CWaitCursor wc;
-
-	static cv::Mat mat;
-	if (mat.empty()) {
-		mat = cv::Mat::zeros(30'000, 40'000, CV_8UC1);
-		for (int row{}; row < mat.rows; row++) {
-			auto v = ((row / 1'000) % 2) ? 0 : 255;
-
-			auto r = mat.row(row);
-			r = v;//cv::Scalar(0, 0, v);
-			r.col(0) = 255;
-			r.col(1) = 0;
-			r.col(r.cols - 2) = 0;
-			r.col(r.cols - 1) = 255;
-		}
-	}
-
-	std::vector<gtl::color_bgra_t> palette;
-	palette.push_back({});
-	palette.push_back(gtl::ColorBGRA(255, 255, 255, 0));
-	auto folder = GetWorkingFolder();
-	gtl::SaveBitmapMat(folder / "8 - 1bpp.bmp", mat, 1, palette);
+	auto path = folder / std::format(L"{}x{}-24bpp.bmp", mat.cols, mat.rows);
+	gtlw::SaveBitmapMatProgress(path, mat, 24, {});
 
 }
 
 void CtestwinView::OnBnClickedTestSaveBMP_nBPP() {
-
-	CWaitCursor wc;
-
-	gtlw::CStopWatchA sw;
-
-	static cv::Mat mat;
-	if (mat.empty()) {
-		mat = cv::Mat::zeros(60'000, 60'000, CV_8UC1);
-		for (int row{}; row < mat.rows; row++) {
-			auto v = ((row / 1'000) % 2) ? 0 : 255;
-
-			auto r = mat.row(row);
-			r = v;//cv::Scalar(0, 0, v);
-			r.col(0) = 255;
-			r.col(1) = 0;
-			r.col(r.cols-2) = 0;
-			r.col(r.cols-1) = 255;
-		}
-	}
-
-	sw.Lap("ImageCreated rows = {}, cols = {}", mat.rows, mat.cols);
-	auto folder = GetWorkingFolder();
-
-	if (1) {
-		std::vector<gtl::color_bgra_t> palette{(size_t)2, gtl::color_bgra_t{}};
-		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(folder / L"8-1bpp.bmp", mat, 1, palette);
-		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 1);
-	}
-
-	if (1) {
-		std::vector<gtl::color_bgra_t> palette{(size_t)16, gtl::color_bgra_t{}};
-		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(folder / L"8-4bpp.bmp", mat, 4, palette);
-		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 4);
-	}
-
-	if (1) {
-		std::vector<gtl::color_bgra_t> palette{(size_t)256, gtl::color_bgra_t{}};
-		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
-		gtl::SaveBitmapMat(folder / L"8-8bpp.bmp", mat, 8, palette);
-		sw.Lap("rows = {}, cols = {} {}bpp", mat.rows, mat.cols, 8);
-	}
+	TestSaveBMP(1);
+	TestSaveBMP(4);
+	TestSaveBMP(8);
 }
 
 
 void CtestwinView::OnBnClickedTestLoadBMP() {
+	gtlw::CProgressDlg dlgP(this);
+	//dlgP.Create(_T("GTL_WINUTIL_DLG_PROGRESS"), this);
+	if (dlgP) {
+		dlgP.ShowWindow(SW_SHOW);
+	}
+
 	CFileDialog dlg(true, _T(".bmp"), nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR, _T("All Files(*.*)|*.*||"), this);
 	if (dlg.DoModal() != IDOK)
 		return;
+	std::filesystem::path path = (LPCTSTR)dlg.GetPathName();
 
 	CWaitCursor wc;
 
 	gtlw::CStopWatchA sw;
 
 	cv::Mat img;
-	img = gtl::LoadImageMat((LPCTSTR)dlg.GetPathName());
-	sw.Lap("LoadImageMat");
+	//img = gtl::LoadImageMat(path);
+	//sw.Lap("LoadImageMat");
 	if (img.empty()) {
 		if (m_bitmap.cols* m_bitmap.rows >= 20'000*20'000)
 			m_bitmap.release();
-		img = gtl::LoadBitmapMat((LPCTSTR)dlg.GetPathName());
+		
+		img = gtlw::LoadBitmapMatProgress(path);
+
 		sw.Lap("LoadBitmapMat -- ");
 	}
 	if (img.empty()) {
