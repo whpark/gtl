@@ -1,0 +1,51 @@
+#pragma once
+
+// CProgressDlg dialog
+
+#include "gtl/win_util/_lib_gtl_win_util.h"
+#include <chrono>
+
+namespace gtl::win_util {
+#pragma pack(push, 8)
+
+	class GTL_WINUTIL_CLASS CProgressDlg : public CDialogEx {
+		DECLARE_DYNAMIC(CProgressDlg)
+	public:
+		using base_t = CDialogEx;
+		static inline std::wstring const strIDD {L"GTL_WINUTIL_DLG_PROGRESS"};
+
+	public:
+		CProgressDlg(CWnd* pParent = nullptr);   // standard constructor
+		virtual ~CProgressDlg();
+
+	// Dialog Data
+	//#ifdef AFX_DESIGN_TIME
+	//	enum { IDD = IDD_PROGRESS };
+	//#endif
+	public:
+		std::chrono::system_clock::time_point m_tStart;
+		gtl::callback_progress_t m_calback;
+		::CString m_strMessage;
+		int m_iPercent{};
+		bool m_bCancel{};
+		bool m_bDone{};
+
+		std::unique_ptr<std::jthread> m_rThreadWorker;
+
+	protected:
+		CProgressCtrl m_progress;
+		virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+		virtual BOOL OnInitDialog();
+
+		DECLARE_MESSAGE_MAP()
+	public:
+		enum eTIMER { T_UPDATE_UI = 1064, };
+		afx_msg void OnTimer(UINT_PTR nIDEvent);
+		virtual void OnOK();
+		virtual void OnCancel();
+		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	};
+
+
+#pragma pack(pop)
+}	// namespace gtl::win_util
