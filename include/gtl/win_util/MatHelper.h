@@ -22,5 +22,8 @@ namespace gtl::win_util {
 	GTL_WINUTIL_API bool MatToDCTransparent (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, COLORREF crTransparent);
 	GTL_WINUTIL_API bool MatToDCAlphaBlend  (cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, BLENDFUNCTION blend);
 
+	GTL_WINUTIL_API bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false);
+	GTL_WINUTIL_API cv::Mat LoadBitmapMatProgress(std::filesystem::path const& path);
+
 #pragma pack(pop)
 }

@@ -245,7 +245,7 @@ namespace gtl {
 	namespace internal {
 
 		template < bool bPixelIndex, typename telement = uint8, bool bLoopUnrolling = true, bool bMultiThreaded = true >
-		bool MatToBitmapFile(std::ostream& f, cv::Mat const& img, int nBPP, std::vector<telement> const& pal, std::function<bool(int percent)> funcCallback) {
+		bool MatToBitmapFile(std::ostream& f, cv::Mat const& img, int nBPP, std::vector<telement> const& pal, callback_progress_t funcCallback) {
 
 			int width32 = (img.cols * nBPP + 31) / 32 * 4;
 			int pixel_per_byte = (8/nBPP);
@@ -434,9 +434,9 @@ namespace gtl {
 					} while(!stop.stop_requested());
 				};
 
-				auto Writer = [&f, &buffers, rows = img.rows, &yWritten, &bWritten](std::stop_token stop_token) {
+				auto Writer = [&f, &buffers, img_rows = img.rows, &yWritten, &bWritten, &funcCallback](std::stop_token stop_token) {
 					int iPercent{};
-					while (yWritten < rows /*and !stop_token.stop_requested()*/) {
+					while (yWritten < img_rows /*and !stop_token.stop_requested()*/) {
 						auto index = yWritten % buffers.size();
 						auto& buf = buffers[index];
 
@@ -457,10 +457,10 @@ namespace gtl {
 						yWritten.notify_one();
 					
 						if (funcCallback) {
-							int iPercentNew = yWritten * 100 / img.rows;
+							int iPercentNew = yWritten * 100 / img_rows;
 							if (iPercent != iPercentNew) {
 								iPercent = iPercentNew;
-								if (!funcCallback(iPercent))
+								if (!funcCallback(iPercent, false, false))
 									return;
 							}
 						}
@@ -479,7 +479,7 @@ namespace gtl {
 				threads.front().join();
 				if (!bWritten) {
 					for (auto& thread : threads)
-						thread.get_stop_source().request_stop();
+						thread.request_stop();
 				}
 				threads.clear();
 				return bWritten;
@@ -496,7 +496,7 @@ namespace gtl {
 						int iPercentNew = y * 100 / img.rows;
 						if (iPercent != iPercentNew) {
 							iPercent = iPercentNew;
-							if (!funcCallback(iPercent))
+							if (!funcCallback(iPercent, false, false))
 								return false;
 						}
 					}
@@ -508,8 +508,13 @@ namespace gtl {
 	}	// namespace internal
 
 
-	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bPixelIndex, std::function<bool(int percent)> funcCallback) {
+	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bPixelIndex, callback_progress_t funcCallback) {
 		// todo : CV_8UC3 with palette.
+
+		bool bOK{};
+
+		// Trigger notifying it's over.
+		CTrigger trigger([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, bOK);});
 
 		if (img.empty())
 			return false;
@@ -564,6 +569,7 @@ namespace gtl {
 			//constexpr bool bMultiThreaded = true;
 			//return MatToBitmapFile<true, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, {});
 
+			bOK = true;
 			return true;
 		}
 		else if (type == CV_8UC1) {
@@ -599,9 +605,10 @@ namespace gtl {
 			}
 
 			if (bPixelIndex)
-				return gtl::internal::MatToBitmapFile<true, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
+				bOK = gtl::internal::MatToBitmapFile<true, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
 			else
-				return gtl::internal::MatToBitmapFile<false, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
+				bOK = gtl::internal::MatToBitmapFile<false, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
+			return bOK;
 		}
 
 		return false;
@@ -610,7 +617,7 @@ namespace gtl {
 	namespace internal {
 
 		template < typename telement = cv::Vec3b, bool bLoopUnrolling = true, bool bMultiThreaded = false >
-		bool MatFromBitmapFile(std::istream& f, cv::Mat& img, int nBPP, std::vector<telement> palette, std::function<bool(int percent)> funcCallback) {
+		bool MatFromBitmapFile(std::istream& f, cv::Mat& img, int nBPP, std::vector<telement> palette, callback_progress_t funcCallback) {
 			//auto type = img.type();
 			//if ( (type != CV_8UC3) and (type != CV_8UC4) and (type != CV_8UC1) )
 			//	return false;
@@ -646,7 +653,7 @@ namespace gtl {
 						int iPercentNew = y*100/img.rows;
 						if (iPercent != iPercentNew) {
 							iPercent = iPercentNew;
-							if (!funcCallback(iPercent))
+							if (!funcCallback(iPercent, false, false))
 								return false;
 						}
 					}
@@ -772,10 +779,10 @@ namespace gtl {
 						cv.notify_one();
 
 						if (funcCallback) {
-							int iPercentNew = y * 100 / img.rows;
+							int iPercentNew = y * 100 / img_rows;
 							if (iPercent != iPercentNew) {
 								iPercent = iPercentNew;
-								if (!funcCallback(iPercent)) {
+								if (!funcCallback(iPercent, false, false)) {
 									bError = true;
 									break;
 								}
@@ -836,7 +843,7 @@ namespace gtl {
 						int iPercentNew = y * 100 / img.rows;
 						if (iPercent != iPercentNew) {
 							iPercent = iPercentNew;
-							if (!funcCallback(iPercent))
+							if (!funcCallback(iPercent, false, false))
 								return false;
 						}
 					}
@@ -855,7 +862,13 @@ namespace gtl {
 	/// @param palette 
 	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
 	/// @return 
-	cv::Mat LoadBitmapMat(std::filesystem::path const& path, std::function<bool(int percent)> funcCallback) {
+	cv::Mat LoadBitmapMat(std::filesystem::path const& path, callback_progress_t funcCallback) {
+		bool bOK{};
+
+		// Trigger notifying it's over.
+		CTrigger trigger([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, bOK); });
+
+
 		cv::Mat img;
 
 		std::ifstream f(path, std::ios_base::binary);
@@ -926,16 +939,15 @@ namespace gtl {
 			for (size_t i{}; i < palette.size(); i++)
 				paletteG[i] = palette[i][0];
 
-			if (!gtl::internal::MatFromBitmapFile<uint8, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, paletteG, funcCallback)) {
-				img.release();
-			}
+			bOK = gtl::internal::MatFromBitmapFile<uint8, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, paletteG, funcCallback);
 		}
 		else {
-			if (!gtl::internal::MatFromBitmapFile<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, palette, funcCallback)) {
-				img.release();
-			}
+			bOK = gtl::internal::MatFromBitmapFile<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, palette, funcCallback);
 		}
-		if (bFlipY) {
+		if (!bOK)
+			img.release();
+
+		if (!img.empty() and bFlipY) {
 			cv::flip(img, img, 0);
 		}
 

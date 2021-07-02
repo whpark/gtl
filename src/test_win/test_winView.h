@@ -48,8 +48,20 @@ protected:
 		GetDlgItemText(IDC_FOLDER_WORKING, strFolder);
 
 		theApp.WriteProfileString(_T("misc"), _T("WorkingFolder"), strFolder);
+		std::filesystem::create_directories((LPCTSTR)strFolder);
 
 		return (LPCTSTR)strFolder;
+	}
+
+	cv::Size GetMatSize() {
+		CString strMatSize;
+		GetDlgItemText(IDC_MAT_SIZE, strMatSize);
+
+		theApp.WriteProfileString(_T("misc"), _T("MatSize"), strMatSize);
+
+		auto size = gtl::FromString<gtl::CSize2i>(std::wstring_view((LPCTSTR)strMatSize, strMatSize.GetLength()));
+
+		return (cv::Size)size;
 	}
 
 // Generated message map functions
@@ -63,9 +75,14 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnBnClickedTestMatTime();
-	afx_msg void OnBnClickedTestLargeBitmap();
-	afx_msg void OnBnClickedTestSaveBMP_24BPP();
+	afx_msg void OnBnClickedTestSaveCImage();
+	static cv::Mat CreateSampleImage(cv::Size size);
+	static bool WriteSampleImage(std::filesystem::path const& folder, cv::Mat const& mat, int nBPP);
+	void TestSaveBMP(int nBPP);
 	afx_msg void OnBnClickedTestSaveBMP_1BPP();
+	afx_msg void OnBnClickedTestSaveBMP_4BPP();
+	afx_msg void OnBnClickedTestSaveBMP_8BPP();
+	afx_msg void OnBnClickedTestSaveBMP_24BPP();
 	afx_msg void OnBnClickedTestSaveBMP_nBPP();
 	afx_msg void OnBnClickedTestLoadBMP();
 };

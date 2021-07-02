@@ -2,6 +2,7 @@
 
 #include "gtl/mat_helper.h"
 #include "gtl/win_util/MatHelper.h"
+#include "gtl/win_util/ProgressDlg.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/stopwatch.h"
 
@@ -136,6 +137,38 @@ namespace gtl::win_util {
 		return dc.AlphaBlend(rectDst.left, rectDst.top, rectDst.Width(), rectDst.Height(), &dcMem, rectSrc.left, rectSrc.top, rectSrc.Width(), rectSrc.Height(), blend) != FALSE;
 	}
 
+	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bPixelIndex) {
+		CProgressDlg dlgProgress;
+		dlgProgress.m_strMessage.Format(_T("Saving : %s"), path.wstring().c_str());
+
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, palette, false, dlgProgress.m_calback);
+
+		auto r = dlgProgress.DoModal();
+
+		dlgProgress.m_rThreadWorker->join();
+
+		bool bResult = (r == IDOK);
+		if (!bResult)
+			std::filesystem::remove(path);
+
+		return bResult;
+	};
+
+	cv::Mat LoadBitmapMatProgress(std::filesystem::path const& path) {
+		cv::Mat img;
+		gtlw::CProgressDlg dlgProgress;
+		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
+
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &dlgProgress]() { img = gtl::LoadBitmapMat(path, dlgProgress.m_calback); });
+		auto r = dlgProgress.DoModal();
+		dlgProgress.m_rThreadWorker->join();
+
+		bool bResult = (r == IDOK);
+		if (!bResult)
+			img.release();
+
+		return img;
+	}
 
 	//=============================================================================
 	//
