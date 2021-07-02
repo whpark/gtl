@@ -188,7 +188,7 @@ namespace gtl {
 	/// @param radix 
 	/// @return number
 	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
-	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** pszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
+	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 
 	/// <summary>

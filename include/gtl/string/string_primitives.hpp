@@ -695,11 +695,11 @@ namespace gtl {
 	/// @param radix 
 	/// @return number
 	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
-	tvalue tszto(tchar const* psz, tchar const* const pszEnd, tchar const** pszStopped, int radix, tchar cSplitter) {
+	tvalue tszto(tchar const* psz, tchar const* const pszEnd, tchar const** ppszStopped, int radix, tchar cSplitter) {
 		if constexpr (std::is_integral_v<tvalue>) {
-			return tsztoi<tvalue>(std::basic_string_view<tchar>{psz, pszEnd}, pszStopped, radix, cSplitter);
+			return tsztoi<tvalue>(std::basic_string_view<tchar>{psz, pszEnd}, ppszStopped, radix, cSplitter);
 		} else {
-			return tsztod<tvalue>(std::basic_string_view<tchar>{psz, pszEnd}, pszStopped, cSplitter);
+			return tsztod<tvalue>(std::basic_string_view<tchar>{psz, pszEnd}, ppszStopped, cSplitter);
 		}
 	}
 

@@ -4,7 +4,6 @@
 //
 #define IDC_MESSAGE                     1011
 #define IDC_PROGRESS                    1012
-#define IDC_MESSAGE2                    1013
 #define IDC_STATE                       1013
 
 // Next default values for new objects

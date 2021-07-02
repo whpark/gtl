@@ -88,7 +88,7 @@ public:
 };
 
 #ifndef _DEBUG  // debug version in test_winView.cpp
-inline CtestwinDoc* CtestwinView::GetDocument() const    {
+inline CtestwinDoc* CtestwinView::GetDocument() const {
 	return reinterpret_cast<CtestwinDoc*>(m_pDocument);
 }
 #endif
