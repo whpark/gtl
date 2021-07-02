@@ -279,13 +279,13 @@
     <None Include="res\testwin.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\gtl\gtl.vcxproj">
+    <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\src\shape\shape.vcxproj">
+    <ProjectReference Include="..\shape\shape.vcxproj">
       <Project>{fba95adb-13a2-4139-ba8e-789bfe9aa1ae}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\src\win_util\win_util.vcxproj">
+    <ProjectReference Include="..\win_util\win_util.vcxproj">
       <Project>{5f0d7bd9-e1ec-45d1-96b9-2ea611944d5e}</Project>
     </ProjectReference>
   </ItemGroup>
