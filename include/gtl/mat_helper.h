@@ -211,8 +211,8 @@ namespace gtl {
 	/// @param palette 
 	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
 	/// @return 
-	GTL_API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false);
-	GTL_API cv::Mat LoadBitmapMat(std::filesystem::path const& path);
+	GTL_API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false, std::function<bool(int percent)> funcCallback = nullptr);
+	GTL_API cv::Mat LoadBitmapMat(std::filesystem::path const& path, std::function<bool(int percent)> funcCallback = nullptr);
 
 
 	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {

@@ -12,6 +12,9 @@ namespace gtl {
 	static bool s_bGPUChecked{};
 	static bool s_bUseGPU{};
 
+	constexpr static bool const bLoopUnrolling = false;
+	constexpr static bool const bMultiThreaded = false;
+
 	bool IsGPUEnabled() {
 		return s_bUseGPU;
 	}
@@ -241,8 +244,8 @@ namespace gtl {
 
 	namespace internal {
 
-		template < bool bPixelIndex, typename telement = uint8, bool bMultiThreaded = true, bool bLoopUnrolling = true >
-		bool MatToBitmapFile(std::ostream& f, cv::Mat const& img, int nBPP, std::vector<telement> const& pal) {
+		template < bool bPixelIndex, typename telement = uint8, bool bLoopUnrolling = true, bool bMultiThreaded = true >
+		bool MatToBitmapFile(std::ostream& f, cv::Mat const& img, int nBPP, std::vector<telement> const& pal, std::function<bool(int percent)> funcCallback) {
 
 			int width32 = (img.cols * nBPP + 31) / 32 * 4;
 			int pixel_per_byte = (8/nBPP);
@@ -267,6 +270,8 @@ namespace gtl {
 							}
 						}
 						int col = x / pixel_per_byte;
+						if (col < line.size())
+							line[col] = 0;
 						for (int shift{ 8-nBPP }; x < img_cols; x++, shift--) {
 							if constexpr (bPixelIndex) {
 								line[col] |= ptr[x] << shift;
@@ -290,6 +295,8 @@ namespace gtl {
 							}
 						}
 						int col = x / pixel_per_byte;
+						if (col < line.size())
+							line[col] = 0;
 						for (int shift{ 8-nBPP }; x < img_cols; x++, shift-=nBPP) {
 							if constexpr (bPixelIndex) {
 								line[col] |= ptr[x] << shift;
@@ -324,9 +331,10 @@ namespace gtl {
 				case 1 :
 				case 4 :
 					PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
+						std::memset(line.data(), 0, line.size()*sizeof(line[0]));
 						for (int x{}; x < img_cols; x++) {
 							int col = x / pixel_per_byte;
-							int shift = 8 - ((x * nBPP) % 8);
+							int shift = 8 - (nBPP * ((x%pixel_per_byte)+1));
 							if constexpr (bPixelIndex) {
 								line[col] |= ptr[x] << shift;
 							}
@@ -412,7 +420,7 @@ namespace gtl {
 					return &buf;
 				};
 
-				auto PackBuffer = [&yCur, &img, &buffers, &PackSingleRow, &pal, &yWritten/*, &id*/, &GetBuffer]() {
+				auto PackBuffer = [&yCur, &img, &buffers, &PackSingleRow, &pal, &yWritten/*, &id*/, &GetBuffer](std::stop_token stop) {
 					do {
 						auto* pBuffer = GetBuffer();
 						if (!pBuffer)
@@ -423,10 +431,11 @@ namespace gtl {
 
 						buf.bReady = true;
 						buf.bReady.notify_one();
-					} while(true);
+					} while(!stop.stop_requested());
 				};
 
 				auto Writer = [&f, &buffers, rows = img.rows, &yWritten, &bWritten](std::stop_token stop_token) {
+					int iPercent{};
 					while (yWritten < rows /*and !stop_token.stop_requested()*/) {
 						auto index = yWritten % buffers.size();
 						auto& buf = buffers[index];
@@ -447,6 +456,14 @@ namespace gtl {
 						yWritten++;
 						yWritten.notify_one();
 					
+						if (funcCallback) {
+							int iPercentNew = yWritten * 100 / img.rows;
+							if (iPercent != iPercentNew) {
+								iPercent = iPercentNew;
+								if (!funcCallback(iPercent))
+									return;
+							}
+						}
 					};
 					f.flush();
 					bWritten = (bool)f;
@@ -460,15 +477,29 @@ namespace gtl {
 				}
 
 				threads.front().join();
+				if (!bWritten) {
+					for (auto& thread : threads)
+						thread.get_stop_source().request_stop();
+				}
 				threads.clear();
 				return bWritten;
 			}
 			else {
+				int iPercent{};
 				std::vector<uint8> line((size_t)width32, 0);
 				for (int y{}; y < img.rows; y++) {
 					auto const* ptr = img.ptr<telement>(y);
 					PackSingleRow(y, line, ptr, pal);
 					f.write((char const*)line.data(), width32);
+
+					if (funcCallback) {
+						int iPercentNew = y * 100 / img.rows;
+						if (iPercent != iPercentNew) {
+							iPercent = iPercentNew;
+							if (!funcCallback(iPercent))
+								return false;
+						}
+					}
 				}
 				return true;
 			}
@@ -477,7 +508,7 @@ namespace gtl {
 	}	// namespace internal
 
 
-	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bPixelIndex) {
+	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bPixelIndex, std::function<bool(int percent)> funcCallback) {
 		// todo : CV_8UC3 with palette.
 
 		if (img.empty())
@@ -531,7 +562,7 @@ namespace gtl {
 
 			//constexpr bool bLoopUnrolling = true;
 			//constexpr bool bMultiThreaded = true;
-			//return MatToBitmapFile<true, cv::Vec3b, bMultiThreaded, bLoopUnrolling>(f, img, nBPP, {});
+			//return MatToBitmapFile<true, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, {});
 
 			return true;
 		}
@@ -567,12 +598,10 @@ namespace gtl {
 				}
 			}
 
-			constexpr bool bLoopUnrolling = true;
-			constexpr bool bMultiThreaded = true;
 			if (bPixelIndex)
-				return gtl::internal::MatToBitmapFile<true, uint8, bMultiThreaded, bLoopUnrolling>(f, img, nBPP, pal);
+				return gtl::internal::MatToBitmapFile<true, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
 			else
-				return gtl::internal::MatToBitmapFile<false, uint8, bMultiThreaded, bLoopUnrolling>(f, img, nBPP, pal);
+				return gtl::internal::MatToBitmapFile<false, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
 		}
 
 		return false;
@@ -581,7 +610,7 @@ namespace gtl {
 	namespace internal {
 
 		template < typename telement = cv::Vec3b, bool bLoopUnrolling = true, bool bMultiThreaded = false >
-		bool MatFromBitmapFile(std::istream& f, cv::Mat& img, int nBPP, std::vector<telement> palette) {
+		bool MatFromBitmapFile(std::istream& f, cv::Mat& img, int nBPP, std::vector<telement> palette, std::function<bool(int percent)> funcCallback) {
 			//auto type = img.type();
 			//if ( (type != CV_8UC3) and (type != CV_8UC4) and (type != CV_8UC1) )
 			//	return false;
@@ -599,6 +628,7 @@ namespace gtl {
 			if ((nBPP == 24) or (nBPP == 32)) {
 				std::vector<uint8> line((size_t)width32, 0);
 				int nByte = nBPP / 8;
+				int iPercent{};
 				for (int y{}; y < img.rows; y++) {
 					if (!f.read((char*)line.data(), line.size()))
 						return false;
@@ -612,7 +642,14 @@ namespace gtl {
 							ptr[x][2] = line[xc + 2];
 						}
 					}
-
+					if (funcCallback) {
+						int iPercentNew = y*100/img.rows;
+						if (iPercent != iPercentNew) {
+							iPercent = iPercentNew;
+							if (!funcCallback(iPercent))
+								return false;
+						}
+					}
 				}
 				return true;
 			}
@@ -687,7 +724,7 @@ namespace gtl {
 					UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, mask](int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette) {
 						for (int x{}; x < img_cols; x++) {
 							int col = x / pixel_per_byte;
-							int shift = 8 - ((x * nBPP) % 8);
+							int shift = 8 - (nBPP * ((x%pixel_per_byte)+1));
 							ptr[x] = palette[(line[col] >> shift) & mask];
 						}
 					};
@@ -711,8 +748,9 @@ namespace gtl {
 				std::queue<BUFFER*> q;
 				bool bError{};
 
-				auto Reader = [&f, &buffers, img_rows = img.rows, &q, &mtxQ, &cv, &bError]() {
+				auto Reader = [&f, &buffers, img_rows = img.rows, &q, &mtxQ, &cv, &bError, &funcCallback]() {
 					int y{};
+					int iPercent{};
 					for (; y < img_rows; y++) {
 						auto index = y % buffers.size();
 						auto& buf = buffers[index];
@@ -733,6 +771,16 @@ namespace gtl {
 						}
 						cv.notify_one();
 
+						if (funcCallback) {
+							int iPercentNew = y * 100 / img.rows;
+							if (iPercent != iPercentNew) {
+								iPercent = iPercentNew;
+								if (!funcCallback(iPercent)) {
+									bError = true;
+									break;
+								}
+							}
+						}
 					}
 				};
 
@@ -776,12 +824,22 @@ namespace gtl {
 			}
 			else {
 				std::vector<uint8> line((size_t)width32, 0);
+				int iPercent{};
 				for (int y{}; y < img.rows; y++) {
 					if (!f.read((char*)line.data(), line.size()))
 						return false;
 					auto* ptr = img.ptr<telement>(y);
 
 					UnPackSingleRow(y, line, ptr, palette);
+
+					if (funcCallback) {
+						int iPercentNew = y * 100 / img.rows;
+						if (iPercent != iPercentNew) {
+							iPercent = iPercentNew;
+							if (!funcCallback(iPercent))
+								return false;
+						}
+					}
 				}
 			}
 
@@ -797,7 +855,7 @@ namespace gtl {
 	/// @param palette 
 	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
 	/// @return 
-	cv::Mat LoadBitmapMat(std::filesystem::path const& path) {
+	cv::Mat LoadBitmapMat(std::filesystem::path const& path, std::function<bool(int percent)> funcCallback) {
 		cv::Mat img;
 
 		std::ifstream f(path, std::ios_base::binary);
@@ -863,19 +921,17 @@ namespace gtl {
 		}
 
 		img = cv::Mat::zeros(cv::Size(cx, cy), bGrayScale ? CV_8UC1 : CV_8UC3);
-		constexpr bool bLoopUnrolling = true;
-		constexpr bool bMultiThreaded = true;
 		if (bGrayScale) {
 			std::vector<uint8> paletteG(palette.size(), 0);
 			for (size_t i{}; i < palette.size(); i++)
 				paletteG[i] = palette[i][0];
 
-			if (!gtl::internal::MatFromBitmapFile<uint8, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, paletteG)) {
+			if (!gtl::internal::MatFromBitmapFile<uint8, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, paletteG, funcCallback)) {
 				img.release();
 			}
 		}
 		else {
-			if (!gtl::internal::MatFromBitmapFile<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, palette)) {
+			if (!gtl::internal::MatFromBitmapFile<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, palette, funcCallback)) {
 				img.release();
 			}
 		}
