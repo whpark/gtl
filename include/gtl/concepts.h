@@ -10,6 +10,7 @@
 #pragma once
 
 #include <concepts>
+#include "_config.h"
 
 #if !defined(__cpp_lib_concepts)
 #	error ERROR! Supports C++v20 only.

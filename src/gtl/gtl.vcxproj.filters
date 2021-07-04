@@ -125,6 +125,9 @@
     <ClInclude Include="..\..\include\gtl\coord\coord_trans.h">
       <Filter>gtl\coord</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\mat_helper.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">
@@ -146,6 +149,9 @@
       <Filter>gtl.impl</Filter>
     </ClCompile>
     <ClCompile Include="log.cpp">
+      <Filter>gtl.impl</Filter>
+    </ClCompile>
+    <ClCompile Include="mat_helper.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
   </ItemGroup>

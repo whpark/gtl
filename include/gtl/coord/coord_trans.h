@@ -360,6 +360,21 @@ namespace gtl {
 
 			return std::make_unique<TCoordTransDim>(scale, mat, offset_, origin_);
 		}
+		bool GetInv(TCoordTransDim& ctI) const {
+			// Scale
+			double scale = 1/scale_;
+			if (!std::isfinite(scale))
+				return false;
+
+			// Matrix
+			bool bOK {};
+			auto mat = mat_.inv(0, &bOK);
+			if (!bOK)
+				return false;
+
+			ctI.Init(scale, mat, offset_, origin_);
+			return true;
+		}
 
 		//-------------------------------------------------------------------------
 		// Setting
@@ -586,6 +601,7 @@ namespace gtl {
 		TCoordTransDim& operator *= (TCoordTransDim const& B) {
 			// 순서 바꾸면 안됨.
 			offset_		= scale_ * mat_ * (B.offset_ - origin_) + offset_;
+
 			origin_		= B.origin_;
 			mat_		= mat_ * B.mat_;
 			scale_		= scale_ * B.scale_;
@@ -602,10 +618,10 @@ namespace gtl {
 	//template GTL_CLASS TCoordTransChain<double>;
 	//using CCoordTransChain = TCoordTransChain<double>;
 
-	template TCoordTransDim<2>;
+	//template TCoordTransDim<2>;
 	using CCoordTrans2d = TCoordTransDim<2>;
 
-	template TCoordTransDim<3>;
+	//template TCoordTransDim<3>;
 	using CCoordTrans3d = TCoordTransDim<3>;
 
 

@@ -22,7 +22,7 @@ namespace gtl::test::reflection::MACRO {
 	#if 1
 		GTL__REFLECTION_MEMBERS(str1,str2)
 	#else
-		constexpr inline static const std::tuple member_tuple_s{
+		constexpr static inline const std::tuple member_tuple_s{
 			gtl::internal::pair{ "str1"sv, &this_t::str1 },
 			gtl::internal::pair{ "str2"sv, &this_t::str2 },
 		};

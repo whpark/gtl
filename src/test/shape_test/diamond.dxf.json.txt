@@ -1,26 +1,26 @@
 Type:LAYER - Color(ff,ff,ff), lineType:CONTINUOUS, lineWeight:31
 Type:LAYER - Color(ff,ff,ff), lineType:CONTINUOUS, lineWeight:0
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(45,45,0) - pt1(45,-45,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(45,-45,0) - pt1(0,0,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0,0,0) - pt1(-45,45,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-45,45,0) - pt1(45,45,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(45,45,0) - pt1(0,0,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0,0,0) - pt1(0,0,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0,0,0) - pt1(-45,-45,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-45,-45,0) - pt1(45,45,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(45,-45,0) - pt1(-45,-45,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-45,-45,0) - pt1(-45,45,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-45,45,0) - pt1(0,0,0)
-Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:29
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0,0,0) - pt1(45,-45,0)

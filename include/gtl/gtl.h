@@ -20,3 +20,4 @@
 #include "gtl/unit.h"
 #include "gtl/coord.h"
 #include "gtl/rand.h"
+#include "gtl/mat_helper.h"

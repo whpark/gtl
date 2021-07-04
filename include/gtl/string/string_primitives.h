@@ -13,6 +13,7 @@
 #define GTL_HEADER__BASIC_STRING
 
 #include "gtl/_lib_gtl.h"
+#include "gtl/_default.h"
 #include "gtl/concepts.h"
 
 #if !defined(__cpp_lib_concepts)
@@ -187,7 +188,7 @@ namespace gtl {
 	/// @param radix 
 	/// @return number
 	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
-	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** pszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
+	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 
 	/// <summary>

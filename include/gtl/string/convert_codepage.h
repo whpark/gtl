@@ -172,7 +172,7 @@ namespace gtl {
 
 	private:
 		template < typename tchar >
-		constexpr inline static eCODEPAGE GetCodepage(eCODEPAGE codepage) {
+		constexpr static inline eCODEPAGE GetCodepage(eCODEPAGE codepage) {
 			if (codepage == eCODEPAGE::DEFAULT__OR_USE_MBCS_CODEPAGE) {	// wrong or default value
 				if constexpr (gtlc::is_same_utf<tchar, char>) {
 					return eMBCS_Codepage_g;
@@ -696,7 +696,7 @@ namespace gtl {
 		auto const* pszSourceEnd = svFrom.data()+svFrom.size();
 
 		auto eCodepageTo = codepage.To<char>();
-		std::locale loc(fmt::format(".{}", eCodepageTo));
+		std::locale loc(std::format(".{}", (int)eCodepageTo));
 
 		auto const& facet = std::use_facet<std::codecvt<wchar_t, char, mbstate_t>>(loc);
 
@@ -734,7 +734,7 @@ namespace gtl {
 
 		auto eCodepageFrom = codepage.From<char>();
 
-		std::locale loc(fmt::format(".{}", eCodepageFrom));
+		std::locale loc(std::format(".{}", (int)eCodepageFrom));
 
 		auto const& facet = std::use_facet<std::codecvt<wchar_t, char, mbstate_t>>(loc);
 
