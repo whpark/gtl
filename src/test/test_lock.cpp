@@ -15,7 +15,7 @@ namespace gtl::test::recursive_shared_mutex {
 	TEST(thread, mutex) {
 
 		//gtl::recursive_shared_mutex mutex;
-		gtl::CSimpleLog log;
+		gtl::xSimpleLog log;
 
 		//std::vector<std::unique_ptr<std::pair<std::thread::id, int> > > vecP;
 

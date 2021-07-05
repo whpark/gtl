@@ -34,8 +34,8 @@
 //        void CParentDlg::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult) {
 //            NMLVDISPINFO* pDispInfo = (NMLVDISPINFO*)pNMHDR;
 //
-//            CString strOldText;
-//            CString strNewText;
+//            xString strOldText;
+//            xString strNewText;
 //
 //            strOldText = m_list.GetItemText(pDispInfo->item.iItem, pDispInfo->item.iSubItem);    // Original Text
 //            strNewText = pDispInfo->item.pszText;                                                // New Text
@@ -60,7 +60,7 @@ namespace gtl::win_util {
 
 	///----------------------------------------------------------------------------------------------------------------------------
 	/// @brief CListCtrlEd
-	class GTL_WINUTIL_CLASS CListCtrlEd : public CListCtrl {
+	class GTL__WINUTIL_CLASS CListCtrlEd : public CListCtrl {
 		DECLARE_DYNAMIC(CListCtrlEd)
 	protected:
 		BOOL m_bEditable;
@@ -98,7 +98,7 @@ namespace gtl::win_util {
 
 	///----------------------------------------------------------------------------------------------------------------------------
 	/// @brief CMFCListCtrlEd
-	class GTL_WINUTIL_CLASS CMFCListCtrlEd : public CMFCListCtrl {
+	class GTL__WINUTIL_CLASS CMFCListCtrlEd : public CMFCListCtrl {
 		DECLARE_DYNAMIC(CMFCListCtrlEd)
 	protected:
 		BOOL m_bEditable;

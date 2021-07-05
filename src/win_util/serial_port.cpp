@@ -20,14 +20,14 @@ namespace gtl::win_util {
 
 	using tchar = wchar_t;
 
-	bool XComm::Open(uint32_t nPort/*1 base*/, const SETTING& setting) {
+	bool xComm::Open(uint32_t nPort/*1 base*/, const SETTING& setting) {
 		if (nPort < 1)
 			return false;
 
 		return Open(fmt::format(L"\\\\.\\COM{}", nPort).c_str(), setting);
 	}
 
-	bool XComm::Open(const tchar* pszPortName, const SETTING& setting) {
+	bool xComm::Open(const tchar* pszPortName, const SETTING& setting) {
 		Close();
 
 		m_hComm = CreateFile(pszPortName, GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
@@ -88,7 +88,7 @@ namespace gtl::win_util {
 		return true;
 	}
 
-	bool XComm::Close() {
+	bool xComm::Close() {
 		if (IsValueNoneOf(m_hComm, (HANDLE)NULL, INVALID_HANDLE_VALUE)) {
 			if (m_overlappedR.hEvent) {
 				CloseHandle(m_overlappedR.hEvent);
@@ -106,7 +106,7 @@ namespace gtl::win_util {
 		return TRUE;
 	}
 
-	bool XComm::Attach(HANDLE hComm) {
+	bool xComm::Attach(HANDLE hComm) {
 		if (IsValueNoneOf(m_hComm, (HANDLE)NULL, INVALID_HANDLE_VALUE))
 			Close();
 
@@ -114,14 +114,14 @@ namespace gtl::win_util {
 
 		return TRUE;
 	}
-	HANDLE XComm::Detach() {
+	HANDLE xComm::Detach() {
 		HANDLE hComm = m_hComm;
 		m_hComm = INVALID_HANDLE_VALUE;
 		return hComm;
 	}
 
-	//DWORD XComm::Reader(LPVOID pVoid) {
-	//	XComm* pThis = (XComm*)pVoid;
+	//DWORD xComm::Reader(LPVOID pVoid) {
+	//	xComm* pThis = (xComm*)pVoid;
 
 	//	pThis->Log("Reader Started");
 	//	try {
@@ -188,7 +188,7 @@ namespace gtl::win_util {
 	//	return 0;
 	//}
 
-	bool XComm::SetCommMask(DWORD dwEvtMask) {
+	bool xComm::SetCommMask(DWORD dwEvtMask) {
 		if (!IsOpen())
 			return FALSE;
 
@@ -209,7 +209,7 @@ namespace gtl::win_util {
 		//}
 		//return TRUE;
 	}
-	bool XComm::EscapeCommFunction(DWORD dwFunc) {
+	bool xComm::EscapeCommFunction(DWORD dwFunc) {
 		if (IsOpen()) {
 			return ::EscapeCommFunction(m_hComm, dwFunc);
 		}
@@ -217,8 +217,8 @@ namespace gtl::win_util {
 	}
 
 
-	//DWORD XComm::EventHandler(LPVOID pVoid) {
-	//	XComm* pThis = (XComm*)pVoid;
+	//DWORD xComm::EventHandler(LPVOID pVoid) {
+	//	xComm* pThis = (xComm*)pVoid;
 
 	//	OVERLAPPED overlapped;
 	//	memset(&overlapped, 0, sizeof(overlapped));
@@ -231,7 +231,7 @@ namespace gtl::win_util {
 	//			DWORD dwError = GetLastError();
 	//			if (dwError != ERROR_IO_PENDING) {
 	//				if (pThis->m_pLog) {
-	//					CString str;
+	//					xString str;
 	//					str.Format(_T("------ %d : %s"), dwError, GetErrorMessage(dwError));
 	//					pThis->Log(str);
 	//				}
@@ -250,7 +250,7 @@ namespace gtl::win_util {
 	//	return 0;
 	//}
 
-	size_t XComm::Read(void* _buf, DWORD nMaxSize, DWORD dwTimeout) {
+	size_t xComm::Read(void* _buf, DWORD nMaxSize, DWORD dwTimeout) {
 		if (m_hComm == INVALID_HANDLE_VALUE)
 			return 0;
 		{
@@ -300,7 +300,7 @@ namespace gtl::win_util {
 		return nReadTotal;
 	}
 
-	size_t XComm::Write(const void* _buf, DWORD nSize, DWORD dwTimeout) {
+	size_t xComm::Write(const void* _buf, DWORD nSize, DWORD dwTimeout) {
 		const BYTE* buf = (BYTE*)_buf;
 		if (m_hComm == INVALID_HANDLE_VALUE)
 			return 0;
@@ -336,14 +336,14 @@ namespace gtl::win_util {
 		return dwSize;
 	}
 
-	bool XComm::Purge(DWORD dwFlags) {
+	bool xComm::Purge(DWORD dwFlags) {
 		if (!m_hComm)
 			return FALSE;
 		PurgeComm(m_hComm, dwFlags);
 		return TRUE;
 	}
 
-	std::vector<std::wstring> XComm::FindSerialPorts() {
+	std::vector<std::wstring> xComm::FindSerialPorts() {
 		using namespace std::literals;
 
 		std::vector<std::wstring> strsPort;

@@ -71,7 +71,7 @@ fOutHeader.write(
                 '\n'
                 '\n'
                 '#include "gtl/_config.h"\n\n'
-                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n\n'
+                '#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n\n'
                 '#include <cstdint>\n'
                 '#include <map>\n'
                 '\n'
@@ -87,7 +87,7 @@ fOutHeader.write(
                 '#pragma pack(pop)\n'
                 '}\t// namespace gtl::charset::KSSM\n'
                 '\n\n'
-                '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+                '#endif // GTL__STRING_SUPPORT_CODEPAGE_KSSM && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
                 )
 fOutHeader.flush()
 
@@ -103,7 +103,7 @@ fOutImpl.write( '#include "pch.h"\n\n'
                 '//=========\n'
                 '\n\n'
                 '#include "gtl/_config.h"\n'
-                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+                '#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
                 '\n\n'
                 '#include <cstdlib>\n'
                 '#include <cstdint>\n'
@@ -137,7 +137,7 @@ fOutImpl.write('\n\t} };\n')
 fOutImpl.write('\n\n')
 
 fOutImpl.write('}\t// namespace gtl::charset::KSSM\n\n'
-               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+               '#endif // GTL__STRING_SUPPORT_CODEPAGE_KSSM && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
                )
 fOutImpl.flush()
 fOutImpl.close()
@@ -154,7 +154,7 @@ fOutImpl.write( '#include "pch.h"\n\n'
                 '//=========\n'
                 '\n\n'
                 '#include "gtl/_config.h"\n'
-                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+                '#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
                 '\n\n'
                 '#include <cstdlib>\n'
                 '#include <cstdint>\n'
@@ -188,7 +188,7 @@ fOutImpl.write('\n\t} };\n')
 fOutImpl.write('\n\n')
 
 fOutImpl.write('}\t// namespace gtl::charset::KSSM\n\n'
-               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+               '#endif // GTL__STRING_SUPPORT_CODEPAGE_KSSM && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
                )
 fOutImpl.flush()
 fOutImpl.close()

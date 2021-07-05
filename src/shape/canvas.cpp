@@ -5,7 +5,7 @@
 
 namespace gtl::shape {
 
-	GTL_SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
+	GTL__SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
 		if (pts.size() < 2)
 			return;
 

@@ -14,8 +14,8 @@
 
 #pragma once
 
-#ifndef GTL_HEADER__ICONV_WRAPPER
-#define GTL_HEADER__ICONV_WRAPPER
+#ifndef GTL__HEADER__ICONV_WRAPPER
+#define GTL__HEADER__ICONV_WRAPPER
 
 #include <optional>
 #include <string>
@@ -221,8 +221,8 @@ namespace gtl {
 			} else if (std::is_same_v<tchar, char>) {
 				return "char";
 			}
-		#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
-			else if (std::is_same_v<tchar, uint16_t>) {
+		#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+			else if (std::is_same_v<tchar, charKSSM_t>) {
 				return "JOHAB";
 			}
 		#endif
@@ -257,4 +257,4 @@ namespace gtl {
 }
 
 
-#endif	// GTL_HEADER__ICONV_WRAPPER
+#endif	// GTL__HEADER__ICONV_WRAPPER

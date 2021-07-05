@@ -13,7 +13,7 @@ using namespace std::literals;
 namespace gtl::shape {
 
 	//// from openCV
-	//bool clipLine(gtl::CSize2i size, gtl::CPoint2d& pt1, gtl::CPoint2d& pt2) {
+	//bool clipLine(gtl::xSize2i size, gtl::xPoint2d& pt1, gtl::xPoint2d& pt2) {
 	//	if( size.cx <= 0 || size.cy <= 0 )
 	//		return false;
 
@@ -67,7 +67,7 @@ namespace gtl::shape {
 	// Cohen–Sutherland clipping algorithm clips a line from
 	// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
 	// diagonal from (xmin, ymin) to (xmax, ymax).
-	void CohenSutherlandLineClip(gtl::CRect2d roi, gtl::CPoint2d& pt0, gtl::CPoint2d& pt1) {
+	void CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1) {
 		enum fOUT_CODE : uint8_t {
 			INSIDE	= 0b0000,
 			LEFT	= 0b0001,
@@ -155,7 +155,7 @@ namespace gtl::shape {
 	}
 
 
-	int s_shape::GetLineWidthInUM(int lineWeight) {
+	int xShape::GetLineWidthInUM(int lineWeight) {
 		static int const widths[] = {
 			   0,
 			  50,
@@ -190,10 +190,10 @@ namespace gtl::shape {
 		return 0;
 	};
 
-	void s_shape::Draw(ICanvas& canvas) const {
+	void xShape::Draw(ICanvas& canvas) const {
 		canvas.PreDraw(*this);
 	}
-	bool s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
+	bool xShape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
 		rect_t rectBoundary;
 		rectBoundary.SetRectEmptyForMinMax2d();
 		UpdateBoundary(rectBoundary);
@@ -203,7 +203,7 @@ namespace gtl::shape {
 		return true;
 	}
 
-	bool s_shape::LoadFromCADJson(json_t& _j) {
+	bool xShape::LoadFromCADJson(json_t& _j) {
 		using namespace std::literals;
 		gtl::bjson<json_t> j(_j);
 		//color.cr = (int)j["color"sv];
@@ -228,7 +228,7 @@ namespace gtl::shape {
 		return true;
 	}
 
-	string_t const& s_shape::GetShapeName(eSHAPE eType) {
+	string_t const& xShape::GetShapeName(eSHAPE eType) {
 		static std::map<eSHAPE, string_t> const map = {
 			{ eSHAPE::none,				L"none" },
 			{ eSHAPE::e3dface,			L"3dFace"s },
@@ -274,12 +274,12 @@ namespace gtl::shape {
 		return iter->second;
 	}
 
-	std::unique_ptr<s_shape> s_shape::CreateShapeFromEntityName(std::string const& strEntityName) {
-		static std::map<std::string, std::function<std::unique_ptr<s_shape>()> > const mapCreator = {
+	std::unique_ptr<xShape> xShape::CreateShapeFromEntityName(std::string const& strEntityName) {
+		static std::map<std::string, std::function<std::unique_ptr<xShape>()> > const mapCreator = {
 			{ "3dFace"s,				nullptr },
-			{ "ARC"s,					[](){ return std::make_unique<s_arcXY>(); } },
+			{ "ARC"s,					[](){ return std::make_unique<xArc>(); } },
 			{ "BLOCK"s,					nullptr },
-			{ "CIRCLE"s,				[](){ return std::make_unique<s_circleXY>(); } },
+			{ "CIRCLE"s,				[](){ return std::make_unique<xCircle>(); } },
 			{ "DIMENSION"s,				nullptr },
 			{ "DIMALIGNED"s,			nullptr },
 			{ "DIMLINEAR"s,				nullptr },
@@ -288,20 +288,20 @@ namespace gtl::shape {
 			{ "DIMANGULAR"s,			nullptr },
 			{ "DIMANGULAR3P"s,			nullptr },
 			{ "DIMORDINATE"s,			nullptr },
-			{ "ELLIPSE"s,				[](){ return std::make_unique<s_ellipseXY>(); } },
-			{ "HATCH"s,					[](){ return std::make_unique<s_hatch>(); } },
+			{ "ELLIPSE"s,				[](){ return std::make_unique<xEllipse>(); } },
+			{ "HATCH"s,					[](){ return std::make_unique<xHatch>(); } },
 			{ "IMAGE"s,					nullptr },
-			{ "INSERT"s,				[](){ return std::make_unique<s_insert>(); } },
+			{ "INSERT"s,				[](){ return std::make_unique<xInsert>(); } },
 			{ "LEADER"s,				nullptr },
-			{ "LINE"s,					[](){ return std::make_unique<s_line>(); } },
-			{ "LWPOLYLINE"s,			[](){ return std::make_unique<s_lwpolyline>(); } },
-			{ "MTEXT"s,					[](){ return std::make_unique<s_mtext>(); } },
-			{ "POINT"s,					[](){ return std::make_unique<s_dot>(); } },
-			{ "POLYLINE"s,				[](){ return std::make_unique<s_polyline>(); } },
+			{ "LINE"s,					[](){ return std::make_unique<xLine>(); } },
+			{ "LWPOLYLINE"s,			[](){ return std::make_unique<xPolylineLW>(); } },
+			{ "MTEXT"s,					[](){ return std::make_unique<xMText>(); } },
+			{ "POINT"s,					[](){ return std::make_unique<xDot>(); } },
+			{ "POLYLINE"s,				[](){ return std::make_unique<xPolyline>(); } },
 			{ "RAY"s,					nullptr },
 			{ "SOLID"s,					nullptr },
-			{ "SPLINE"s,				[](){ return std::make_unique<s_spline>(); } },
-			{ "TEXT"s,					[](){ return std::make_unique<s_text>(); } },
+			{ "SPLINE"s,				[](){ return std::make_unique<xSpline>(); } },
+			{ "TEXT"s,					[](){ return std::make_unique<xText>(); } },
 			{ "TRACE"s,					nullptr },
 			{ "UNDERLAY"s,				nullptr },
 			{ "VERTEX"s,				nullptr },
@@ -318,8 +318,8 @@ namespace gtl::shape {
 		return {};
 	}
 
-	void s_polyline::Draw(ICanvas& canvas) const {
-		s_shape::Draw(canvas);
+	void xPolyline::Draw(ICanvas& canvas) const {
+		xShape::Draw(canvas);
 
 		if (pts.size())
 			canvas.MoveTo(pts[0]);
@@ -335,8 +335,8 @@ namespace gtl::shape {
 				canvas.LineTo(pt1);
 			} else {
 				canvas.LineTo(pt0);
-				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
-				(s_shape&)arc = *(s_shape*)this;
+				xArc arc = xArc::GetFromBulge(pt0.Bulge(), pt0, pt1);
+				(xShape&)arc = *(xShape*)this;
 
 				arc.Draw(canvas);
 
@@ -345,8 +345,8 @@ namespace gtl::shape {
 		}
 	}
 
-	boost::ptr_deque<s_shape> s_polyline::Split() const {
-		boost::ptr_deque<s_shape> shapes;
+	boost::ptr_deque<xShape> xPolyline::Split() const {
+		boost::ptr_deque<xShape> shapes;
 
 		auto nPt = pts.size();
 		if (!bLoop)
@@ -356,22 +356,22 @@ namespace gtl::shape {
 			auto pt0 = pts[iPt];
 			auto pt1 = pts[iPt2];
 			if (pt0.Bulge() == 0.0) {
-				auto rLine = std::make_unique<s_line>();
-				(s_shape&)*rLine = (s_shape const&)*this;
+				auto rLine = std::make_unique<xLine>();
+				(xShape&)*rLine = (xShape const&)*this;
 				rLine->pt0 = pt0;
 				rLine->pt1 = pt1;
 				shapes.push_back(std::move(rLine));
 			} else {
-				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
-				(s_shape&)arc = *(s_shape*)this;
+				xArc arc = xArc::GetFromBulge(pt0.Bulge(), pt0, pt1);
+				(xShape&)arc = *(xShape*)this;
 				shapes.push_back(arc.NewClone());
 			}
 		}
 		return shapes;
 	}
 
-	bool s_drawing::LoadFromCADJson(json_t& _j) {
-		//s_shape::LoadFromCADJson(_j);
+	bool xDrawing::LoadFromCADJson(json_t& _j) {
+		//xShape::LoadFromCADJson(_j);
 
 		gtl::bjson<json_t> jTOP(_j);
 
@@ -414,16 +414,16 @@ namespace gtl::shape {
 		}
 
 		// layers
-		std::map<string_t, s_layer*> mapLayers;	// cache
+		std::map<string_t, xLayer*> mapLayers;	// cache
 		{
 			layers.clear();
-			//layers.push_back(std::make_unique<s_layer>(L"0"));
+			//layers.push_back(std::make_unique<xLayer>(L"0"));
 
 			auto jLayers = jTOP["layers"].json().as_array();
 			for (auto& item : jLayers) {
 				bjson<json_t> j(item);
 
-				auto rLayer = std::make_unique<s_layer>();
+				auto rLayer = std::make_unique<xLayer>();
 				rLayer->LoadFromCADJson(item);
 
 				if (auto iterLineType = std::find_if(line_types.begin(), line_types.end(), [&rLayer](auto const& lt) { return lt.name == rLayer->strLineType; });
@@ -438,14 +438,14 @@ namespace gtl::shape {
 		}
 
 		// block
-		boost::ptr_deque<s_block> blocks;
-		std::map<string_t, s_block*> mapBlocks;
+		boost::ptr_deque<xBlock> blocks;
+		std::map<string_t, xBlock*> mapBlocks;
 		{
 			blocks.clear();
 			auto jBlocks = jTOP["blocks"].json().as_array();
 			for (auto& item : jBlocks) {
 				bjson<json_t> j(item);
-				auto rBlock = std::make_unique<s_block>();
+				auto rBlock = std::make_unique<xBlock>();
 
 				try {
 					rBlock->LoadFromCADJson(item);
@@ -470,7 +470,7 @@ namespace gtl::shape {
 					bjson<json_t> j(jEntity);
 					std::string strEntityName = j["entityName"];
 
-					std::unique_ptr<s_shape> rShape = CreateShapeFromEntityName(strEntityName);
+					std::unique_ptr<xShape> rShape = CreateShapeFromEntityName(strEntityName);
 					if (!rShape)
 						continue;
 
@@ -508,7 +508,7 @@ namespace gtl::shape {
 				bjson<json_t> j(jEntity);
 				std::string strEntityName = j["entityName"];
 
-				std::unique_ptr<s_shape> rShape = CreateShapeFromEntityName(strEntityName);
+				std::unique_ptr<xShape> rShape = CreateShapeFromEntityName(strEntityName);
 				if (!rShape)
 					continue;
 
@@ -531,14 +531,14 @@ namespace gtl::shape {
 		return true;
 	}
 
-	bool s_drawing::AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectB) {
+	bool xDrawing::AddEntity(std::unique_ptr<xShape> rShape, std::map<string_t, xLayer*> const& mapLayers, std::map<string_t, xBlock*> const& mapBlocks, rect_t& rectB) {
 		if (!rShape)
 			return false;
 
 		switch (rShape->GetShapeType()) {
 		case eSHAPE::insert :
 			// todo :
-			if (s_insert* pInsert = dynamic_cast<s_insert*>(rShape.get()); pInsert) {
+			if (xInsert* pInsert = dynamic_cast<xInsert*>(rShape.get()); pInsert) {
 				auto iter = mapBlocks.find(pInsert->name);
 				if (iter == mapBlocks.end()) {
 					DEBUG_PRINT(L"No Block : {}\n", pInsert->name);
@@ -550,7 +550,7 @@ namespace gtl::shape {
 					return false;
 				}
 
-				CCoordTrans3d ct;
+				xCoordTrans3d ct;
 				// todo : 순서 확인 (scale->rotate ? or rotate->scale ?)
 				if (pInsert->xscale != 1.0) {
 					ct.mat_(0, 0) *= pInsert->xscale;
@@ -577,7 +577,7 @@ namespace gtl::shape {
 				for (int y = 0; y < pInsert->nRow; y++) {
 					for (int x = 0; x < pInsert->nCol; x++) {
 
-						std::unique_ptr<s_block> rBlockNew { dynamic_cast<s_block*>(pBlock->NewClone().release()) };
+						std::unique_ptr<xBlock> rBlockNew { dynamic_cast<xBlock*>(pBlock->NewClone().release()) };
 
 						ct.offset_.x = x*pInsert->spacingCol + pInsert->pt.x;
 						ct.offset_.y = y*pInsert->spacingRow + pInsert->pt.x;

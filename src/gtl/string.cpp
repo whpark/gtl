@@ -23,7 +23,7 @@
 
 namespace gtl {
 
-	GTL_DATA eCODEPAGE eMBCS_Codepage_g = static_cast<eCODEPAGE>(GTL_DEFAULT_CODEPAGE);
+	GTL__DATA eCODEPAGE eMBCS_Codepage_g = static_cast<eCODEPAGE>(GTL__DEFAULT_CODEPAGE);
 
 //	//-----------------------------------------------------------------------------
 //	bool IsUTF8String(std::string_view sv, size_t* pOutputBufferCount, bool* pbIsMSBSet) {

@@ -15,9 +15,9 @@
 
 		class name :
 
-			CShapeObject	-> s_shape
-			CShapeLine		-> s_line
-			CShapePolyLine	-> s_polyline
+			CShapeObject	-> xShape
+			CShapeLine		-> xLine
+			CShapePolyLine	-> xPolyline
 			...
 
 		Container :
@@ -26,10 +26,10 @@
 
 		Point / Line : x, y, z 3차원으로 변경
 
-			typedef CSize3d					size2d_t;
-			typedef CPoint3d				point_t;
-			typedef CRect3d					rect_t;
-			typedef std::vector<s_line>		s_lines;
+			typedef xSize3d					size2d_t;
+			typedef xPoint3d				point_t;
+			typedef xRect3d					rect_t;
+			typedef std::vector<xLine>		s_lines;
 
 */
 ///////////////////////////////////////////////////////////////////////////////

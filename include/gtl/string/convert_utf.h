@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef GTL_HEADER__STRING_CONVERT_UTF
-#define GTL_HEADER__STRING_CONVERT_UTF
+#ifndef GTL__HEADER__STRING_CONVERT_UTF
+#define GTL__HEADER__STRING_CONVERT_UTF
 
 #include <experimental/generator>
 
@@ -489,4 +489,4 @@ namespace gtl {
 };	// namespace gtl;
 
 
-#endif	// GTL_HEADER__STRING_CONVERT_UTF
+#endif	// GTL__HEADER__STRING_CONVERT_UTF

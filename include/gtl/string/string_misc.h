@@ -16,8 +16,8 @@
 
 
 
-//#ifndef GTL_HEADER__BASIC_STRING_MISC
-//#define GTL_HEADER__BASIC_STRING_MISC
+//#ifndef GTL__HEADER__BASIC_STRING_MISC
+//#define GTL__HEADER__BASIC_STRING_MISC
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -134,4 +134,4 @@ namespace gtl {
 #include "string_misc.hpp"
 
 
-//#endif	// GTL_HEADER__BASIC_STRING_MISC
+//#endif	// GTL__HEADER__BASIC_STRING_MISC

@@ -59,7 +59,7 @@ protected:
 
 		theApp.WriteProfileString(_T("misc"), _T("MatSize"), strMatSize);
 
-		auto size = gtl::FromString<gtl::CSize2i>(std::wstring_view((LPCTSTR)strMatSize, strMatSize.GetLength()));
+		auto size = gtl::FromString<gtl::xSize2i>(std::wstring_view((LPCTSTR)strMatSize, strMatSize.GetLength()));
 
 		return (cv::Size)size;
 	}

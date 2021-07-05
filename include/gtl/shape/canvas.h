@@ -25,7 +25,7 @@ namespace gtl::shape {
 
 	////-------------------------------------------------------------------------
 	///// @brief 3점(or 2점) 얼라인.
-	//class CCoordSystem : public CCoordTransChain {
+	//class CCoordSystem : public xCoordTransChain {
 	//public:
 	//	//ct_t ctShape2Real_;	// DXF 좌표계에서 실 좌표계.
 	//	//ct_t ctAlign_;			// Align 미세 보정. (3 점 보정)
@@ -42,13 +42,13 @@ namespace gtl::shape {
 	//};
 
 	class ICanvas;
-	extern GTL_SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
+	extern GTL__SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
 
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
 	class ICanvas {
 	public:
-		CCoordTransChain ct_, ctI_;
+		xCoordTransChain ct_, ctI_;
 		point_t ptLast_{};
 
 	public:
@@ -79,7 +79,7 @@ namespace gtl::shape {
 		}
 
 		void SetCT(ICoordTrans const& ct) {
-			if (auto* pCT = dynamic_cast<CCoordTransChain const*>(&ct); pCT) {
+			if (auto* pCT = dynamic_cast<xCoordTransChain const*>(&ct); pCT) {
 				ct_ = *pCT;
 				ct_.GetInv(ctI_);
 			} else {
@@ -96,8 +96,8 @@ namespace gtl::shape {
 		virtual void MoveTo_Target(point_t const& ptTargetSystem) = 0;
 		virtual void LineTo_Target(point_t const& ptTargetSystem) = 0;
 
-		virtual void PreDraw(s_shape const&) = 0;
-		//virtual void Draw(s_shape const&);
+		virtual void PreDraw(xShape const&) = 0;
+		//virtual void Draw(xShape const&);
 
 		void MoveTo(point_t pt) {
 			pt = Trans(pt);
@@ -129,12 +129,12 @@ namespace gtl::shape {
 				constexpr static auto m2pi = std::numbers::pi*2;
 				double c = radius * cos(t);
 				double s = radius * sin(t);
-				CPoint2d pt(ptCenter.x + c, ptCenter.y+s);
+				xPoint2d pt(ptCenter.x + c, ptCenter.y+s);
 				LineTo(pt);
 			}
 		}
 		virtual void Ellipse(point_t const& ptCenter, double radius1, double radius2, deg_t tFirstAxis, deg_t t0, deg_t tLength) {
-			CCoordTrans2d ct;
+			xCoordTrans2d ct;
 			ct.Init(1.0, (rad_t)tFirstAxis, point_t{}, ptCenter);
 
 			deg_t t1 = t0 + tLength;
@@ -161,7 +161,7 @@ namespace gtl::shape {
 
 	//=============================================================================================================================
 	// IQDeviceScanner : Interface of Canvas
-	class GTL_SHAPE_CLASS ICanvasScanner : public ICanvas {
+	class GTL__SHAPE_CLASS ICanvasScanner : public ICanvas {
 		friend class ICanvas;
 
 	public:
@@ -171,9 +171,9 @@ namespace gtl::shape {
 		}
 
 	public:
-		//virtual void PreDraw(s_shape const& shape) {}
+		//virtual void PreDraw(xShape const& shape) {}
 
-		virtual void PreDraw(s_shape const&) override {}
+		virtual void PreDraw(xShape const&) override {}
 
 		virtual void MoveTo_Target(point_t const& pt) override {
 			// Scanner Jump To
@@ -187,7 +187,7 @@ namespace gtl::shape {
 
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
-	class GTL_SHAPE_CLASS CCanvasMat : public ICanvas {
+	class GTL__SHAPE_CLASS xCanvasMat : public ICanvas {
 	public:
 		cv::Mat& img_;
 
@@ -198,10 +198,10 @@ namespace gtl::shape {
 		int line_type_ = cv::LINE_8;
 
 	public:
-		CCanvasMat(cv::Mat& img, ICoordTrans const& ct) : img_(img), ICanvas(ct) { }
-		virtual ~CCanvasMat() { }
+		xCanvasMat(cv::Mat& img, ICoordTrans const& ct) : img_(img), ICanvas(ct) { }
+		virtual ~xCanvasMat() { }
 
-		virtual void PreDraw(s_shape const& shape) override {
+		virtual void PreDraw(xShape const& shape) override {
 			color_ = ColorS(shape.color);
 		}
 
@@ -226,9 +226,9 @@ namespace gtl::shape {
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
 	template < bool round_down_line = true, bool round_down_arc = true >
-	class CCanvasMat_RoundDown : public CCanvasMat {
+	class xCanvasMat_RoundDown : public xCanvasMat {
 	public:
-		using base_t = CCanvasMat;
+		using base_t = xCanvasMat;
 		struct {
 			bool arc;
 			bool line;
@@ -241,14 +241,14 @@ namespace gtl::shape {
 			if constexpr (round_down_line) {
 				cv::line(img_, cv::Point((int)ptLast_.x, (int)ptLast_.y), cv::Point((int)pt.x, (int)pt.y), color_, (int)line_thickness_, line_type_);
 			} else {
-				CCanvasMat::LineTo_Target(pt);
+				xCanvasMat::LineTo_Target(pt);
 			}
 		}
 
 		virtual void Arc(point_t const& ptCenter, double radius, deg_t t0, deg_t tLength) override {
 			if constexpr (round_down_arc) {
 				point_t ptC = Trans(ptCenter);
-				CPoint3i ptCi((int)ptC.x, (int)ptC.y, (int)ptC.z);	// RoundDrop
+				xPoint3i ptCi((int)ptC.x, (int)ptC.y, (int)ptC.z);	// RoundDrop
 				ptC = TransI(ptCi);
 				ICanvas::Arc(ptC, radius, t0, tLength);
 			} else {
@@ -374,7 +374,7 @@ namespace gtl::shape {
 	//};
 
 	////-----------------------------------------------------------------------------
-	//// CCanvasMat
+	//// xCanvasMat
 	//class CCanvaMat : public ICanvas {
 	//public:
 	//	cv::Size m_sizeEffective;
@@ -388,12 +388,12 @@ namespace gtl::shape {
 	//	CCanvaMat(const CCanvaMat& B) = delete;
 	//	virtual ~CCanvaMat() {}
 
-	//	virtual bool CreateCanvas(const CRect2i& rectSource, const CRect2i& rectTarget, bool bKeepAspectRatio = true);
+	//	virtual bool CreateCanvas(const xRect2i& rectSource, const xRect2i& rectTarget, bool bKeepAspectRatio = true);
 	//};
 
 	//-----------------------------------------------------------------------------
 	//
-	//GTL_API std::vector<point_t> AddLaserOffsetToLine(std::span<point_t const> pts, double dThickness, bool bLoop);
+	//GTL__API std::vector<point_t> AddLaserOffsetToLine(std::span<point_t const> pts, double dThickness, bool bLoop);
 
 
 #pragma warning(pop)

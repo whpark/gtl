@@ -124,7 +124,7 @@ namespace gtl::win_util {
 		}
 
 		CRect rect, rectSubItem;
-		CString str;
+		xString str;
 		DWORD dwStyle = 0;
 		if (GetStyle() & LVS_REPORT) {
 			GetItemRect(iItem, rect, LVIR_BOUNDS);
@@ -178,7 +178,7 @@ namespace gtl::win_util {
 			return FALSE;
 
 		if (m_edit.m_hWnd) {
-			::CString str;
+			CString str;
 			m_edit.GetWindowText(str);
 			if ( ( (m_iItem >= 0) && (m_iItem < GetItemCount()) )
 				&& (m_iSubItem >= 0) && (m_iSubItem < GetHeaderCtrl()->GetItemCount())
@@ -450,7 +450,7 @@ namespace gtl::win_util {
 		}
 
 		CRect rect, rectSubItem;
-		CString str;
+		xString str;
 		DWORD dwStyle = 0;
 		if (GetStyle() & LVS_REPORT) {
 			GetItemRect(iItem, rect, LVIR_BOUNDS);
@@ -504,7 +504,7 @@ namespace gtl::win_util {
 			return FALSE;
 
 		if (m_edit.m_hWnd) {
-			::CString str;
+			CString str;
 			m_edit.GetWindowText(str);
 			if ( ( (m_iItem >= 0) && (m_iItem < GetItemCount()) )
 				&& (m_iSubItem >= 0) && (m_iSubItem < GetHeaderCtrl().GetItemCount())

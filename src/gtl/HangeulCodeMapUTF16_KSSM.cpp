@@ -9,7 +9,7 @@
 
 
 #include "gtl/_config.h"
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)
 
 
 #include <cstdlib>
@@ -24,7 +24,7 @@ namespace gtl::charset::KSSM {
 
 	//------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------
-	GTL_DATA std::map<char16_t, uint16_t> const mapUTF16toKSSM_g { {
+	GTL__DATA std::map<char16_t, charKSSM_t> const mapUTF16toKSSM_g { {
 		{ 0x3131/*ㄱ*/, 0x8841 },	{ 0x3132/*ㄲ*/, 0x8c41 },	{ 0x3133/*ㄳ*/, 0x8444 },	{ 0x3134/*ㄴ*/, 0x9041 },	{ 0x3135/*ㄵ*/, 0x8446 },	{ 0x3136/*ㄶ*/, 0x8447 },	{ 0x3137/*ㄷ*/, 0x9441 },	{ 0x3138/*ㄸ*/, 0x9841 },
 		{ 0x3139/*ㄹ*/, 0x9c41 },	{ 0x313a/*ㄺ*/, 0x844a },	{ 0x313b/*ㄻ*/, 0x844b },	{ 0x313c/*ㄼ*/, 0x844c },	{ 0x313d/*ㄽ*/, 0x844d },	{ 0x313e/*ㄾ*/, 0x844e },	{ 0x313f/*ㄿ*/, 0x844f },	{ 0x3140/*ㅀ*/, 0x8450 },
 		{ 0x3141/*ㅁ*/, 0xa041 },	{ 0x3142/*ㅂ*/, 0xa441 },	{ 0x3143/*ㅃ*/, 0xa841 },	{ 0x3144/*ㅄ*/, 0x8454 },	{ 0x3145/*ㅅ*/, 0xac41 },	{ 0x3146/*ㅆ*/, 0xb041 },	{ 0x3147/*ㅇ*/, 0xb441 },	{ 0x3148/*ㅈ*/, 0xb841 },
@@ -1433,4 +1433,4 @@ namespace gtl::charset::KSSM {
 
 }	// namespace gtl::charset::KSSM
 
-#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)
+#endif // GTL__STRING_SUPPORT_CODEPAGE_KSSM && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)

@@ -25,7 +25,7 @@ namespace gtl {
 #if 0
 	template < class ARCHIVE >
 	bool LoadMat(ARCHIVE& ar, cv::Mat& mat) {
-		gtl::CStringA str;
+		gtl::xStringA str;
 		ar >> str;
 		if (str != "mat")
 			return false;
@@ -48,7 +48,7 @@ namespace gtl {
 	}
 	template < class ARCHIVE >
 	bool StoreMat(ARCHIVE& ar, cv::Mat const& mat) {
-		gtl::CStringA str("mat");
+		gtl::xStringA str("mat");
 		ar << str;
 
 		ar << mat.rows;
@@ -130,8 +130,8 @@ namespace gtl {
 		int thickness = 1, int lineType = 8,
 		bool bottomLeftOrigin = false, bool bOutline = true)
 	{
-		gtl::CStringA str(psz);
-		CSize2i size { cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
+		gtl::xStringA str(psz);
+		xSize2i size { cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
 
 		if (bOutline) {
 			cv::Scalar crBkgnd;
@@ -139,10 +139,10 @@ namespace gtl {
 			//if (crBkgnd == Scalar(0, 0, 0))
 			//	crBkgnd = Scalar(1, 1, 1);
 			int iShift = std::max(1, thickness/2);
-			cv::putText(img, str, org-size/2+CPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+CPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+CPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+CPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+xPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+xPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+xPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+xPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
 		}
 
 		cv::putText(img, str, org-size/2, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
@@ -151,12 +151,12 @@ namespace gtl {
 
 	//-----------------------------------------------------------------------------
 	// Mat 
-	GTL_API bool CheckGPU(bool bUse);
-	GTL_API bool IsGPUEnabled();
-	GTL_API bool ConvertColor(cv::Mat const& imgSrc, cv::Mat& imgDest, int eCode);
-	GTL_API bool ResizeImage(cv::Mat const& imgSrc, cv::Mat& imgDest, double dScale, int eInterpolation = cv::INTER_LINEAR/*, int eScaleDownMethod = cv::INTER_AREA*/);
-	GTL_API bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, cv::Mat& matResult, int method);
-	GTL_API bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, CPoint2d& ptBest, double& dMinMax, double& dRate, double dScale = 0.0, int eInterpolation = cv::INTER_LINEAR);
+	GTL__API bool CheckGPU(bool bUse);
+	GTL__API bool IsGPUEnabled();
+	GTL__API bool ConvertColor(cv::Mat const& imgSrc, cv::Mat& imgDest, int eCode);
+	GTL__API bool ResizeImage(cv::Mat const& imgSrc, cv::Mat& imgDest, double dScale, int eInterpolation = cv::INTER_LINEAR/*, int eScaleDownMethod = cv::INTER_AREA*/);
+	GTL__API bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, cv::Mat& matResult, int method);
+	GTL__API bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, xPoint2d& ptBest, double& dMinMax, double& dRate, double dScale = 0.0, int eInterpolation = cv::INTER_LINEAR);
 
 	//-----------------------------------------------------------------------------
 	// Mat to DC
@@ -200,8 +200,8 @@ namespace gtl {
 		return true;
 
 	}
-	GTL_API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Mat const& matMask);
-	GTL_API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Scalar const& crTransparent);
+	GTL__API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Mat const& matMask);
+	GTL__API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Scalar const& crTransparent);
 
 
 	/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
@@ -211,8 +211,8 @@ namespace gtl {
 	/// @param palette 
 	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
 	/// @return 
-	GTL_API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false, callback_progress_t funcCallback = nullptr);
-	GTL_API cv::Mat LoadBitmapMat(std::filesystem::path const& path, callback_progress_t funcCallback = nullptr);
+	GTL__API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false, callback_progress_t funcCallback = nullptr);
+	GTL__API cv::Mat LoadBitmapMat(std::filesystem::path const& path, callback_progress_t funcCallback = nullptr);
 
 
 	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {

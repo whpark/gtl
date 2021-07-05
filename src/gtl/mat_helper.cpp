@@ -110,7 +110,7 @@ namespace gtl {
 		return true;
 	}
 
-	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, CPoint2d& ptBest, double& dMinMax, double& dRate, double dScale, int eInterpolation) {
+	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, xPoint2d& ptBest, double& dMinMax, double& dRate, double dScale, int eInterpolation) {
 		try {
 			double dMin, dMax;
 			cv::Point ptMin, ptMax;
@@ -514,7 +514,7 @@ namespace gtl {
 		bool bOK{};
 
 		// Trigger notifying it's over.
-		CTrigger trigger([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, bOK);});
+		xTrigger trigger([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, bOK);});
 
 		if (img.empty())
 			return false;
@@ -866,7 +866,7 @@ namespace gtl {
 		bool bOK{};
 
 		// Trigger notifying it's over.
-		CTrigger trigger([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, bOK); });
+		xTrigger trigger([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, bOK); });
 
 
 		cv::Mat img;

@@ -34,7 +34,7 @@ TEST(gtl_string, TString_CodepageConversion) {
 	auto len1 = gtl::tszlen(u"ABCDEF"sv);
 	static_assert(gtl::tszlen(u"ABCDEF"sv) == 6);
 
-	gtl::CStringU16 str;
+	gtl::xStringU16 str;
 	str = u"가나다라😊";
 	EXPECT_TRUE(str == u"가나다라😊"sv);
 
@@ -53,7 +53,7 @@ TEST(gtl_string, TString_CodepageConversion) {
 TEST(gtl_string, TString_Trim) {
 	using namespace gtl;
 	
-	gtl::CStringU16 str;
+	gtl::xStringU16 str;
 	str = u8"나라😊가나다";
 
 	str += u"  \r\n \t\t   \r\n";
@@ -104,16 +104,16 @@ TEST(gtl_string, TString_Upper_Lower) {
 		char32_t c1 = *pos;
 		char32_t c2 = *(pos+1);
 
-		CStringU16 str1;
+		xStringU16 str1;
 		str1 = std::u16string_view(pos, pos+1);
-		CStringU16 str2;
+		xStringU16 str2;
 		str2 = std::u16string_view(pos+1, pos+2);
 
 		EXPECT_EQ(str1.size(), 1);
 		EXPECT_EQ(str2.size(), 1);
 
-		CStringU16 str1L { str1.GetLower() };
-		CStringU16 str2U { str2.GetUpper() };
+		xStringU16 str1L { str1.GetLower() };
+		xStringU16 str2U { str2.GetUpper() };
 		EXPECT_EQ(str1L, str2);
 		EXPECT_EQ(str2U, str1);
 
@@ -125,7 +125,7 @@ TEST(gtl_string, TString_Upper_Lower) {
 TEST(gtl_string, TString_etc) {
 	//using namespace gtl;
 
-	gtl::CStringU16 str;
+	gtl::xStringU16 str;
 
 	str = u"ABCDEFGHIJKLMNOPQUST";
 
@@ -147,7 +147,7 @@ TEST(gtl_string, TString_etc) {
 	EXPECT_TRUE(str.SpanExcluding(u"OKLBA"sv) == u"CDEFGHIJMNPQUST"sv);
 	EXPECT_TRUE(str.SpanIncluding(u"OKLBA"sv) == u"ABKLO"sv);
 
-	gtl::CStringU16 strR = str.GetReverse();
+	gtl::xStringU16 strR = str.GetReverse();
 	EXPECT_TRUE(strR == u"TSUQPONMLKJIHGFEDCBA"sv);
 	strR.MakeReverse();
 	EXPECT_TRUE(strR == str);
@@ -237,10 +237,10 @@ SUPPRESS_DEPRECATED_WARNING
 		EXPECT_TRUE(str == u"ABCDEF\nABCDEF\nABCDEF\n");
 
 		str = u"ABCDEF\n";
-		gtl::CStringU16 str2 = str + L"가나다\n"sv + u8"마바사\n"sv + U"아자차\n"sv;
+		gtl::xStringU16 str2 = str + L"가나다\n"sv + u8"마바사\n"sv + U"아자차\n"sv;
 		EXPECT_TRUE(str2 == u"ABCDEF\n가나다\n마바사\n아자차\n"sv);
 
-		gtl::CStringU16 str3;
+		gtl::xStringU16 str3;
 		str3 = str + str2;
 		str3 = u"가나다\n"sv + str3;
 		str3 = U"마바사\n"sv + str3;
@@ -264,7 +264,7 @@ SUPPRESS_DEPRECATED_WARNING
 		EXPECT_TRUE(str == u"가가나다"sv);
 
 		str = u"가나다"sv;
-		gtl::CStringA strA { "가"sv};
+		gtl::xStringA strA { "가"sv};
 		auto strA1 = "가" + str + u"도레미";
 		auto strA2 = "가"s + str + U"마바사";
 		auto strA3 = "가"sv + str + "솔라시";

@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef GTL_HEADER__BASIC_STRING_MISC_IMPL
-#define GTL_HEADER__BASIC_STRING_MISC_IMPL
+#ifndef GTL__HEADER__BASIC_STRING_MISC_IMPL
+#define GTL__HEADER__BASIC_STRING_MISC_IMPL
 
 #include "gtl/_default.h"
 //#include "latin_charset.h"
@@ -31,7 +31,7 @@ namespace gtl {
 		else if constexpr (std::is_same_v<tchar, char16_t>) { return TEXT_u(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, char32_t>) { return TEXT_U(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, wchar_t>) { return TEXT_W(SPACE_STRING); }
-		else if constexpr (std::is_same_v<tchar, uint16_t>) { return (uint16_t*)TEXT_u(SPACE_STRING); }
+		else if constexpr (std::is_same_v<tchar, charKSSM_t>) { return (charKSSM_t*)TEXT_u(SPACE_STRING); }
 		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
 #if 0 // obsolete
@@ -529,9 +529,9 @@ namespace gtl {
 			else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
 				str += v;
 			}
-#if GTL_STRING_SUPPORT_CODEPAGE_KSSM
-			else if constexpr (gtlc::is_one_of<tchar, uint16_t>) {
-				str += (v < 0xffff) ? (uint16_t)v : cFill;
+#if GTL__STRING_SUPPORT_CODEPAGE_KSSM
+			else if constexpr (gtlc::is_one_of<tchar, charKSSM_t>) {
+				str += (v < 0xffff) ? (charKSSM_t)v : cFill;
 			}
 #endif
 			else {
@@ -685,4 +685,4 @@ namespace gtl {
 };	// namespace gtl;
 
 
-#endif	// GTL_HEADER__BASIC_STRING_MISC_IMPL
+#endif	// GTL__HEADER__BASIC_STRING_MISC_IMPL
