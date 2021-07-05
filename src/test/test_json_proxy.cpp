@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 
 #include "gtl/gtl.h"
 #include "gtl/concepts.h"
@@ -142,7 +142,7 @@ TEST(json_proxy, basic) {
 
 	{	// boost::json
 		gtl::bjson j;
-		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"°¡³ª´Ù¶ó¸¶"};
+		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"ê°€ë‚˜ë‹¤ë¼ë§ˆ"};
 		j = a;
 
 		std::cout << '\n' << std::setw(4) << j.json() << '\n';
@@ -157,7 +157,7 @@ TEST(json_proxy, basic) {
 		// nlohmann::ordered_json
 		gtl::njson<nlohmann::ordered_json> j;
 
-		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"°¡³ª´Ù¶ó¸¶"};
+		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"ê°€ë‚˜ë‹¤ë¼ë§ˆ"};
 		j = a;
 
 		std::cout << '\n' << std::setw(4) << j.json() << '\n';
@@ -172,7 +172,7 @@ TEST(json_proxy, basic) {
 		// nlohmann::json
 		gtl::njson j;
 
-		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"°¡³ª´Ù¶ó¸¶"};
+		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"ê°€ë‚˜ë‹¤ë¼ë§ˆ"};
 		j = a;
 
 		std::cout << '\n' << std::setw(4) << j.json() << '\n';

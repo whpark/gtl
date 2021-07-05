@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // shape.h:
 //
@@ -11,25 +11,25 @@
 ///////////////////////////////////////////////////////////////////////////////
 /*
 
-	1. CShapeObject ¿¡¼­ º¯°æ ³»¿ë :
+	1. CShapeObject ì—ì„œ ë³€ê²½ ë‚´ìš© :
 
 		class name :
 
-			CShapeObject	-> s_shape
-			CShapeLine		-> s_line
-			CShapePolyLine	-> s_polyline
+			CShapeObject	-> xShape
+			CShapeLine		-> xLine
+			CShapePolyLine	-> xPolyline
 			...
 
 		Container :
 
 			TList -> boost::ptr_deque
 
-		Point / Line : x, y, z 3Â÷¿øÀ¸·Î º¯°æ
+		Point / Line : x, y, z 3ì°¨ì›ìœ¼ë¡œ ë³€ê²½
 
-			typedef CSize3d					size2d_t;
-			typedef CPoint3d				point_t;
-			typedef CRect3d					rect_t;
-			typedef std::vector<s_line>		s_lines;
+			typedef xSize3d					size2d_t;
+			typedef xPoint3d				point_t;
+			typedef xRect3d					rect_t;
+			typedef std::vector<xLine>		s_lines;
 
 */
 ///////////////////////////////////////////////////////////////////////////////

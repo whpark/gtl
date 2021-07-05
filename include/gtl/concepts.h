@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////
 //
 // concepts.h:
 //
@@ -14,6 +14,15 @@
 
 #if !defined(__cpp_lib_concepts)
 #	error ERROR! Supports C++v20 only.
+#endif
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+	using charKSSM_t = uint16_t;
+#endif
+
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+namespace gtl {
+	using charKSSM_t = uint16_t;
+}
 #endif
 
 namespace gtl::concepts {
@@ -69,11 +78,11 @@ namespace gtl::concepts {
 		};
 
 
-	/// @brief type for string (uint16_t for KSSM (Korean Johab)
+	/// @brief type for string (charKSSM_t for KSSM (Korean Johab)
 	template < typename tchar >
 	concept string_elem = is_one_of<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
-		, uint16_t	// uint16_t for KSSM (Johab)
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+		, charKSSM_t// charKSSM_t for KSSM (Johab)
 #endif
 	>;
 
@@ -177,7 +186,7 @@ namespace gtl::concepts {
 	template < typename T_COORD > concept size2 = ( requires (T_COORD a) { a.cx; a.cy; } and !requires (T_COORD a) { a.cz; } );
 	template < typename T_COORD > concept size3 = ( requires (T_COORD a) { a.cx; a.cy; a.cz; } );
 
-	template < typename T_COORD > concept rect = requires (T_COORD a) { a.pt0; a.pt1; };
+	template < typename T_COORD > concept rect = requires (T_COORD a) { a.pt0(); a.pt1(); a.left; a.top; a.right; a.bottom; };
 	template < typename T_COORD > concept rect2 = ( gtl::concepts::rect<T_COORD> and requires (T_COORD a) { a.left; a.top; a.right; a.bottom; } and !requires (T_COORD a) { a.front; a.back; } );
 	template < typename T_COORD > concept rect3 = ( gtl::concepts::rect<T_COORD> and requires (T_COORD a) { a.left; a.top; a.right; a.bottom; a.front; a.back;} );
 

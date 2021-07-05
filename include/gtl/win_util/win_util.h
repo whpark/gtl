@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -18,7 +18,7 @@
 
 #include "targetver.h"
 
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some xString constructors will be explicit
 
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
@@ -52,8 +52,8 @@
 namespace gtl::win_util {
 #pragma pack(push, 8)	// default align. (8 bytes)
 
-	GTL_WINUTIL_API gtl::CString GetErrorMessage(CException& e);
-	GTL_WINUTIL_API gtl::CString GetErrorMessage(DWORD dwLastError);
+	GTL__WINUTIL_API gtl::xString GetErrorMessage(CException& e);
+	GTL__WINUTIL_API gtl::xString GetErrorMessage(DWORD dwLastError);
 
 	//-------------------------------------------------------------------------
 	/// @brief StopWatch
@@ -91,18 +91,49 @@ namespace gtl::win_util {
 
 	//-------------------------------------------------------------------------
 	/// @brief StopWatch
-	template < typename tchar, typename tresolution = std::chrono::duration<double> >
-	class TStopWatch : public gtl::TStopWatch<tchar, tresolution > {
+	template < typename tresolution = std::chrono::duration<double>, typename tclock = std::chrono::steady_clock >
+	class TStopWatch : public gtl::TStopWatch<char, tresolution, tclock > {
 	public:
-		static inline TDebugOutputStreamBuf<tchar> osbuf;
-		static inline std::basic_ostream<tchar> os{&osbuf};	// !! Destruction Order ... (<- static inline)
-		using base_t = gtl::TStopWatch<tchar, tresolution>;
+		static inline TDebugOutputStreamBuf<char> osbufA;
+		static inline TDebugOutputStreamBuf<wchar_t> osbufW;
+		static inline std::ostream osA{&osbufA};	// !! Destruction Order ... (<- static inline)
+		static inline std::wostream osW{&osbufW};	// !! Destruction Order ... (<- static inline)
+		using base_t = gtl::TStopWatch<char, tresolution, tclock>;
 
-		TStopWatch() : /*os(&osbuf),*/ base_t(os) {};
+	public:
+		TStopWatch() : base_t(osA) {
+		}
+		~TStopWatch() {
+			Lap("end");
+			//osbufA.flush();
+			//osbufW.flush();
+		}
+
+	public:
+	#define GTL__PRINT_FMT_STOPWATCH_PRE "STOP_WATCH {:{}}[ "
+	#define GTL__PRINT_FMT_STOPWATCH_POST " ] {}\n"
+
+		template < typename ... Args >
+		void Lap(std::string_view sv, Args&& ... args) {
+			auto t = tclock::now();
+			osA << std::format(GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
+			osA << std::format(sv, std::forward<Args>(args)...);
+			osA << std::format(GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
+			base_t::t0 = tclock::now();
+		}
+		template < typename ... Args >
+		void Lap(std::wstring_view sv, Args&& ... args) {
+			auto t = tclock::now();
+			osW << std::format(L"" GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
+			osW << std::format(sv, std::forward<Args>(args)...);
+			osW << std::format(L"" GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
+			base_t::t0 = tclock::now();
+		}
+	#undef GTL__PRINT_FMT_STOPWATCH_POST
+	#undef GTL__PRINT_FMT_STOPWATCH_PRE
 	};
 
-	using CStopWatchA = TStopWatch<char>;
-	using CStopWatchW = TStopWatch<wchar_t>;
+	using xStopWatch = TStopWatch;
 
 #pragma pack(pop)
 }
@@ -115,8 +146,8 @@ namespace gtlw = gtl::win_util;
 // Scan
 AFX_EXT_API_MISC const char*	ScanString(const char* psz, char* pszResult, sizeXX_t& nBufferCount/* including NULL Terminator */, const char* pszDelimiter = " ", const char* pszPrefix = NULL, const char* pszEnd = " ");
 AFX_EXT_API_MISC const wchar_t*	ScanString(const wchar_t* psz, wchar_t* pszResult, sizeXX_t& nBufferCount/* including NULL Terminator */, const wchar_t* pszDelimiter = L" ", const wchar_t* pszPrefix = NULL, const wchar_t* pszEnd = L" ");
-AFX_EXT_API_MISC const char*	ScanString(const char* psz, CStringA& strResult, const char* pszDelimiter = " ", const char* pszPrefix = NULL, const char* pszEnd = " ");
-AFX_EXT_API_MISC const wchar_t*	ScanString(const wchar_t* psz, CStringW& strResult, const wchar_t* pszDelimiter = L" ", const wchar_t* pszPrefix = NULL, const wchar_t* pszEnd = L" ");
+AFX_EXT_API_MISC const char*	ScanString(const char* psz, xStringA& strResult, const char* pszDelimiter = " ", const char* pszPrefix = NULL, const char* pszEnd = " ");
+AFX_EXT_API_MISC const wchar_t*	ScanString(const wchar_t* psz, xStringW& strResult, const wchar_t* pszDelimiter = L" ", const wchar_t* pszPrefix = NULL, const wchar_t* pszEnd = L" ");
 //#define ScanStringA ScanString
 //#define ScanStringW ScanString
 
@@ -124,18 +155,18 @@ inline BOOL CompareBoolean(BOOL b1, BOOL b2) { return ( (b1 && b2) || (!b1 && !b
 AFX_EXT_API_MISC int CompareNumberedString(LPCSTR psz1, LPCSTR psz2);
 AFX_EXT_API_MISC int CompareNumberedString(LPCWSTR psz1, LPCWSTR psz2);
 
-AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, CStringA& drive, CStringA& path, CStringA& title, CStringA& ext);
-AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, CStringA& folder, CStringA& title, CStringA& ext);
-AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, CStringA& folder, CStringA& name);
-AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, CStringW& drive, CStringW& folder, CStringW& title, CStringW& ext);
-AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, CStringW& folder, CStringW& title, CStringW& ext);
-AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, CStringW& folder, CStringW& name);
+AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, xStringA& drive, xStringA& path, xStringA& title, xStringA& ext);
+AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& title, xStringA& ext);
+AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& m_name);
+AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, xStringW& drive, xStringW& folder, xStringW& title, xStringW& ext);
+AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& title, xStringW& ext);
+AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& m_name);
 //#define SplitPathW SplitPath
 //#define SplitPathA SplitPath
 class AFX_EXT_API_MISC CPushDirectory {
 private:
-	CString strOldDirectory;
-	CString strCurrentDirectory;
+	xString strOldDirectory;
+	xString strCurrentDirectory;
 public:
 	CPushDirectory(LPCTSTR pszNewDirectory) {
 		::GetCurrentDirectory(1024, strOldDirectory.GetBuffer(1024));
@@ -159,31 +190,31 @@ public:
 AFX_EXT_API_MISC BOOL BackupMoveFile(LPCTSTR pszPath, LPCTSTR pszBackupFolder = NULL, BOOL bUseDateTime = TRUE, DWORD dwMoveFileExFlag = MOVEFILE_COPY_ALLOWED|MOVEFILE_REPLACE_EXISTING);
 AFX_EXT_API_MISC BOOL BackupCopyFile(LPCTSTR pszPath, LPCTSTR pszBackupFolder = NULL, BOOL bUseDateTime = TRUE, DWORD dwCopyFileExFlag = 0);
 
-AFX_EXT_API_MISC void GetErrorText(DWORD dwLastError, CString& strMessage);
+AFX_EXT_API_MISC void GetErrorText(DWORD dwLastError, xString& strMessage);
 
 AFX_EXT_API_MISC DWORD CALLBACK EditStreamCallback(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
 
-//Shellø° PathRelativePathTo(); «‘ºˆ ¿÷¿Ω.
-AFX_EXT_API_MISC void GetRelativePath(LPCTSTR pszFolderBase, LPCTSTR pszFullPathTarget, CString& strPathRelative);
-AFX_EXT_API_MISC void GetAbsolutePath(LPCTSTR pszFolderBase, LPCTSTR pszPathRelative, CString& strPathFull);
-AFX_EXT_API_MISC CStringW GetLongPathNameUnicode(LPCWSTR szShortName);
+//ShellÏóê PathRelativePathTo(); Ìï®Ïàò ÏûàÏùå.
+AFX_EXT_API_MISC void GetRelativePath(LPCTSTR pszFolderBase, LPCTSTR pszFullPathTarget, xString& strPathRelative);
+AFX_EXT_API_MISC void GetAbsolutePath(LPCTSTR pszFolderBase, LPCTSTR pszPathRelative, xString& strPathFull);
+AFX_EXT_API_MISC xStringW GetLongPathNameUnicode(LPCWSTR szShortName);
 
 AFX_EXT_API_MISC BOOL HexaStringToBinary(LPCSTR psz, BYTE buffer[], sizeXX_t& nBufferSize, char** pszEnd = NULL);
 AFX_EXT_API_MISC BOOL HexaStringToBinary(LPCSTR psz, TBuffer<BYTE>& buf, char** pszEnd = NULL);
 AFX_EXT_API_MISC BOOL HexaStringToBinary(LPCWSTR psz, BYTE buffer[], sizeXX_t& nBufferSize, wchar_t** pszEnd = NULL);
 AFX_EXT_API_MISC BOOL HexaStringToBinary(LPCWSTR psz, TBuffer<BYTE>& buf, wchar_t** pszEnd = NULL);
-AFX_EXT_API_MISC void MakeDataToHexForm(CStrings& strHexForm, const void* lpBuf, sizeXX_t nBufLen, int nCol = 16, BOOL bAddText = TRUE);
-AFX_EXT_API_MISC void MakeDataToDecForm(CStrings& strHexForm, const void* lpBuf, sizeXX_t nBufLen, int nCol = 16, BOOL bAddText = TRUE);
+AFX_EXT_API_MISC void MakeDataToHexForm(xStrings& strHexForm, const void* lpBuf, sizeXX_t nBufLen, int nCol = 16, BOOL bAddText = TRUE);
+AFX_EXT_API_MISC void MakeDataToDecForm(xStrings& strHexForm, const void* lpBuf, sizeXX_t nBufLen, int nCol = 16, BOOL bAddText = TRUE);
 
-AFX_EXT_API_MISC CString GetUniqueFileName(LPCTSTR path, LPCTSTR fName = _T("UniqueName??.DAT"), BOOL bCreateFile = TRUE);
-AFX_EXT_API_MISC CString GetUniqueFileName(CStrings paths, LPCTSTR fName, BOOL bCreateFile = TRUE);
+AFX_EXT_API_MISC xString GetUniqueFileName(LPCTSTR path, LPCTSTR fName = _T("UniqueName??.DAT"), BOOL bCreateFile = TRUE);
+AFX_EXT_API_MISC xString GetUniqueFileName(xStrings paths, LPCTSTR fName, BOOL bCreateFile = TRUE);
 
 MOCHA_DEPRECATED AFX_EXT_API_MISC BOOL CreateIntermediateDirectory(LPCTSTR szPath);
 AFX_EXT_API_MISC bool CreateSubDirectories(LPCTSTR szPath);
 
 #ifdef _USE_SHELL_API
 AFX_EXT_API_MISC LPITEMIDLIST PidlBrowse(HWND hWnd, int nCSIDL, LPTSTR pszDisplayName, LPCTSTR pszTitle = _T("Choose a folder"));
-AFX_EXT_API_MISC CString BrowseFolder(HWND hWnd, int nCSIDL, LPCTSTR pszTitle = _T("Choose a folder"));
+AFX_EXT_API_MISC xString BrowseFolder(HWND hWnd, int nCSIDL, LPCTSTR pszTitle = _T("Choose a folder"));
 #endif
 
 // Window/App Focus
@@ -210,8 +241,8 @@ typedef struct {
 	T_IP_ADDRESS subnetmask;
 	T_IP_ADDRESS gateway;	 // N/A
 	T_MAC_ADDRESS mac;
-	CString strName;
-	CString strDescription;
+	xString strName;
+	xString strDescription;
 } T_NIC_INFO;
 AFX_EXT_API_MISC BOOL GetNICInfo(std::vector<T_NIC_INFO>& nics);
 
@@ -281,7 +312,7 @@ protected:
 #endif
 	BOOL bLocked;
 public:
-	CS(LPCTSTR name = NULL, LONG lInitialCount = 1, LONG lMaxCount = 1, int nTimeOut = INFINITE) : cs(lInitialCount, lMaxCount, name) {
+	CS(LPCTSTR m_name = NULL, LONG lInitialCount = 1, LONG lMaxCount = 1, int nTimeOut = INFINITE) : cs(lInitialCount, lMaxCount, m_name) {
 		pCS = NULL;
 	#if (_MSC_VER >= _MSC_VER_VS2013)
 		pMX = NULL;
@@ -425,11 +456,11 @@ public:
 
 
 //-----------------------------------------------------------------------------
-// CString       <--------->       TPoint2/3, TSize2/3, TRect2/3, T_POINT2/3, T_SIZE2/3, T_RECT2/3
+// xString       <--------->       TPoint2/3, TSize2/3, TRect2/3, T_POINT2/3, T_SIZE2/3, T_RECT2/3
 //
 template < class T_COORD, class = T_COORD::coord_t >
 bool Text2Coord(T_COORD& coord, LPCTSTR pszText) {
-	std::vector<CString> strs;
+	std::vector<xString> strs;
 	SplitString(pszText, ',', strs, countof(coord.val));
 
 	if (strs.size() < countof(coord.val))
@@ -445,7 +476,7 @@ bool Text2Coord(T_COORD& coord, LPCTSTR pszText) {
 	return true;
 }
 template < class T_COORD, class = T_COORD::coord_t >
-bool Coord2Text(const T_COORD& coord, CString& str, LPCTSTR pszFMT = nullptr) {
+bool Coord2Text(const T_COORD& coord, xString& str, LPCTSTR pszFMT = nullptr) {
 	if (pszFMT == NULL) {
 		if constexpr (std::is_integral_v<std::remove_cvref_t<decltype(T_COORD::val[0])>>) {
 			pszFMT = _T("%d");
@@ -470,8 +501,8 @@ T_COORD ConvText2Coord(LPCTSTR pszText) {
 	return coord;
 }
 template < class T_COORD, class = T_COORD::coord_t >
-CString ConvCoord2Text(const T_COORD& coord, LPCTSTR pszFMT = nullptr) {
-	CString str;
+xString ConvCoord2Text(const T_COORD& coord, LPCTSTR pszFMT = nullptr) {
+	xString str;
 	Coord2Text(coord, str, pszFMT);
 	return str;
 }

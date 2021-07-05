@@ -1,4 +1,4 @@
-// ProgressDlg.cpp : implementation file
+Ôªø// ProgressDlg.cpp : implementation file
 //
 
 #include "pch.h"
@@ -74,7 +74,7 @@ namespace gtl::win_util {
 				if (m_iPercent != iPos)
 					m_progress.SetPos(m_iPercent);
 				auto ts = std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now() - m_tStart);
-				auto str = std::format(_T("{:.3f} √ "), ts.count());
+				auto str = std::format(_T("{:.3f} Ï¥à"), ts.count());
 				CheckAndSetDlgItemText(this, IDC_STATE, str.c_str());
 			}
 			if (m_bDone) {

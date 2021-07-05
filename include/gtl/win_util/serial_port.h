@@ -22,7 +22,7 @@
 namespace gtl::win_util {
 #pragma pack(push, 8)
 
-	class GTL_WINUTIL_CLASS XComm {
+	class GTL__WINUTIL_CLASS xComm {
 	public:
 		enum eCONTROL_CHAR : uint8_t {
 			ACK = 0x06,
@@ -69,7 +69,7 @@ namespace gtl::win_util {
 		constexpr static inline size_t RECV_ENQ_TIME = 30;
 
 	public:
-		CSimpleLog m_log;
+		xSimpleLog m_log;
 
 	protected:
 		HANDLE m_hComm;
@@ -91,7 +91,7 @@ namespace gtl::win_util {
 	public:
 		bool m_bLog {};	// if true, leaves log for read/written texts.
 
-		XComm() = default;
+		xComm() = default;
 
 		HANDLE GetCommHandle() { return m_hComm; }
 

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // convert_codepage.h:
 //
@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef GTL_HEADER__STRING_CONVERT_CODEPAGE
-#define GTL_HEADER__STRING_CONVERT_CODEPAGE
+#ifndef GTL__HEADER__STRING_CONVERT_CODEPAGE
+#define GTL__HEADER__STRING_CONVERT_CODEPAGE
 
 #include <experimental/generator>
 
@@ -51,8 +51,8 @@ namespace gtl {
 	//------------------------
 
 		KO_KR_949 = 949,
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
-		KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+		KO_KR_JOHAB_KSSM_1361 = 1361,	// ì¡°í•©í˜• KSSM
 #endif
 
 
@@ -91,8 +91,8 @@ namespace gtl {
 			ACP = 0,
 
 			KO_KR_949 = 949,
-	#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
-			KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
+	#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+			KO_KR_JOHAB_KSSM_1361 = 1361,	// ì¡°í•©í˜• KSSM
 	#endif
 
 
@@ -144,7 +144,7 @@ namespace gtl {
 
 	/// @brief default codepage for MBCS (windows)
 	/// you can set this value for your region.
-	GTL_DATA extern eCODEPAGE eMBCS_Codepage_g;
+	GTL__DATA extern eCODEPAGE eMBCS_Codepage_g;
 
 
 	constexpr static inline [[nodiscard]] std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {
@@ -598,7 +598,7 @@ namespace gtl {
 	}
 
 
-#if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
+#if (GTL__STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
 	template < bool bCOUNT_FIRST >
 	std::string ConvWide_MBCS(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
 		std::string str;
@@ -787,4 +787,4 @@ namespace gtl {
 };	// namespace gtl;
 
 
-#endif	// GTL_HEADER__STRING_CONVERT_CODEPAGE
+#endif	// GTL__HEADER__STRING_CONVERT_CODEPAGE

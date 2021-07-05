@@ -12,23 +12,23 @@
 
 #include "gtl/__lib.h"
 
-#ifndef _GTL_SHAPE_AS_DLL
-#	define _GTL_SHAPE_AS_DLL 1
+#ifndef GTL__SHAPE_AS_DLL
+#	define GTL__SHAPE_AS_DLL 1
 #endif
 
-#if (_GTL_SHAPE_AS_DLL)
-#	ifdef GTL_SHAPE_EXPORTS
-#		define GTL_SHAPE_CLASS		GTL_EXPORT
-#		define GTL_SHAPE_API		GTL_EXPORT
-#		define GTL_SHAPE_DATA		GTL_EXPORT
+#if (GTL__SHAPE_AS_DLL)
+#	ifdef GTL__SHAPE_EXPORTS
+#		define GTL__SHAPE_CLASS		GTL__EXPORT
+#		define GTL__SHAPE_API		GTL__EXPORT
+#		define GTL__SHAPE_DATA		GTL__EXPORT
 #	else 
-#		define GTL_SHAPE_CLASS		GTL_IMPORT
-#		define GTL_SHAPE_API		GTL_IMPORT
-#		define GTL_SHAPE_DATA		GTL_IMPORT
-		GTL_IMPORT_LIB(shape)
+#		define GTL__SHAPE_CLASS		GTL__IMPORT
+#		define GTL__SHAPE_API		GTL__IMPORT
+#		define GTL__SHAPE_DATA		GTL__IMPORT
+		GTL__IMPORT_LIB(shape)
 #	endif
-#else	// _GTL_SHAPE_AS_DLL
-#	define GTL_SHAPE_CLASS
-#	define GTL_SHAPE_API
-#	define GTL_SHAPE_DATA
-#endif	// _GTL_SHAPE_AS_DLL
+#else	// GTL__SHAPE_AS_DLL
+#	define GTL__SHAPE_CLASS
+#	define GTL__SHAPE_API
+#	define GTL__SHAPE_DATA
+#endif	// GTL__SHAPE_AS_DLL

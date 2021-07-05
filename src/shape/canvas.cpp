@@ -1,11 +1,11 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "gtl/shape/canvas.h"
 
 #include "../3rdparty/tinyspline/tinysplinecxx.h"
 
 namespace gtl::shape {
 
-	GTL_SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
+	GTL__SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
 		if (pts.size() < 2)
 			return;
 
@@ -14,7 +14,7 @@ namespace gtl::shape {
 			len += pts[i].Distance(pts[i-1]);
 		}
 
-		double step = canvas.target_interpolation_inverval_ / len / 2.;
+		double step = canvas.m_target_interpolation_inverval / len / 2.;
 
 		tinyspline::BSpline bspline(pts.size(), 2, degree);
 		std::vector<tinyspline::real> points(pts.size()*degree);

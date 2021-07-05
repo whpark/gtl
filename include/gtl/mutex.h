@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 //
 // lock.h
 //
@@ -26,8 +26,8 @@
 namespace gtl {
 #pragma pack(push, 8)
 
-	//class GTL_CLASS null_mutex;
-	//class GTL_CLASS recursive_shared_mutex;
+	//class GTL__CLASS null_mutex;
+	//class GTL__CLASS recursive_shared_mutex;
 
 
 	//------------------------------------------------------------------------

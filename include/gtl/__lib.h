@@ -8,11 +8,12 @@
 // 2018.12.05.
 // 2019.07.24. QL -> GTL
 // 2020.11.12.
+// 2021.07.05. new naming convention
 //
 //////////////////////////////////////////////////////////////////////
 
 
-#define GTL_LIBRARY_2020			// 그냥.
+#define GTL__LIBRARY_2020			// 그냥.
 
 
 //-----------------------------------------------------------------------------
@@ -65,22 +66,22 @@
 #endif
 
 
-#ifndef GTL_DEPRECATED
+#ifndef GTL__DEPRECATED
 #	ifdef _DEBUG
-#		define GTL_DEPRECATED __declspec(deprecated)
+#		define GTL__DEPRECATED __declspec(deprecated)
 #	else
-#		define GTL_DEPRECATED
+#		define GTL__DEPRECATED
 #	endif
 #endif
 
 
 //-----------------------------------------------------------------------------
 // library
-#ifndef GTL_EXPORT
-#	define GTL_EXPORT __declspec(dllexport)
+#ifndef GTL__EXPORT
+#	define GTL__EXPORT __declspec(dllexport)
 #endif
-#ifndef GTL_IMPORT
-#	define GTL_IMPORT __declspec(dllimport)
+#ifndef GTL__IMPORT
+#	define GTL__IMPORT __declspec(dllimport)
 #endif
 
 
@@ -116,9 +117,9 @@
 #	define GTL__PLATFORM_CHARSET_ "A"
 #endif
 
-#define GTL_IMPORT_LIB(name) \
+#define GTL__IMPORT_LIB(name) \
 	__pragma(comment(lib, #name "." GTL__PLATFORM_MACHINE_ GTL__PLATFORM_CHARSET_ GTL__PLATFORM_CONFIGURE_ ".lib" ))
-#define GTL_IMPORT_LIB__TOOLSET(name) \
+#define GTL__IMPORT_LIB__TOOLSET(name) \
 	__pragma(comment(lib, #name "." GTL__PLATFORM_TOOLSET_VER_ "." GTL__PLATFORM_MACHINE_  GTL__PLATFORM_CHARSET_ GTL__PLATFORM_CONFIGURE_ ".lib" ))
 
 //-----------------------------------------------------------------------------

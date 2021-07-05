@@ -1,4 +1,4 @@
-// mfc_util.cpp : Defines the initialization routines for the DLL.
+Ôªø// mfc_util.cpp : Defines the initialization routines for the DLL.
 //
 
 #include "pch.h"
@@ -27,16 +27,16 @@ WARNING_DISABLE(4018)
 
 namespace gtl::win_util {
 
-	CString GetErrorMessage(CException& e) {
-		CString str;
+	xString GetErrorMessage(CException& e) {
+		xString str;
 		e.GetErrorMessage(str.GetBuffer(1024), 1024);
 		str.ReleaseBuffer();
 		str.TrimRight();
 		return str;
 	}
 
-	CString GetErrorMessage(DWORD dwLastError) {
-		CString str;
+	xString GetErrorMessage(DWORD dwLastError) {
+		xString str;
 		LPVOID lpMsgBuf;
 		FormatMessage( 
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
@@ -106,10 +106,10 @@ intXX_t TSplitString(TSTRING strSRC, const TCHAR* pszDelimiters, TList<TSTRING>&
 	}
 	return strs.size();
 }
-intXX_t SplitString(CStringA strSRC, LPCSTR szDelimiters, CStringsA& strs)					{ return TSplitString<char, CStringA>(strSRC, szDelimiters, strs); }
-intXX_t SplitString(const CStringA& strSRC, char cDelimiter, CStringsA& strs)					{ return TSplitString<char, CStringA>(strSRC, cDelimiter, strs); }
-intXX_t SplitString(CStringW strSRC, LPCWSTR szDelimiters, CStringsW& strs)					{ return TSplitString<wchar_t, CStringW>(strSRC, szDelimiters, strs); }
-intXX_t SplitString(const CStringW& strSRC, wchar_t cDelimiter, CStringsW& strs)				{ return TSplitString<wchar_t, CStringW>(strSRC, cDelimiter, strs); }
+intXX_t SplitString(xStringA strSRC, LPCSTR szDelimiters, xStringsA& strs)					{ return TSplitString<char, xStringA>(strSRC, szDelimiters, strs); }
+intXX_t SplitString(const xStringA& strSRC, char cDelimiter, xStringsA& strs)					{ return TSplitString<char, xStringA>(strSRC, cDelimiter, strs); }
+intXX_t SplitString(xStringW strSRC, LPCWSTR szDelimiters, xStringsW& strs)					{ return TSplitString<wchar_t, xStringW>(strSRC, szDelimiters, strs); }
+intXX_t SplitString(const xStringW& strSRC, wchar_t cDelimiter, xStringsW& strs)				{ return TSplitString<wchar_t, xStringW>(strSRC, cDelimiter, strs); }
 
 template <typename TCHAR, class TSTRING>
 intXX_t TSplitString(const TSTRING& strSRC, TCHAR cDelimiter, std::vector<TSTRING>& strs, int nInitialSize) {
@@ -146,10 +146,10 @@ intXX_t TSplitString(TSTRING strSRC, const TCHAR* pszDelimiters, std::vector<TST
 	}
 	return strs.size();
 }
-intXX_t SplitString(CStringA strSRC, LPCSTR szDelimiters, std::vector<CStringA>& strs, int nInitialSize)			{ return TSplitString<char, CStringA>(strSRC, szDelimiters, strs, nInitialSize); }
-intXX_t SplitString(const CStringA& strSRC, char cDelimiter, std::vector<CStringA>& strs, int nInitialSize)		{ return TSplitString<char, CStringA>(strSRC, cDelimiter, strs, nInitialSize); }
-intXX_t SplitString(CStringW strSRC, LPCWSTR szDelimiters, std::vector<CStringW>& strs, int nInitialSize)			{ return TSplitString<wchar_t, CStringW>(strSRC, szDelimiters, strs, nInitialSize); }
-intXX_t SplitString(const CStringW& strSRC, wchar_t cDelimiter, std::vector<CStringW>& strs, int nInitialSize)	{ return TSplitString<wchar_t, CStringW>(strSRC, cDelimiter, strs, nInitialSize); }
+intXX_t SplitString(xStringA strSRC, LPCSTR szDelimiters, std::vector<xStringA>& strs, int nInitialSize)			{ return TSplitString<char, xStringA>(strSRC, szDelimiters, strs, nInitialSize); }
+intXX_t SplitString(const xStringA& strSRC, char cDelimiter, std::vector<xStringA>& strs, int nInitialSize)		{ return TSplitString<char, xStringA>(strSRC, cDelimiter, strs, nInitialSize); }
+intXX_t SplitString(xStringW strSRC, LPCWSTR szDelimiters, std::vector<xStringW>& strs, int nInitialSize)			{ return TSplitString<wchar_t, xStringW>(strSRC, szDelimiters, strs, nInitialSize); }
+intXX_t SplitString(const xStringW& strSRC, wchar_t cDelimiter, std::vector<xStringW>& strs, int nInitialSize)	{ return TSplitString<wchar_t, xStringW>(strSRC, cDelimiter, strs, nInitialSize); }
 
 template <typename TCHAR, class TSTRING>
 BOOL TFilterString(const TCHAR* szSRC, const TCHAR* szFilter, TList<TSTRING>& strParams, BOOL bCaseSensitive) {
@@ -195,11 +195,11 @@ BOOL TFilterString(const TCHAR* szSRC, const TCHAR* szFilter, TList<TSTRING>& st
 
 	return !*szSRC && !*szFilter;	// both reached to end
 }
-BOOL FilterString(LPCSTR szSRC, LPCSTR szFilter, CStringsA& strParams, BOOL bCaseSensitive)	{
-	return TFilterString<char, CStringA>(szSRC, szFilter, strParams, bCaseSensitive);
+BOOL FilterString(LPCSTR szSRC, LPCSTR szFilter, xStringsA& strParams, BOOL bCaseSensitive)	{
+	return TFilterString<char, xStringA>(szSRC, szFilter, strParams, bCaseSensitive);
 }
-BOOL FilterString(LPCWSTR szSRC, LPCWSTR szFilter, CStringsW& strParams, BOOL bCaseSensitive) {
-	return TFilterString<wchar_t, CStringW>(szSRC, szFilter, strParams, bCaseSensitive);
+BOOL FilterString(LPCWSTR szSRC, LPCWSTR szFilter, xStringsW& strParams, BOOL bCaseSensitive) {
+	return TFilterString<wchar_t, xStringW>(szSRC, szFilter, strParams, bCaseSensitive);
 }
 
 template <typename TCHAR>
@@ -360,17 +360,17 @@ BOOL TranslateEscapeCharacters(const char* szSRC, char* pszResult, sizeXX_t& nSi
 BOOL TranslateEscapeCharacters(const wchar_t* szSRC, wchar_t* pszResult, sizeXX_t& nSize/*exclude null-terminating*/, wchar_t** ppszEnd, wchar_t cAdditionalTerminating) {
 	return TranslateEscapeCharactersT(szSRC, pszResult, nSize, ppszEnd, cAdditionalTerminating);
 }
-BOOL TranslateEscapeCharacters(const char* szSRC, CStringA& strResult, char** ppszEnd, char cAdditionalTerminating) {
+BOOL TranslateEscapeCharacters(const char* szSRC, xStringA& strResult, char** ppszEnd, char cAdditionalTerminating) {
 	return TranslateEscapeCharactersT(szSRC, strResult, ppszEnd, cAdditionalTerminating);
 }
-BOOL TranslateEscapeCharacters(const wchar_t* szSRC, CStringW& strResult, wchar_t** ppszEnd, wchar_t cAdditionalTerminating) {
+BOOL TranslateEscapeCharacters(const wchar_t* szSRC, xStringW& strResult, wchar_t** ppszEnd, wchar_t cAdditionalTerminating) {
 	return TranslateEscapeCharactersT(szSRC, strResult, ppszEnd, cAdditionalTerminating);
 }
 
 
 template < typename T >
-CString DtoA(T number, LPCTSTR format) {
-	CString buf, result;
+xString DtoA(T number, LPCTSTR format) {
+	xString buf, result;
 	buf.Format(format, number);
 	BOOL bMinus = FALSE;
 	if (buf.GetLength() && (buf.GetAt(0) == '-')) {
@@ -379,7 +379,7 @@ CString DtoA(T number, LPCTSTR format) {
 	}
 	int index = buf.Find('.');
 	if (index < 0) index = buf.GetLength();
-	CString str = buf.Left(index);
+	xString str = buf.Left(index);
 	int len = str.GetLength();
 	for (int i = 0; i < len; i++) {
 		result += str.GetAt(i);
@@ -390,57 +390,57 @@ CString DtoA(T number, LPCTSTR format) {
 		result = _T("-") + result;
 	return result;
 }
-CString DtoA(const double number, LPCTSTR format) {
+xString DtoA(const double number, LPCTSTR format) {
 	return DtoA<double>(number, format);
 }
-CString DtoA(int32_t number) {
+xString DtoA(int32_t number) {
 	return DtoA<int32_t>(number, _T("%I32d"));
 }
-CString DtoA(uint32_t number) {
+xString DtoA(uint32_t number) {
 	return DtoA<uint32_t>(number, _T("%I32u"));
 }
-CString DtoA(DWORD number) {
+xString DtoA(DWORD number) {
 	return DtoA<DWORD>(number, _T("%I32u"));
 }
-CString DtoA(int64_t number) {
+xString DtoA(int64_t number) {
 	return DtoA<int64_t>(number, _T("%I64d"));
 }
-CString DtoA(uint64_t number) {
+xString DtoA(uint64_t number) {
 	return DtoA<uint64_t>(number, _T("%I64u"));
 }
 
-//CStringA Format(LPCSTR fmt, ... ) {
+//xStringA Format(LPCSTR fmt, ... ) {
 //	va_list arglist;
 //	va_start(arglist, fmt);
 //
-//	CStringA str;
+//	xStringA str;
 //	str.FormatV(fmt, arglist);
 //
 //	va_end(arglist);
 //	return str;
 //}
 //
-//CStringW Format(LPCWSTR fmt, ... ) {
+//xStringW Format(LPCWSTR fmt, ... ) {
 //	va_list arglist;
 //	va_start(arglist, fmt);
 //
-//	CStringW str;
+//	xStringW str;
 //	str.FormatV(fmt, arglist);
 //
 //	va_end(arglist);
 //	return str;
 //}
 
-CString FormatDate(const LPCTSTR szDate) {
-	CString str;
+xString FormatDate(const LPCTSTR szDate) {
+	xString str;
 	if (szDate && (_tcslen(szDate) >= 8)) {
 		str.Format(_T("%.4s/%.2s/%.2s"), szDate, szDate+4, szDate+6);
 	}
 	return str;
 }
 
-CString FormatTime(const LPCTSTR szTime) {
-	CString str;
+xString FormatTime(const LPCTSTR szTime) {
+	xString str;
 	if (szTime) {
 		if (_tcslen(szTime) >= 6)
 			str.Format(_T("%.2s:%.2s:%.2s"), szTime, szTime+2, szTime+4);
@@ -450,16 +450,16 @@ CString FormatTime(const LPCTSTR szTime) {
 	return str;
 }
 
-CString GetErrorMessage(CException& e) {
-	CString str;
+xString GetErrorMessage(CException& e) {
+	xString str;
 	e.GetErrorMessage(str.GetBuffer(1024), 1024);
 	str.ReleaseBuffer();
 	str.TrimRight();
 	return str;
 }
 
-CString GetErrorMessage(DWORD dwLastError) {
-	CString str;
+xString GetErrorMessage(DWORD dwLastError) {
+	xString str;
 	LPVOID lpMsgBuf;
 	FormatMessage( 
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
@@ -551,17 +551,17 @@ const char* ScanString(const char* psz, char* pszResult, sizeXX_t& nBufferCount/
 const wchar_t* ScanString(const wchar_t* psz, wchar_t* pszResult, sizeXX_t& nBufferCount/* including NULL Terminator */, const wchar_t* pszDelimiter, const wchar_t* pszPrefix, const wchar_t* pszEnd) {
 	return ScanString<wchar_t>(psz, pszResult, nBufferCount, pszDelimiter, pszPrefix, pszEnd);
 }
-const char* ScanString(const char* psz, CStringA& strResult, const char* pszDelimiter, const char* pszPrefix, const char* pszEnd) {
+const char* ScanString(const char* psz, xStringA& strResult, const char* pszDelimiter, const char* pszPrefix, const char* pszEnd) {
 	return ScanStringStr(psz, strResult, pszDelimiter, pszPrefix, pszEnd);
 }
-const wchar_t* ScanString(const wchar_t* psz, CStringW& strResult, const wchar_t* pszDelimiter, const wchar_t* pszPrefix, const wchar_t* pszEnd) {
+const wchar_t* ScanString(const wchar_t* psz, xStringW& strResult, const wchar_t* pszDelimiter, const wchar_t* pszPrefix, const wchar_t* pszEnd) {
 	return ScanStringStr(psz, strResult, pszDelimiter, pszPrefix, pszEnd);
 }
 
 int CompareNumberedString(LPCSTR psz1, LPCSTR psz2) { return tdszcmp(psz1, psz2); }
 int CompareNumberedString(LPCWSTR psz1, LPCWSTR psz2) { return tdszcmp(psz1, psz2); }
 
-void SplitPath(LPCSTR pszFullPath, CStringA& drive, CStringA& folder, CStringA& title, CStringA& ext) {
+void SplitPath(LPCSTR pszFullPath, xStringA& drive, xStringA& folder, xStringA& title, xStringA& ext) {
 	drive.Empty(); folder.Empty(); title.Empty(); ext.Empty();
 	if (!pszFullPath)
 		return;
@@ -570,25 +570,25 @@ void SplitPath(LPCSTR pszFullPath, CStringA& drive, CStringA& folder, CStringA& 
 	drive.ReleaseBuffer(); folder.ReleaseBuffer(); title.ReleaseBuffer(); ext.ReleaseBuffer();
 }
 
-void SplitPath(LPCSTR pszFullPath, CStringA& folder, CStringA& title, CStringA& ext) {
-	CStringA drive;
+void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& title, xStringA& ext) {
+	xStringA drive;
 	SplitPath(pszFullPath, drive, folder, title, ext);
 	drive.ReleaseBuffer();
 
 	folder = drive + folder;
 }
 
-void SplitPath(LPCSTR pszFullPath, CStringA& folder, CStringA& name) {
-	CStringA drive, title, ext;
+void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& m_name) {
+	xStringA drive, title, ext;
 
 	SplitPath(pszFullPath, drive, folder, title, ext);
 	drive.ReleaseBuffer();
 
 	folder = drive + folder;
-	name = title + ext;
+	m_name = title + ext;
 }
 
-void SplitPath(LPCWSTR pszFullPath, CStringW& drive, CStringW& folder, CStringW& title, CStringW& ext) {
+void SplitPath(LPCWSTR pszFullPath, xStringW& drive, xStringW& folder, xStringW& title, xStringW& ext) {
 	drive.Empty(); folder.Empty(); title.Empty(); ext.Empty();
 	if (!pszFullPath)
 		return;
@@ -597,33 +597,33 @@ void SplitPath(LPCWSTR pszFullPath, CStringW& drive, CStringW& folder, CStringW&
 	drive.ReleaseBuffer(); folder.ReleaseBuffer(); title.ReleaseBuffer(); ext.ReleaseBuffer();
 }
 
-void SplitPath(LPCWSTR pszFullPath, CStringW& folder, CStringW& title, CStringW& ext) {
-	CStringW drive;
+void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& title, xStringW& ext) {
+	xStringW drive;
 	SplitPath(pszFullPath, drive, folder, title, ext);
 	drive.ReleaseBuffer();
 
 	folder = drive + folder;
 }
 
-void SplitPath(LPCWSTR pszFullPath, CStringW& folder, CStringW& name) {
-	CStringW drive, title, ext;
+void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& m_name) {
+	xStringW drive, title, ext;
 
 	SplitPath(pszFullPath, drive, folder, title, ext);
 	drive.ReleaseBuffer();
 
 	folder = drive + folder;
-	name = title + ext;
+	m_name = title + ext;
 }
 
 BOOL BackupFile(BOOL bMove, LPCTSTR pszPath, LPCTSTR pszBackupFolder, BOOL bUseDateTime, DWORD dwFlag) {
-	CString strPath(pszPath);
-	CString strBackupFolder(pszBackupFolder);
+	xString strPath(pszPath);
+	xString strBackupFolder(pszBackupFolder);
 
 	if (strPath.IsEmpty())
 		return FALSE;
 
 	if (strBackupFolder.IsEmpty()) {
-		CString strName;
+		xString strName;
 		SplitPath(strPath, strBackupFolder, strName);
 	}
 	if (!strBackupFolder.IsEmpty()) {
@@ -643,8 +643,8 @@ BOOL BackupFile(BOOL bMove, LPCTSTR pszPath, LPCTSTR pszBackupFolder, BOOL bUseD
 		if (ff.IsDirectory()) {
 			continue;
 		}
-		CString strTarget;
-		CString strFolder, strTitle, strExt;
+		xString strTarget;
+		xString strFolder, strTitle, strExt;
 		SplitPath(ff.GetFilePath(), strFolder, strTitle, strExt);
 		if (bUseDateTime) {
 			CTime t;
@@ -671,7 +671,7 @@ BOOL BackupCopyFile(LPCTSTR pszPath, LPCTSTR pszBackupFolder, BOOL bUseDateTime,
 
 // From MSDN
 #include <lmerr.h>
-void GetErrorText(DWORD dwLastError, CString& strMessage) {
+void GetErrorText(DWORD dwLastError, xString& strMessage) {
 	HMODULE hModule = NULL; // default to system source
 	LPSTR MessageBuffer;
 	DWORD dwBufferLength;
@@ -794,13 +794,13 @@ BOOL FilterFile(LPCTSTR pszFilter, LPCTSTR pszName, BOOL bCaseSensitive) {
 	if (!pszFilter || !pszFilter[0] || !pszName || !pszName[0])
 		return TRUE;
 	//if (!bCaseSensitive) {
-	//	CString strFilter(pszFilter), strName(pszName);
+	//	xString strFilter(pszFilter), strName(pszName);
 	//	strFilter.MakeLower();
 	//	strName.MakeLower();
 	//	return FilterFileR(strFilter, strName);
 	//}
 	//return FilterFileR(pszFilter, pszName);
-	CStrings strs;
+	xStrings strs;
 	return FilterString(pszName, pszFilter, strs, bCaseSensitive);
 }
 
@@ -809,18 +809,18 @@ BOOL FilterFileMultiFilter(LPCTSTR pszFilters, LPCTSTR pszName, BOOL bCaseSensit
 		return TRUE;
 
 	//if (bCaseSensitive) {
-	CStrings strsFilter;
+	xStrings strsFilter;
 	SplitString(pszFilters, cSpliter, strsFilter);
 	for (int i = 0; i < strsFilter.N(); i++) {
-		CStrings strsTemp;
+		xStrings strsTemp;
 		if (FilterString(pszName, strsFilter[i], strsTemp, bCaseSensitive))
 			return TRUE;
 	}
 	//} else {
-	//	CString strFilters(pszFilters), strName(pszName);
+	//	xString strFilters(pszFilters), strName(pszName);
 	//	strFilters.MakeLower();
 	//	strName.MakeLower();
-	//	CStrings strsFilter;
+	//	xStrings strsFilter;
 	//	SplitString(strFilters, cSpliter, strsFilter);
 	//	for (int i = 0; i < strsFilter.N(); i++) {
 	//		if (FilterFileR(strsFilter[i], strName))
@@ -831,14 +831,14 @@ BOOL FilterFileMultiFilter(LPCTSTR pszFilters, LPCTSTR pszName, BOOL bCaseSensit
 	return FALSE;
 }
 
-void GetRelativePath(LPCTSTR pszFolderBase, LPCTSTR pszFullPathTarget, CString& strPathRelative) {
+void GetRelativePath(LPCTSTR pszFolderBase, LPCTSTR pszFullPathTarget, xString& strPathRelative) {
 	//PathRelativePathTo();
 
 	strPathRelative.Empty();
-	std::vector<CString> strPathsBase;
-	std::vector<CString> strPathsTarget;
+	std::vector<xString> strPathsBase;
+	std::vector<xString> strPathsTarget;
 
-	CString strFolderBase(pszFolderBase), strFullPathTarget(pszFullPathTarget);
+	xString strFolderBase(pszFolderBase), strFullPathTarget(pszFullPathTarget);
 
 	strFolderBase.Replace(_T('/'), _T('\\'));
 	strFullPathTarget.Replace(_T('/'), _T('\\'));
@@ -879,13 +879,13 @@ void GetRelativePath(LPCTSTR pszFolderBase, LPCTSTR pszFullPathTarget, CString& 
 		strPathRelative = _T(".\\");
 }
 
-void GetAbsolutePath(LPCTSTR pszFolderBase, LPCTSTR pszPathRelative, CString& strPathFull) {
+void GetAbsolutePath(LPCTSTR pszFolderBase, LPCTSTR pszPathRelative, xString& strPathFull) {
 	if (tszncmp(pszPathRelative, _T("\\\\"), 2) == 0) {	// in case '\\.\' or '\\?\'
 		strPathFull = pszPathRelative;
 		return;
 	}
 
-	CString strFolderBase(pszFolderBase), strPathRelative(pszPathRelative);
+	xString strFolderBase(pszFolderBase), strPathRelative(pszPathRelative);
 	if (strFolderBase.IsEmpty()) {
 		GetCurrentDirectory(1024, strFolderBase.GetBuffer(1024));
 		strFolderBase.ReleaseBuffer();
@@ -905,7 +905,7 @@ void GetAbsolutePath(LPCTSTR pszFolderBase, LPCTSTR pszPathRelative, CString& st
 	if (strFolderBase && strFolderBase.GetAt(strFolderBase.GetLength()-1) != '\\')
 		strFolderBase += "\\";
 
-	CString strDrive, strFolder, strTitle, strExt;
+	xString strDrive, strFolder, strTitle, strExt;
 	SplitPath(strPathRelative, strDrive, strFolder, strTitle, strExt);
 
 	if (!strDrive.IsEmpty()) {
@@ -921,7 +921,7 @@ void GetAbsolutePath(LPCTSTR pszFolderBase, LPCTSTR pszPathRelative, CString& st
 	strPathFull = strFolderBase + strPathRelative;
 
 	if ( (strPathFull.Find(_T("..")) >= 0) || (strPathFull.Find(_T("\\.")) >= 0) || (strPathFull.Find(_T(".\\")) >= 0)) {
-		CStrings strs;
+		xStrings strs;
 		SplitString(strPathFull, '\\', strs);
 
 		for (int i = 1; i < strs.N(); i++) {
@@ -945,36 +945,36 @@ void GetAbsolutePath(LPCTSTR pszFolderBase, LPCTSTR pszPathRelative, CString& st
 
 }
 
-CStringW GetLongPathNameUnicode(const wchar_t* szShortName) {
+xStringW GetLongPathNameUnicode(const wchar_t* szShortName) {
 	const int BUFFER_LENGTH = 4096;
-	CStringW strResult;
-	CStringW strSource;
+	xStringW strResult;
+	xStringW strSource;
 	strSource = szShortName;
 
 	wchar_t* psz = strResult.GetBuffer(BUFFER_LENGTH);
 
 	if (!GetLongPathNameW(strSource, psz, BUFFER_LENGTH)) {
-		CStringW strPath;
-		CStringW strPathTemp;
+		xStringW strPath;
+		xStringW strPathTemp;
 
-		CStringW strName;
+		xStringW strName;
 		int iStart = 0;
 		for (int i = 0; strName = strSource.Tokenize(L"\\/", iStart), !strName.IsEmpty(); i++) {
 			if (i)
 				strPathTemp += _T('\\');
 			CFileFind ff;
-			CString str;
+			xString str;
 			if (GetLongPathNameW(strPathTemp + strName, psz, BUFFER_LENGTH)) {
 				strPathTemp = psz;
 			} else {
-				BOOL bFound = ff.FindFile(CString(strPathTemp + L"*.*"));
+				BOOL bFound = ff.FindFile(xString(strPathTemp + L"*.*"));
 				while (bFound) {
 					bFound = ff.FindNextFile();
 					if (ff.IsDots())
 						continue;
-					CStringA strA;
+					xStringA strA;
 					strA = ff.GetFileName();
-					if (strA.CompareNoCase((CStringA)strName) != 0)
+					if (strA.CompareNoCase((xStringA)strName) != 0)
 						continue;
 					strPathTemp += ff.GetFileName();
 					break;
@@ -1017,13 +1017,13 @@ BOOL HexaStringToBinaryT(const TCHAR* psz, BYTE buffer[], sizeXX_t& nBufferSize,
 			if (nLen%2)
 				nLen++;
 
-			// æ∆∑°øÕ ∞∞¿Ã ±◊¥Î∑Œ «ÿæﬂ «‘. Unicode -> MBCS ∫Ø»ØΩ√ ±€¿⁄ ºˆ ¥ﬁ∂Û¡˙ ∞°¥…º∫ ¿÷¿Ω.
+			// ÏïÑÎûòÏôÄ Í∞ôÏù¥ Í∑∏ÎåÄÎ°ú Ìï¥Ïïº Ìï®. Unicode -> MBCS Î≥ÄÌôòÏãú Í∏ÄÏûê Ïàò Îã¨ÎùºÏßà Í∞ÄÎä•ÏÑ± ÏûàÏùå.
 			TSTRING strTemp;
 			if (TranslateEscapeCharacters(pos+1, strTemp, (TCHAR**)&pos, _T('\"'))) {
 				if (sizeof(TCHAR) == sizeof(char)) {
 					nLen += strTemp.GetLength()*2;
 				} else if (sizeof(TCHAR) == sizeof(wchar_t)) {
-					CStringA strA(strTemp);
+					xStringA strA(strTemp);
 					nLen += strA.GetLength()*2;
 				}
 				continue;
@@ -1084,7 +1084,7 @@ BOOL HexaStringToBinaryT(const TCHAR* psz, BYTE buffer[], sizeXX_t& nBufferSize,
 						continue;
 					}
 				} else if (sizeof(TCHAR) == sizeof(wchar_t)) {
-					CStringA strA(strTemp);
+					xStringA strA(strTemp);
 					if (strA.GetLength() <= nBufferSize-nLen/2) {
 						memmove(buffer + nLen/2, strA, strA.GetLength());
 						nLen += strA.GetLength()*2;
@@ -1123,12 +1123,12 @@ BOOL HexaStringToBinaryT(const TCHAR* psz, TBuffer<BYTE>& buf, TCHAR** ppszEnd) 
 	return HexaStringToBinaryT<TCHAR, TSTRING>(psz, buf, nSize, ppszEnd);
 }
 
-BOOL HexaStringToBinary(LPCSTR psz, BYTE buffer[], sizeXX_t& nBufferSize, char** ppszEnd)		{ return HexaStringToBinaryT<char, CStringA>(psz, buffer, nBufferSize, ppszEnd); }
-BOOL HexaStringToBinary(LPCSTR psz, TBuffer<BYTE>& buf, char** ppszEnd)							{ return HexaStringToBinaryT<char, CStringA>(psz, buf, ppszEnd); }
-BOOL HexaStringToBinary(LPCWSTR psz, BYTE buffer[], sizeXX_t& nBufferSize, wchar_t** ppszEnd)	{ return HexaStringToBinaryT<wchar_t, CStringW>(psz, buffer, nBufferSize, ppszEnd); }
-BOOL HexaStringToBinary(LPCWSTR psz, TBuffer<BYTE>& buf, wchar_t** ppszEnd)						{ return HexaStringToBinaryT<wchar_t, CStringW>(psz, buf, ppszEnd); }
+BOOL HexaStringToBinary(LPCSTR psz, BYTE buffer[], sizeXX_t& nBufferSize, char** ppszEnd)		{ return HexaStringToBinaryT<char, xStringA>(psz, buffer, nBufferSize, ppszEnd); }
+BOOL HexaStringToBinary(LPCSTR psz, TBuffer<BYTE>& buf, char** ppszEnd)							{ return HexaStringToBinaryT<char, xStringA>(psz, buf, ppszEnd); }
+BOOL HexaStringToBinary(LPCWSTR psz, BYTE buffer[], sizeXX_t& nBufferSize, wchar_t** ppszEnd)	{ return HexaStringToBinaryT<wchar_t, xStringW>(psz, buffer, nBufferSize, ppszEnd); }
+BOOL HexaStringToBinary(LPCWSTR psz, TBuffer<BYTE>& buf, wchar_t** ppszEnd)						{ return HexaStringToBinaryT<wchar_t, xStringW>(psz, buf, ppszEnd); }
 
-void MakeDataToHexForm(CStrings& strHexForms, const void* lpBuf, sizeXX_t nBufLen, int nCol, BOOL bAddText) {
+void MakeDataToHexForm(xStrings& strHexForms, const void* lpBuf, sizeXX_t nBufLen, int nCol, BOOL bAddText) {
 	int iCurrent = 0;
 	char* buf = (char*)lpBuf;
 	strHexForms.DeleteAll();
@@ -1172,11 +1172,11 @@ void MakeDataToHexForm(CStrings& strHexForms, const void* lpBuf, sizeXX_t nBufLe
 			}
 		}
 		*pHex = 0;
-		strHexForms.Push(new CString(hex));
+		strHexForms.Push(new xString(hex));
 	}
 }
 
-void MakeDataToDecForm(CStrings& strHexForms, const void* lpBuf, sizeXX_t nBufLen, int nCol, BOOL bAddText) {
+void MakeDataToDecForm(xStrings& strHexForms, const void* lpBuf, sizeXX_t nBufLen, int nCol, BOOL bAddText) {
 	int iCurrent = 0;
 	char* buf = (char*)lpBuf;
 	strHexForms.DeleteAll();
@@ -1214,28 +1214,28 @@ void MakeDataToDecForm(CStrings& strHexForms, const void* lpBuf, sizeXX_t nBufLe
 			}
 		}
 		*pHex = 0;
-		strHexForms.Push(new CString(hex));
+		strHexForms.Push(new xString(hex));
 	}
 }
 
-CString GetUniqueFileName(LPCTSTR path, LPCTSTR fName, BOOL bCreateFile) {
+xString GetUniqueFileName(LPCTSTR path, LPCTSTR fName, BOOL bCreateFile) {
 	if (_tcslen(path) == 0)
-		return CString();
+		return xString();
 
-	CStrings paths;
-	paths.Push(new CString(path));
+	xStrings paths;
+	paths.Push(new xString(path));
 	return GetUniqueFileName(paths, fName, bCreateFile);
 }
 
-CString GetUniqueFileName(CStrings paths, LPCTSTR fName, BOOL bCreateFile) {
+xString GetUniqueFileName(xStrings paths, LPCTSTR fName, BOOL bCreateFile) {
 	if (paths.IsEmpty())
-		return CString();
+		return xString();
 
-	CString strFName;
+	xString strFName;
 	int iSeq = 0;
 
 	// Find position and number of '?'
-	CString strFilter;
+	xString strFilter;
 	strFilter = fName;
 	const TCHAR* buf = fName;
 	int nQt = 0;
@@ -1252,13 +1252,13 @@ CString GetUniqueFileName(CStrings paths, LPCTSTR fName, BOOL bCreateFile) {
 	if (!nQt)
 		return strFilter;
 
-	CString fmt = strFilter.Left(iQt) + Format(_T("%%0%dd"), nQt) + strFilter.Mid(iQt+nQt);
+	xString fmt = strFilter.Left(iQt) + Format(_T("%%0%dd"), nQt) + strFilter.Mid(iQt+nQt);
 
 	CS cs(_T("GetUniqueFileName"));
 
 	int i;
 	for (i = 0; i < paths.N(); i++) {
-		CString path = paths[i];
+		xString path = paths[i];
 		if (!path.IsEmpty()) {
 			//TCHAR cSplitter[] = {'/', '\\'};
 			TCHAR cRight = path.Right(1).GetAt(0);
@@ -1273,7 +1273,7 @@ CString GetUniqueFileName(CStrings paths, LPCTSTR fName, BOOL bCreateFile) {
 		BOOL bFound = ff.FindFile(paths[i] + strFilter);
 		while (bFound) {
 			bFound = ff.FindNextFile();
-			CString str = ff.GetFileName();
+			xString str = ff.GetFileName();
 			if (str.GetLength() < iQt + nQt)
 				continue;
 			int temp = _ttoi(str.Mid(iQt, nQt));
@@ -1287,7 +1287,7 @@ CString GetUniqueFileName(CStrings paths, LPCTSTR fName, BOOL bCreateFile) {
 	for (i = 0; i < paths.N(); i++) {
 		CFileFind ff;
 		if (ff.FindFile(paths[i] + strFName)) {
-			return CString();
+			return xString();
 		}
 	}
 
@@ -1311,8 +1311,8 @@ bool CreateSubDirectories(LPCTSTR szPath) {
 	if (!szPath || !_tcslen(szPath))
 		return false;
 
-	CStrings strs;
-	CString strPath = szPath;
+	xStrings strs;
+	xString strPath = szPath;
 	strPath.Replace('/', '\\');
 
 	SplitString(strPath, '\\', strs);
@@ -1379,8 +1379,8 @@ LPITEMIDLIST PidlBrowse(HWND hWnd, int nCSIDL, LPTSTR pszDisplayName, LPCTSTR ps
 	return pidlSelected;
 }
 
-CString BrowseFolder(HWND hWnd, int nCSIDL, LPCTSTR pszTitle) {
-	CString strFolder;
+xString BrowseFolder(HWND hWnd, int nCSIDL, LPCTSTR pszTitle) {
+	xString strFolder;
 
 	TCHAR* buf = strFolder.GetBuffer(2048);
 	LPITEMIDLIST pidlSelected = PidlBrowse(hWnd, nCSIDL, buf, pszTitle);
@@ -1456,7 +1456,7 @@ sizeXX_t FindApp(LPCTSTR pszFullPath, TList<DWORD>& pIDs, bool bNameOnly) {
 		HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION/*PROCESS_QUERY_INFORMATION|PROCESS_VM_READ*/, FALSE, dwProcessIDs[i]);
 		if (!hProcess)
 			continue;
-	#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)	// GetModuleFileNameEx () : ∏µÁ Process ∏¶ ¥Ÿ ∞°¡ˆ∞Ì ø¿¡ˆ ∏¯«‘.
+	#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)	// GetModuleFileNameEx () : Î™®Îì† Process Î•º Îã§ Í∞ÄÏßÄÍ≥† Ïò§ÏßÄ Î™ªÌï®.
 		DWORD dwSize = countof(buf);
 		if (!QueryFullProcessImageName(hProcess, 0, buf, &dwSize))
 			continue;
@@ -1472,11 +1472,11 @@ sizeXX_t FindApp(LPCTSTR pszFullPath, TList<DWORD>& pIDs, bool bNameOnly) {
 
 		CloseHandle(hProcess);
 		if (size) {
-			CString str;
+			xString str;
 			if (bNameOnly) {
-				CString folder, name;
-				SplitPath(buf, folder, name);
-				str = name;
+				xString folder, m_name;
+				SplitPath(buf, folder, m_name);
+				str = m_name;
 			} else {
 				str = buf;
 			}
@@ -1505,7 +1505,7 @@ bool ForceTerminateApp(LPCTSTR pszFullPath, bool bNameOnly, bool bExcludeSelf) {
 
 		HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, false, dwProcessID);
 		if (!hProcess) {
-			//TRACE1("OpenProcess(%s) Ω«∆–\r\n", pszFullPath);
+			//TRACE1("OpenProcess(%s) Ïã§Ìå®\r\n", pszFullPath);
 			continue;
 		}
 
@@ -1513,9 +1513,9 @@ bool ForceTerminateApp(LPCTSTR pszFullPath, bool bNameOnly, bool bExcludeSelf) {
 
 		BOOL bResult = ::TerminateProcess(hProcess, 0);
 		if (bResult) {
-			//TRACE1("%s∏¶ ¡æ∑·Ω√≈¥\r\n", pszFullPath);
+			//TRACE1("%sÎ•º Ï¢ÖÎ£åÏãúÌÇ¥\r\n", pszFullPath);
 		} else {
-			//TRACE1("%s∏¶ ¡æ∑·Ω√≈∞¡ˆ ∏¯«ﬂΩ¿¥œ¥Ÿ.\r\n", pszFullPath);
+			//TRACE1("%sÎ•º Ï¢ÖÎ£åÏãúÌÇ§ÏßÄ Î™ªÌñàÏäµÎãàÎã§.\r\n", pszFullPath);
 		}
 	}
 	if (bKillSelf) {
@@ -1794,7 +1794,7 @@ BOOL GetNICInfo(std::vector<T_NIC_INFO>& nics) {
 		//TRACE("\tDHCP Enabled. . . . . . . . : %s\n", (pAdapt->DhcpEnabled ? "yes" : "no"));
 
 		pAddrStr = &(pAdapt->IpAddressList);
-		CString strIP, strMask;
+		xString strIP, strMask;
 		while (pAddrStr) {
 			if (!strIP.IsEmpty()) {
 				strIP.Empty();
@@ -1805,7 +1805,7 @@ BOOL GetNICInfo(std::vector<T_NIC_INFO>& nics) {
 			//TRACE("\tIP Address. . . . . . . . . : %s\n", pAddrStr->IpAddress.String);
 			//TRACE("\tSubnet Mask . . . . . . . . : %s\n", pAddrStr->IpMask.String);
 
-			break;	// «— ∞≥∏∏ ¿˚øÎ. ∞°≤˚ ∞°¥Ÿ 2~3∞≥æø µÈæÓø¿¥¬ ∞ÊøÏµµ ¿÷¿Ω.
+			break;	// Ìïú Í∞úÎßå Ï†ÅÏö©. Í∞ÄÎÅî Í∞ÄÎã§ 2~3Í∞úÏî© Îì§Ïñ¥Ïò§Îäî Í≤ΩÏö∞ÎèÑ ÏûàÏùå.
 
 			pAddrStr = pAddrStr->Next;
 		}

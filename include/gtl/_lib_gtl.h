@@ -12,23 +12,23 @@
 
 #include "__lib.h"
 
-#ifndef _GTL_AS_DLL
-#	define _GTL_AS_DLL 1
+#ifndef GTL__AS_DLL
+#	define GTL__AS_DLL 1
 #endif
 
-#if (_GTL_AS_DLL)
-#	ifdef GTL_EXPORTS
-#		define GTL_CLASS		GTL_EXPORT
-#		define GTL_API			GTL_EXPORT
-#		define GTL_DATA			GTL_EXPORT
+#if (GTL__AS_DLL)
+#	ifdef GTL__EXPORTS
+#		define GTL__CLASS		GTL__EXPORT
+#		define GTL__API			GTL__EXPORT
+#		define GTL__DATA		GTL__EXPORT
 #	else 
-#		define GTL_CLASS		GTL_IMPORT
-#		define GTL_API			GTL_IMPORT
-#		define GTL_DATA			GTL_IMPORT
-		GTL_IMPORT_LIB(gtl)
+#		define GTL__CLASS		GTL__IMPORT
+#		define GTL__API			GTL__IMPORT
+#		define GTL__DATA		GTL__IMPORT
+		GTL__IMPORT_LIB(gtl)
 #	endif
-#else	// _GTL_AS_DLL
-#	define GTL_CLASS
-#	define GTL_API
-#	define GTL_DATA
-#endif	// _GTL_AS_DLL
+#else	// GTL__AS_DLL
+#	define GTL__CLASS
+#	define GTL__API
+#	define GTL__DATA
+#endif	// GTL__AS_DLL

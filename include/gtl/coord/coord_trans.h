@@ -7,6 +7,7 @@
 // PWH
 // 2019.11.02. 전체 수정
 // 2021.05.21. renewal
+// 2021.07.05. new - naming convention
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -132,7 +133,7 @@ namespace gtl {
 
 	//-----------------------------------------------------------------------------
 //	template < std::floating_point T >
-	class CCoordTransChain : public ICoordTrans {
+	class xCoordTransChain : public ICoordTrans {
 	public:
 		using base_t = ICoordTrans;
 
@@ -142,33 +143,33 @@ namespace gtl {
 	public:
 		//friend class boost::serialization::access;
 		template < typename Archive >
-		friend void serialize(Archive &ar, CCoordTransChain& ct, unsigned int const version) {
+		friend void serialize(Archive &ar, xCoordTransChain& ct, unsigned int const version) {
 			//ar & boost::serialization::base_object<base_t>(ct);
 			ar & (base_t&)ct;
 			ar & ct.chain_;
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(CCoordTransChain);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xCoordTransChain);
 
 	public:
 		// Constructors
-		CCoordTransChain() = default;
+		xCoordTransChain() = default;
 		//virtual ~TCoordTransChain() { }
-		CCoordTransChain(CCoordTransChain const& B) = default;
-		CCoordTransChain& operator = (CCoordTransChain const& B) = default;
-		auto operator <=> (CCoordTransChain const&) const = default;
+		xCoordTransChain(xCoordTransChain const& B) = default;
+		xCoordTransChain& operator = (xCoordTransChain const& B) = default;
+		auto operator <=> (xCoordTransChain const&) const = default;
 
-		CCoordTransChain& operator *= (CCoordTransChain const& B)	{
+		xCoordTransChain& operator *= (xCoordTransChain const& B)	{
 			for (auto const& ct : chain_) 
 				chain_.push_back(std::move(ct.NewClone()));
 			return *this;
 		}
-		CCoordTransChain& operator *= (ICoordTrans const& B) {
+		xCoordTransChain& operator *= (ICoordTrans const& B) {
 			chain_.push_back(std::move(B.NewClone()));
 			return *this;
 		}
-		[[nodiscard]] CCoordTransChain operator * (CCoordTransChain const& B) const {
-			CCoordTransChain newChain;
+		[[nodiscard]] xCoordTransChain operator * (xCoordTransChain const& B) const {
+			xCoordTransChain newChain;
 			for (auto const& ct : chain_) {
 				newChain.chain_.push_back(std::move(ct.NewClone()));
 			}
@@ -178,8 +179,8 @@ namespace gtl {
 			return newChain;
 		}
 
-		[[nodiscard]] CCoordTransChain operator * (ICoordTrans const& B) const {
-			CCoordTransChain newChain;
+		[[nodiscard]] xCoordTransChain operator * (ICoordTrans const& B) const {
+			xCoordTransChain newChain;
 			for (auto const& ct : chain_) {
 				newChain.chain_.push_back(std::move(ct.NewClone()));
 			}
@@ -187,8 +188,8 @@ namespace gtl {
 			return newChain;
 		}
 
-		friend [[nodiscard]] CCoordTransChain operator * (ICoordTrans const& A, CCoordTransChain const& B) {
-			CCoordTransChain newChain;
+		friend [[nodiscard]] xCoordTransChain operator * (ICoordTrans const& A, xCoordTransChain const& B) {
+			xCoordTransChain newChain;
 			newChain.chain_.push_back(std::move(A.NewClone()));
 			for (auto const& ct : B.chain_) {
 				newChain.chain_.push_back(std::move(ct.NewClone()));
@@ -198,7 +199,7 @@ namespace gtl {
 
 
 		virtual std::unique_ptr<ICoordTrans> GetInverse() const override {
-			auto inv = std::make_unique<CCoordTransChain>();
+			auto inv = std::make_unique<xCoordTransChain>();
 			for (auto iter = chain_.rbegin(); iter != chain_.rend(); iter++) {
 				if (auto r = iter->GetInverse(); r) {
 					inv->chain_.push_back(std::move(r));
@@ -208,7 +209,7 @@ namespace gtl {
 			}
 			return std::move(inv);
 		}
-		bool GetInv(CCoordTransChain& ctI) const {
+		bool GetInv(xCoordTransChain& ctI) const {
 			ctI.chain_.clear();
 			for (auto iter = chain_.rbegin(); iter != chain_.rend(); iter++) {
 				if (auto r = iter->GetInverse(); r) {
@@ -278,10 +279,10 @@ namespace gtl {
 		using point_t = TPointT<double, dim>;
 
 	public:
-		double scale_{1.0};	// additional scale value
-		mat_t mat_;			// transforming matrix
-		point_t origin_;	// pivot of source coordinate
-		point_t offset_;	// pivot of target coordinate
+		double m_scale{1.0};	// additional scale value
+		mat_t m_mat;			// transforming matrix
+		point_t m_origin;		// pivot of source coordinate
+		point_t m_offset;		// pivot of target coordinate
 
 	public:
 
@@ -293,37 +294,37 @@ namespace gtl {
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
 			//ar & boost::serialization::base_object<base_t>(*this);
 			ar & (base_t&)B;
-			ar & B.scale_;
-			for (auto& v : B.mat_.val)
+			ar & B.m_scale;
+			for (auto& v : B.m_mat.val)
 				ar & v;
-			ar & B.origin_ & B.offset_;
+			ar & B.m_origin & B.m_offset;
 			return ar;
 		}
 		template < typename JSON > friend void from_json(JSON const& j, this_t& B) {
-			j["scale"] = B.scale_;
+			j["scale"] = B.m_scale;
 			if constexpr (dim == 2) {
-				j["mat00"] = B.mat_(0, 0); j["mat01"] = B.mat_(0, 1);
-				j["mat10"] = B.mat_(1, 0); j["mat10"] = B.mat_(1, 1);
+				j["mat00"] = B.m_mat(0, 0); j["mat01"] = B.m_mat(0, 1);
+				j["mat10"] = B.m_mat(1, 0); j["mat10"] = B.m_mat(1, 1);
 			} else {
-				j["mat00"] = B.mat_(0, 0); j["mat01"] = B.mat_(0, 1); j["mat02"] = B.mat_(0, 2);
-				j["mat10"] = B.mat_(1, 0); j["mat11"] = B.mat_(1, 1); j["mat12"] = B.mat_(1, 2);
-				j["mat20"] = B.mat_(2, 0); j["mat21"] = B.mat_(2, 1); j["mat22"] = B.mat_(2, 2);
+				j["mat00"] = B.m_mat(0, 0); j["mat01"] = B.m_mat(0, 1); j["mat02"] = B.m_mat(0, 2);
+				j["mat10"] = B.m_mat(1, 0); j["mat11"] = B.m_mat(1, 1); j["mat12"] = B.m_mat(1, 2);
+				j["mat20"] = B.m_mat(2, 0); j["mat21"] = B.m_mat(2, 1); j["mat22"] = B.m_mat(2, 2);
 			}
-			j["origin"] = B.origin_;
-			j["offset"] = B.offset_;
+			j["origin"] = B.m_origin;
+			j["offset"] = B.m_offset;
 		}
 		template < typename JSON > friend void to_json(JSON& j, this_t const& B) {
-			B.scale_ = j["scale"];
+			B.m_scale = j["scale"];
 			if constexpr (dim == 2) {
-				B.mat_(0, 0) = j["mat00"]; B.mat_(0, 1) = j["mat01"];
-				B.mat_(1, 0) = j["mat10"]; B.mat_(1, 1) = j["mat10"];
+				B.m_mat(0, 0) = j["mat00"]; B.m_mat(0, 1) = j["mat01"];
+				B.m_mat(1, 0) = j["mat10"]; B.m_mat(1, 1) = j["mat10"];
 			} else {
-				B.mat_(0, 0) = j["mat00"]; B.mat_(0, 1) = j["mat01"]; B.mat_(0, 2) = j["mat02"];
-				B.mat_(1, 0) = j["mat10"]; B.mat_(1, 1) = j["mat11"]; B.mat_(1, 2) = j["mat12"];
-				B.mat_(2, 0) = j["mat20"]; B.mat_(2, 1) = j["mat21"]; B.mat_(2, 2) = j["mat22"];
+				B.m_mat(0, 0) = j["mat00"]; B.m_mat(0, 1) = j["mat01"]; B.m_mat(0, 2) = j["mat02"];
+				B.m_mat(1, 0) = j["mat10"]; B.m_mat(1, 1) = j["mat11"]; B.m_mat(1, 2) = j["mat12"];
+				B.m_mat(2, 0) = j["mat20"]; B.m_mat(2, 1) = j["mat21"]; B.m_mat(2, 2) = j["mat22"];
 			}
-			B.origin_ = j["origin"];
-			B.offset_ = j["offset"];
+			B.m_origin = j["origin"];
+			B.m_offset = j["offset"];
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(TCoordTransDim);
@@ -331,10 +332,10 @@ namespace gtl {
 	public:
 		// Constructors
 		TCoordTransDim(double scale = 1.0, mat_t const& m = mat_t::eye(), point_t const& origin = {}, point_t const& offset = {}) :
-			scale_{scale},
-			mat_(m),
-			origin_(origin),
-			offset_(offset)
+			m_scale{scale},
+			m_mat(m),
+			m_origin(origin),
+			m_offset(offset)
 		{
 		}
 
@@ -343,52 +344,52 @@ namespace gtl {
 
 		auto operator <=> (TCoordTransDim const&) const = default;
 
-		//bool operator == (const TCoordTransDim& B) const { return (scale_ == B.scale_) && (mat_ == B.mat_) && (origin_ == B.origin_) && (offset_ == B.offset_); }
+		//bool operator == (const TCoordTransDim& B) const { return (m_scale == B.m_scale) && (m_mat == B.m_mat) && (m_origin == B.m_origin) && (m_offset == B.m_offset); }
 		//bool operator != (const TCoordTransDim& B) const { return !(*this == B); }
 		//-------------------------------------------------------------------------
 		std::unique_ptr<ICoordTrans> GetInverse() const override {
 			// Scale
-			double scale = 1/scale_;
+			double scale = 1/m_scale;
 			if (!std::isfinite(scale))
 				return {};
 
 			// Matrix
 			bool bOK {};
-			auto mat = mat_.inv(0, &bOK);
+			auto mat = m_mat.inv(0, &bOK);
 			if (!bOK)
 				return {};
 
-			return std::make_unique<TCoordTransDim>(scale, mat, offset_, origin_);
+			return std::make_unique<TCoordTransDim>(scale, mat, m_offset, m_origin);
 		}
 		bool GetInv(TCoordTransDim& ctI) const {
 			// Scale
-			double scale = 1/scale_;
+			double scale = 1/m_scale;
 			if (!std::isfinite(scale))
 				return false;
 
 			// Matrix
 			bool bOK {};
-			auto mat = mat_.inv(0, &bOK);
+			auto mat = m_mat.inv(0, &bOK);
 			if (!bOK)
 				return false;
 
-			ctI.Init(scale, mat, offset_, origin_);
+			ctI.Init(scale, mat, m_offset, m_origin);
 			return true;
 		}
 
 		//-------------------------------------------------------------------------
 		// Setting
 		void Init(double scale = 1., mat_t const& m = mat_t::eye(), point_t const& origin = {}, point_t const& offset = {}) {
-			scale_ = scale;
-			mat_ = m;
-			origin_ = origin;
-			offset_ = offset;
+			m_scale = scale;
+			m_mat = m;
+			m_origin = origin;
+			m_offset = offset;
 		}
 		void Init(double scale, rad_t angle, point_t const& origin = {}, point_t const& offset = {}) requires (dim == 2) {
-			scale_ = scale;
-			mat_ = GetRotatingMatrix(angle);
-			origin_ = origin;
-			offset_ = offset;
+			m_scale = scale;
+			m_mat = GetRotatingMatrix(angle);
+			m_origin = origin;
+			m_offset = offset;
 		}
 
 		[[nodiscard]] bool SetFrom2Points(std::span<point_t const> ptsSource, std::span<point_t const> ptsTarget, bool bCalcScale = true, double dMinDeterminant = 0.0, bool bRightHanded = true) 
@@ -434,16 +435,16 @@ namespace gtl {
 
 			mat_t matT { v1t.x, v2t.x, v1t.y, v2t.y };
 
-			mat_ = matT * matS.inv();
+			m_mat = matT * matS.inv();
 
-			scale_ = fabs(cv::determinant(mat_));
-			mat_ /= scale_;
+			m_scale = fabs(cv::determinant(m_mat));
+			m_mat /= m_scale;
 
 			if (!bCalcScale)
-				scale_ = 1.0;
+				m_scale = 1.0;
 
-			origin_ = ptsSource[0];
-			offset_ = ptsTarget[0];
+			m_origin = ptsSource[0];
+			m_offset = ptsTarget[0];
 
 			return true;
 		}
@@ -492,16 +493,16 @@ namespace gtl {
 				matT(2, i) = pts1[i+1].z - pts1[0].z;
 			}
 
-			mat_ = matT * matS.inv();
+			m_mat = matT * matS.inv();
 
-			scale_ = cv::determinant(mat_);
-			mat_ /= scale_;
+			m_scale = cv::determinant(m_mat);
+			m_mat /= m_scale;
 
 			if (!bCalcScale)
-				scale_ = 1.0;
+				m_scale = 1.0;
 
-			origin_ = ptsSource[0];
-			offset_ = ptsTarget[0];
+			m_origin = ptsSource[0];
+			m_offset = ptsTarget[0];
 
 			return true;
 		}
@@ -524,42 +525,42 @@ namespace gtl {
 		}
 
 		void SetMatrixRotaional(rad_t angle) requires (dim == 2) {
-			mat_ = GetRotatingMatrix(angle);
+			m_mat = GetRotatingMatrix(angle);
 		}
 		void RotateMatrix(rad_t angle) requires (dim == 2) {
-			mat_ = GetRotatingMatrix(angle) * mat_;
+			m_mat = GetRotatingMatrix(angle) * m_mat;
 		}
 		void Rotate(rad_t angle, point_t const& ptCenter) requires (dim == 2) {
 			auto backup(*this);
 			Init(1.0, angle, ptCenter, ptCenter);
 			*this *= backup;
 		}
-		void FlipSourceX()										{ for (int i {}; i < mat_.rows; i++) mat_(i, 0) = -mat_(i, 0); }
-		void FlipSourceY()										{ for (int i {}; i < mat_.rows; i++) mat_(i, 1) = -mat_(i, 1); }
-		void FlipSourceZ()					requires (dim >= 3) { for (int i {}; i < mat_.rows; i++) mat_(i, 2) = -mat_(i, 2); }
-		void FlipSourceX(double x)								{ FlipSourceX(); origin_.x = 2*x - origin_.x; }
-		void FlipSourceY(double y)								{ FlipSourceY(); origin_.y = 2*y - origin_.y; }
-		void FlipSourceZ(double z)			requires (dim >= 3) { FlipSourceY(); origin_.z = 2*z - origin_.z; }
+		void FlipSourceX()										{ for (int i {}; i < m_mat.rows; i++) m_mat(i, 0) = -m_mat(i, 0); }
+		void FlipSourceY()										{ for (int i {}; i < m_mat.rows; i++) m_mat(i, 1) = -m_mat(i, 1); }
+		void FlipSourceZ()					requires (dim >= 3) { for (int i {}; i < m_mat.rows; i++) m_mat(i, 2) = -m_mat(i, 2); }
+		void FlipSourceX(double x)								{ FlipSourceX(); m_origin.x = 2*x - m_origin.x; }
+		void FlipSourceY(double y)								{ FlipSourceY(); m_origin.y = 2*y - m_origin.y; }
+		void FlipSourceZ(double z)			requires (dim >= 3) { FlipSourceY(); m_origin.z = 2*z - m_origin.z; }
 
-		void FlipSource()										{ mat_ = -mat_; }
-		void FlipSource(point_t pt)								{ mat_ = -mat_; origin_ = 2*pt - origin_; }
+		void FlipSource()										{ m_mat = -m_mat; }
+		void FlipSource(point_t pt)								{ m_mat = -m_mat; m_origin = 2*pt - m_origin; }
 
-		void FlipMatX()											{ for (int i {}; i < mat_.cols; i++) mat_(0, i) = -mat_(0, i); }
-		void FlipMatY()											{ for (int i {}; i < mat_.cols; i++) mat_(1, i) = -mat_(1, i); }
-		void FlipMatZ()						requires (dim >= 3) { for (int i {}; i < mat_.cols; i++) mat_(2, i) = -mat_(2, i); }
-		void FlipTargetX(double x = {})							{ FlipMatX(); offset_.x = 2*x - offset_.x; }
-		void FlipTargetY(double y = {})							{ FlipMatY(); offset_.y = 2*y - offset_.y; }
-		void FlipTargetZ(double z = {})		requires (dim >= 3) { FlipMatZ(); offset_.z = 2*z - offset_.z; }
-		void FlipTarget(point_t pt = {})						{ mat_ = -mat_; offset_ = 2*pt - offset_; }
+		void FlipMatX()											{ for (int i {}; i < m_mat.cols; i++) m_mat(0, i) = -m_mat(0, i); }
+		void FlipMatY()											{ for (int i {}; i < m_mat.cols; i++) m_mat(1, i) = -m_mat(1, i); }
+		void FlipMatZ()						requires (dim >= 3) { for (int i {}; i < m_mat.cols; i++) m_mat(2, i) = -m_mat(2, i); }
+		void FlipTargetX(double x = {})							{ FlipMatX(); m_offset.x = 2*x - m_offset.x; }
+		void FlipTargetY(double y = {})							{ FlipMatY(); m_offset.y = 2*y - m_offset.y; }
+		void FlipTargetZ(double z = {})		requires (dim >= 3) { FlipMatZ(); m_offset.z = 2*z - m_offset.z; }
+		void FlipTarget(point_t pt = {})						{ m_mat = -m_mat; m_offset = 2*pt - m_offset; }
 
 		//-------------------------------------------------------------------------
 		// Operation
 		//
 		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const override {
 			if constexpr (dim == 2) {
-				return scale_ * (mat_ * (pt-origin_)) + offset_;
+				return m_scale * (m_mat * (pt-m_origin)) + m_offset;
 			} else if constexpr (dim == 3) {
-				return scale_ * (mat_ * (point_t(pt)-origin_)) + offset_;
+				return m_scale * (m_mat * (point_t(pt)-m_origin)) + m_offset;
 			}
 		}
 		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override {
@@ -568,7 +569,7 @@ namespace gtl {
 				ptNew.z = pt.z;
 				return ptNew;
 			} else if constexpr (dim == 3) {
-				return scale_ * (mat_ * (pt-origin_)) + offset_;
+				return m_scale * (m_mat * (pt-m_origin)) + m_offset;
 			}
 		}
 		virtual [[nodiscard]] std::optional<point2_t> TransI(point2_t const& pt) const override {
@@ -595,16 +596,16 @@ namespace gtl {
 			return scale * dLength;
 		}
 		virtual [[nodiscard]] bool IsRightHanded() const override {
-			return cv::determinant(mat_) >= 0;
+			return cv::determinant(m_mat) >= 0;
 		}
 
 		TCoordTransDim& operator *= (TCoordTransDim const& B) {
 			// 순서 바꾸면 안됨.
-			offset_		= scale_ * mat_ * (B.offset_ - origin_) + offset_;
+			m_offset		= m_scale * m_mat * (B.m_offset - m_origin) + m_offset;
 
-			origin_		= B.origin_;
-			mat_		= mat_ * B.mat_;
-			scale_		= scale_ * B.scale_;
+			m_origin		= B.m_origin;
+			m_mat		= m_mat * B.m_mat;
+			m_scale		= m_scale * B.m_scale;
 			return *this;
 		}
 		[[nodiscard]] TCoordTransDim operator * (TCoordTransDim const& B) const {
@@ -615,18 +616,18 @@ namespace gtl {
 	};
 
 
-	//template GTL_CLASS TCoordTransChain<double>;
-	//using CCoordTransChain = TCoordTransChain<double>;
+	//template GTL__CLASS TCoordTransChain<double>;
+	//using xCoordTransChain = TCoordTransChain<double>;
 
 	//template TCoordTransDim<2>;
-	using CCoordTrans2d = TCoordTransDim<2>;
+	using xCoordTrans2d = TCoordTransDim<2>;
 
 	//template TCoordTransDim<3>;
-	using CCoordTrans3d = TCoordTransDim<3>;
+	using xCoordTrans3d = TCoordTransDim<3>;
 
 
-	//GTL_CLASS CCoordTrans2d;
-	//GTL_CLASS CCoordTrans3d;
+	//GTL__CLASS xCoordTrans2d;
+	//GTL__CLASS xCoordTrans3d;
 
 #pragma pack(pop)
 }	// namespace gtl

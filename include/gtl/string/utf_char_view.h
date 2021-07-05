@@ -1,4 +1,4 @@
-
+﻿
 //////////////////////////////////////////////////////////////////////
 //
 // utf_char_view.h : UTF 8/16/32 Characters one by one. (from any utf string.)
@@ -13,8 +13,8 @@
 #pragma once
 
 #if 1
-#ifndef GTL_HEADER__STRING_UTF_STRING_VIEW
-#define GTL_HEADER__STRING_UTF_STRING_VIEW
+#ifndef GTL__HEADER__STRING_UTF_STRING_VIEW
+#define GTL__HEADER__STRING_UTF_STRING_VIEW
 
 #include "string_primitives.h"
 #include "convert_utf.h"
@@ -111,7 +111,7 @@ namespace gtl {
 #pragma pack(pop)
 }
 
-#endif // GTL_HEADER__STRING_UTF_STRING_VIEW
+#endif // GTL__HEADER__STRING_UTF_STRING_VIEW
 
 
 #endif

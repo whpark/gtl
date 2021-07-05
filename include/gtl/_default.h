@@ -112,11 +112,11 @@
 #	include <source_location>
 #endif
 
-#define GTL_DEPR_SEC [[deprecated("NOT Secure")]]
+#define GTL__DEPR_SEC [[deprecated("NOT Secure")]]
 
 #include "gtl/_config.h"
 
-#if (GTL_USE_WINDOWS_API)
+#if (GTL__USE_WINDOWS_API)
 	#define NOMINMAX
 	#pragma warning(push)
 	#pragma warning(disable: 5104 5105)
@@ -239,54 +239,8 @@ namespace gtl {
 	using uchar = unsigned char;
 	using uint = uint32_t;	// conflicts with cv::
 
-	// todo : streamable_unique_ptr / streamable_shared_ptr - derived from std::unique_ptr / std::shared_ptr  respectively. for dynamic creatable object
-
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+	using charKSSM_t = uint16_t;
+#endif
 
 }
-
-
-
-//-----------------------------------------------------------------------------
-// Naming Convention :
-/*
-
-(*) 기본 : 
-	- Camal Case. 단어 시작할 때 대문자로 시작.
-	- 단축어 줄임말 등은 전체 대문자 사용.
-	-
-
-	ex)
-		PutSomethingSpecial() ('P', 'S', 'S' 대문자 사용)
-		GetDNS_Name : Get, DNS, Name 의 'G'et, 'DNS', 'N'ame 은 대문자 사용. DNS 와 Name 이 대문자로 연결 되므로, '_' 를 사용하여 띄워줌.
-
-
-1. 
-	(1) Class Name : 'C' 로 시작.
-
-
-	(2) 여러가지 방법이 있으므로.....
-
-		* (동사 + 목적어) 또는 (목적어 + 동사) 둘 중 하나만 골라서 사용하기.
-
-		* Member Functino Name : 그룹으로 묶어서 사용.
-			ex) path 에 대한 것일 경우,
-				Path + Get -> PathGet, PathSet, PathInit ...
-
-
-
-
-2. 구체적인 이름 :
-	(1) (Set/Get), (Read/Write), (Send/Receive)
-		- Set/Get : 단순히 변수의 값을 설정 할 경우.
-		- Read/Write : File/Stream 등의 입출력. IO 길이가 정해진 경우.
-		- Send/Receive : 특정 Protocol 을 사용하여 데이터를 송/수신 해야 하는 경우.
-
-	(2) Init, Clear
-		- Init() : 초기화. Class 를 사용하기 전, 어떤 작업(파일 입출력이든, ...)을 해야 할 경우.
-		- Clear() : 초기화. 단순 값들을 0으로 돌리는 작업.
-
-	(3) FromString, ToString
-
-
-
-*/

@@ -19,7 +19,7 @@
 namespace gtl {
 
 
-	bool CSimpleLog::OpenFile(std::chrono::system_clock::time_point now) {
+	bool xSimpleLog::OpenFile(std::chrono::system_clock::time_point now) {
 		std::scoped_lock lock(m_mutex);
 
 		if (m_fmtLogFileName.empty()) {
@@ -27,12 +27,12 @@ namespace gtl {
 			return false;
 		}
 
-		CStringW strFilePath;
+		xStringW strFilePath;
 
 		strFilePath = (m_folderLog / m_fmtLogFileName.c_str()).c_str();
 		strFilePath.Replace(L"[Name]", m_strName);
 
-		CSysTime tNow(now);
+		xSysTime tNow(now);
 		std::time_t t = tNow;
 		std::tm tm;
 		localtime_s(&tm, &t);
@@ -56,8 +56,8 @@ namespace gtl {
 
 			// Delete Old Files
 			if (m_bOverwriteOlderFile && std::filesystem::exists(path)) {
-				CSysTime tLastWrite = std::filesystem::last_write_time(path);
-				CSysTime t(now);
+				xSysTime tLastWrite = std::filesystem::last_write_time(path);
+				xSysTime t(now);
 				auto ts = t - tLastWrite;
 				if (ts > m_tsOld)
 					std::filesystem::remove(path);
@@ -96,7 +96,7 @@ namespace gtl {
 		}
 		return true;
 	}
-	bool CSimpleLog::CloseFile() {
+	bool xSimpleLog::CloseFile() {
 		std::scoped_lock lock(m_mutex);
 
 		if (m_ar.get()) {

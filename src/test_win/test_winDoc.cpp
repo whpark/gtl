@@ -1,4 +1,4 @@
-
+﻿
 // test_winDoc.cpp : implementation of the CtestwinDoc class
 //
 

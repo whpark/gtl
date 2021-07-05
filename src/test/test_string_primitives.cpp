@@ -647,9 +647,9 @@ TEST(gtl_string, tszto) {
 	auto a1 = gtl::tsztoi("12345"sv);
 	auto a2 = gtl::tsztoi("12345"s);
 	auto a3 = gtl::tsztoi("12345");
-	CString str;
+	xString str;
 	str = "12345";
-	auto a4 = gtl::tsztoi(CString("12345"sv));
+	auto a4 = gtl::tsztoi(xString("12345"sv));
 	//auto aa = overload{
 	//	[]() { std::cout << "()" << std::endl; },
 	//	[](int) { std::cout << "(int)" << std::endl; },
@@ -671,8 +671,8 @@ TEST(gtl_string, tszto) {
 	//EXPECT_EQ(1.1, (gtl::tsztod<double, char>("1.1")));
 	//EXPECT_EQ(1.1, (gtl::tsztod<double, char>("1.1"s)));
 	//EXPECT_EQ(1.1, (gtl::tsztod<double, char>("1.1"sv)));
-	//EXPECT_EQ(1.1, (gtl::tsztod<double, char>(gtl::CStringA("1.1"))));
-	//EXPECT_EQ(1.1, (gtl::tsztod<double, char>(gtl::CStringA("1.1"))));
+	//EXPECT_EQ(1.1, (gtl::tsztod<double, char>(gtl::xStringA("1.1"))));
+	//EXPECT_EQ(1.1, (gtl::tsztod<double, char>(gtl::xStringA("1.1"))));
 	//EXPECT_EQ(1.1, gtl::tsztod((std::string_view)"1.1"));
 	//EXPECT_EQ(1.1, gtl::tsztod((std::string_view)"1.1"s));
 	//EXPECT_EQ(+1.1, gtl::tsztod("+1.1"sv));

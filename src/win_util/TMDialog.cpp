@@ -64,7 +64,7 @@ namespace gtl::win_util {
 		if (!pWnd || !pWnd->m_hWnd)
 			return 0;
 
-		::CString str;
+		CString str;
 		pWnd->GetDlgItemText(idc, str);
 		return _tcstol(str, NULL, eRadix);
 	}
@@ -73,8 +73,8 @@ namespace gtl::win_util {
 		if (!pWnd || !pWnd->m_hWnd)
 			return;
 
-		::CString str;
-		::CString strFMT = pszFMT;
+		CString str;
+		CString strFMT = pszFMT;
 		if (strFMT.IsEmpty())
 			strFMT = _T("%I32d");
 		str.Format(strFMT, iValue);
@@ -85,7 +85,7 @@ namespace gtl::win_util {
 		if (!pWnd || !pWnd->m_hWnd)
 			return 0;
 
-		::CString str;
+		CString str;
 		pWnd->GetDlgItemText(idc, str);
 		return _tcstoi64(str, NULL, eRadix);
 	}
@@ -94,8 +94,8 @@ namespace gtl::win_util {
 		if (!pWnd || !pWnd->m_hWnd)
 			return;
 
-		::CString str;
-		::CString strFMT = pszFMT;
+		CString str;
+		CString strFMT = pszFMT;
 		if (strFMT.IsEmpty())
 			strFMT = _T("%I64d");
 		str.Format(strFMT, iValue);
@@ -106,7 +106,7 @@ namespace gtl::win_util {
 		if (!pWnd || !pWnd->m_hWnd)
 			return 0.0;
 
-		::CString str;
+		CString str;
 		pWnd->GetDlgItemText(idc, str);
 		return _ttof(str);
 	}
@@ -115,8 +115,8 @@ namespace gtl::win_util {
 		if (!pWnd || !pWnd->m_hWnd)
 			return;
 
-		::CString str;
-		::CString strFMT = pszFMT;
+		CString str;
+		CString strFMT = pszFMT;
 		if (strFMT.IsEmpty())
 			strFMT = _T("%.5f");
 		str.Format(strFMT, dValue);
@@ -136,12 +136,12 @@ namespace gtl::win_util {
 	//WARNING_PUSH_AND_DISABLE(4996)
 
 	void DDX_String(CDataExchange* pDX, int idc, char* sz, size_t nSize) {
-		::CString str(sz);
+		CString str(sz);
 		DDX_Text(pDX, idc, str);
 		if (pDX->m_bSaveAndValidate) {
 
 			#ifdef _UNICODE
-			#	define STR ::CStringA(str)
+			#	define STR CStringA(str)
 			#else
 			#	define STR str
 			#endif
@@ -156,20 +156,20 @@ namespace gtl::win_util {
 		}
 	}
 	void DDX_String(CDataExchange* pDX, int idc, wchar_t* sz, size_t nSize) {
-		::CString str(sz);
+		CString str(sz);
 		DDX_Text(pDX, idc, str);
 		if (pDX->m_bSaveAndValidate) {
 
 			#ifdef _UNICODE
 			#	define STR str
 			#else
-			#	define STR CStringW(str)
+			#	define STR xStringW(str)
 			#endif
 
 			if (nSize == (size_t)-1) {
-				//wcscpy(sz, CStringW(str));
+				//wcscpy(sz, xStringW(str));
 			} else if (nSize > 0) {
-				wcsncpy_s(sz, nSize, CStringW(str), nSize);
+				wcsncpy_s(sz, nSize, xStringW(str), nSize);
 			}
 
 			#undef STR
@@ -178,8 +178,8 @@ namespace gtl::win_util {
 
 	//WARNING_POP()
 
-	bool CheckAndSetDlgItemText(CWnd* pWnd, int idc, LPCTSTR pszText, ::CString* pStrOrigin) {
-		::CString str;
+	bool CheckAndSetDlgItemText(CWnd* pWnd, int idc, LPCTSTR pszText, CString* pStrOrigin) {
+		CString str;
 		if (!pWnd)
 			return false;
 		pWnd->GetDlgItemText(idc, str);
@@ -191,8 +191,8 @@ namespace gtl::win_util {
 		return bChanged;
 	}
 
-	::CString GetDlgItemText(CWnd* pWnd, int idc) {
-		::CString str;
+	CString GetDlgItemText(CWnd* pWnd, int idc) {
+		CString str;
 		if (!pWnd)
 			return str;
 		pWnd->GetDlgItemText(idc, str);

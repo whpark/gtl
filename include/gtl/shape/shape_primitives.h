@@ -51,8 +51,8 @@ namespace gtl::shape {
 
 	using char_t = wchar_t;
 	using string_t = std::wstring;
-	using point_t = CPoint3d;
-	using rect_t = CRect3d;
+	using point_t = xPoint3d;
+	using rect_t = xRect3d;
 	struct line_t { point_t beg, end; };
 	using json_t = boost::json::value;
 
@@ -94,22 +94,8 @@ namespace gtl::shape {
 	}
 
 	using color_t = color_rgba_t;
-	template < typename tjson >
-	void from_json(tjson const& j, color_t& object) {
-		object.r = j[0];
-		object.g = j[1];
-		object.b = j[2];
-		object.a = j[3];
-	}
-	template < typename tjson >
-	void to_json(tjson&& j, color_t const& object) {
-		j[0] = object.r;
-		j[1] = object.g;
-		j[2] = object.b;
-		j[3] = object.a;
-	}
 
-	constexpr color_t const CR_DEFAULT = ColorRGBA(255, 255, 255);
+	//constexpr color_t const CR_DEFAULT = ColorRGBA(255, 255, 255);
 
 	enum class eSHAPE {
 		none = -1,
@@ -186,7 +172,7 @@ namespace gtl::shape {
 				count = var.duration.count();
 			}
 			ar & count;
-			
+
 			if constexpr (archive::is_loading()) {
 				var.duration = std::chrono::nanoseconds(count);
 			}
@@ -220,22 +206,20 @@ namespace gtl::shape {
 	class ICanvas;
 
 	/// @brief shape interface class
-	struct GTL_SHAPE_CLASS s_shape {
+	struct GTL__SHAPE_CLASS xShape {
 	public:
 	protected:
-		friend struct s_drawing;
-		int crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
+		friend struct xDrawing;
+		int m_crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
 	public:
-		string_t strLayer;	// temporary value. (while loading from dxf)
-		color_t color{};
-		int eLineType{};
-		string_t strLineType;
-		int lineWeight{1};
-		bool bVisible{};
-		bool bTransparent{};
-		//std::optional<hatching_t> hatch;
-		boost::optional<cookie_t> cookie;
-		//cookie_t cookie;
+		string_t m_strLayer;	// temporary value. (while loading from dxf)
+		color_t m_color{};
+		int m_eLineType{};
+		string_t m_strLineType;
+		int m_lineWeight{1};
+		bool m_bVisible{};
+		bool m_bTransparent{};
+		boost::optional<cookie_t> m_cookie;
 
 	public:
 		enum class eLINE_WIDTH : int {
@@ -245,27 +229,27 @@ namespace gtl::shape {
 		};
 
 	public:
-		virtual ~s_shape() {}
+		virtual ~xShape() {}
 
-		GTL__DYNAMIC_VIRTUAL_INTERFACE(s_shape);
-		//GTL__REFLECTION_VIRTUAL_BASE(s_shape);
-		//GTL__REFLECTION_MEMBERS(color, eLineType, strLineType, lineWeight, bVisible, bTransparent, cookie);
+		GTL__DYNAMIC_VIRTUAL_INTERFACE(xShape);
+		//GTL__REFLECTION_VIRTUAL_BASE(xShape);
+		//GTL__REFLECTION_MEMBERS(m_color, m_eLineType, m_strLineType, m_lineWeight, m_bVisible, m_bTransparent, m_cookie);
 
-		auto operator <=> (s_shape const&) const = default;
+		auto operator <=> (xShape const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_shape& var, unsigned int const file_version) {
+		friend void serialize(archive& ar, xShape& var, unsigned int const file_version) {
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_shape& var) {
-			ar & var.color;
-			ar & var.cookie;
-			ar & var.strLineType;
-			ar & var.lineWeight;
-			ar & var.eLineType;
-			ar & var.bVisible;
-			ar & var.bTransparent;
+		friend archive& operator & (archive& ar, xShape& var) {
+			ar & var.m_color.cr;
+			ar & var.m_cookie;
+			ar & var.m_strLineType;
+			ar & var.m_lineWeight;
+			ar & var.m_eLineType;
+			ar & var.m_bVisible;
+			ar & var.m_bTransparent;
 			return ar;
 		}
 		virtual bool LoadFromCADJson(json_t& _j);
@@ -278,24 +262,24 @@ namespace gtl::shape {
 		virtual void FlipX() = 0;
 		virtual void FlipY() = 0;
 		virtual void FlipZ() = 0;
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
 		virtual bool UpdateBoundary(rect_t&) const = 0;
-		int GetLineWidthInUM() const { return GetLineWidthInUM(lineWeight); }
+		int GetLineWidthInUM() const { return GetLineWidthInUM(m_lineWeight); }
 		static int GetLineWidthInUM(int lineWeight);
 
 		virtual void Draw(ICanvas& canvas) const;
 		virtual bool DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
 
 		virtual void PrintOut(std::wostream& os) const {
-			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetShapeName(GetShapeType()), color.r, color.g, color.b, !bVisible?L"Invisible ":L"", bTransparent?L"Transparent ":L"");
-			fmt::print(os, L"lineType:{}, lineWeight:{}\n", strLineType, lineWeight);
+			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetShapeName(GetShapeType()), m_color.r, m_color.g, m_color.b, !m_bVisible?L"Invisible ":L"", m_bTransparent?L"Transparent ":L"");
+			fmt::print(os, L"lineType:{}, lineWeight:{}\n", m_strLineType, m_lineWeight);
 		}
 
-		static std::unique_ptr<s_shape> CreateShapeFromEntityName(std::string const& strEntityName);
+		static std::unique_ptr<xShape> CreateShapeFromEntityName(std::string const& strEntityName);
 	};
 
 
-	GTL_SHAPE_API void CohenSutherlandLineClip(gtl::CRect2d roi, gtl::CPoint2d& pt0, gtl::CPoint2d& pt1);
+	GTL__SHAPE_API void CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1);
 
 #pragma pack(pop)
 }

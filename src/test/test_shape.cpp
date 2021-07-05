@@ -28,7 +28,7 @@ TEST(gtl_shape, basic) {
 		gtl::bjson jDXF;
 		jDXF.read(path);
 
-		gtl::shape::s_drawing cad;
+		gtl::shape::xDrawing cad;
 
 		cad.LoadFromCADJson(jDXF.json());
 
@@ -43,7 +43,7 @@ TEST(gtl_shape, basic) {
 		}
 
 		{
-			gtl::shape::s_drawing cad2;
+			gtl::shape::xDrawing cad2;
 			std::ifstream ar(std::filesystem::path{path}+=L".shape", std::ios_base::binary);
 			boost::archive::text_iarchive ia(ar);
 			ia & cad2;
