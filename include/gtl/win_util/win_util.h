@@ -126,10 +126,10 @@ AFX_EXT_API_MISC int CompareNumberedString(LPCWSTR psz1, LPCWSTR psz2);
 
 AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, xStringA& drive, xStringA& path, xStringA& title, xStringA& ext);
 AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& title, xStringA& ext);
-AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& name);
+AFX_EXT_API_MISC void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& m_name);
 AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, xStringW& drive, xStringW& folder, xStringW& title, xStringW& ext);
 AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& title, xStringW& ext);
-AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& name);
+AFX_EXT_API_MISC void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& m_name);
 //#define SplitPathW SplitPath
 //#define SplitPathA SplitPath
 class AFX_EXT_API_MISC CPushDirectory {
@@ -281,7 +281,7 @@ protected:
 #endif
 	BOOL bLocked;
 public:
-	CS(LPCTSTR name = NULL, LONG lInitialCount = 1, LONG lMaxCount = 1, int nTimeOut = INFINITE) : cs(lInitialCount, lMaxCount, name) {
+	CS(LPCTSTR m_name = NULL, LONG lInitialCount = 1, LONG lMaxCount = 1, int nTimeOut = INFINITE) : cs(lInitialCount, lMaxCount, m_name) {
 		pCS = NULL;
 	#if (_MSC_VER >= _MSC_VER_VS2013)
 		pMX = NULL;

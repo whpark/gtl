@@ -186,7 +186,7 @@ namespace gtl::concepts {
 	template < typename T_COORD > concept size2 = ( requires (T_COORD a) { a.cx; a.cy; } and !requires (T_COORD a) { a.cz; } );
 	template < typename T_COORD > concept size3 = ( requires (T_COORD a) { a.cx; a.cy; a.cz; } );
 
-	template < typename T_COORD > concept rect = requires (T_COORD a) { a.pt0; a.pt1; };
+	template < typename T_COORD > concept rect = requires (T_COORD a) { a.pt0(); a.pt1(); a.left; a.top; a.right; a.bottom; };
 	template < typename T_COORD > concept rect2 = ( gtl::concepts::rect<T_COORD> and requires (T_COORD a) { a.left; a.top; a.right; a.bottom; } and !requires (T_COORD a) { a.front; a.back; } );
 	template < typename T_COORD > concept rect3 = ( gtl::concepts::rect<T_COORD> and requires (T_COORD a) { a.left; a.top; a.right; a.bottom; a.front; a.back;} );
 

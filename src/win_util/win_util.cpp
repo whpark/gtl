@@ -578,14 +578,14 @@ void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& title, xStringA& 
 	folder = drive + folder;
 }
 
-void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& name) {
+void SplitPath(LPCSTR pszFullPath, xStringA& folder, xStringA& m_name) {
 	xStringA drive, title, ext;
 
 	SplitPath(pszFullPath, drive, folder, title, ext);
 	drive.ReleaseBuffer();
 
 	folder = drive + folder;
-	name = title + ext;
+	m_name = title + ext;
 }
 
 void SplitPath(LPCWSTR pszFullPath, xStringW& drive, xStringW& folder, xStringW& title, xStringW& ext) {
@@ -605,14 +605,14 @@ void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& title, xStringW&
 	folder = drive + folder;
 }
 
-void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& name) {
+void SplitPath(LPCWSTR pszFullPath, xStringW& folder, xStringW& m_name) {
 	xStringW drive, title, ext;
 
 	SplitPath(pszFullPath, drive, folder, title, ext);
 	drive.ReleaseBuffer();
 
 	folder = drive + folder;
-	name = title + ext;
+	m_name = title + ext;
 }
 
 BOOL BackupFile(BOOL bMove, LPCTSTR pszPath, LPCTSTR pszBackupFolder, BOOL bUseDateTime, DWORD dwFlag) {
@@ -1474,9 +1474,9 @@ sizeXX_t FindApp(LPCTSTR pszFullPath, TList<DWORD>& pIDs, bool bNameOnly) {
 		if (size) {
 			xString str;
 			if (bNameOnly) {
-				xString folder, name;
-				SplitPath(buf, folder, name);
-				str = name;
+				xString folder, m_name;
+				SplitPath(buf, folder, m_name);
+				str = m_name;
 			} else {
 				str = buf;
 			}

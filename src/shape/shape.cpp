@@ -206,24 +206,24 @@ namespace gtl::shape {
 	bool xShape::LoadFromCADJson(json_t& _j) {
 		using namespace std::literals;
 		gtl::bjson<json_t> j(_j);
-		//color.cr = (int)j["color"sv];
-		strLayer = j["layer"sv];
+		//m_color.cr = (int)j["color"sv];
+		m_strLayer = j["layer"sv];
 
-		lineWeight = j["lWeight"];
-		strLineType = j["lineType"];
+		m_lineWeight = j["lWeight"];
+		m_strLineType = j["lineType"];
 
 		//eLineType = j["lineType"sv];
-		crIndex = j["color"].value_or(0);
-		color.cr = -1;
+		m_crIndex = j["color"].value_or(0);
+		m_color.cr = -1;
 		if (j["color24"].json().is_int64()) {
-			crIndex = 0;
-			color.cr = (int)j["color24"];
+			m_crIndex = 0;
+			m_color.cr = (int)j["color24"];
 		} else {
-			if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
-				color = colorTable_s[crIndex];
+			if ( (m_crIndex > 0) and (m_crIndex < colorTable_s.size()) )
+				m_color = colorTable_s[m_crIndex];
 		}
-		bVisible = j["visible"].value_or(true);
-		bTransparent = j["transparency"].value_or(0) != false;
+		m_bVisible = j["visible"].value_or(true);
+		m_bTransparent = j["transparency"].value_or(0) != false;
 
 		return true;
 	}
@@ -321,16 +321,16 @@ namespace gtl::shape {
 	void xPolyline::Draw(ICanvas& canvas) const {
 		xShape::Draw(canvas);
 
-		if (pts.size())
-			canvas.MoveTo(pts[0]);
+		if (m_pts.size())
+			canvas.MoveTo(m_pts[0]);
 
-		auto nPt = pts.size();
-		if (!bLoop)
+		auto nPt = m_pts.size();
+		if (!m_bLoop)
 			nPt--;
 		for (int iPt = 0; iPt < nPt; iPt++) {
-			auto iPt2 = (iPt+1) % pts.size();
-			auto pt0 = pts[iPt];
-			auto pt1 = pts[iPt2];
+			auto iPt2 = (iPt+1) % m_pts.size();
+			auto pt0 = m_pts[iPt];
+			auto pt1 = m_pts[iPt2];
 			if (pt0.Bulge() == 0.0) {
 				canvas.LineTo(pt1);
 			} else {
@@ -348,18 +348,18 @@ namespace gtl::shape {
 	boost::ptr_deque<xShape> xPolyline::Split() const {
 		boost::ptr_deque<xShape> shapes;
 
-		auto nPt = pts.size();
-		if (!bLoop)
+		auto nPt = m_pts.size();
+		if (!m_bLoop)
 			nPt--;
 		for (int iPt = 0; iPt < nPt; iPt++) {
-			auto iPt2 = (iPt+1) % pts.size();
-			auto pt0 = pts[iPt];
-			auto pt1 = pts[iPt2];
+			auto iPt2 = (iPt+1) % m_pts.size();
+			auto pt0 = m_pts[iPt];
+			auto pt1 = m_pts[iPt2];
 			if (pt0.Bulge() == 0.0) {
 				auto rLine = std::make_unique<xLine>();
 				(xShape&)*rLine = (xShape const&)*this;
-				rLine->pt0 = pt0;
-				rLine->pt1 = pt1;
+				rLine->m_pt0 = pt0;
+				rLine->m_pt1 = pt1;
 				shapes.push_back(std::move(rLine));
 			} else {
 				xArc arc = xArc::GetFromBulge(pt0.Bulge(), pt0, pt1);
@@ -379,24 +379,24 @@ namespace gtl::shape {
 		{
 			auto jHeader = jTOP["header"];
 			auto jVars = jHeader["vars"].json().as_object();
-			vars.clear();
+			m_vars.clear();
 			for (auto& var : jVars) {
 				auto key = var.key();
 				auto value = var.value();
 				if (value.is_string()) {
 					auto& str = value.as_string();
-					vars[std::string(key.data(), key.size())] = gtl::ToString<gtl::shape::char_t, char8_t>(std::u8string{(char8_t const*)str.data(), str.size()});
+					m_vars[std::string(key.data(), key.size())] = gtl::ToString<gtl::shape::char_t, char8_t>(std::u8string{(char8_t const*)str.data(), str.size()});
 				} else if (value.is_int64()) {
-					vars[std::string(key.data(), key.size())] = (int)value.as_int64();
+					m_vars[std::string(key.data(), key.size())] = (int)value.as_int64();
 				} else if (value.is_double()) {
-					vars[std::string(key.data(), key.size())] = value.as_double();
+					m_vars[std::string(key.data(), key.size())] = value.as_double();
 				}
 			}
 		}
 
 		// line types
 		{
-			line_types.clear();
+			m_line_types.clear();
 			auto jLineTypes = jTOP["lineTypes"].json().as_array();
 			for (auto& item : jLineTypes) {
 				bjson<json_t> jLT(item);
@@ -409,14 +409,14 @@ namespace gtl::shape {
 						lt->path.push_back(jp.is_double() ? jp.as_double() : jp.as_int64());
 					}
 				}
-				line_types.push_back(std::move(lt));
+				m_line_types.push_back(std::move(lt));
 			}
 		}
 
 		// layers
 		std::map<string_t, xLayer*> mapLayers;	// cache
 		{
-			layers.clear();
+			m_layers.clear();
 			//layers.push_back(std::make_unique<xLayer>(L"0"));
 
 			auto jLayers = jTOP["layers"].json().as_array();
@@ -426,14 +426,14 @@ namespace gtl::shape {
 				auto rLayer = std::make_unique<xLayer>();
 				rLayer->LoadFromCADJson(item);
 
-				if (auto iterLineType = std::find_if(line_types.begin(), line_types.end(), [&rLayer](auto const& lt) { return lt.name == rLayer->strLineType; });
-					iterLineType != line_types.end()) {
+				if (auto iterLineType = std::find_if(m_line_types.begin(), m_line_types.end(), [&rLayer](auto const& lt) { return lt.name == rLayer->m_strLineType; });
+					iterLineType != m_line_types.end()) {
 
 					rLayer->pLineType = &(*iterLineType);
 				}
 
-				mapLayers[rLayer->name] = rLayer.get();
-				layers.push_back(std::move(rLayer));
+				mapLayers[rLayer->m_name] = rLayer.get();
+				m_layers.push_back(std::move(rLayer));
 			}
 		}
 
@@ -459,8 +459,8 @@ namespace gtl::shape {
 				}
 
 
-				if (auto iterLineType = std::find_if(line_types.begin(), line_types.end(), [&rBlock](auto const& lt) { return lt.name == rBlock->strLineType; });
-					iterLineType != line_types.end()) {
+				if (auto iterLineType = std::find_if(m_line_types.begin(), m_line_types.end(), [&rBlock](auto const& lt) { return lt.name == rBlock->m_strLineType; });
+					iterLineType != m_line_types.end()) {
 
 					rBlock->pLineType = &(*iterLineType);
 				}
@@ -490,10 +490,10 @@ namespace gtl::shape {
 						break;
 					}
 
-					rBlock->shapes.push_back(std::move(rShape));
+					rBlock->m_shapes.push_back(std::move(rShape));
 				}
 
-				mapBlocks[rBlock->name] = rBlock.get();
+				mapBlocks[rBlock->m_name] = rBlock.get();
 				blocks.push_back(std::move(rBlock));
 			}
 		}
@@ -502,7 +502,7 @@ namespace gtl::shape {
 		// Entities
 		{
 			auto jEntities = jTOP["mainBlock"].json().as_array();
-			rectBoundary.SetRectEmptyForMinMax2d();
+			m_rectBoundary.SetRectEmptyForMinMax2d();
 			// block entities
 			for (auto& jEntity : jEntities) {
 				bjson<json_t> j(jEntity);
@@ -524,7 +524,7 @@ namespace gtl::shape {
 					continue;
 				}
 
-				AddEntity(std::move(rShape), mapLayers, mapBlocks, rectBoundary);
+				AddEntity(std::move(rShape), mapLayers, mapBlocks, m_rectBoundary);
 			}
 		}
 
@@ -539,59 +539,59 @@ namespace gtl::shape {
 		case eSHAPE::insert :
 			// todo :
 			if (xInsert* pInsert = dynamic_cast<xInsert*>(rShape.get()); pInsert) {
-				auto iter = mapBlocks.find(pInsert->name);
+				auto iter = mapBlocks.find(pInsert->m_name);
 				if (iter == mapBlocks.end()) {
-					DEBUG_PRINT(L"No Block : {}\n", pInsert->name);
+					DEBUG_PRINT(L"No Block : {}\n", pInsert->m_name);
 					return false;
 				}
 				auto* pBlock = iter->second;
 				if (!pBlock) {
-					DEBUG_PRINT(L"Internal ERROR (Block Name : {})\n", pInsert->name);
+					DEBUG_PRINT(L"Internal ERROR (Block Name : {})\n", pInsert->m_name);
 					return false;
 				}
 
 				xCoordTrans3d ct;
 				// todo : 순서 확인 (scale->rotate ? or rotate->scale ?)
-				if (pInsert->xscale != 1.0) {
-					ct.mat_(0, 0) *= pInsert->xscale;
-					ct.mat_(0, 1) *= pInsert->xscale;
-					ct.mat_(0, 2) *= pInsert->xscale;
+				if (pInsert->m_xscale != 1.0) {
+					ct.m_mat(0, 0) *= pInsert->m_xscale;
+					ct.m_mat(0, 1) *= pInsert->m_xscale;
+					ct.m_mat(0, 2) *= pInsert->m_xscale;
 				}
-				if (pInsert->yscale != 1.0) {
-					ct.mat_(1, 0) *= pInsert->yscale;
-					ct.mat_(1, 1) *= pInsert->yscale;
-					ct.mat_(1, 2) *= pInsert->yscale;
+				if (pInsert->m_yscale != 1.0) {
+					ct.m_mat(1, 0) *= pInsert->m_yscale;
+					ct.m_mat(1, 1) *= pInsert->m_yscale;
+					ct.m_mat(1, 2) *= pInsert->m_yscale;
 				}
-				if (pInsert->zscale != 1.0) {
-					ct.mat_(2, 0) *= pInsert->zscale;
-					ct.mat_(2, 1) *= pInsert->zscale;
-					ct.mat_(2, 2) *= pInsert->zscale;
-				}
-
-				if (pInsert->angle != 0.0_rad) {
-					ct.mat_ = ct.GetRotatingMatrixXY(pInsert->angle) * ct.mat_;
+				if (pInsert->m_zscale != 1.0) {
+					ct.m_mat(2, 0) *= pInsert->m_zscale;
+					ct.m_mat(2, 1) *= pInsert->m_zscale;
+					ct.m_mat(2, 2) *= pInsert->m_zscale;
 				}
 
-				ct.origin_ = pBlock->pt;
+				if (pInsert->m_angle != 0.0_rad) {
+					ct.m_mat = ct.GetRotatingMatrixXY(pInsert->m_angle) * ct.m_mat;
+				}
 
-				for (int y = 0; y < pInsert->nRow; y++) {
-					for (int x = 0; x < pInsert->nCol; x++) {
+				ct.m_origin = pBlock->m_pt;
+
+				for (int y = 0; y < pInsert->m_nRow; y++) {
+					for (int x = 0; x < pInsert->m_nCol; x++) {
 
 						std::unique_ptr<xBlock> rBlockNew { dynamic_cast<xBlock*>(pBlock->NewClone().release()) };
 
-						ct.offset_.x = x*pInsert->spacingCol + pInsert->pt.x;
-						ct.offset_.y = y*pInsert->spacingRow + pInsert->pt.x;
+						ct.m_offset.x = x*pInsert->m_spacingCol + pInsert->m_pt.x;
+						ct.m_offset.y = y*pInsert->m_spacingRow + pInsert->m_pt.x;
 
-						for (auto const& rShape : rBlockNew->shapes) {
+						for (auto const& rShape : rBlockNew->m_shapes) {
 							auto rShapeNew = rShape.NewClone();
 							rBlockNew->Transform(ct, ct.IsRightHanded());
 							// color
-							if (rShapeNew->crIndex == 0) {
-								rShapeNew->crIndex = pBlock->crIndex;
+							if (rShapeNew->m_crIndex == 0) {
+								rShapeNew->m_crIndex = pBlock->m_crIndex;
 							}
 							// line Width
-							if (rShapeNew->lineWeight == (int)eLINE_WIDTH::ByBlock) {
-								rShapeNew->lineWeight = pBlock->lineWeight;
+							if (rShapeNew->m_lineWeight == (int)eLINE_WIDTH::ByBlock) {
+								rShapeNew->m_lineWeight = pBlock->m_lineWeight;
 							}
 							if (!AddEntity(std::move(rShapeNew), mapLayers, mapBlocks, rectB)) {
 								DEBUG_PRINT("CANNOT Add Shape\n");
@@ -604,36 +604,36 @@ namespace gtl::shape {
 			break;
 
 		default :
-			if (auto iter = mapLayers.find(rShape->strLayer); iter != mapLayers.end()) {
+			if (auto iter = mapLayers.find(rShape->m_strLayer); iter != mapLayers.end()) {
 				auto* pLayer = iter->second;
 				if (!pLayer) {
-					DEBUG_PRINT(L"Internal Error : Layer {}\n", rShape->strLayer);
+					DEBUG_PRINT(L"Internal Error : Layer {}\n", rShape->m_strLayer);
 					return false;
 				}
 
 				// color
-				if (rShape->color.cr == -1) {
-					int crIndex = rShape->crIndex;
-					if (crIndex == 256) {
-						crIndex = pLayer->crIndex;
-						rShape->color = pLayer->color;
+				if (rShape->m_color.cr == -1) {
+					int m_crIndex = rShape->m_crIndex;
+					if (m_crIndex == 256) {
+						m_crIndex = pLayer->m_crIndex;
+						rShape->m_color = pLayer->m_color;
 					}
-					if (rShape->color.cr == -1) {
-						if ( (crIndex > 0) and (crIndex < colorTable_s.size()) )
-							rShape->color = colorTable_s[crIndex];
+					if (rShape->m_color.cr == -1) {
+						if ( (m_crIndex > 0) and (m_crIndex < colorTable_s.size()) )
+							rShape->m_color = colorTable_s[m_crIndex];
 					}
 				}
 
 				// line Width
-				if (rShape->lineWeight == (int)eLINE_WIDTH::ByLayer) {
-					rShape->lineWeight = pLayer->lineWeight;
+				if (rShape->m_lineWeight == (int)eLINE_WIDTH::ByLayer) {
+					rShape->m_lineWeight = pLayer->m_lineWeight;
 				}
 
 				rShape->UpdateBoundary(rectB);
-				pLayer->shapes.push_back(std::move(rShape));
+				pLayer->m_shapes.push_back(std::move(rShape));
 
 			} else {
-				DEBUG_PRINT(L"No Layer : {}\n", rShape->strLayer);
+				DEBUG_PRINT(L"No Layer : {}\n", rShape->m_strLayer);
 				return false;
 			}
 

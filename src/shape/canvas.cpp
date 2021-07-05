@@ -14,7 +14,7 @@ namespace gtl::shape {
 			len += pts[i].Distance(pts[i-1]);
 		}
 
-		double step = canvas.target_interpolation_inverval_ / len / 2.;
+		double step = canvas.m_target_interpolation_inverval / len / 2.;
 
 		tinyspline::BSpline bspline(pts.size(), 2, degree);
 		std::vector<tinyspline::real> points(pts.size()*degree);

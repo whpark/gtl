@@ -31,10 +31,10 @@ TEST(gtl_coord_trans, ct2) {
 	EXPECT_EQ(ct(pts0[2]), pts1[2]);
 
 	EXPECT_TRUE(ct.SetFrom3Points(pts0, pts1));
-	EXPECT_EQ(ct.scale_, 1.0);
-	EXPECT_EQ(ct.mat_, (cv::Matx22d{0, 1, 1, 0}));
-	EXPECT_EQ(ct.origin_, xPoint2d(0, 0));
-	EXPECT_EQ(ct.offset_, xPoint2d(0, 0));
+	EXPECT_EQ(ct.m_scale, 1.0);
+	EXPECT_EQ(ct.m_mat, (cv::Matx22d{0, 1, 1, 0}));
+	EXPECT_EQ(ct.m_origin, xPoint2d(0, 0));
+	EXPECT_EQ(ct.m_offset, xPoint2d(0, 0));
 	EXPECT_EQ(ct(pts0[0]), pts1[0]);
 	EXPECT_EQ(ct(pts0[1]), pts1[1]);
 	EXPECT_EQ(ct(pts0[2]), pts1[2]);
