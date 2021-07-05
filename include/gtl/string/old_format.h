@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // old_format.h:
 //
@@ -18,7 +18,7 @@
 namespace gtl::old_format {
 	//-----------------------------------------------------------------------------
 	// Format()
-	// Âü°í : https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
+	// ì°¸ê³  : https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 	//
 
 	template < gtlc::arithmetic T_NUMBER >
@@ -80,7 +80,7 @@ namespace gtl::old_format {
 	}
 	template < typename ... Args >
 	int tsz_snprintf(wchar_t* const _Buffer, size_t const _BufferCount, wchar_t const* const _Format, Args&& ... args) {
-		//#pragma warning(suppress:4996)	// ¾Æ·¡ ÇÑ ÁÙ¸¸ ¿¡·¯ ¸·±â.
+		//#pragma warning(suppress:4996)	// ì•„ë˜ í•œ ì¤„ë§Œ ì—ëŸ¬ ë§‰ê¸°.
 		return _snwprintf(_Buffer, _BufferCount, _Format, args ...);
 	}
 	template < typename ... Args >
@@ -93,7 +93,7 @@ namespace gtl::old_format {
 		return ::vsnprintf(buffer, _Count, format, argptr);
 	}
 	inline int tsz_vsnprintf(wchar_t *buffer, size_t _Count, wchar_t const* format, va_list argptr) {
-	#pragma warning(suppress:4996)	// ¾Æ·¡ ÇÑ ÁÙ¸¸ ¿¡·¯ ¸·±â.
+	#pragma warning(suppress:4996)	// ì•„ë˜ í•œ ì¤„ë§Œ ì—ëŸ¬ ë§‰ê¸°.
 		return ::_vsnwprintf(buffer, _Count, format, argptr);
 	}
 	inline int tsz_vsnprintf(char8_t *buffer, size_t _Count, char8_t const* format, va_list argptr) {

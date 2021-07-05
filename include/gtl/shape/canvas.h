@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // canvas.h:
 //
@@ -24,12 +24,12 @@ namespace gtl::shape {
 	// CoordSystem
 
 	////-------------------------------------------------------------------------
-	///// @brief 3Á¡(or 2Á¡) ¾ó¶óÀÎ.
+	///// @brief 3ì (or 2ì ) ì–¼ë¼ì¸.
 	//class CCoordSystem : public xCoordTransChain {
 	//public:
-	//	//ct_t ctShape2Real_;	// DXF ÁÂÇ¥°è¿¡¼­ ½Ç ÁÂÇ¥°è.
-	//	//ct_t ctAlign_;			// Align ¹Ì¼¼ º¸Á¤. (3 Á¡ º¸Á¤)
-	//	//ct_t ctReal2Canvas_;	// ½ÇÁÂÇ¥°è -> Canvas(ex, Scanner) ÁÂÇ¥°è
+	//	//ct_t ctShape2Real_;	// DXF ì¢Œí‘œê³„ì—ì„œ ì‹¤ ì¢Œí‘œê³„.
+	//	//ct_t ctAlign_;			// Align ë¯¸ì„¸ ë³´ì •. (3 ì  ë³´ì •)
+	//	//ct_t ctReal2Canvas_;	// ì‹¤ì¢Œí‘œê³„ -> Canvas(ex, Scanner) ì¢Œí‘œê³„
 
 	//public:
 	//	//CCoordSystem() = default;
@@ -317,7 +317,7 @@ namespace gtl::shape {
 	//	//-----------------------
 	//	// Hatch :
 	//	//
-	//	//	linePolygon : ½ÃÀÛ°ú ³¡Á¡ÀÌ ´Ù¸¦ °æ¿ì, Ã¹¹øÂ° Á¡°ú ¸¶Áö¸·Á¡À» ¿¬°áÇÏ°Ô µÊ. Á¡ÀÇ °¹¼ö°¡ ÃÖ¼ÒÇÑ 3°³ ÀÌ»ó ÀÖ¾î¾ß ÇÔ.
+	//	//	linePolygon : ì‹œì‘ê³¼ ëì ì´ ë‹¤ë¥¼ ê²½ìš°, ì²«ë²ˆì§¸ ì ê³¼ ë§ˆì§€ë§‰ì ì„ ì—°ê²°í•˜ê²Œ ë¨. ì ì˜ ê°¯ìˆ˜ê°€ ìµœì†Œí•œ 3ê°œ ì´ìƒ ìˆì–´ì•¼ í•¨.
 	//	//
 	//	//	eHatching :	SH_NONE
 	//	//				SH_L2R
@@ -328,7 +328,7 @@ namespace gtl::shape {
 
 	//	//-----------------------
 	//	// Text :
-	//	//	pt : ±âÁØ Á¡
+	//	//	pt : ê¸°ì¤€ ì 
 	//	//
 	//	//	dwAlign :	DT_TOP
 	//	//				DT_LEFT
@@ -337,7 +337,7 @@ namespace gtl::shape {
 	//	//				DT_VCENTER
 	//	//				DT_BOTTOM
 	//	//
-	//	//	lf : Å©±â´Â ¹«½ÃµÊ. (±âº» 72 point(720) À¸·Î ¸¸µé¾î¾ß ÇÔ)
+	//	//	lf : í¬ê¸°ëŠ” ë¬´ì‹œë¨. (ê¸°ë³¸ 72 point(720) ìœ¼ë¡œ ë§Œë“¤ì–´ì•¼ í•¨)
 	//	//
 	//	virtual void Text(LPCWSTR pszText, const point_t& pt, DWORD dwAlign /*DT_...*/, double dHeight, double dLineSpacingFactor, const LOGFONT& lf, DWORD eHatching, double dHatching);
 	//};

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // shape_others.h:
 //
@@ -11,7 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /*
 
-	1. CShapeObject ¿¡¼­ º¯°æ ³»¿ë :
+	1. CShapeObject ì—ì„œ ë³€ê²½ ë‚´ìš© :
 
 		class name :
 
@@ -24,7 +24,7 @@
 
 			TList -> boost::ptr_deque
 
-		Point / Line : x, y, z 3Â÷¿øÀ¸·Î º¯°æ
+		Point / Line : x, y, z 3ì°¨ì›ìœ¼ë¡œ ë³€ê²½
 
 			typedef xSize3d					size2d_t;
 			typedef xPoint3d				point_t;
@@ -394,7 +394,7 @@ namespace gtl::shape {
 	struct GTL__SHAPE_CLASS xCircle : public xShape {
 		point_t m_ptCenter;
 		double m_radius{};
-		deg_t m_angle_length{360_deg};	// È¸Àü ¹æÇâ.
+		deg_t m_angle_length{360_deg};	// íšŒì „ ë°©í–¥.
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::circle_xy; }
 
@@ -457,7 +457,7 @@ namespace gtl::shape {
 		//virtual point_t PointAt(double t) const override {};
 		virtual void FlipX() override { xCircle::FlipX(); m_angle_start = AdjustAngle(180._deg - m_angle_start); }
 		virtual void FlipY() override { xCircle::FlipY(); m_angle_start = AdjustAngle(-m_angle_start); }
-		virtual void FlipZ() override { xCircle::FlipZ(); m_angle_start = AdjustAngle(180._deg - m_angle_start); }	// ????.....  ¼º¸³ ¾ÈµÇÁö¸¸,
+		virtual void FlipZ() override { xCircle::FlipZ(); m_angle_start = AdjustAngle(180._deg - m_angle_start); }	// ????.....  ì„±ë¦½ ì•ˆë˜ì§€ë§Œ,
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			// todo : ... upgrade?
 			xCircle::Transform(ct, bRightHanded);

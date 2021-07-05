@@ -1,4 +1,4 @@
-
+﻿
 // test_winView.cpp : implementation of the CtestwinView class
 //
 
@@ -304,7 +304,7 @@ cv::Mat CtestwinView::CreateSampleImage(cv::Size size) {
 		r.col(r.cols - 2) = 0;
 		r.col(r.cols - 1) = 255;
 
-		cv::Rect rect(row % r.cols/*�缱*/, 0, mat.cols / 5, 1);
+		cv::Rect rect(row % r.cols/*사선*/, 0, mat.cols / 5, 1);
 		rect = gtl::GetSafeROI(rect, r.size());
 		if (!rect.empty())
 			r(rect) = ~r(rect);

@@ -1,4 +1,4 @@
-
+﻿
 // test_winDoc.h : interface of the CtestwinDoc class
 //
 

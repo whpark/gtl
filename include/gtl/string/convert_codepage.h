@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // convert_codepage.h:
 //
@@ -52,7 +52,7 @@ namespace gtl {
 
 		KO_KR_949 = 949,
 #if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-		KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
+		KO_KR_JOHAB_KSSM_1361 = 1361,	// ì¡°í•©í˜• KSSM
 #endif
 
 
@@ -92,7 +92,7 @@ namespace gtl {
 
 			KO_KR_949 = 949,
 	#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-			KO_KR_JOHAB_KSSM_1361 = 1361,	// Á¶ÇÕÇü KSSM
+			KO_KR_JOHAB_KSSM_1361 = 1361,	// ì¡°í•©í˜• KSSM
 	#endif
 
 
