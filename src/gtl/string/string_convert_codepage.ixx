@@ -57,7 +57,7 @@ export namespace gtl {
 	//------------------------
 
 		KO_KR_949 = 949,
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
 		KO_KR_JOHAB_KSSM_1361 = 1361,	// 조합형 KSSM
 #endif
 
@@ -97,7 +97,7 @@ export namespace gtl {
 			ACP = 0,
 
 			KO_KR_949 = 949,
-	#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
+	#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
 			KO_KR_JOHAB_KSSM_1361 = 1361,	// 조합형 KSSM
 	#endif
 
@@ -150,7 +150,7 @@ export namespace gtl {
 
 	/// @brief default codepage for MBCS (windows)
 	/// you can set this value for your region.
-	eCODEPAGE eMBCS_Codepage_g{GTL_DEFAULT_CODEPAGE};
+	eCODEPAGE eMBCS_Codepage_g{GTL__DEFAULT_CODEPAGE};
 
 
 	constexpr [[nodiscard]] std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {
@@ -604,7 +604,7 @@ export namespace gtl {
 	}
 
 
-#if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
+#if (GTL__STRING_PRIMITIVES__WINDOWS_FRIENDLY) && defined(_WINDOWS)
 	template < bool bCOUNT_FIRST >
 	std::string ConvWide_MBCS(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage) {
 		std::string str;

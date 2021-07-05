@@ -16,9 +16,9 @@
 
 class name :
 
-CShapeObject	-> s_shape
-CShapeLine		-> s_line
-CShapePolyLine	-> s_polyline
+CShapeObject	-> xShape
+CShapeLine		-> xLine
+CShapePolyLine	-> xPolyline
 ...
 
 Container :
@@ -27,10 +27,10 @@ TList -> boost::ptr_deque
 
 Point / Line : x, y, z 3차원으로 변경
 
-typedef CSize3d					size2d_t;
-typedef CPoint3d				point_t;
-typedef CRect3d					rect_t;
-typedef std::vector<s_line>		s_lines;
+typedef xSize3d					size2d_t;
+typedef xPoint3d				point_t;
+typedef xRect3d					rect_t;
+typedef std::vector<xLine>		s_lines;
 
 */
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,23 +75,23 @@ namespace gtl::shape {
 export namespace gtl::shape {
 
 
-	struct s_layer : public s_shape {
+	struct xLayer : public xShape {
 		string_t name;
 		bool bUse{true};
 		int flags{};
-		boost::ptr_deque<s_shape> shapes;
+		boost::ptr_deque<xShape> shapes;
 
-		s_layer() = default;
-		s_layer(s_layer const&) = default;
-		s_layer(s_layer&&) = default;
-		s_layer(string_t const& name) : name(name) {}
+		xLayer() = default;
+		xLayer(xLayer const&) = default;
+		xLayer(xLayer&&) = default;
+		xLayer(string_t const& name) : name(name) {}
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::layer; }
 		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
 		virtual void FlipX() override { for (auto& shape : shapes) shape.FlipX(); }
 		virtual void FlipY() override { for (auto& shape : shapes) shape.FlipY(); }
 		virtual void FlipZ() override { for (auto& shape : shapes) shape.FlipZ(); }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			for (auto& shape : shapes)
 				shape.Transform(ct, bRightHanded);
 		}
@@ -102,7 +102,7 @@ export namespace gtl::shape {
 			return r;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			for (auto& shape : shapes) {
 				shape.Draw(canvas);
 			}
@@ -115,25 +115,25 @@ export namespace gtl::shape {
 			return result;
 		}
 		virtual void PrintOut(std::wostream& os) const override {
-			s_shape::PrintOut(os);
+			xShape::PrintOut(os);
 			for (auto& shape : shapes) {
 				shape.PrintOut(os);
 			}
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_layer);
-		//GTL__REFLECTION_DERIVED(s_layer, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xLayer);
+		//GTL__REFLECTION_DERIVED(xLayer, xShape);
 		//GTL__REFLECTION_MEMBERS(name, flags, strLineType, lineWeight, shapes);
-		auto operator <=> (s_layer const&) const = default;
+		auto operator <=> (xLayer const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_layer& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+		friend void serialize(archive& ar, xLayer& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_layer& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xLayer& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 
 			ar & var.name & var.bUse &var.flags & var.strLineType & var.lineWeight;
 			ar & var.shapes;
@@ -161,7 +161,7 @@ export namespace gtl::shape {
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 			name = j["name"];	// not a "layer"
@@ -180,31 +180,31 @@ export namespace gtl::shape {
 		}
 
 	protected:
-		friend struct s_drawing;
+		friend struct xDrawing;
 		line_type_t* pLineType{};
 
 	};
 
 	// internally
-	struct s_block : public s_layer {
+	struct s_block : public xLayer {
 		string_t layer;
 		point_t pt;
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::block; }
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_block);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_block, s_layer);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(s_block, xLayer);
 		//GTL__REFLECTION_MEMBERS(layer, pt);
 		auto operator <=> (s_block const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, s_block& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_layer>(var);
+			boost::serialization::base_object<xLayer>(var);
 			ar & var;
 		}
 		template < typename archive >
 		friend archive& operator & (archive& ar, s_block& var) {
-			ar & boost::serialization::base_object<s_layer>(var);
+			ar & boost::serialization::base_object<xLayer>(var);
 
 			ar & var.layer & var.pt;
 
@@ -212,7 +212,7 @@ export namespace gtl::shape {
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			this->layer = layer;
 			using namespace std::literals;
 			gtl::bjson j(_j);
@@ -225,7 +225,7 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct s_dot : public s_shape {
+	struct xDot : public xShape {
 		point_t pt;
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::dot; }
@@ -234,41 +234,41 @@ export namespace gtl::shape {
 		virtual void FlipX() override { pt.x = -pt.x; }
 		virtual void FlipY() override { pt.y = -pt.y; }
 		virtual void FlipZ() override { pt.z = -pt.z; }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			pt = ct(pt);
 		};
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			return rectBoundary.UpdateBoundary(pt);
 		};
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			canvas.MoveTo(pt);
 			canvas.LineTo(pt);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
-			s_shape::PrintOut(os);
+			xShape::PrintOut(os);
 			fmt::print(os, L"\tpt({},{},{})\n", pt.x, pt.y, pt.z);
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_dot);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_dot, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xDot);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xDot, xShape);
 		//GTL__REFLECTION_MEMBERS(pt);
-		auto operator <=> (s_dot const&) const = default;
+		auto operator <=> (xDot const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_dot& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+		friend void serialize(archive& ar, xDot& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_dot& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xDot& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 			ar & var.pt;
 			return ar;
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 			pt = PointFrom(j["basePoint"sv]);
@@ -277,7 +277,7 @@ export namespace gtl::shape {
 
 	};
 
-	struct s_line : public s_shape {
+	struct xLine : public xShape {
 		point_t pt0, pt1;
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::line; }
@@ -286,7 +286,7 @@ export namespace gtl::shape {
 		virtual void FlipX() override { pt0.x = -pt0.x; pt1.x = -pt1.x; }
 		virtual void FlipY() override { pt0.y = -pt0.y; pt1.y = -pt1.y; }
 		virtual void FlipZ() override { pt0.z = -pt0.z; pt1.z = -pt1.z; }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			pt0 = ct(pt0); pt1 = ct(pt1);
 		};
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
@@ -296,32 +296,32 @@ export namespace gtl::shape {
 			return bModified;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			canvas.Line(pt0, pt1);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
-			s_shape::PrintOut(os);
+			xShape::PrintOut(os);
 			fmt::print(os, L"\tpt0({},{},{}) - pt1({},{},{})\n", pt0.x, pt0.y, pt0.z, pt1.x, pt1.y, pt1.z);
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_line);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_line, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xLine);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xLine, xShape);
 		//GTL__REFLECTION_MEMBERS(pt0, pt1);
-		auto operator <=> (s_line const&) const = default;
+		auto operator <=> (xLine const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_line& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+		friend void serialize(archive& ar, xLine& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_line& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xLine& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 			return ar & var.pt0 & var.pt1;
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 			pt0 = PointFrom(j["basePoint"sv]);
@@ -330,7 +330,7 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct s_polyline : public s_shape {
+	struct xPolyline : public xShape {
 		bool bLoop{};
 		std::vector<polypoint_t> pts;
 
@@ -340,7 +340,7 @@ export namespace gtl::shape {
 		virtual void FlipX() override { for (auto& pt : pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } }
 		virtual void FlipY() override { for (auto& pt : pts) { pt.y = -pt.y;  pt.Bulge() = -pt.Bulge(); } }
 		virtual void FlipZ() override { for (auto& pt : pts) { pt.z = -pt.z;  pt.Bulge() = -pt.Bulge(); } }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			for (auto& pt : pts) {
 				(point_t&)pt = ct((point_t&)pt);
 			}
@@ -356,33 +356,33 @@ export namespace gtl::shape {
 		};
 		virtual void Draw(ICanvas& canvas) const override;
 		virtual void PrintOut(std::wostream& os) const override {
-			s_shape::PrintOut(os);
+			xShape::PrintOut(os);
 			fmt::print(os, L"\t{}", bLoop ? L"loop ":L"");
 			for (auto const& pt : pts)
 				fmt::print(os, L"({},{},{},{}), ", pt.x, pt.y, pt.z, pt.w);
 			fmt::print(os, L"\n");
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_polyline);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_polyline, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolyline);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xPolyline, xShape);
 		//GTL__REFLECTION_MEMBERS(pts);
-		auto operator <=> (s_polyline const&) const = default;
+		auto operator <=> (xPolyline const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_polyline& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+		friend void serialize(archive& ar, xPolyline& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_polyline& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xPolyline& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 			ar & var.pts;
 			ar & var.bLoop;
 			return ar;
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -397,33 +397,33 @@ export namespace gtl::shape {
 			return true;
 		}
 
-		boost::ptr_deque<s_shape> Split() const;
+		boost::ptr_deque<xShape> Split() const;
 
 	};
 
-	struct s_lwpolyline : public s_polyline {
+	struct xPolylineLW : public xPolyline {
 		int dummy{};
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::lwpolyline; }
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_lwpolyline);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_lwpolyline, s_polyline);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolylineLW);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xPolylineLW, xPolyline);
 		//GTL__REFLECTION_MEMBERS(dummy);
-		auto operator <=> (s_lwpolyline const&) const = default;
+		auto operator <=> (xPolylineLW const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_lwpolyline& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_polyline>(var);
+		friend void serialize(archive& ar, xPolylineLW& var, unsigned int const file_version) {
+			boost::serialization::base_object<xPolyline>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_lwpolyline& var) {
-			ar & boost::serialization::base_object<s_polyline>(var);
+		friend archive& operator & (archive& ar, xPolylineLW& var) {
+			ar & boost::serialization::base_object<xPolyline>(var);
 			return ar;
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -439,7 +439,7 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct s_circleXY : public s_shape {
+	struct xCircle : public xShape {
 		point_t ptCenter;
 		double radius{};
 		deg_t angle_length{360_deg};	// 회전 방향.
@@ -450,7 +450,7 @@ export namespace gtl::shape {
 		virtual void FlipX() override { ptCenter.x = -ptCenter.x; angle_length = -angle_length; }
 		virtual void FlipY() override { ptCenter.y = -ptCenter.y; angle_length = -angle_length; }
 		virtual void FlipZ() override { ptCenter.z = -ptCenter.z; angle_length = -angle_length; }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			ptCenter = ct(ptCenter); radius = ct.Trans(radius);
 			if (!bRightHanded)
 				angle_length = -angle_length;
@@ -462,32 +462,32 @@ export namespace gtl::shape {
 			return bResult;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			canvas.Arc(ptCenter, radius, 0._deg, angle_length);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
-			s_shape::PrintOut(os);
+			xShape::PrintOut(os);
 			fmt::print(os, L"\tcenter({},{},{}), r {}\n", ptCenter.x, ptCenter.y, ptCenter.z, radius);
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_circleXY);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_circleXY, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xCircle);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xCircle, xShape);
 		//GTL__REFLECTION_MEMBERS(ptCenter, radius, angle_length);
-		auto operator <=> (s_circleXY const&) const = default;
+		auto operator <=> (xCircle const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_circleXY& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+		friend void serialize(archive& ar, xCircle& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_circleXY& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xCircle& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 			return ar & var.ptCenter & var.radius & (double&)var.angle_length;
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -497,52 +497,52 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct s_arcXY : public s_circleXY {
+	struct xArc : public xCircle {
 		deg_t angle_start{};
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::arc_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
-		virtual void FlipX() override { s_circleXY::FlipX(); angle_start = AdjustAngle(180._deg - angle_start); }
-		virtual void FlipY() override { s_circleXY::FlipY(); angle_start = AdjustAngle(-angle_start); }
-		virtual void FlipZ() override { s_circleXY::FlipZ(); angle_start = AdjustAngle(180._deg - angle_start); }	// ????.....  성립 안되지만,
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void FlipX() override { xCircle::FlipX(); angle_start = AdjustAngle(180._deg - angle_start); }
+		virtual void FlipY() override { xCircle::FlipY(); angle_start = AdjustAngle(-angle_start); }
+		virtual void FlipZ() override { xCircle::FlipZ(); angle_start = AdjustAngle(180._deg - angle_start); }	// ????.....  성립 안되지만,
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			// todo : ... upgrade?
-			s_circleXY::Transform(ct, bRightHanded);
+			xCircle::Transform(ct, bRightHanded);
 			if (!bRightHanded)
 				angle_start = -angle_start;
 		}
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			// todo : ... upgrade?
-			return s_circleXY::UpdateBoundary(rectBoundary);
+			return xCircle::UpdateBoundary(rectBoundary);
 		}
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			canvas.Arc(ptCenter, radius, angle_start, angle_length);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
-			s_circleXY::PrintOut(os);
+			xCircle::PrintOut(os);
 			fmt::print(os, L"\tangle_start:{} deg, length:{} deg\n", (double)(deg_t)angle_start, (double)(deg_t)angle_length);
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_arcXY);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_arcXY, s_circleXY);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xArc);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xArc, xCircle);
 		//GTL__REFLECTION_MEMBERS(angle_start);
-		auto operator <=> (s_arcXY const&) const = default;
+		auto operator <=> (xArc const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_arcXY& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_circleXY>(var);
+		friend void serialize(archive& ar, xArc& var, unsigned int const file_version) {
+			boost::serialization::base_object<xCircle>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_arcXY& var) {
-			ar & boost::serialization::base_object<s_circleXY>(var);
+		friend archive& operator & (archive& ar, xArc& var) {
+			ar & boost::serialization::base_object<xCircle>(var);
 			return ar & var.angle_start;
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_circleXY::LoadFromCADJson(_j);
+			xCircle::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -573,18 +573,18 @@ export namespace gtl::shape {
 			return angle;
 		}
 
-		static s_arcXY GetFromBulge(double bulge, point_t const& pt0, point_t const& pt1) {
-			s_arcXY arc;
-			CPoint2d vecPerpendicular(-(pt0.y-pt1.y), (pt0.x-pt1.x));
+		static xArc GetFromBulge(double bulge, point_t const& pt0, point_t const& pt1) {
+			xArc arc;
+			xPoint2d vecPerpendicular(-(pt0.y-pt1.y), (pt0.x-pt1.x));
 			// Normalize
 			{
-				double d = vecPerpendicular.Distance(CPoint2d(0.0, 0.0));
+				double d = vecPerpendicular.Distance(xPoint2d(0.0, 0.0));
 				vecPerpendicular.x /= d;
 				vecPerpendicular.y /= d;
 			}
-			CPoint2d ptCenterOfLine((pt0.x+pt1.x)/2., (pt0.y+pt1.y)/2.);
+			xPoint2d ptCenterOfLine((pt0.x+pt1.x)/2., (pt0.y+pt1.y)/2.);
 			double l = pt1.Distance(pt0)/2.;
-			CPoint2d ptBulge;
+			xPoint2d ptBulge;
 			ptBulge.x = ptCenterOfLine.x + vecPerpendicular.x * (bulge * l);
 			ptBulge.y = ptCenterOfLine.y + vecPerpendicular.y * (bulge * l);
 			double h = ptBulge.Distance(ptCenterOfLine);
@@ -611,18 +611,18 @@ export namespace gtl::shape {
 
 	};
 
-	struct s_ellipseXY : public s_arcXY {
+	struct xEllipse : public xArc {
 		double radiusH{};
 		deg_t angle_first_axis{};
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::ellipse_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
-		virtual void FlipX() override { s_arcXY::FlipX(); angle_first_axis = 180._deg - angle_first_axis; }
-		virtual void FlipY() override { s_arcXY::FlipY(); angle_first_axis = - angle_first_axis; }
-		virtual void FlipZ() override { s_arcXY::FlipZ(); angle_first_axis = 180._deg - angle_first_axis; }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
-			s_arcXY::Transform(ct, bRightHanded);
+		virtual void FlipX() override { xArc::FlipX(); angle_first_axis = 180._deg - angle_first_axis; }
+		virtual void FlipY() override { xArc::FlipY(); angle_first_axis = - angle_first_axis; }
+		virtual void FlipZ() override { xArc::FlipZ(); angle_first_axis = 180._deg - angle_first_axis; }
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
+			xArc::Transform(ct, bRightHanded);
 			radiusH = ct.Trans(radiusH);
 			if (!bRightHanded)
 				angle_first_axis = -angle_first_axis;
@@ -635,32 +635,32 @@ export namespace gtl::shape {
 			return bResult;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			canvas.Ellipse(ptCenter, radius, radiusH, angle_first_axis, angle_start, angle_length);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
-			s_arcXY::PrintOut(os);
+			xArc::PrintOut(os);
 			fmt::print(os, L"\tradiusH:{}, angle_first_axis:{} deg\n", radiusH, (double)(deg_t)angle_first_axis);
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_ellipseXY);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_ellipseXY, s_arcXY);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xEllipse);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xEllipse, xArc);
 		//GTL__REFLECTION_MEMBERS(radiusH, angle_first_axis);
-		auto operator <=> (s_ellipseXY const&) const = default;
+		auto operator <=> (xEllipse const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_ellipseXY& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_arcXY>(var);
+		friend void serialize(archive& ar, xEllipse& var, unsigned int const file_version) {
+			boost::serialization::base_object<xArc>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_ellipseXY& var) {
-			ar & boost::serialization::base_object<s_arcXY>(var);
+		friend archive& operator & (archive& ar, xEllipse& var) {
+			ar & boost::serialization::base_object<xArc>(var);
 			return ar & var.radiusH & (double&)var.angle_first_axis;
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -691,7 +691,7 @@ export namespace gtl::shape {
 
 	};
 
-	struct s_spline : public s_shape {
+	struct xSpline : public xShape {
 		enum class eFLAG { closed = 1, periodic = 2, rational = 4, planar = 8, linear = planar|16 };
 		int flags{};
 		point_t ptNormal;
@@ -712,7 +712,7 @@ export namespace gtl::shape {
 		virtual void FlipX() override { for (auto& pt : ptsControl) pt.x = -pt.x; for (auto& pt : ptsFit) pt.x = -pt.x; ptNormal.x = -ptNormal.x; vStart.x = -vStart.x; vEnd.x = -vEnd.x; }
 		virtual void FlipY() override { for (auto& pt : ptsControl) pt.y = -pt.y; for (auto& pt : ptsFit) pt.y = -pt.y; ptNormal.y = -ptNormal.y; vStart.y = -vStart.y; vEnd.y = -vEnd.y; }
 		virtual void FlipZ() override { for (auto& pt : ptsControl) pt.z = -pt.z; for (auto& pt : ptsFit) pt.z = -pt.z; ptNormal.z = -ptNormal.z; vStart.z = -vStart.z; vEnd.z = -vEnd.z; }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			ptNormal = ct(ptNormal);
 			vStart = ct(vStart);
 			vEnd = ct(vEnd);
@@ -726,11 +726,11 @@ export namespace gtl::shape {
 			return b;
 		};
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			canvas.Spline(degree, ptsControl, knots, false);
 		}
 		virtual void PrintOut(std::wostream& os) const override {
-			s_shape::PrintOut(os);
+			xShape::PrintOut(os);
 			fmt::print(os, L"\tflags:{}, degree:{}\n");
 			fmt::print(os, L"\tknot ");
 			for (auto knot : knots)
@@ -741,19 +741,19 @@ export namespace gtl::shape {
 			fmt::print(os, L"\n");
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_spline);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_spline, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xSpline);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xSpline, xShape);
 		//GTL__REFLECTION_MEMBERS(flags, ptNormal, vStart, vEnd, degree, knots, ptsControl, toleranceKnot, toleranceControlPoint, toleranceFitPoint);
-		auto operator <=> (s_spline const&) const = default;
+		auto operator <=> (xSpline const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_spline& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+		friend void serialize(archive& ar, xSpline& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_spline& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xSpline& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 
 			ar & var.flags;
 			ar & var.ptNormal;
@@ -771,7 +771,7 @@ export namespace gtl::shape {
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -800,7 +800,7 @@ export namespace gtl::shape {
 
 	};
 
-	struct s_text : public s_shape {
+	struct xText : public xShape {
 		enum class eALIGN_VERT : int { base_line = 0, bottom, mid, top };
 		enum class eALIGN_HORZ : int { left = 0, center, right, aligned, middle, fit };
 
@@ -821,7 +821,7 @@ export namespace gtl::shape {
 		virtual void FlipX() override { pt0.x = -pt0.x; pt1.x = -pt1.x; }
 		virtual void FlipY() override { pt0.y = -pt0.y; pt1.y = -pt1.y; }
 		virtual void FlipZ() override { pt0.z = -pt0.z; pt1.z = -pt1.z; }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			pt0 = ct(pt0);
 			pt1 = ct(pt1);
 		}
@@ -833,23 +833,23 @@ export namespace gtl::shape {
 			return b;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			// todo :
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_text);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_text, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xText);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xText, xShape);
 		//GTL__REFLECTION_MEMBERS(pt0, pt1, text, height, angle, widthScale, oblique, textStyle, textgen, alignHorz, alignVert);
-		auto operator <=> (s_text const&) const = default;
+		auto operator <=> (xText const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_text& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+		friend void serialize(archive& ar, xText& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_text& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xText& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 
 			ar & var.pt0 & var.pt1;
 			ar & var.text;
@@ -866,7 +866,7 @@ export namespace gtl::shape {
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -886,9 +886,9 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct s_mtext : public s_text {
+	struct xMText : public xText {
 	protected:
-		using s_text::alignVert;
+		using xText::alignVert;
 	public:
 		enum class eATTACH {
 			topLeft = 1,
@@ -913,31 +913,31 @@ export namespace gtl::shape {
 		//virtual void FlipX() override {}
 		//virtual void FlipY() override {}
 		//virtual void FlipY() override {}
-		//virtual void Transform(CCoordTrans3d const&, bool bRightHanded) override { return true; };
+		//virtual void Transform(xCoordTrans3d const&, bool bRightHanded) override { return true; };
 		//virtual bool UpdateBoundary(rect_t& rectBoundary) const override { return true; };
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			// todo : draw mtext
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_mtext);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_mtext, s_text);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xMText);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xMText, xText);
 		//GTL__REFLECTION_MEMBERS(interlin);
-		auto operator <=> (s_mtext const&) const = default;
+		auto operator <=> (xMText const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_mtext& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_text>(var);
+		friend void serialize(archive& ar, xMText& var, unsigned int const file_version) {
+			boost::serialization::base_object<xText>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_mtext& var) {
-			ar & boost::serialization::base_object<s_text>(var);
+		friend archive& operator & (archive& ar, xMText& var) {
+			ar & boost::serialization::base_object<xText>(var);
 			return ar & var.interlin;
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_text::LoadFromCADJson(_j);
+			xText::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -947,7 +947,7 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct s_hatch : public s_shape {
+	struct xHatch : public xShape {
 		string_t name;
 		bool bSolid{};
 		bool bAssociative{};
@@ -959,7 +959,7 @@ export namespace gtl::shape {
 		double scale{};
 		int deflines{};
 
-		std::vector<s_polyline> boundaries;
+		std::vector<xPolyline> boundaries;
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::hatch; }
 
@@ -967,7 +967,7 @@ export namespace gtl::shape {
 		virtual void FlipX() override { for (auto& b : boundaries) b.FlipX(); }
 		virtual void FlipY() override { for (auto& b : boundaries) b.FlipY(); }
 		virtual void FlipZ() override { for (auto& b : boundaries) b.FlipZ(); }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 		};
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			bool b{};
@@ -977,23 +977,23 @@ export namespace gtl::shape {
 			return b;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			// todo : draw hatch
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_hatch);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_hatch, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xHatch);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xHatch, xShape);
 		//GTL__REFLECTION_MEMBERS(name, bSolid, bAssociative, nLoops, hstyle, hpattern, bDouble, angle, scale, deflines);
-		auto operator <=> (s_hatch const&) const = default;
+		auto operator <=> (xHatch const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_hatch& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+		friend void serialize(archive& ar, xHatch& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_hatch& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xHatch& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 
 			ar & var.name;
 			ar & var.bSolid;
@@ -1010,7 +1010,7 @@ export namespace gtl::shape {
 		}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
@@ -1031,7 +1031,7 @@ export namespace gtl::shape {
 	};
 
 	// temporary object
-	struct s_insert : public s_shape {
+	struct s_insert : public xShape {
 		string_t name;	// block name
 		point_t pt;
 		double xscale{1};
@@ -1044,13 +1044,13 @@ export namespace gtl::shape {
 		double spacingRow{};
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(s_insert);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(s_insert, s_shape);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(s_insert, xShape);
 		//GTL__REFLECTION_MEMBERS(name, xscale, yscale, zscale, angle, nCol, nRow, spacingCol, spacingRow);
 		auto operator <=> (s_insert const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, s_insert& var, unsigned int const file_version) {
-			boost::serialization::base_object<s_shape>(var);
+			boost::serialization::base_object<xShape>(var);
 			ar & var;
 		}
 		template < typename archive >
@@ -1062,7 +1062,7 @@ export namespace gtl::shape {
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
 			using namespace std::literals;
-			s_shape::LoadFromCADJson(_j);
+			xShape::LoadFromCADJson(_j);
 			gtl::bjson j(_j);
 
 			pt = PointFrom(j["basePoint"]);
@@ -1085,32 +1085,32 @@ export namespace gtl::shape {
 		virtual void FlipX() override {};
 		virtual void FlipY() override {};
 		virtual void FlipZ() override {};
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) override {};
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) override {};
 		virtual bool UpdateBoundary(rect_t&) const override { return false; };
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 		};
 
 		virtual void PrintOut(std::wostream& os) const override {
-			s_shape::PrintOut(os);
+			xShape::PrintOut(os);
 			fmt::print(os, L"\tname:{}, pt:({},{},{}), scale:({},{},{}), angle:{} deg, nCol:{}, nRow:{}, SpaceCol:{}, SpaceRow:{}\n",
 				name, pt.x, pt.y, pt.z, xscale, yscale, zscale, (double)(deg_t)angle, nCol, nRow, spacingCol, spacingRow);
 		}
 	};
 
 
-	struct s_drawing : public s_shape {
+	struct xDrawing : public xShape {
 		std::map<std::string, variable_t> vars;
 		boost::ptr_deque<line_type_t> line_types;
 		//boost::ptr_deque<s_block> blocks;
 		rect_t rectBoundary;
-		boost::ptr_deque<s_layer> layers;
+		boost::ptr_deque<xLayer> layers;
 
-		//s_drawing() = default;
-		//s_drawing(s_drawing const&) = default;
-		//s_drawing(s_drawing &&) = default;
-		//s_drawing& operator = (s_drawing const&) = default;
-		//s_drawing& operator = (s_drawing &&) = default;
+		//xDrawing() = default;
+		//xDrawing(xDrawing const&) = default;
+		//xDrawing(xDrawing &&) = default;
+		//xDrawing& operator = (xDrawing const&) = default;
+		//xDrawing& operator = (xDrawing &&) = default;
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::drawing; }
 
@@ -1118,7 +1118,7 @@ export namespace gtl::shape {
 		virtual void FlipX() override { for (auto& layer : layers) layer.FlipX(); }
 		virtual void FlipY() override { for (auto& layer : layers) layer.FlipY(); }
 		virtual void FlipZ() override { for (auto& layer : layers) layer.FlipZ(); }
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded) override {
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			for (auto& layer : layers)
 				layer.Transform(ct, bRightHanded);
 		}
@@ -1129,7 +1129,7 @@ export namespace gtl::shape {
 			return r;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
-			s_shape::Draw(canvas);
+			xShape::Draw(canvas);
 			for (auto& layer : layers) {
 				layer.Draw(canvas);
 			}
@@ -1147,17 +1147,17 @@ export namespace gtl::shape {
 			}
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(s_drawing);
-		//GTL__REFLECTION_DERIVED(s_drawing, s_shape);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xDrawing);
+		//GTL__REFLECTION_DERIVED(xDrawing, xShape);
 		//GTL__REFLECTION_MEMBERS(vars, line_types, layers);
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_drawing& var, unsigned int const file_version) {
+		friend void serialize(archive& ar, xDrawing& var, unsigned int const file_version) {
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_drawing& var) {
-			ar & boost::serialization::base_object<s_shape>(var);
+		friend archive& operator & (archive& ar, xDrawing& var) {
+			ar & boost::serialization::base_object<xShape>(var);
 
 			ar & var.vars;
 			ar & var.line_types;
@@ -1168,18 +1168,18 @@ export namespace gtl::shape {
 			return ar;
 		}
 
-		s_layer& Layer(string_t const& name) {
-			if (auto iter = std::find_if(layers.begin(), layers.end(), [&name](s_layer const& layer) -> bool { return name == layer.name; }); iter != layers.end())
+		xLayer& Layer(string_t const& name) {
+			if (auto iter = std::find_if(layers.begin(), layers.end(), [&name](xLayer const& layer) -> bool { return name == layer.name; }); iter != layers.end())
 				return *iter;
 			return layers.front();
 		}
-		s_layer const& Layer(string_t const& name) const {
-			if (auto iter = std::find_if(layers.begin(), layers.end(), [&name](s_layer const& layer) -> bool { return name == layer.name; }); iter != layers.end())
+		xLayer const& Layer(string_t const& name) const {
+			if (auto iter = std::find_if(layers.begin(), layers.end(), [&name](xLayer const& layer) -> bool { return name == layer.name; }); iter != layers.end())
 				return *iter;
 			return layers.front();
 		}
 
-		bool AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectBoundary);
+		bool AddEntity(std::unique_ptr<xShape> rShape, std::map<string_t, xLayer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectBoundary);
 
 	public:
 		virtual bool LoadFromCADJson(json_t& _j) override;

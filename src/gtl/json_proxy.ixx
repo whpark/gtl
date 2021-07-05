@@ -30,7 +30,7 @@ module;
 //#elif (GTL__BOOST_JSON__AS_NESTED_LIB)
 //#	define BOOST_JSON_STANDALONE
 ////#	define BOOST_NO_EXCEPTIONS
-//#	ifdef GTL_EXPORTS
+//#	ifdef GTL__EXPORTS
 //#		define BOOST_JSON_DECL       __declspec(dllexport)
 //#		define BOOST_JSON_CLASS_DECL __declspec(dllexport)
 //#	else

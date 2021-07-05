@@ -1,4 +1,9 @@
-﻿import os
+﻿################################################################################
+#
+# PWH.
+#
+
+import os
 
 pathIn = 'HangeulCodeTable.txt'
 pathOutH = 'HangeulCodeMap.h'
@@ -59,91 +64,6 @@ for line in list(lines):
 #-----------------
 strLineSeperator = '//------------------------------------------------------------------------------------------------\n'
 
-##=================
-## .h
-#fOutHeader = open(pathOutH, mode='w', encoding='utf-8-sig')
-#fOutHeader.write(
-#                '#pragma once\n'
-#                '//=========\n'
-#                '//Automatically Generated File.\n'
-#                '//\n'
-#                '//        PWH.\n'
-#                '//\n'
-#                '//=========\n'
-#                '\n'
-#                '\n'
-#                '#include "gtl/config_gtl.h"\n\n'
-#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n\n'
-#                '#include <cstdint>\n'
-#                '#include <map>\n'
-#                '\n'
-#                '\n'
-#                '#include "gtl/_lib_gtl.h"\n\n'
-#                'namespace gtl::charset::KSSM {\n'
-#                '#pragma pack(push, 8)\n'
-#                '\n'
-#                '\n'
-#                '\tGTL_DATA extern std::map<char16_t, uint16_t> const mapUTF16toKSSM_g;\n'
-#                '\tGTL_DATA extern std::map<uint16_t, char16_t> const mapKSSMtoUTF16_g;\n'
-#                '\n'
-#                '#pragma pack(pop)\n'
-#                '}\t// namespace gtl::charset::KSSM\n'
-#                '\n\n'
-#                '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
-#                )
-#fOutHeader.flush()
-
-##=================
-## .cpp U16->KSSM
-#fOutImpl = open(pathOutC_UTF16_KSSM, mode='w', encoding='utf-8-sig')
-#fOutImpl.write( '#include "pch.h"\n\n'
-#                '//=========\n'
-#                '//Automatically Generated File.\n'
-#                '//\n'
-#                '//        PWH.\n'
-#                '//\n'
-#                '//=========\n'
-#                '\n\n'
-#                '#include "gtl/config_gtl.h"\n'
-#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
-#                '\n\n'
-#                '#include <cstdlib>\n'
-#                '#include <cstdint>\n'
-#                '#include <array>\n\n'
-#                '#include "gtl/string/' + pathOutH + '"\n\n\n'
-#                'namespace gtl::charset::KSSM {\n\n\n'
-#                '\t' + strLineSeperator
-#                )
-#
-##-----------------
-## map UTF16 -> KSSM
-#codes.sort(key=codepair.KeyUnicode)
-#nCount = 0
-#fOutImpl.write('\t' + strLineSeperator)
-#fOutImpl.write('\tGTL_DATA std::map<char16_t, uint16_t> const mapUTF16toKSSM_g { {\n')
-#for code in codes :
-#    if (nCount == 0) :
-#        fOutImpl.write('\t\t');
-#
-#    out = '{{ 0x{v.codeUni:<4}/*{codePrint}*/, 0x{v.codeKSSM:<4} }},'.format(v = code, codePrint = chr(int(code.codeUni, 16)));
-#    fOutImpl.write(out)
-#
-#    nCount += 1;
-#    if (nCount < 8) :
-#        fOutImpl.write('\t');
-#    else :
-#        nCount = 0;
-#        fOutImpl.write('\n');
-#
-#fOutImpl.write('\n\t} };\n')
-#fOutImpl.write('\n\n')
-#
-#fOutImpl.write('}\t// namespace gtl::charset::KSSM\n\n'
-#               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
-#               )
-#fOutImpl.flush()
-#fOutImpl.close()
-
 #=================
 # .ixx UTF16->KSSM
 fOutModuleUTF16_KSSM = open(pathOutModule_UTF16_KSSM, mode='w', encoding='utf-8-sig')
@@ -153,7 +73,7 @@ fOutModuleUTF16_KSSM.write(
         '#include "gtl/_config.h"\n'
         '#include "gtl/_macro.h"\n'
         '\n'
-        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+        '#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
         '\t#include <map>\n'
         '#endif\n'
         '\n'
@@ -167,10 +87,10 @@ fOutModuleUTF16_KSSM.write(
         '//=========\n'
         '\n'
         '\n'
-        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+        '#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
         '\n'
         '\n'
-        'namespace gtl::charset::KSSM {\n'
+        'export namespace gtl::charset::KSSM {\n'
         '\n'
         '\n'
         '\n'
@@ -178,7 +98,7 @@ fOutModuleUTF16_KSSM.write(
 codes.sort(key=codepair.KeyUnicode)
 nCount = 0
 fOutModuleUTF16_KSSM.write('\t' + strLineSeperator)
-fOutModuleUTF16_KSSM.write('\tstd::map<char16_t, uint16_t> const mapUTF16toKSSM_g { {\n')
+fOutModuleUTF16_KSSM.write('\tstd::map<char16_t, charKSSM_t> const mapUTF16toKSSM_g { {\n')
 for code in codes :
     if (nCount == 0) :
         fOutModuleUTF16_KSSM.write('\t\t');
@@ -196,62 +116,11 @@ for code in codes :
 fOutModuleUTF16_KSSM.write('\n\t} };\n')
 fOutModuleUTF16_KSSM.write('\n\n')
 
-fOutModuleUTF16_KSSM.write('}\t// namespace gtl::charset::KSSM\n\n'
-               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n')
+fOutModuleUTF16_KSSM.write('}\t// export namespace gtl::charset::KSSM\n\n'
+               '#endif // GTL__STRING_SUPPORT_CODEPAGE_KSSM && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n')
 fOutModuleUTF16_KSSM.flush()
 fOutModuleUTF16_KSSM.close()
 
-
-##=================
-## .cpp KSSM->U16
-#fOutImpl = open(pathOutC_KSSM_UTF16, mode='w', encoding='utf-8-sig')
-#fOutImpl.write( '#include "pch.h"\n\n'
-#                '//=========\n'
-#                '//Automatically Generated File.\n'
-#                '//\n'
-#                '//        PWH.\n'
-#                '//\n'
-#                '//=========\n'
-#                '\n\n'
-#                '#include "gtl/config_gtl.h"\n'
-#                '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
-#                '\n\n'
-#                '#include <cstdlib>\n'
-#                '#include <cstdint>\n'
-#                '#include <array>\n\n'
-#                '#include "gtl/string/' + pathOutH + '"\n\n\n'
-#                'namespace gtl::charset::KSSM {\n\n\n'
-#                '\t' + strLineSeperator
-#                )
-#
-##-----------------
-## map KSSM -> UTF16
-#codes.sort(key=codepair.KeyKSSM)
-#nCount = 0
-#fOutImpl.write('\t' + strLineSeperator)
-#fOutImpl.write('\tGTL_DATA std::map<uint16_t, char16_t> const mapKSSMtoUTF16_g { {\n')
-#for code in codes :
-#    if (nCount == 0) :
-#        fOutImpl.write('\t\t');
-#
-#    out = '{{ 0x{v.codeKSSM:<4}, 0x{v.codeUni:<4}/*{codePrint}*/ }},'.format(v = code, codePrint = chr(int(code.codeUni, 16)));
-#    fOutImpl.write(out)
-#
-#    nCount += 1;
-#    if (nCount < 8) :
-#        fOutImpl.write('\t');
-#    else :
-#        nCount = 0;
-#        fOutImpl.write('\n');
-#
-#fOutImpl.write('\n\t} };\n')
-#fOutImpl.write('\n\n')
-#
-#fOutImpl.write('}\t// namespace gtl::charset::KSSM\n\n'
-#               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
-#               )
-#fOutImpl.flush()
-#fOutImpl.close()
 
 #----------------
 # .ixx KSSM -> UTF16
@@ -262,7 +131,7 @@ fOutModuleKSSM_UTF16.write(
         '#include "gtl/_config.h"\n'
         '#include "gtl/_macro.h"\n'
         '\n'
-        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+        '#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
         '\t#include <map>\n'
         '#endif\n'
         '\n'
@@ -276,10 +145,10 @@ fOutModuleKSSM_UTF16.write(
         '//=========\n'
         '\n'
         '\n'
-        '#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
+        '#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM) && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n'
         '\n'
         '\n'
-        'namespace gtl::charset::KSSM {\n'
+        'export namespace gtl::charset::KSSM {\n'
         '\n'
         '\n'
         '\n'
@@ -288,7 +157,7 @@ fOutModuleKSSM_UTF16.write(
 codes.sort(key=codepair.KeyKSSM)
 nCount = 0
 fOutModuleKSSM_UTF16.write('\t' + strLineSeperator)
-fOutModuleKSSM_UTF16.write('\tstd::map<uint16_t, char16_t> const mapKSSMtoUTF16_g { {\n')
+fOutModuleKSSM_UTF16.write('\tstd::map<charKSSM_t, char16_t> const mapKSSMtoUTF16_g { {\n')
 for code in codes :
     if (nCount == 0) :
         fOutModuleKSSM_UTF16.write('\t\t');
@@ -306,8 +175,8 @@ for code in codes :
 fOutModuleKSSM_UTF16.write('\n\t} };\n')
 fOutModuleKSSM_UTF16.write('\n\n')
 
-fOutModuleKSSM_UTF16.write('}\t// namespace gtl::charset::KSSM\n\n'
-               '#endif // GTL_STRING_SUPPORT_CODEPAGE_KSSM && !(GTL_STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n')
+fOutModuleKSSM_UTF16.write('}\t// export namespace gtl::charset::KSSM\n\n'
+               '#endif // GTL__STRING_SUPPORT_CODEPAGE_KSSM && !(GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV)\n')
 fOutModuleKSSM_UTF16.flush()
 fOutModuleKSSM_UTF16.close()
 

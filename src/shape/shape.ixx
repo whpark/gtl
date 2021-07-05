@@ -41,20 +41,20 @@ export import :others;
 export import :canvas;
 
 export {
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_shape, "shape")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_layer, "layer")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_dot, "dot")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_line, "line")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_polyline, "polyline")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_lwpolyline, "lwpolyline")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_circleXY, "circleXY")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_arcXY, "arcXY")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_ellipseXY, "ellipseXY")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_spline, "spline")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_text, "text")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_mtext, "mtext")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_hatch, "hatch")
-	BOOST_CLASS_EXPORT_GUID(gtl::shape::s_drawing, "drawing")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xShape, "shape")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xLayer, "layer")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xDot, "dot")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xLine, "line")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xPolyline, "polyline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xPolylineLW, "lwpolyline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xCircle, "circleXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xArc, "arcXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xEllipse, "ellipseXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xSpline, "spline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xText, "text")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xMText, "mtext")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xHatch, "hatch")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xDrawing, "drawing")
 
 }
 
@@ -78,10 +78,10 @@ namespace gtl {
 
 export namespace gtl::shape {
 
-	void s_shape::Draw(ICanvas& canvas) const {
+	void xShape::Draw(ICanvas& canvas) const {
 		canvas.PreDraw(*this);
 	}
-	bool s_shape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
+	bool xShape::DrawROI(ICanvas& canvas, rect_t const& rectROI) const {
 		rect_t rectBoundary;
 		rectBoundary.SetRectEmptyForMinMax2d();
 		UpdateBoundary(rectBoundary);
@@ -91,7 +91,7 @@ export namespace gtl::shape {
 		return true;
 	}
 
-	bool s_shape::LoadFromCADJson(json_t& _j) {
+	bool xShape::LoadFromCADJson(json_t& _j) {
 		using namespace std::literals;
 		gtl::bjson<json_t> j(_j);
 		//color.cr = (int)j["color"sv];
@@ -116,7 +116,7 @@ export namespace gtl::shape {
 		return true;
 	}
 
-	string_t const& s_shape::GetShapeName(eSHAPE eType) {
+	string_t const& xShape::GetShapeName(eSHAPE eType) {
 		using namespace std::literals;
 		static std::map<eSHAPE, string_t> const map = {
 			{ eSHAPE::none,				L"none" },
@@ -163,13 +163,13 @@ export namespace gtl::shape {
 		return iter->second;
 	}
 
-	std::unique_ptr<s_shape> s_shape::CreateShapeFromEntityName(std::string const& strEntityName) {
+	std::unique_ptr<xShape> xShape::CreateShapeFromEntityName(std::string const& strEntityName) {
 		using namespace std::literals;
-		static std::map<std::string, std::function<std::unique_ptr<s_shape>()> > const mapCreator = {
+		static std::map<std::string, std::function<std::unique_ptr<xShape>()> > const mapCreator = {
 			{ "3dFace"s,				nullptr },
-			{ "ARC"s,					[](){ return std::make_unique<s_arcXY>(); } },
+			{ "ARC"s,					[](){ return std::make_unique<xArc>(); } },
 			{ "BLOCK"s,					nullptr },
-			{ "CIRCLE"s,				[](){ return std::make_unique<s_circleXY>(); } },
+			{ "CIRCLE"s,				[](){ return std::make_unique<xCircle>(); } },
 			{ "DIMENSION"s,				nullptr },
 			{ "DIMALIGNED"s,			nullptr },
 			{ "DIMLINEAR"s,				nullptr },
@@ -178,20 +178,20 @@ export namespace gtl::shape {
 			{ "DIMANGULAR"s,			nullptr },
 			{ "DIMANGULAR3P"s,			nullptr },
 			{ "DIMORDINATE"s,			nullptr },
-			{ "ELLIPSE"s,				[](){ return std::make_unique<s_ellipseXY>(); } },
-			{ "HATCH"s,					[](){ return std::make_unique<s_hatch>(); } },
+			{ "ELLIPSE"s,				[](){ return std::make_unique<xEllipse>(); } },
+			{ "HATCH"s,					[](){ return std::make_unique<xHatch>(); } },
 			{ "IMAGE"s,					nullptr },
 			{ "INSERT"s,				[](){ return std::make_unique<s_insert>(); } },
 			{ "LEADER"s,				nullptr },
-			{ "LINE"s,					[](){ return std::make_unique<s_line>(); } },
-			{ "LWPOLYLINE"s,			[](){ return std::make_unique<s_lwpolyline>(); } },
-			{ "MTEXT"s,					[](){ return std::make_unique<s_mtext>(); } },
-			{ "POINT"s,					[](){ return std::make_unique<s_dot>(); } },
-			{ "POLYLINE"s,				[](){ return std::make_unique<s_polyline>(); } },
+			{ "LINE"s,					[](){ return std::make_unique<xLine>(); } },
+			{ "LWPOLYLINE"s,			[](){ return std::make_unique<xPolylineLW>(); } },
+			{ "MTEXT"s,					[](){ return std::make_unique<xMText>(); } },
+			{ "POINT"s,					[](){ return std::make_unique<xDot>(); } },
+			{ "POLYLINE"s,				[](){ return std::make_unique<xPolyline>(); } },
 			{ "RAY"s,					nullptr },
 			{ "SOLID"s,					nullptr },
-			{ "SPLINE"s,				[](){ return std::make_unique<s_spline>(); } },
-			{ "TEXT"s,					[](){ return std::make_unique<s_text>(); } },
+			{ "SPLINE"s,				[](){ return std::make_unique<xSpline>(); } },
+			{ "TEXT"s,					[](){ return std::make_unique<xText>(); } },
 			{ "TRACE"s,					nullptr },
 			{ "UNDERLAY"s,				nullptr },
 			{ "VERTEX"s,				nullptr },
@@ -208,8 +208,8 @@ export namespace gtl::shape {
 		return {};
 	}
 
-	void s_polyline::Draw(ICanvas& canvas) const {
-		s_shape::Draw(canvas);
+	void xPolyline::Draw(ICanvas& canvas) const {
+		xShape::Draw(canvas);
 
 		if (pts.size())
 			canvas.MoveTo(pts[0]);
@@ -225,8 +225,8 @@ export namespace gtl::shape {
 				canvas.LineTo(pt1);
 			} else {
 				canvas.LineTo(pt0);
-				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
-				(s_shape&)arc = *(s_shape*)this;
+				xArc arc = xArc::GetFromBulge(pt0.Bulge(), pt0, pt1);
+				(xShape&)arc = *(xShape*)this;
 
 				arc.Draw(canvas);
 
@@ -235,8 +235,8 @@ export namespace gtl::shape {
 		}
 	}
 
-	boost::ptr_deque<s_shape> s_polyline::Split() const {
-		boost::ptr_deque<s_shape> shapes;
+	boost::ptr_deque<xShape> xPolyline::Split() const {
+		boost::ptr_deque<xShape> shapes;
 
 		auto nPt = pts.size();
 		if (!bLoop)
@@ -246,22 +246,22 @@ export namespace gtl::shape {
 			auto pt0 = pts[iPt];
 			auto pt1 = pts[iPt2];
 			if (pt0.Bulge() == 0.0) {
-				auto rLine = std::make_unique<s_line>();
-				(s_shape&)*rLine = (s_shape const&)*this;
+				auto rLine = std::make_unique<xLine>();
+				(xShape&)*rLine = (xShape const&)*this;
 				rLine->pt0 = pt0;
 				rLine->pt1 = pt1;
 				shapes.push_back(std::move(rLine));
 			} else {
-				s_arcXY arc = s_arcXY::GetFromBulge(pt0.Bulge(), pt0, pt1);
-				(s_shape&)arc = *(s_shape*)this;
+				xArc arc = xArc::GetFromBulge(pt0.Bulge(), pt0, pt1);
+				(xShape&)arc = *(xShape*)this;
 				shapes.push_back(arc.NewClone());
 			}
 		}
 		return shapes;
 	}
 
-	bool s_drawing::LoadFromCADJson(json_t& _j) {
-		//s_shape::LoadFromCADJson(_j);
+	bool xDrawing::LoadFromCADJson(json_t& _j) {
+		//xShape::LoadFromCADJson(_j);
 
 		gtl::bjson<json_t> jTOP(_j);
 
@@ -304,16 +304,16 @@ export namespace gtl::shape {
 		}
 
 		// layers
-		std::map<string_t, s_layer*> mapLayers;	// cache
+		std::map<string_t, xLayer*> mapLayers;	// cache
 		{
 			layers.clear();
-			//layers.push_back(std::make_unique<s_layer>(L"0"));
+			//layers.push_back(std::make_unique<xLayer>(L"0"));
 
 			auto jLayers = jTOP["layers"].json().as_array();
 			for (auto& item : jLayers) {
 				bjson<json_t> j(item);
 
-				auto rLayer = std::make_unique<s_layer>();
+				auto rLayer = std::make_unique<xLayer>();
 				rLayer->LoadFromCADJson(item);
 
 				if (auto iterLineType = std::find_if(line_types.begin(), line_types.end(), [&rLayer](auto const& lt) { return lt.name == rLayer->strLineType; });
@@ -360,7 +360,7 @@ export namespace gtl::shape {
 					bjson<json_t> j(jEntity);
 					std::string strEntityName = j["entityName"];
 
-					std::unique_ptr<s_shape> rShape = CreateShapeFromEntityName(strEntityName);
+					std::unique_ptr<xShape> rShape = CreateShapeFromEntityName(strEntityName);
 					if (!rShape)
 						continue;
 
@@ -398,7 +398,7 @@ export namespace gtl::shape {
 				bjson<json_t> j(jEntity);
 				std::string strEntityName = j["entityName"];
 
-				std::unique_ptr<s_shape> rShape = CreateShapeFromEntityName(strEntityName);
+				std::unique_ptr<xShape> rShape = CreateShapeFromEntityName(strEntityName);
 				if (!rShape)
 					continue;
 
@@ -421,7 +421,7 @@ export namespace gtl::shape {
 		return true;
 	}
 
-	bool s_drawing::AddEntity(std::unique_ptr<s_shape> rShape, std::map<string_t, s_layer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectB) {
+	bool xDrawing::AddEntity(std::unique_ptr<xShape> rShape, std::map<string_t, xLayer*> const& mapLayers, std::map<string_t, s_block*> const& mapBlocks, rect_t& rectB) {
 		if (!rShape)
 			return false;
 
@@ -440,7 +440,7 @@ export namespace gtl::shape {
 					return false;
 				}
 
-				CCoordTrans3d ct;
+				xCoordTrans3d ct;
 				// todo : 순서 확인 (scale->rotate ? or rotate->scale ?)
 				if (pInsert->xscale != 1.0) {
 					ct.mat_(0, 0) *= pInsert->xscale;

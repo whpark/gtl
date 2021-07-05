@@ -74,7 +74,7 @@ export namespace gtl {
 		/// @brief Constructor from other codepage (psz)
 		/// @param pszOther 
 		template < gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
-		GTL_DEPR_SEC explicit TString(tchar_other const* pszOther) {
+		GTL__DEPR_SEC explicit TString(tchar_other const* pszOther) {
 #pragma warning(suppress:4996)
 			*this = pszOther;
 		}
@@ -89,7 +89,7 @@ export namespace gtl {
 
 	public:
 		// returns psz
-	#if GTL_USE_WINDOWS_API
+	#if GTL__USE_WINDOWS_API
 		operator tchar const*() const					{ return this->c_str(); }
 	#endif
 
@@ -138,7 +138,7 @@ export namespace gtl {
 		}
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
-		GTL_DEPR_SEC TString& operator = (tchar_other const* const& psz) {
+		GTL__DEPR_SEC TString& operator = (tchar_other const* const& psz) {
 			*this = gtl::ToString<tchar, tchar_other>(psz);
 			return *this;
 		}
@@ -179,7 +179,7 @@ export namespace gtl {
 			}
 		}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
-		GTL_DEPR_SEC inline TString& operator += (tchar_other const* const& psz) {
+		GTL__DEPR_SEC inline TString& operator += (tchar_other const* const& psz) {
 			operator += (std::basic_string_view<tchar_other>(psz));
 			return *this;
 		}
@@ -237,7 +237,7 @@ export namespace gtl {
 		//	return std::move(a);
 		//}
 		//template < gtlc::string_elem tchar_other >
-		//GTL_DEPR_SEC friend inline [[nodiscard]] TString&& operator + (TString&& a, tchar_other const* const& b) {
+		//GTL__DEPR_SEC friend inline [[nodiscard]] TString&& operator + (TString&& a, tchar_other const* const& b) {
 		//	a += std::basic_string_view<tchar_other>(b);
 		//	return std::move(a);
 		//}
@@ -273,7 +273,7 @@ export namespace gtl {
 			return TString::Add<tchar_other, tchar>(a, b);
 		}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
-		GTL_DEPR_SEC friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const* const& a, TString const& b) {
+		GTL__DEPR_SEC friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const* const& a, TString const& b) {
 			return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>(a), b);
 		}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
@@ -584,14 +584,14 @@ export namespace gtl {
 	};	// TString
 
 
-	using CString = TString<wchar_t>;
-	using CStringA = TString<char>;				// MBCS
-	using CStringW = TString<wchar_t>;			// Unicode (WideChar)
-	using CStringU8 = TString<char8_t>;			// Unicode UTF-8
-	using CStringU16 = TString<char16_t>;		// Unicode UTF-16
-	using CStringU32 = TString<char32_t>;		// Unicode UTF-32
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
-	using CKSSMString = TString<uint16_t>;		// KSSM (codepage 1361)
+	using xString = TString<wchar_t>;
+	using xStringA = TString<char>;				// MBCS
+	using xStringW = TString<wchar_t>;			// Unicode (WideChar)
+	using xStringU8 = TString<char8_t>;			// Unicode UTF-8
+	using xStringU16 = TString<char16_t>;		// Unicode UTF-16
+	using xStringU32 = TString<char32_t>;		// Unicode UTF-32
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+	using CKSSMString = TString<charKSSM_t>;		// KSSM (codepage 1361)
 #endif
 
 

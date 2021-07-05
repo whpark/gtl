@@ -137,7 +137,7 @@ export namespace gtl {
 #if 1
 	//-----------------------------------------------------------------------------
 //	template < std::floating_point T >
-	class CCoordTransChain : public ICoordTrans {
+	class xCoordTransChain : public ICoordTrans {
 	public:
 		using base_t = ICoordTrans;
 
@@ -147,33 +147,33 @@ export namespace gtl {
 	public:
 		//friend class boost::serialization::access;
 		template < typename Archive >
-		friend void serialize(Archive &ar, CCoordTransChain& ct, unsigned int const version) {
+		friend void serialize(Archive &ar, xCoordTransChain& ct, unsigned int const version) {
 			//ar & boost::serialization::base_object<base_t>(ct);
 			ar & (base_t&)ct;
 			ar & ct.chain_;
 		}
 
-		GTL__DYNAMIC_VIRTUAL_DERIVED(CCoordTransChain);
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xCoordTransChain);
 
 	public:
 		// Constructors
-		CCoordTransChain() = default;
+		xCoordTransChain() = default;
 		//virtual ~TCoordTransChain() { }
-		CCoordTransChain(CCoordTransChain const& B) = default;
-		CCoordTransChain& operator = (CCoordTransChain const& B) = default;
-		auto operator <=> (CCoordTransChain const&) const = default;
+		xCoordTransChain(xCoordTransChain const& B) = default;
+		xCoordTransChain& operator = (xCoordTransChain const& B) = default;
+		auto operator <=> (xCoordTransChain const&) const = default;
 
-		CCoordTransChain& operator *= (CCoordTransChain const& B)	{
+		xCoordTransChain& operator *= (xCoordTransChain const& B)	{
 			for (auto const& ct : chain_) 
 				chain_.push_back(std::move(ct.NewClone()));
 			return *this;
 		}
-		CCoordTransChain& operator *= (ICoordTrans const& B) {
+		xCoordTransChain& operator *= (ICoordTrans const& B) {
 			chain_.push_back(std::move(B.NewClone()));
 			return *this;
 		}
-		[[nodiscard]] CCoordTransChain operator * (CCoordTransChain const& B) const {
-			CCoordTransChain newChain;
+		[[nodiscard]] xCoordTransChain operator * (xCoordTransChain const& B) const {
+			xCoordTransChain newChain;
 			for (auto const& ct : chain_) {
 				newChain.chain_.push_back(std::move(ct.NewClone()));
 			}
@@ -183,8 +183,8 @@ export namespace gtl {
 			return newChain;
 		}
 
-		[[nodiscard]] CCoordTransChain operator * (ICoordTrans const& B) const {
-			CCoordTransChain newChain;
+		[[nodiscard]] xCoordTransChain operator * (ICoordTrans const& B) const {
+			xCoordTransChain newChain;
 			for (auto const& ct : chain_) {
 				newChain.chain_.push_back(std::move(ct.NewClone()));
 			}
@@ -192,8 +192,8 @@ export namespace gtl {
 			return newChain;
 		}
 
-		friend [[nodiscard]] CCoordTransChain operator * (ICoordTrans const& A, CCoordTransChain const& B) {
-			CCoordTransChain newChain;
+		friend [[nodiscard]] xCoordTransChain operator * (ICoordTrans const& A, xCoordTransChain const& B) {
+			xCoordTransChain newChain;
 			newChain.chain_.push_back(std::move(A.NewClone()));
 			for (auto const& ct : B.chain_) {
 				newChain.chain_.push_back(std::move(ct.NewClone()));
@@ -202,7 +202,7 @@ export namespace gtl {
 		}
 
 		virtual std::unique_ptr<ICoordTrans> GetInverse() const override {
-			auto inv = std::make_unique<CCoordTransChain>();
+			auto inv = std::make_unique<xCoordTransChain>();
 			for (auto iter = chain_.rbegin(); iter != chain_.rend(); iter++) {
 				if (auto r = iter->GetInverse(); r) {
 					inv->chain_.push_back(std::move(r));
@@ -212,7 +212,7 @@ export namespace gtl {
 			}
 			return std::move(inv);
 		}
-		bool GetInv(CCoordTransChain& ctI) const {
+		bool GetInv(xCoordTransChain& ctI) const {
 			ctI.chain_.clear();
 			for (auto iter = chain_.rbegin(); iter != chain_.rend(); iter++) {
 				if (auto r = iter->GetInverse(); r) {
@@ -626,18 +626,18 @@ export namespace gtl {
 	};
 
 
-	//template GTL_CLASS TCoordTransChain<double>;
-	//using CCoordTransChain = TCoordTransChain<double>;
+	//template GTL__CLASS TCoordTransChain<double>;
+	//using xCoordTransChain = TCoordTransChain<double>;
 
 	//template TCoordTransDim<2>;
-	using CCoordTrans2d = TCoordTransDim<2>;
+	using xCoordTrans2d = TCoordTransDim<2>;
 
 	//template TCoordTransDim<3>;
-	using CCoordTrans3d = TCoordTransDim<3>;
+	using xCoordTrans3d = TCoordTransDim<3>;
 
 #endif
 
-	//GTL_CLASS CCoordTrans2d;
-	//GTL_CLASS CCoordTrans3d;
+	//GTL__CLASS xCoordTrans2d;
+	//GTL__CLASS xCoordTrans3d;
 
 }	// namespace gtl

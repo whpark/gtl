@@ -304,7 +304,7 @@ export namespace gtl::win_util {
 			return FALSE;
 
 		if (m_edit.m_hWnd) {
-			::CString str;
+			CString str;
 			m_edit.GetWindowText(str);
 			if ( ( (m_iItem >= 0) && (m_iItem < GetItemCount()) )
 				&& (m_iSubItem >= 0) && (m_iSubItem < GetHeaderCtrl()->GetItemCount())
@@ -630,7 +630,7 @@ export namespace gtl::win_util {
 			return FALSE;
 
 		if (m_edit.m_hWnd) {
-			::CString str;
+			CString str;
 			m_edit.GetWindowText(str);
 			if ( ( (m_iItem >= 0) && (m_iItem < GetItemCount()) )
 				&& (m_iSubItem >= 0) && (m_iSubItem < GetHeaderCtrl().GetItemCount())

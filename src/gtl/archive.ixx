@@ -61,23 +61,23 @@ export namespace gtl {
 		tstream& stream_;
 		eCODEPAGE eCodepage_{ eCODEPAGE::UTF8 };
 	public:
-		bool const bStore_;
+		bool const m_bStore;
 
 	public:
 		TArchive() = delete;
 		TArchive(const TArchive&) = delete;
 		TArchive(TArchive&&) = default;
 		explicit TArchive(tstream& stream) requires ((bSTORE && !bLOAD) || (!bSTORE && bLOAD))
-			: stream_{ stream }, bStore_{ bSTORE }
+			: stream_{ stream }, m_bStore{ bSTORE }
 		{
 		}
 
 		TArchive(tstream& stream, bool bStore) requires (bSTORE && bLOAD)
-			: stream_{ stream }, bStore_{ bStore }
+			: stream_{ stream }, m_bStore{ bStore }
 		{
 		}
 
-		TArchive(std::filesystem::path path, std::ios_base::openmode mode = std::ios_base::binary) : stream_m{tstream{path, std::ios_base::binary|mode}}, stream_(stream_m.value()), bStore_{bSTORE} {}
+		TArchive(std::filesystem::path path, std::ios_base::openmode mode = std::ios_base::binary) : stream_m{tstream{path, std::ios_base::binary|mode}}, stream_(stream_m.value()), m_bStore{bSTORE} {}
 		//template < typename tchar >
 		//TArchive(std::basic_string_view<tchar> path, std::ios_base::openmode mode = std::ios_base::binary) : stream_m{path, std::ios_base::binary|mode}, stream_(stream_m.value()) {}
 
@@ -95,7 +95,7 @@ export namespace gtl {
 		/// @return 
 		bool IsStoring() const {
 			if constexpr (bSTORE && bLOAD) {
-				return bStore_;
+				return m_bStore;
 			}
 			else {
 				return bSTORE;
@@ -103,7 +103,7 @@ export namespace gtl {
 		}
 		bool IsLoading() const {
 			if constexpr (bSTORE && bLOAD) {
-				return !bStore_;
+				return !m_bStore;
 			}
 			else {
 				return bLOAD;
@@ -1067,9 +1067,9 @@ export namespace gtl {
 
 	//-------------------------------------------------------------------------
 
-	using CIFArchive = TArchive<std::ifstream>;
-	using COFArchive = TArchive<std::ofstream>;
-	using CArchive = TArchive<std::fstream, true, true>;
+	using xIFArchive = TArchive<std::ifstream>;
+	using xOFArchive = TArchive<std::ofstream>;
+	using xArchive = TArchive<std::fstream, true, true>;
 
 
 	template < typename T > requires (std::is_trivial_v<T>)

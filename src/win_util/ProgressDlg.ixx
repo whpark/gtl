@@ -34,7 +34,7 @@ export namespace gtl::win_util {
 		DECLARE_DYNAMIC(CProgressDlg)
 	public:
 		using base_t = CDialogEx;
-		static inline std::wstring const strIDD {L"GTL_WINUTIL_DLG_PROGRESS"};
+		static inline std::wstring const strIDD {L"GTL__WINUTIL_DLG_PROGRESS"};
 		static inline DLGTEMPLATE m_template{WS_VISIBLE, 0, 0, 0, 0, 300, 120};
 	public:
 		CProgressDlg(CWnd* pParent = nullptr);   // standard constructor
@@ -47,7 +47,7 @@ export namespace gtl::win_util {
 	public:
 		std::chrono::system_clock::time_point m_tStart;
 		gtl::callback_progress_t m_calback;
-		::CString m_strMessage;
+		CString m_strMessage;
 		int m_iPercent{};
 		bool m_bCancel{};
 		bool m_bDone{};

@@ -129,10 +129,10 @@ export namespace gtl {
 
 
 	/// @brief RAI helper
-	struct CTrigger {
+	struct xTrigger {
 		std::function<void()> m_cleaner;
-		CTrigger(std::function<void()> cleaner) : m_cleaner(cleaner) {}
-		~CTrigger() {
+		xTrigger(std::function<void()> cleaner) : m_cleaner(cleaner) {}
+		~xTrigger() {
 			if (m_cleaner)
 				m_cleaner();
 		}
@@ -270,7 +270,7 @@ export namespace gtl {
 
 
 	// byte swap
-#if (GTL_STRING_PRIMITIVES__WINDOWS_FRIENDLY)
+#if (GTL__STRING_PRIMITIVES__WINDOWS_FRIENDLY)
 	template < std::integral type >
 	[[nodiscard]] inline auto GetByteSwap(type v) {
 		if constexpr (sizeof(v) == sizeof(std::uint8_t)) {

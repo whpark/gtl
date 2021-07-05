@@ -41,7 +41,7 @@ export namespace gtl {
 	//-----------------------------------------------------------------------------
 	// Simple Log
 	//
-	class CSimpleLog {
+	class xSimpleLog {
 	public:
 		using archive_out_t = gtl::TArchive<std::ofstream>;
 
@@ -50,12 +50,12 @@ export namespace gtl {
 		std::filesystem::path m_path;								// Current File Path
 		std::ofstream m_file;										// Current File
 		std::unique_ptr<archive_out_t> m_ar;						// Archive
-		CString m_strTagFilter;										// Tag Filter. 'How to use' is up to user.
+		xString m_strTagFilter;										// Tag Filter. 'How to use' is up to user.
 																	// (if and only if m_strTagFilter and strTag is not empty), if strTag is not found on strTagFilter, no Log will be written.
 
 	public:
-		CStringW m_strName;											// Task Name
-		CStringW m_fmtLogFileName{L"[Name]_{0:%m}_{0:%d}.log"};		// Format of Log File (fmt::format)
+		xStringW m_strName;											// Task Name
+		xStringW m_fmtLogFileName{L"[Name]_{0:%m}_{0:%d}.log"};		// Format of Log File (fmt::format)
 		std::filesystem::path m_folderLog;							// Folder
 		eCODEPAGE m_eCharEncoding = eCODEPAGE::UTF8;				// Default Char Encoding
 		std::chrono::milliseconds m_tsOld{std::chrono::hours(24)};	// 오래된 파일 삭제시 기준 시간
@@ -66,20 +66,20 @@ export namespace gtl {
 		bool m_bTraceOut = true;
 	//#endif
 
-		std::function<CStringA  (CSimpleLog&, archive_out_t&, CSysTime, const std::string_view svTag, const std::string_view svContent)> m_funcFormatterA;			// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<CStringW  (CSimpleLog&, archive_out_t&, CSysTime, const std::wstring_view svTag, const std::wstring_view svContent)> m_funcFormatterW;		// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<CStringU8 (CSimpleLog&, archive_out_t&, CSysTime, const std::u8string_view svTag, const std::u8string_view svContent)> m_funcFormatterU8;		// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<CStringU16 (CSimpleLog&, archive_out_t&, CSysTime, const std::u16string_view svTag, const std::u16string_view svContent)> m_funcFormatterU16;	// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<CStringU32 (CSimpleLog&, archive_out_t&, CSysTime, const std::u32string_view svTag, const std::u32string_view svContent)> m_funcFormatterU32;	// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringA  (xSimpleLog&, archive_out_t&, xSysTime, const std::string_view svTag, const std::string_view svContent)> m_funcFormatterA;			// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringW  (xSimpleLog&, archive_out_t&, xSysTime, const std::wstring_view svTag, const std::wstring_view svContent)> m_funcFormatterW;		// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringU8 (xSimpleLog&, archive_out_t&, xSysTime, const std::u8string_view svTag, const std::u8string_view svContent)> m_funcFormatterU8;		// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringU16 (xSimpleLog&, archive_out_t&, xSysTime, const std::u16string_view svTag, const std::u16string_view svContent)> m_funcFormatterU16;	// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringU32 (xSimpleLog&, archive_out_t&, xSysTime, const std::u32string_view svTag, const std::u32string_view svContent)> m_funcFormatterU32;	// 로그 파일 포맷을 바꾸고 싶을 때...
 
 	public:
-		CSimpleLog() = default;
-		CSimpleLog(std::string_view pszName) : m_strName(pszName) {}
-		CSimpleLog(std::wstring_view pszName) : m_strName(pszName) {}
-		CSimpleLog(const CSimpleLog&) = default;
-		CSimpleLog(CSimpleLog&&) = default;
-		CSimpleLog& operator = (const CSimpleLog&) = default;
-		CSimpleLog& operator = (CSimpleLog&&) = default;
+		xSimpleLog() = default;
+		xSimpleLog(std::string_view pszName) : m_strName(pszName) {}
+		xSimpleLog(std::wstring_view pszName) : m_strName(pszName) {}
+		xSimpleLog(const xSimpleLog&) = default;
+		xSimpleLog(xSimpleLog&&) = default;
+		xSimpleLog& operator = (const xSimpleLog&) = default;
+		xSimpleLog& operator = (xSimpleLog&&) = default;
 
 	public:
 		bool OpenFile(std::chrono::system_clock::time_point now);
@@ -159,7 +159,7 @@ export namespace gtl {
 	};
 
 
-	bool CSimpleLog::OpenFile(std::chrono::system_clock::time_point now) {
+	bool xSimpleLog::OpenFile(std::chrono::system_clock::time_point now) {
 		std::scoped_lock lock(m_mutex);
 
 		if (m_fmtLogFileName.empty()) {
@@ -167,12 +167,12 @@ export namespace gtl {
 			return false;
 		}
 
-		CStringW strFilePath;
+		xStringW strFilePath;
 
 		strFilePath = (m_folderLog / m_fmtLogFileName.c_str()).c_str();
 		strFilePath.Replace(L"[Name]", m_strName);
 
-		CSysTime tNow(now);
+		xSysTime tNow(now);
 		std::time_t t = tNow;
 		std::tm tm;
 		localtime_s(&tm, &t);
@@ -196,8 +196,8 @@ export namespace gtl {
 
 			// Delete Old Files
 			if (m_bOverwriteOlderFile && std::filesystem::exists(path)) {
-				CSysTime tLastWrite = std::filesystem::last_write_time(path);
-				CSysTime t(now);
+				xSysTime tLastWrite = std::filesystem::last_write_time(path);
+				xSysTime t(now);
 				auto ts = t - tLastWrite;
 				if (ts > m_tsOld)
 					std::filesystem::remove(path);
@@ -236,7 +236,7 @@ export namespace gtl {
 		}
 		return true;
 	}
-	bool CSimpleLog::CloseFile() {
+	bool xSimpleLog::CloseFile() {
 		std::scoped_lock lock(m_mutex);
 
 		if (m_ar.get()) {
@@ -252,7 +252,7 @@ export namespace gtl {
 
 	// Write Log
 	template < typename tchar_t >
-	void CSimpleLog::_Log(const std::basic_string_view<tchar_t> svMask, const std::basic_string_view<tchar_t> svText) {
+	void xSimpleLog::_Log(const std::basic_string_view<tchar_t> svMask, const std::basic_string_view<tchar_t> svText) {
 		auto now = std::chrono::system_clock::now();
 
 	#if defined(_DEBUG) and defined(_WINDOWS)
@@ -270,11 +270,11 @@ export namespace gtl {
 		if (!OpenFile(now) || !m_ar)
 			return;
 		if (!m_strTagFilter.empty() && !svMask.empty()) {
-			if constexpr (std::is_same_v<tchar_t, CString::value_type>) {
+			if constexpr (std::is_same_v<tchar_t, xString::value_type>) {
 				if (!m_strTagFilter.find(svMask))
 					return;
 			} else {
-				if (!m_strTagFilter.find(CString(svMask)))
+				if (!m_strTagFilter.find(xString(svMask)))
 					return;
 			}
 		}
@@ -372,10 +372,10 @@ export namespace gtl {
 			CloseFile();
 	}
 
-	//template void CSimpleLog::_Log<char>(const std::basic_string_view<char> svMask, const std::basic_string_view<char> svText);
-	//template void CSimpleLog::_Log<wchar_t>(const std::basic_string_view<wchar_t> svMask, const std::basic_string_view<wchar_t> svText);
-	//template void CSimpleLog::_Log<char8_t>(const std::basic_string_view<char8_t> svMask, const std::basic_string_view<char8_t> svText);
-	//template void CSimpleLog::_Log<char16_t>(const std::basic_string_view<char16_t> svMask, const std::basic_string_view<char16_t> svText);
-	//template void CSimpleLog::_Log<char32_t>(const std::basic_string_view<char32_t> svMask, const std::basic_string_view<char32_t> svText);
+	//template void xSimpleLog::_Log<char>(const std::basic_string_view<char> svMask, const std::basic_string_view<char> svText);
+	//template void xSimpleLog::_Log<wchar_t>(const std::basic_string_view<wchar_t> svMask, const std::basic_string_view<wchar_t> svText);
+	//template void xSimpleLog::_Log<char8_t>(const std::basic_string_view<char8_t> svMask, const std::basic_string_view<char8_t> svText);
+	//template void xSimpleLog::_Log<char16_t>(const std::basic_string_view<char16_t> svMask, const std::basic_string_view<char16_t> svText);
+	//template void xSimpleLog::_Log<char32_t>(const std::basic_string_view<char32_t> svMask, const std::basic_string_view<char32_t> svText);
 
 }

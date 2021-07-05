@@ -11,15 +11,15 @@ export namespace gtl::win_util {
 	using string_t = std::wstring;
 	using string_view_t = std::wstring_view;
 
-	::CString GetErrorMessage(CException& e) {
-		::CString str;
+	CString GetErrorMessage(CException& e) {
+		CString str;
 		e.GetErrorMessage(str.GetBuffer(1024), 1024);
 		str.ReleaseBuffer();
 		str.TrimRight();
 		return str;
 	}
 
-	::CString GetErrorMessage(DWORD dwLastError) {
+	CString GetErrorMessage(DWORD dwLastError) {
 		wchar_t buf[1024];
 		FormatMessage( 
 			FORMAT_MESSAGE_FROM_SYSTEM | 
@@ -32,7 +32,7 @@ export namespace gtl::win_util {
 			NULL 
 		);
 
-		::CString str = buf;
+		CString str = buf;
 		str.TrimRight();
 
 		return str;
@@ -84,8 +84,8 @@ export namespace gtl::win_util {
 		TStopWatch() : /*os(&osbuf),*/ base_t(os) {};
 	};
 
-	using CStopWatchA = TStopWatch<char>;
-	using CStopWatchW = TStopWatch<wchar_t>;
+	using xStopWatchA = TStopWatch<char>;
+	using xStopWatchW = TStopWatch<wchar_t>;
 
 
 }

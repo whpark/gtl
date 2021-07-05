@@ -1,13 +1,13 @@
 ﻿//////////////////////////////////////////////////////////////////////
 //
-// time.h: CSysTime
+// time.h: xSysTime
 //
 //			FILETIME, SYSTEMTIME <=> std::chrono::system_clock
 //
 // PWH
 // 2019.01.10.
 // 2019.07.24. QL -> GTL
-// 2020.01.07. XTime -> CSysTime 으로 이름 변경, chrono 사용법에 맞춰 수정.
+// 2020.01.07. XTime -> xSysTime 으로 이름 변경, chrono 사용법에 맞춰 수정.
 //				sec_t, msec_t 등 추가.
 //				CSysTimeSpan 삭제. (필요 없음)
 //
@@ -24,7 +24,7 @@ module;
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
-#if (GTL_USE_WINDOWS_API)
+#if (GTL__USE_WINDOWS_API)
 	#define NOMINMAX
 	#include <windows.h>
 #endif
@@ -35,7 +35,7 @@ export module gtl:time;
 
 export namespace gtl {
 
-	//class GTL_CLASS CSysTime;
+	//class GTL__CLASS xSysTime;
 
 	using system_clock_t = std::chrono::system_clock;
 
@@ -65,7 +65,7 @@ export namespace gtl {
 	//-------------------------------------------------------------------------
 	//
 	template < typename tclock = std::chrono::system_clock >
-	class /*GTL_CLASS*/ TSysTime : public std::chrono::time_point<tclock> {
+	class /*GTL__CLASS*/ TSysTime : public std::chrono::time_point<tclock> {
 	public:
 		using base_t = std::chrono::time_point<tclock>;
 		using clock_t = base_t::clock;// == tclock;
@@ -106,7 +106,7 @@ export namespace gtl {
 		// 초 단위
 		sec_t GetTotalSec() const { return base_t::time_since_epoch(); }
 
-#if defined(_WINDOWS) and (GTL_USE_WINDOWS_API)
+#if defined(_WINDOWS) and (GTL__USE_WINDOWS_API)
 		TSysTime(FILETIME ft) :
 			base_t(tclock::duration(std::bit_cast<typename base_t::rep>(ft) - eSysTimeToFileTime))
 		{
@@ -181,7 +181,7 @@ export namespace gtl {
 		static_assert(tclock::duration::period::den == eTimeToSysTime);
 	};
 
-	using CSysTime = TSysTime<std::chrono::system_clock>;
+	using xSysTime = TSysTime<std::chrono::system_clock>;
 
 
 
@@ -193,8 +193,8 @@ export namespace gtl {
 		template < typename T >
 		void Func() {
 
-			CSysTime t1("now");
-			CSysTime t2("now");
+			xSysTime t1("now");
+			xSysTime t2("now");
 			sec_t ts { t2 - t1 };
 
 

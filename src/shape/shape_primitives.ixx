@@ -49,8 +49,8 @@ export namespace gtl::shape {
 
 	using char_t = wchar_t;
 	using string_t = std::wstring;
-	using point_t = CPoint3d;
-	using rect_t = CRect3d;
+	using point_t = xPoint3d;
+	using rect_t = xRect3d;
 	struct line_t { point_t beg, end; };
 	using json_t = boost::json::value;
 
@@ -201,10 +201,10 @@ export namespace gtl::shape {
 	class ICanvas;
 
 	/// @brief shape interface class
-	struct s_shape {
+	struct xShape {
 	public:
 	protected:
-		friend struct s_drawing;
+		friend struct xDrawing;
 		int crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
 	public:
 		string_t strLayer;	// temporary value. (while loading from dxf)
@@ -226,20 +226,20 @@ export namespace gtl::shape {
 		};
 
 	public:
-		virtual ~s_shape() {}
+		virtual ~xShape() {}
 
-		GTL__DYNAMIC_VIRTUAL_INTERFACE(s_shape);
-		//GTL__REFLECTION_VIRTUAL_BASE(s_shape);
+		GTL__DYNAMIC_VIRTUAL_INTERFACE(xShape);
+		//GTL__REFLECTION_VIRTUAL_BASE(xShape);
 		//GTL__REFLECTION_MEMBERS(color, eLineType, strLineType, lineWeight, bVisible, bTransparent, cookie);
 
-		auto operator <=> (s_shape const&) const = default;
+		auto operator <=> (xShape const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, s_shape& var, unsigned int const file_version) {
+		friend void serialize(archive& ar, xShape& var, unsigned int const file_version) {
 			ar & var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, s_shape& var) {
+		friend archive& operator & (archive& ar, xShape& var) {
 			ar & var.color.cr;
 			ar & var.cookie;
 			ar & var.strLineType;
@@ -259,7 +259,7 @@ export namespace gtl::shape {
 		virtual void FlipX() = 0;
 		virtual void FlipY() = 0;
 		virtual void FlipZ() = 0;
-		virtual void Transform(CCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
 		virtual bool UpdateBoundary(rect_t&) const = 0;
 		int GetLineWidthInUM() const { return GetLineWidthInUM(lineWeight); }
 		static int GetLineWidthInUM(int lineWeight);
@@ -272,7 +272,7 @@ export namespace gtl::shape {
 			fmt::print(os, L"lineType:{}, lineWeight:{}\n", strLineType, lineWeight);
 		}
 
-		static std::unique_ptr<s_shape> CreateShapeFromEntityName(std::string const& strEntityName);
+		static std::unique_ptr<xShape> CreateShapeFromEntityName(std::string const& strEntityName);
 	};
 
 }
@@ -292,7 +292,7 @@ namespace gtl::shape {
 
 export namespace gtl::shape {
 
-	void CohenSutherlandLineClip(gtl::CRect2d roi, gtl::CPoint2d& pt0, gtl::CPoint2d& pt1) {
+	void CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1) {
 
 		auto& x0 = pt0.x;
 		auto& y0 = pt0.y;
@@ -372,7 +372,7 @@ export namespace gtl::shape {
 		}
 	}
 
-	int s_shape::GetLineWidthInUM(int lineWeight) {
+	int xShape::GetLineWidthInUM(int lineWeight) {
 		static int const widths[] = {
 			0,
 			50,

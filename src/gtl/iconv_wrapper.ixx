@@ -215,7 +215,7 @@ export namespace gtl {
 			} else if (std::is_same_v<tchar, char>) {
 				return "char";
 			}
-		#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
+		#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
 			else if (std::is_same_v<tchar, uint16_t>) {
 				return "JOHAB";
 			}

@@ -74,12 +74,11 @@ export namespace gtl::concepts {
 			v.end();
 		};
 
-
-	/// @brief type for string (uint16_t for KSSM (Korean Johab)
+	/// @brief type for string (charKSSM_t for KSSM (Korean Johab)
 	template < typename tchar >
 	concept string_elem = is_one_of<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t
-#if (GTL_STRING_SUPPORT_CODEPAGE_KSSM)
-		, uint16_t	// uint16_t for KSSM (Johab)
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+		, charKSSM_t	// charKSSM_t for KSSM (Johab)
 #endif
 	>;
 

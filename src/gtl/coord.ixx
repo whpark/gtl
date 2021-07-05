@@ -46,20 +46,20 @@ export namespace gtl {
 	//
 
 
-	using CSize3d	= TSize3<double>;
-	using CSize2d	= TSize2<double>;
-	using CPoint4d	= TPoint4<double>;
-	using CPoint3d	= TPoint3<double>;
-	using CPoint2d	= TPoint2<double>;
-	using CRect3d	= TRect3<double>;
-	using CRect2d	= TRect2<double>;
-	using CSize3i	= TSize3<int>;
-	using CSize2i	= TSize2<int>;
-	using CPoint4i	= TPoint4<int>;
-	using CPoint3i	= TPoint3<int>;
-	using CPoint2i	= TPoint2<int>;
-	using CRect3i	= TRect3<int>;
-	using CRect2i	= TRect2<int>;
+	using xSize3d	= TSize3<double>;
+	using xSize2d	= TSize2<double>;
+	using xPoint4d	= TPoint4<double>;
+	using xPoint3d	= TPoint3<double>;
+	using xPoint2d	= TPoint2<double>;
+	using xRect3d	= TRect3<double>;
+	using xRect2d	= TRect2<double>;
+	using xSize3i	= TSize3<int>;
+	using xSize2i	= TSize2<int>;
+	using xPoint4i	= TPoint4<int>;
+	using xPoint3i	= TPoint3<int>;
+	using xPoint2i	= TPoint2<int>;
+	using xRect3i	= TRect3<int>;
+	using xRect2i	= TRect2<int>;
 
 
 	/// @brief Interpolation (lerp)

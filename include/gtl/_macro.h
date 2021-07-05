@@ -29,10 +29,13 @@ namespace gtl {
 	using uchar = unsigned char;
 	using uint = uint32_t;	// conflicts with cv::
 
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+	using charKSSM_t = uint16_t;
+#endif
 
 }
 
-#define GTL_DEPR_SEC [[deprecated("NOT Secure")]]
+#define GTL__DEPR_SEC [[deprecated("NOT Secure")]]
 
 // until c++20 source_location
 #ifdef __cpp_lib_source_location

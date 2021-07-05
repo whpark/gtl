@@ -98,12 +98,12 @@ export namespace gtl {
 
 	//-----------------------------------------------------------------------------
 	// ¿Ü°û¼± ±ÛÀÚ
-	void putTextC(cv::InputOutputArray img, std::string const& str, CPoint2i org,
+	void putTextC(cv::InputOutputArray img, std::string const& str, xPoint2i org,
 		int fontFace, double fontScale, cv::Scalar color,
 		int thickness = 1, int lineType = 8,
 		bool bottomLeftOrigin = false, bool bOutline = true)
 	{
-		CSize2i size { cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
+		xSize2i size { cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
 
 		if (bOutline) {
 			cv::Scalar crBkgnd;
@@ -111,10 +111,10 @@ export namespace gtl {
 			//if (crBkgnd == Scalar(0, 0, 0))
 			//	crBkgnd = Scalar(1, 1, 1);
 			int iShift = std::max(1, thickness/2);
-			cv::putText(img, str, org-size/2+CPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+CPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+CPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+CPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+xPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+xPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+xPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org-size/2+xPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
 		}
 
 		cv::putText(img, str, org-size/2, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
@@ -128,7 +128,7 @@ export namespace gtl {
 	bool ConvertColor(cv::Mat const& imgSrc, cv::Mat& imgDest, int eCode);
 	bool ResizeImage(cv::Mat const& imgSrc, cv::Mat& imgDest, double dScale, int eInterpolation = cv::INTER_LINEAR/*, int eScaleDownMethod = cv::INTER_AREA*/);
 	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, cv::Mat& matResult, int method);
-	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, CPoint2d& ptBest, double& dMinMax, double& dRate, double dScale = 0.0, int eInterpolation = cv::INTER_LINEAR);
+	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, xPoint2d& ptBest, double& dMinMax, double& dRate, double dScale = 0.0, int eInterpolation = cv::INTER_LINEAR);
 
 	//-----------------------------------------------------------------------------
 	// Mat to DC
@@ -230,7 +230,7 @@ export namespace gtl {
 		return true;
 	}
 
-	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, CPoint2d& ptBest, double& dMinMax, double& dRate, double dScale, int eInterpolation) {
+	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, xPoint2d& ptBest, double& dMinMax, double& dRate, double dScale, int eInterpolation) {
 		try {
 			double dMin, dMax;
 			cv::Point ptMin, ptMax;
@@ -765,7 +765,7 @@ export namespace gtl {
 		bool bOK{};
 
 		// Trigger notifying it's over.
-		CTrigger trigger([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, bOK);});
+		xTrigger trigger([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, bOK);});
 
 		if (img.empty())
 			return false;
@@ -1117,7 +1117,7 @@ export namespace gtl {
 		bool bOK{};
 
 		// Trigger notifying it's over.
-		CTrigger trigger([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, bOK); });
+		xTrigger trigger([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, bOK); });
 
 
 		cv::Mat img;

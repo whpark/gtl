@@ -36,13 +36,13 @@ TEST(gtl_archive, ReadLine) {
 	for (auto const& dir : std::filesystem::directory_iterator(uR"x(.\stream_test\)x")) {
 		if (dir.is_directory() or dir.is_other())
 			continue;
-		gtl::CStringU16 strFilename(dir.path().filename().string<wchar_t>());
+		gtl::xStringU16 strFilename(dir.path().filename().string<wchar_t>());
 		auto str2 = strFilename.GetUpper();
 		std::basic_regex<wchar_t> re{LR"xx(.*\.[Bb][Oo][Mm]\.[Cc][Xx][Xx]$)xx"};
 		if (!std::regex_match((std::wstring&)strFilename, re))
 			continue;
 
-		CIFArchive ar(dir.path());
+		xIFArchive ar(dir.path());
 
 		ar.GetStream().seekg(0);
 		auto codepage = ar.ReadCodepageBOM(gtl::eCODEPAGE::UTF8);
@@ -73,7 +73,7 @@ TEST(gtl_archive, ReadLine) {
 
 
 	{
-		CIFArchive ar(uR"x(.\stream_test\short file.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\short file.txt)x");
 		ar.ReadCodepageBOM(gtl::eCODEPAGE::DEFAULT__OR_USE_MBCS_CODEPAGE);
 		auto strs = ReadFile<char16_t>(ar);
 
@@ -84,7 +84,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp949.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp949.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)949);
 		auto strs = ReadFile<wchar_t>(ar);
 
@@ -95,7 +95,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp949.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp949.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)949);
 		auto strs = ReadFile<char32_t>(ar);
 
@@ -134,7 +134,7 @@ TEST(gtl_archive, ReadLine) {
 
 	// cp1250 -> char8_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1250);
 		auto strs = ReadFile<char8_t>(ar);
 
@@ -153,7 +153,7 @@ TEST(gtl_archive, ReadLine) {
 
 	// cp1250 -> char16_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1250);
 		auto strs = ReadFile<char16_t>(ar);
 
@@ -171,7 +171,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 	// cp1250 -> char32_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1250);
 		auto strs = ReadFile<char32_t>(ar);
 
@@ -189,7 +189,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 	// cp1250 -> wchar_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1250.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1250);
 		auto strs = ReadFile<wchar_t>(ar);
 
@@ -208,7 +208,7 @@ TEST(gtl_archive, ReadLine) {
 
 	// cp1251 -> char8_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1251);
 		auto strs = ReadFile<char8_t>(ar);
 
@@ -226,7 +226,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 	// cp1251 -> char16_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1251);
 		auto strs = ReadFile<char16_t>(ar);
 
@@ -244,7 +244,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 	// cp1251 -> char32_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1251);
 		auto strs = ReadFile<char32_t>(ar);
 
@@ -262,7 +262,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 	// cp1251 -> wchar_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1251.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1251);
 		auto strs = ReadFile<wchar_t>(ar);
 
@@ -281,7 +281,7 @@ TEST(gtl_archive, ReadLine) {
 
 	// cp1252 -> char8_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1252);
 		auto strs = ReadFile<char8_t>(ar);
 
@@ -299,7 +299,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 	// cp1252 -> char16_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1252);
 		auto strs = ReadFile<char16_t>(ar);
 
@@ -317,7 +317,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 	// cp1252 -> char32_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1252);
 		auto strs = ReadFile<char32_t>(ar);
 
@@ -335,7 +335,7 @@ TEST(gtl_archive, ReadLine) {
 	}
 	// cp1252 -> wchar_t
 	{
-		CIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
+		xIFArchive ar(uR"x(.\stream_test\cp1252.txt)x");
 		ar.ReadCodepageBOM((eCODEPAGE)1252);
 		auto strs = ReadFile<wchar_t>(ar);
 
@@ -363,7 +363,7 @@ TEST(gtl_archive, WriteLine) {
 	{
 		std::ifstream st;
 		st.close();
-		COFArchive ar(uR"x(.\stream_test\write_line_u16.txt)x");
+		xOFArchive ar(uR"x(.\stream_test\write_line_u16.txt)x");
 		ar.WriteCodepageBOM(eCODEPAGE::UTF16);
 		for (auto const& vstr : strs1) {
 			std::visit([&ar](auto const& str) { ar.WriteLine(str); }, vstr);

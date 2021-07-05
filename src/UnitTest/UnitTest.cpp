@@ -97,9 +97,9 @@ namespace UnitTest {
 			//path.u32string();
 
 			std::string str1{ "message1" };
-			gtl::CStringA str2 = gtl::ToString<char, char>(str1);
-			gtl::CStringA str3 = "asdfasdjklfd";
-			gtl::CString str4{ gtl::CStringA(str1) };
+			gtl::xStringA str2 = gtl::ToString<char, char>(str1);
+			gtl::xStringA str3 = "asdfasdjklfd";
+			gtl::xString str4{ gtl::xStringA(str1) };
 
 			std::string_view sv{ str1 };
 			std::string_view sv2{ str2 };
@@ -110,8 +110,8 @@ namespace UnitTest {
 			auto strU32 = fmt::format(U"{}", 3);
 
 
-			gtl::CStringA str5{ sv };
-			gtl::CString str6(sv);
+			gtl::xStringA str5{ sv };
+			gtl::xString str6(sv);
 			str6 = sv;
 			str6 = str5;
 			str6 = str1;

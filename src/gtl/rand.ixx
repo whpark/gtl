@@ -58,68 +58,68 @@ export namespace gtl {
 	//-----------------------------------------------------------------------------------------------------------------------------
 	// Random Uniform Distribution for int, int64_t, float, double
 	template < typename T_ENGINE = std::mt19937, typename T_RANDOM_DEVICE = std::random_device >
-	class CRandUniI : public TRand<int, T_ENGINE, std::uniform_int_distribution<int>, T_RANDOM_DEVICE > {
+	class xRandUniI : public TRand<int, T_ENGINE, std::uniform_int_distribution<int>, T_RANDOM_DEVICE > {
 	public:
 		using base_t = TRand<int, T_ENGINE, std::uniform_int_distribution<int>, T_RANDOM_DEVICE >;
 		using base_t::base_t;
-		CRandUniI(int min, int max) : TRand(min, max) {}
+		xRandUniI(int min, int max) : TRand(min, max) {}
 	};
 
 	template < typename T_ENGINE = std::mt19937_64, typename T_RANDOM_DEVICE = std::random_device >
-	class CRandUniI64 : public TRand<int64_t, T_ENGINE, std::uniform_int_distribution<int64_t>, T_RANDOM_DEVICE > {
+	class xRandUniI64 : public TRand<int64_t, T_ENGINE, std::uniform_int_distribution<int64_t>, T_RANDOM_DEVICE > {
 	public:
 		using base_t = TRand<int64_t, T_ENGINE, std::uniform_int_distribution<int64_t>, T_RANDOM_DEVICE >;
 		using base_t::base_t;
-		CRandUniI64(int64_t min, int64_t max) : TRand(min, max) {}
+		xRandUniI64(int64_t min, int64_t max) : TRand(min, max) {}
 	};
 
 	template < typename T_ENGINE = std::mt19937, typename T_RANDOM_DEVICE = std::random_device >
-	class CRandUniF : public TRand<float, T_ENGINE, std::uniform_real_distribution<float>, T_RANDOM_DEVICE > {
+	class xRandUniF : public TRand<float, T_ENGINE, std::uniform_real_distribution<float>, T_RANDOM_DEVICE > {
 	public:
 		using base_t = TRand<float, T_ENGINE, std::uniform_real_distribution<float>, T_RANDOM_DEVICE >;
 		using base_t::base_t;
-		CRandUniF(float min, float max) : TRand(min, max) {}
+		xRandUniF(float min, float max) : TRand(min, max) {}
 	};
 
 	template < typename T_ENGINE = std::mt19937, typename T_RANDOM_DEVICE = std::random_device >
-	class CRandUniD : public TRand<double, T_ENGINE, std::uniform_real_distribution<double>, T_RANDOM_DEVICE > {
+	class xRandUniD : public TRand<double, T_ENGINE, std::uniform_real_distribution<double>, T_RANDOM_DEVICE > {
 	public:
 		using base_t = TRand<double, T_ENGINE, std::uniform_real_distribution<double>, T_RANDOM_DEVICE >;
 		using base_t::base_t;
-		CRandUniD(double min, double max) : TRand(min, max) {}
+		xRandUniD(double min, double max) : TRand(min, max) {}
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
 	// Normal Distribution for int, int64_t, float, double
 	template < typename T_ENGINE = std::mt19937, typename T_RANDOM_DEVICE = std::random_device >
-	class CRandNormI : public TRand<int, T_ENGINE, std::normal_distribution<int>, T_RANDOM_DEVICE > {
+	class xRandNormI : public TRand<int, T_ENGINE, std::normal_distribution<int>, T_RANDOM_DEVICE > {
 	public:
 		using base_t = TRand<int, T_ENGINE, std::normal_distribution<int>, T_RANDOM_DEVICE >;
 		using base_t::base_t;
-		CRandNormI(int mean, int sigma) : TRand(mean, sigma) {}
+		xRandNormI(int mean, int sigma) : TRand(mean, sigma) {}
 	};
 	template < typename T_ENGINE = std::mt19937_64, typename T_RANDOM_DEVICE = std::random_device >
-	class CRandNormI64 : public TRand<int64_t, T_ENGINE, std::normal_distribution<int64_t>, T_RANDOM_DEVICE > {
+	class xRandNormI64 : public TRand<int64_t, T_ENGINE, std::normal_distribution<int64_t>, T_RANDOM_DEVICE > {
 	public:
 		using base_t = TRand<int64_t, T_ENGINE, std::normal_distribution<int64_t>, T_RANDOM_DEVICE >;
 		using base_t::base_t;
-		CRandNormI64(int64_t mean, int64_t sigma) : TRand(mean, sigma) {}
+		xRandNormI64(int64_t mean, int64_t sigma) : TRand(mean, sigma) {}
 	};
 
 	template < typename T_ENGINE = std::mt19937, typename T_RANDOM_DEVICE = std::random_device >
-	class CRandNormF : public TRand<float, T_ENGINE, std::normal_distribution<float>, T_RANDOM_DEVICE > {
+	class xRandNormF : public TRand<float, T_ENGINE, std::normal_distribution<float>, T_RANDOM_DEVICE > {
 	public:
 		using base_t = TRand<float, T_ENGINE, std::normal_distribution<float>, T_RANDOM_DEVICE >;
 		using base_t::base_t;
-		CRandNormF(float mean, double sigma) : TRand(mean, sigma) {}
+		xRandNormF(float mean, double sigma) : TRand(mean, sigma) {}
 	};
 
 	template < typename T_ENGINE = std::mt19937, typename T_RANDOM_DEVICE = std::random_device >
-	class CRandNormD : public TRand<double, T_ENGINE, std::normal_distribution<double>, T_RANDOM_DEVICE > {
+	class xRandNormD : public TRand<double, T_ENGINE, std::normal_distribution<double>, T_RANDOM_DEVICE > {
 	public:
 		using base_t = TRand<double, T_ENGINE, std::normal_distribution<double>, T_RANDOM_DEVICE >;
 		using base_t::base_t;
-		CRandNormD(double mean, double sigma) : TRand(mean, sigma) {}
+		xRandNormD(double mean, double sigma) : TRand(mean, sigma) {}
 	};
 
 } // namespace gtl;
