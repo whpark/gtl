@@ -238,7 +238,7 @@ void CtestwinView::OnBnClickedTestMatTime() {
 		img3.row(row) = row%256;
 	}
 
-	gtlw::xStopWatchA sw;
+	gtlw::xStopWatch sw;
 	cv::cvtColor(img3, img3, cv::COLOR_GRAY2BGR);
 	sw.Lap("1256x1256 1ch -> 3ch");
 }
@@ -258,7 +258,7 @@ void CtestwinView::OnBnClickedTestSaveCImage() {
 	palette.back() = (RGBQUAD&)gtl::ColorBGRA(255, 255, 255, 0);
 	img.SetColorTable(0, (UINT)std::size(palette), palette.data());
 
-	gtlw::xStopWatchA sw;
+	gtlw::xStopWatch sw;
 
 	CDC dc;
 	dc.Attach(img.GetDC());
@@ -295,7 +295,7 @@ cv::Mat CtestwinView::CreateSampleImage(cv::Size size) {
 	if (mat.size() == size)
 		return mat;
 
-	gtlw::xStopWatchA sw;
+	gtlw::xStopWatch sw;
 	mat = cv::Mat::zeros(size, CV_8UC1);
 	for (int row{}; row < mat.rows; row++) {
 		auto v = ((row / 1'000) % 2) ? 0 : 255;
@@ -317,7 +317,7 @@ cv::Mat CtestwinView::CreateSampleImage(cv::Size size) {
 }
 
 bool CtestwinView::WriteSampleImage(std::filesystem::path const& folder, cv::Mat const& mat, int nBPP) {
-	gtlw::xStopWatchA sw;
+	gtlw::xStopWatch sw;
 
 	std::vector<gtl::color_bgra_t> palette{ (nBPP <= 8) ? (size_t)(0x01 << nBPP) : (size_t)0, gtl::color_bgra_t{} };
 	if (!palette.empty())
@@ -339,7 +339,7 @@ void CtestwinView::TestSaveBMP(int nBPP) {
 	if (size.width < 1'000) size.width = 1'000;
 	if (size.height < 1'000) size.height = 1'000;
 
-	gtlw::xStopWatchA sw;
+	gtlw::xStopWatch sw;
 
 	cv::Mat mat = CreateSampleImage(size);
 
@@ -397,7 +397,7 @@ void CtestwinView::OnBnClickedTestLoadBMP() {
 
 	CWaitCursor wc;
 
-	gtlw::xStopWatchA sw;
+	gtlw::xStopWatch sw;
 
 	cv::Mat img;
 	//img = gtl::LoadImageMat(path);
