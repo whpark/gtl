@@ -91,18 +91,49 @@ namespace gtl::win_util {
 
 	//-------------------------------------------------------------------------
 	/// @brief StopWatch
-	template < typename tchar, typename tresolution = std::chrono::duration<double> >
-	class TStopWatch : public gtl::TStopWatch<tchar, tresolution > {
+	template < typename tresolution = std::chrono::duration<double>, typename tclock = std::chrono::steady_clock >
+	class TStopWatch : public gtl::TStopWatch<char, tresolution, tclock > {
 	public:
-		static inline TDebugOutputStreamBuf<tchar> osbuf;
-		static inline std::basic_ostream<tchar> os{&osbuf};	// !! Destruction Order ... (<- static inline)
-		using base_t = gtl::TStopWatch<tchar, tresolution>;
+		static inline TDebugOutputStreamBuf<char> osbufA;
+		static inline TDebugOutputStreamBuf<wchar_t> osbufW;
+		static inline std::ostream osA{&osbufA};	// !! Destruction Order ... (<- static inline)
+		static inline std::wostream osW{&osbufW};	// !! Destruction Order ... (<- static inline)
+		using base_t = gtl::TStopWatch<char, tresolution, tclock>;
 
-		TStopWatch() : /*os(&osbuf),*/ base_t(os) {};
+	public:
+		TStopWatch() : base_t(osA) {
+		}
+		~TStopWatch() {
+			Lap("end");
+			//osbufA.flush();
+			//osbufW.flush();
+		}
+
+	public:
+	#define GTL__PRINT_FMT_STOPWATCH_PRE "STOP_WATCH {:{}}[ "
+	#define GTL__PRINT_FMT_STOPWATCH_POST " ] {}\n"
+
+		template < typename ... Args >
+		void Lap(std::string_view sv, Args&& ... args) {
+			auto t = tclock::now();
+			osA << std::format(GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
+			osA << std::format(sv, std::forward<Args>(args)...);
+			osA << std::format(GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
+			base_t::t0 = tclock::now();
+		}
+		template < typename ... Args >
+		void Lap(std::wstring_view sv, Args&& ... args) {
+			auto t = tclock::now();
+			osW << std::format(L"" GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
+			osW << std::format(sv, std::forward<Args>(args)...);
+			osW << std::format(L"" GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
+			base_t::t0 = tclock::now();
+		}
+	#undef GTL__PRINT_FMT_STOPWATCH_POST
+	#undef GTL__PRINT_FMT_STOPWATCH_PRE
 	};
 
-	using xStopWatchA = TStopWatch<char>;
-	using xStopWatchW = TStopWatch<wchar_t>;
+	using xStopWatch = TStopWatch;
 
 #pragma pack(pop)
 }
