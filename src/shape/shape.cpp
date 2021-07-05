@@ -229,6 +229,7 @@ namespace gtl::shape {
 	}
 
 	string_t const& xShape::GetShapeName(eSHAPE eType) {
+		using namespace std::literals;
 		static std::map<eSHAPE, string_t> const map = {
 			{ eSHAPE::none,				L"none" },
 			{ eSHAPE::e3dface,			L"3dFace"s },
@@ -275,6 +276,7 @@ namespace gtl::shape {
 	}
 
 	std::unique_ptr<xShape> xShape::CreateShapeFromEntityName(std::string const& strEntityName) {
+		using namespace std::literals;
 		static std::map<std::string, std::function<std::unique_ptr<xShape>()> > const mapCreator = {
 			{ "3dFace"s,				nullptr },
 			{ "ARC"s,					[](){ return std::make_unique<xArc>(); } },

@@ -354,7 +354,7 @@ namespace gtl::shape {
 	struct GTL__SHAPE_CLASS xPolylineLW : public xPolyline {
 	//protected:
 	//	int dummy{};
-	public:
+	//public:
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::lwpolyline; }
 
@@ -766,7 +766,7 @@ namespace gtl::shape {
 		int m_textgen{};
 		eALIGN_HORZ m_alignHorz{eALIGN_HORZ::left};
 		eALIGN_VERT m_alignVert{eALIGN_VERT::base_line};
-	
+
 		virtual eSHAPE GetShapeType() const { return eSHAPE::text; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -981,7 +981,7 @@ namespace gtl::shape {
 	};
 
 	// temporary object
-	struct xInsert : public xShape {
+	struct GTL__SHAPE_CLASS xInsert : public xShape {
 		string_t m_name;	// block name
 		point_t m_pt;
 		double m_xscale{1};
