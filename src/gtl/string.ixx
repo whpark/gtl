@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // string.h:
 //
@@ -266,7 +266,7 @@ export namespace gtl {
 	public:
 		//---------------------------------------------------------------------
 		/// @brief operator ... +
-		// TString<tchar_other> ·Î ÇÏ¸é µ¿ÀÛ ¾ÈÇÔ. friend ÇÔ¼öÀÇ ÀÎÀÚ¿¡ ÇÏ³ª¶óµµ class¿Í µ¿ÀÏÇÑ ÀÎÀÚ°¡ ÀÖ¾î¾ß ÇÏ³ª?....
+		// TString<tchar_other> ë¡œ í•˜ë©´ ë™ì‘ ì•ˆí•¨. friend í•¨ìˆ˜ì˜ ì¸ìì— í•˜ë‚˜ë¼ë„ classì™€ ë™ì¼í•œ ì¸ìê°€ ìˆì–´ì•¼ í•˜ë‚˜?....
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_base_of_v<TString<tchar_other>, tstring_buf>)
 		friend inline [[nodiscard]] TString<tchar_other> operator + (tstring_buf const& a, TString const& b) {
@@ -298,7 +298,7 @@ export namespace gtl {
 		int CompareNoCase(std::basic_string<tchar_other> const& str)	const { return tszicmp<tchar>((std::basic_string_view<tchar>)*this, TString<tchar>(str)); }
 
 		//---------------------------------------------------------------------
-		// operator ==, !=, <, >, <=, >=, ÇÊ¿ä ¾øÀ½. basic_string À¸·Î ´ëÃ¼
+		// operator ==, !=, <, >, <=, >=, í•„ìš” ì—†ìŒ. basic_string ìœ¼ë¡œ ëŒ€ì²´
 
 		//---------------------------------------------------------------------
 		// ToNumber
@@ -465,7 +465,7 @@ export namespace gtl {
 			tchar const* pszEnd = pszStart + this->size();
 			tchar const* pszEndSearch = pszEnd-nLenOld+1;
 
-			// ¸ÕÀú ¸î °³ ¹Ù²ã¾ß µÇ´ÂÁö Ã£°í
+			// ë¨¼ì € ëª‡ ê°œ ë°”ê¿”ì•¼ ë˜ëŠ”ì§€ ì°¾ê³ 
 			for (tchar const* psz = pszStart; psz < pszEndSearch; psz++) {
 				if (tszncmp({psz, pszEnd}, svOld, nLenOld) == 0) {
 					psz += nLenOld-1;
@@ -572,7 +572,7 @@ export namespace gtl {
 			return this->data();
 		}
 		/// @brief Manual Buffer Manage
-		size_type ReleaseBuffer() {	// reserve(), data() ÇÔ¼ö¸¦ »ç¿ëÇØ¼­ ¹öÆÛ¸¦ °¡Á®¿Â ´ÙÀ½, ¹öÆÛ¿¡ µ¥ÀÌÅÍ¸¦ º¸³½ ´ÙÀ½, Å©±â ´Ù½Ã ¼³Á¤.
+		size_type ReleaseBuffer() {	// reserve(), data() í•¨ìˆ˜ë¥¼ ì‚¬ìš©í•´ì„œ ë²„í¼ë¥¼ ê°€ì ¸ì˜¨ ë‹¤ìŒ, ë²„í¼ì— ë°ì´í„°ë¥¼ ë³´ë‚¸ ë‹¤ìŒ, í¬ê¸° ë‹¤ì‹œ ì„¤ì •.
 			if (!this->data() || !this->size())
 				return 0;
 			size_type nNewLen = tszlen(this->data(), this->size());

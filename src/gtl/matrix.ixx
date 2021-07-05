@@ -38,15 +38,15 @@ export namespace gtl {
 		using value_type = T;
 		using var_type = std::array<value_type, m*n>;
 
-		var_type mat_ {};
+		var_type m_mat {};
 
 	public:
 		constexpr TMatrix() = default;
 		constexpr TMatrix(TMatrix const&) = default;
 		constexpr TMatrix(TMatrix &&) = default;
-		constexpr TMatrix(std::initializer_list<T>&& lst) : mat_{} {
+		constexpr TMatrix(std::initializer_list<T>&& lst) : m_mat{} {
 			auto pos = lst.begin();
-			for (auto& v : mat_) {
+			for (auto& v : m_mat) {
 				if (pos == lst.end())
 					break;
 				v = *pos++;
@@ -69,41 +69,41 @@ export namespace gtl {
 		}
 		constexpr static TMatrix ones() {
 			TMatrix M;
-			for (auto& v : M.mat_) v = 1;
+			for (auto& v : M.m_mat) v = 1;
 			return M;
 		}
 		constexpr static TMatrix all(value_type value) {
 			TMatrix M;
-			for (auto& v : M.mat_) v = value;
+			for (auto& v : M.m_mat) v = value;
 			return M;
 		}
 
 		constexpr value_type& operator () (size_t row, size_t col) {
-			return mat_[row*cols + col];
+			return m_mat[row*cols + col];
 		}
 		constexpr value_type const& operator () (size_t row, size_t col) const {
-			return mat_[row*cols + col];
+			return m_mat[row*cols + col];
 		}
 		constexpr value_type& at(size_t row, size_t col) {
-			return mat_[row*cols + col];
+			return m_mat[row*cols + col];
 		}
 		constexpr value_type const& at(size_t row, size_t col) const {
-			return mat_[row*cols + col];
+			return m_mat[row*cols + col];
 		}
 		constexpr value_type& operator () (size_t index) requires (rows == 1 or cols == 1) {
-			return mat_[index];
+			return m_mat[index];
 		}
 		constexpr value_type const& operator () (size_t index) const requires (rows == 1 or cols == 1) {
-			return mat_[index];
+			return m_mat[index];
 		}
 
-		constexpr TMatrix& operator += (const TMatrix& B) { for (size_t i{}; i < m*n; i++) mat_[i] += B.mat_[i]; return *this; }
-		constexpr TMatrix& operator -= (const TMatrix& B) { for (size_t i{}; i < m*n; i++) mat_[i] -= B.mat_[i]; return *this; }
+		constexpr TMatrix& operator += (const TMatrix& B) { for (size_t i{}; i < m*n; i++) m_mat[i] += B.m_mat[i]; return *this; }
+		constexpr TMatrix& operator -= (const TMatrix& B) { for (size_t i{}; i < m*n; i++) m_mat[i] -= B.m_mat[i]; return *this; }
 		constexpr TMatrix operator + (TMatrix const& B) { return TMatrix{*this} += B; }
 		constexpr TMatrix operator - (TMatrix const& B) { return TMatrix{*this} -= B; }
-		constexpr TMatrix operator - () const { TMatrix B{*this}; for (auto& v : B.mat_) v = -v; return B; }
-		constexpr TMatrix& operator *= (value_type const& B) { for (auto& v : mat_) v *= B; return *this; }
-		constexpr TMatrix& operator /= (value_type const& B) { for (auto& v : mat_) v /= B; return *this; }
+		constexpr TMatrix operator - () const { TMatrix B{*this}; for (auto& v : B.m_mat) v = -v; return B; }
+		constexpr TMatrix& operator *= (value_type const& B) { for (auto& v : m_mat) v *= B; return *this; }
+		constexpr TMatrix& operator /= (value_type const& B) { for (auto& v : m_mat) v /= B; return *this; }
 		constexpr TMatrix operator * (value_type const& B) { return TMatrix{*this} *= B; }
 		constexpr TMatrix operator / (value_type const& B) { return TMatrix{*this} /= B; }
 		friend TMatrix operator * (value_type a, TMatrix B) {
@@ -138,7 +138,7 @@ export namespace gtl {
 
 		constexpr [[nodiscard]] value_type sum(void) const {
 			value_type s{};
-			for (auto v : mat_) s += v;
+			for (auto v : m_mat) s += v;
 			return s;
 		}
 
@@ -153,14 +153,14 @@ export namespace gtl {
 
 		constexpr value_type determinant() const requires (m == n) {
 			if constexpr (m == 1) {
-				return mat_[0];
+				return m_mat[0];
 			}
 			else if constexpr (m == 2) {
-				return mat_[0]*mat_[3] - mat_[1]*mat_[2];	// ad-bc
+				return m_mat[0]*m_mat[3] - m_mat[1]*m_mat[2];	// ad-bc
 			}
 			else if constexpr (m == 3) {
 				auto M = [&,this](size_t i0, size_t i1, size_t i2) -> value_type {
-					return mat_[i0]*mat_[i1]*mat_[i2];
+					return m_mat[i0]*m_mat[i1]*m_mat[i2];
 				};
 				return M(0,4,8)+M(1,5,6)+M(2,3,7)-M(0,5,7)-M(1,3,8)-M(2,4,6);
 			}

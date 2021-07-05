@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\3rdparty\tinyspline\parson.c" />
+    <ClCompile Include="..\..\3rdparty\tinyspline\tinyspline.c" />
+    <ClCompile Include="..\..\3rdparty\tinyspline\tinysplinecxx.cxx" />
     <ClCompile Include="canvas.ixx" />
     <ClCompile Include="color_table.ixx" />
     <ClCompile Include="shape.ixx" />
@@ -29,6 +32,14 @@
     <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{5b9dcfa4-22db-4fc5-b559-0bacbf04fbe7}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\3rdparty\tinyspline\parson.h" />
+    <ClInclude Include="..\..\3rdparty\tinyspline\tinyspline.h" />
+    <ClInclude Include="..\..\3rdparty\tinyspline\tinysplinecxx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\3rdparty\tinyspline\LICENSE" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

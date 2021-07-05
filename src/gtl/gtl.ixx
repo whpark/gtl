@@ -1,4 +1,4 @@
-module;
+﻿module;
 
 #include <compare>
 #include <string>

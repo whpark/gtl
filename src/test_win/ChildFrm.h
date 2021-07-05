@@ -1,4 +1,4 @@
-
+﻿
 // ChildFrm.h : interface of the CChildFrame class
 //
 

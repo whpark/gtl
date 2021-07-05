@@ -1,10 +1,10 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
-// misc.h: Àâ´ÙÇÑ°Íµé...
+// misc.h: ì¡ë‹¤í•œê²ƒë“¤...
 //
 // PWH
 // 2019.01.03.
-// define macro µéÀ» template class / function À¸·Î º¯°æ
+// define macro ë“¤ì„ template class / function ìœ¼ë¡œ ë³€ê²½
 // 2019.07.24. QL -> GTL
 // 2021.01.04.
 //
@@ -61,7 +61,7 @@ export namespace gtl {
 	//template < typename T, size_t n > constexpr auto countof(const std::array<T, n>& arr) { return n; }
 
 	//-----------------------------------------------------------------------------
-	// defaulted Copy Constructor/Assignment ¿¡¼­ Á¦¿ÜÇÒ ¸â¹ö º¯¼ö¿ë
+	// defaulted Copy Constructor/Assignment ì—ì„œ ì œì™¸í•  ë©¤ë²„ ë³€ìˆ˜ìš©
 	template < typename T >
 	class non_copyable_member : public T {
 	public:
@@ -77,7 +77,7 @@ export namespace gtl {
 
 
 	////-----------------------------------------------------------------------------
-	//// Auto Copy Constructor ¿¡¼­ Á¦¿Ü, Movable Æ÷ÇÔ ¸â¹ö º¯¼ö¿ë
+	//// Auto Copy Constructor ì—ì„œ ì œì™¸, Movable í¬í•¨ ë©¤ë²„ ë³€ìˆ˜ìš©
 	//template < typename T >
 	//class non_copyable_movable_member : public T {
 	//public:
@@ -114,7 +114,7 @@ export namespace gtl {
 	//		{
 	//			XCleaner cleanup([&]() { delete pValue; pValue = nullptr; });
 	//			...
-	//		}// ºí·° ³ª°¡¸é¼­ pValue »èÁ¦.
+	//		}// ë¸”ëŸ­ ë‚˜ê°€ë©´ì„œ pValue ì‚­ì œ.
 	//
 	template < typename tfcleaner >
 	class TCleaner {
@@ -188,7 +188,7 @@ export namespace gtl {
 		return T_DEST(T_DEST(v/place/10+0.5*(v<T_SOURCE{}?-1:1))*place*10);
 	}
 
-	/// @brief Round or just forward values. (½Ç¼ö -> Á¤¼ö ´ëÀÔ½Ã ¹İ¿Ã¸². (½Ç¼ö -> ½Ç¼ö) ¶Ç´Â (Á¤¼ö -> Á¤¼ö) ÀÏ °æ¿ì¿¡´Â °ªÀÇ º¯È­ ¾øÀÌ ±×´ë·Î ´ëÀÔ.)
+	/// @brief Round or just forward values. (ì‹¤ìˆ˜ -> ì •ìˆ˜ ëŒ€ì…ì‹œ ë°˜ì˜¬ë¦¼. (ì‹¤ìˆ˜ -> ì‹¤ìˆ˜) ë˜ëŠ” (ì •ìˆ˜ -> ì •ìˆ˜) ì¼ ê²½ìš°ì—ëŠ” ê°’ì˜ ë³€í™” ì—†ì´ ê·¸ëŒ€ë¡œ ëŒ€ì….)
 	/// @tparam T_DEST 
 	/// @tparam T_SOURCE 
 	/// @param v2 
@@ -211,7 +211,7 @@ export namespace gtl {
 	constexpr [[nodiscard]] T_DEST Ceil(T_SOURCE v, T_SOURCE place) {
 		return T_DEST(std::ceil(v/place/10)*place*10);
 	}
-	// ½Ç¼ö -> Á¤¼ö ´ëÀÔ½Ã ¹İ¿Ã¸². (½Ç¼ö -> ½Ç¼ö) ¶Ç´Â (Á¤¼ö -> Á¤¼ö) ÀÏ °æ¿ì¿¡´Â °ªÀÇ º¯È­ ¾øÀÌ ±×´ë·Î ´ëÀÔ.
+	// ì‹¤ìˆ˜ -> ì •ìˆ˜ ëŒ€ì…ì‹œ ë°˜ì˜¬ë¦¼. (ì‹¤ìˆ˜ -> ì‹¤ìˆ˜) ë˜ëŠ” (ì •ìˆ˜ -> ì •ìˆ˜) ì¼ ê²½ìš°ì—ëŠ” ê°’ì˜ ë³€í™” ì—†ì´ ê·¸ëŒ€ë¡œ ëŒ€ì….
 	template < typename T_DEST, typename T_SOURCE >
 	constexpr [[nodiscard]] T_DEST CeilOrForward(T_SOURCE v2) {
 		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {
@@ -230,7 +230,7 @@ export namespace gtl {
 	constexpr [[nodiscard]] T_DEST Floor(T_SOURCE v, T_SOURCE place) {
 		return T_DEST(std::floor(v/place/10)*place*10);
 	}
-	// ½Ç¼ö -> Á¤¼ö ´ëÀÔ½Ã ¹İ¿Ã¸². (½Ç¼ö -> ½Ç¼ö) ¶Ç´Â (Á¤¼ö -> Á¤¼ö) ÀÏ °æ¿ì¿¡´Â °ªÀÇ º¯È­ ¾øÀÌ ±×´ë·Î ´ëÀÔ.
+	// ì‹¤ìˆ˜ -> ì •ìˆ˜ ëŒ€ì…ì‹œ ë°˜ì˜¬ë¦¼. (ì‹¤ìˆ˜ -> ì‹¤ìˆ˜) ë˜ëŠ” (ì •ìˆ˜ -> ì •ìˆ˜) ì¼ ê²½ìš°ì—ëŠ” ê°’ì˜ ë³€í™” ì—†ì´ ê·¸ëŒ€ë¡œ ëŒ€ì….
 	template < typename T_DEST, typename T_SOURCE >
 	constexpr [[nodiscard]] T_DEST FloorOrForward(T_SOURCE v2) {
 		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {

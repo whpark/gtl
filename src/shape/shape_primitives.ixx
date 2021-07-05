@@ -91,6 +91,8 @@ export namespace gtl::shape {
 		return pt;
 	}
 
+	using color_t = color_rgba_t;
+
 	enum class eSHAPE {
 		none = -1,
 		e3dface = 0,
@@ -161,16 +163,15 @@ export namespace gtl::shape {
 			ar & (ptrdiff_t&)var.ptr;
 			ar & var.buffer;
 			ar & var.str;
-
 			decltype(var.duration)::rep count{};
 			if constexpr (archive::is_saving()) {
 				count = var.duration.count();
 			}
 			ar & count;
+
 			if constexpr (archive::is_loading()) {
 				var.duration = std::chrono::nanoseconds(count);
 			}
-
 			return ar;
 		};
 	};
@@ -205,18 +206,16 @@ export namespace gtl::shape {
 	public:
 	protected:
 		friend struct xDrawing;
-		int crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
+		int m_crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
 	public:
-		string_t strLayer;	// temporary value. (while loading from dxf)
-		color_t color{};
-		int eLineType{};
-		string_t strLineType;
-		int lineWeight{1};
-		bool bVisible{};
-		bool bTransparent{};
-		//std::optional<hatching_t> hatch;
-		boost::optional<cookie_t> cookie;
-		//cookie_t cookie;
+		string_t m_strLayer;	// temporary value. (while loading from dxf)
+		color_t m_color{};
+		int m_eLineType{};
+		string_t m_strLineType;
+		int m_lineWeight{1};
+		bool m_bVisible{};
+		bool m_bTransparent{};
+		boost::optional<cookie_t> m_cookie;
 
 	public:
 		enum class eLINE_WIDTH : int {
@@ -230,7 +229,7 @@ export namespace gtl::shape {
 
 		GTL__DYNAMIC_VIRTUAL_INTERFACE(xShape);
 		//GTL__REFLECTION_VIRTUAL_BASE(xShape);
-		//GTL__REFLECTION_MEMBERS(color, eLineType, strLineType, lineWeight, bVisible, bTransparent, cookie);
+		//GTL__REFLECTION_MEMBERS(m_color, m_eLineType, m_strLineType, m_lineWeight, m_bVisible, m_bTransparent, m_cookie);
 
 		auto operator <=> (xShape const&) const = default;
 
@@ -240,13 +239,13 @@ export namespace gtl::shape {
 		}
 		template < typename archive >
 		friend archive& operator & (archive& ar, xShape& var) {
-			ar & var.color.cr;
-			ar & var.cookie;
-			ar & var.strLineType;
-			ar & var.lineWeight;
-			ar & var.eLineType;
-			ar & var.bVisible;
-			ar & var.bTransparent;
+			ar & var.m_color.cr;
+			ar & var.m_cookie;
+			ar & var.m_strLineType;
+			ar & var.m_lineWeight;
+			ar & var.m_eLineType;
+			ar & var.m_bVisible;
+			ar & var.m_bTransparent;
 			return ar;
 		}
 		virtual bool LoadFromCADJson(json_t& _j);
@@ -261,150 +260,18 @@ export namespace gtl::shape {
 		virtual void FlipZ() = 0;
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
 		virtual bool UpdateBoundary(rect_t&) const = 0;
-		int GetLineWidthInUM() const { return GetLineWidthInUM(lineWeight); }
+		int GetLineWidthInUM() const { return GetLineWidthInUM(m_lineWeight); }
 		static int GetLineWidthInUM(int lineWeight);
 
 		virtual void Draw(ICanvas& canvas) const;
 		virtual bool DrawROI(ICanvas& canvas, rect_t const& rectROI) const;
 
 		virtual void PrintOut(std::wostream& os) const {
-			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetShapeName(GetShapeType()), color.r, color.g, color.b, !bVisible?L"Invisible ":L"", bTransparent?L"Transparent ":L"");
-			fmt::print(os, L"lineType:{}, lineWeight:{}\n", strLineType, lineWeight);
+			fmt::print(os, L"Type:{} - Color({:02x},{:02x},{:02x}), {}{}", GetShapeName(GetShapeType()), m_color.r, m_color.g, m_color.b, !m_bVisible?L"Invisible ":L"", m_bTransparent?L"Transparent ":L"");
+			fmt::print(os, L"lineType:{}, lineWeight:{}\n", m_strLineType, m_lineWeight);
 		}
 
 		static std::unique_ptr<xShape> CreateShapeFromEntityName(std::string const& strEntityName);
-	};
-
-}
-
-namespace gtl::shape {
-	// Cohen-Sutherland clipping algorithm clips a line from
-	// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
-	// diagonal from (xmin, ymin) to (xmax, ymax).
-		enum fOUT_CODE : uint8_t {
-			INSIDE	= 0b0000,
-			LEFT	= 0b0001,
-			RIGHT	= 0b0010,
-			BOTTOM	= 0b0100,
-			TOP		= 0b1000,
-		};
-};
-
-export namespace gtl::shape {
-
-	void CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1) {
-
-		auto& x0 = pt0.x;
-		auto& y0 = pt0.y;
-		auto& x1 = pt1.x;
-		auto& y1 = pt1.y;
-
-		// Compute the bit code for a point (x, y) using the clip
-		// bounded diagonally by (xmin, ymin), and (xmax, ymax)
-		auto ComputeOutCode = [&roi](auto x, auto y) -> fOUT_CODE {
-			fOUT_CODE code {};
-			if (x < roi.left)
-				(uint8_t&)code |= fOUT_CODE::LEFT;
-			else if (x >= roi.right)
-				(uint8_t&)code |= fOUT_CODE::RIGHT;
-			if (y < roi.top)
-				(uint8_t&)code |= fOUT_CODE::BOTTOM;
-			else if (y >= roi.bottom)
-				(uint8_t&)code |= fOUT_CODE::TOP;
-			return code;
-		};
-
-		// compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
-		auto outcode0 = ComputeOutCode(x0, y0);
-		auto outcode1 = ComputeOutCode(x1, y1);
-		bool accept = false;
-
-		while (true) {
-			if (!(outcode0 | outcode1)) {
-				// bitwise OR is 0: both points inside window; trivially accept and exit loop
-				accept = true;
-				break;
-			} else if (outcode0 & outcode1) {
-				// bitwise AND is not 0: both points share an outside zone (LEFT, RIGHT, TOP,
-				// or BOTTOM), so both must be outside window; exit loop (accept is false)
-				break;
-			} else {
-				// failed both tests, so calculate the line segment to clip
-				// from an outside point to an intersection with clip edge
-				double x, y;
-
-				// At least one endpoint is outside the clip rectangle; pick it.
-				auto outcodeOut = outcode1 > outcode0 ? outcode1 : outcode0;
-
-				// Now find the intersection point;
-				// use formulas:
-				//   slope = (y1 - y0) / (x1 - x0)
-				//   x = x0 + (1 / slope) * (ym - y0), where ym is ymin or ymax
-				//   y = y0 + slope * (xm - x0), where xm is xmin or xmax
-				// No need to worry about divide-by-zero because, in each case, the
-				// outcode bit being tested guarantees the denominator is non-zero
-				if (outcodeOut & fOUT_CODE::TOP) {           // point is above the clip window
-					x = x0 + (x1 - x0) * (roi.bottom - y0) / (y1 - y0);
-					y = roi.bottom;
-				} else if (outcodeOut & fOUT_CODE::BOTTOM) { // point is below the clip window
-					x = x0 + (x1 - x0) * (roi.top - y0) / (y1 - y0);
-					y = roi.top;
-				} else if (outcodeOut & fOUT_CODE::RIGHT) {  // point is to the right of clip window
-					y = y0 + (y1 - y0) * (roi.right - x0) / (x1 - x0);
-					x = roi.right;
-				} else if (outcodeOut & fOUT_CODE::LEFT) {   // point is to the left of clip window
-					y = y0 + (y1 - y0) * (roi.left - x0) / (x1 - x0);
-					x = roi.left;
-				}
-
-				// Now we move outside point to intersection point to clip
-				// and get ready for next pass.
-				if (outcodeOut == outcode0) {
-					x0 = x;
-					y0 = y;
-					outcode0 = ComputeOutCode(x0, y0);
-				} else {
-					x1 = x;
-					y1 = y;
-					outcode1 = ComputeOutCode(x1, y1);
-				}
-			}
-		}
-	}
-
-	int xShape::GetLineWidthInUM(int lineWeight) {
-		static int const widths[] = {
-			0,
-			50,
-			90,
-			130,
-			150,
-			180,
-			200,
-			250,
-			300,
-			350,
-			400,
-			500,
-			530,
-			600,
-			700,
-			800,
-			900,
-			1000,
-			1060,
-			1200,
-			1400,
-			1580,
-			2000,
-			2110,
-		};
-
-		if ( (lineWeight >= 0) and (lineWeight < std::size(widths)) ) {
-			return widths[lineWeight];
-		}
-
-		return 0;
 	};
 
 }

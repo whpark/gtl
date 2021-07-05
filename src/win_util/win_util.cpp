@@ -1,4 +1,4 @@
-
+ï»¿
 // win_util.cpp : Defines the initialization routines for the DLL.
 //
 
@@ -970,7 +970,7 @@ BOOL HexaStringToBinaryT(const TCHAR* psz, BYTE buffer[], sizeXX_t& nBufferSize,
 			if (nLen%2)
 				nLen++;
 
-			// ¾Æ·¡¿Í °°ÀÌ ±×´ë·Î ÇØ¾ß ÇÔ. Unicode -> MBCS º¯È¯½Ã ±ÛÀÚ ¼ö ´Ş¶óÁú °¡´É¼º ÀÖÀ½.
+			// ì•„ë˜ì™€ ê°™ì´ ê·¸ëŒ€ë¡œ í•´ì•¼ í•¨. Unicode -> MBCS ë³€í™˜ì‹œ ê¸€ì ìˆ˜ ë‹¬ë¼ì§ˆ ê°€ëŠ¥ì„± ìˆìŒ.
 			TSTRING strTemp;
 			if (TranslateEscapeCharacters(pos+1, strTemp, (TCHAR**)&pos, _T('\"'))) {
 				if (sizeof(TCHAR) == sizeof(char)) {
@@ -1409,7 +1409,7 @@ sizeXX_t FindApp(LPCTSTR pszFullPath, TList<DWORD>& pIDs, bool bNameOnly) {
 		HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION/*PROCESS_QUERY_INFORMATION|PROCESS_VM_READ*/, FALSE, dwProcessIDs[i]);
 		if (!hProcess)
 			continue;
-	#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)	// GetModuleFileNameEx () : ¸ğµç Process ¸¦ ´Ù °¡Áö°í ¿ÀÁö ¸øÇÔ.
+	#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)	// GetModuleFileNameEx () : ëª¨ë“  Process ë¥¼ ë‹¤ ê°€ì§€ê³  ì˜¤ì§€ ëª»í•¨.
 		DWORD dwSize = countof(buf);
 		if (!QueryFullProcessImageName(hProcess, 0, buf, &dwSize))
 			continue;
@@ -1458,7 +1458,7 @@ bool ForceTerminateApp(LPCTSTR pszFullPath, bool bNameOnly, bool bExcludeSelf) {
 
 		HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, false, dwProcessID);
 		if (!hProcess) {
-			//TRACE1("OpenProcess(%s) ½ÇÆĞ\r\n", pszFullPath);
+			//TRACE1("OpenProcess(%s) ì‹¤íŒ¨\r\n", pszFullPath);
 			continue;
 		}
 
@@ -1466,9 +1466,9 @@ bool ForceTerminateApp(LPCTSTR pszFullPath, bool bNameOnly, bool bExcludeSelf) {
 
 		BOOL bResult = ::TerminateProcess(hProcess, 0);
 		if (bResult) {
-			//TRACE1("%s¸¦ Á¾·á½ÃÅ´\r\n", pszFullPath);
+			//TRACE1("%së¥¼ ì¢…ë£Œì‹œí‚´\r\n", pszFullPath);
 		} else {
-			//TRACE1("%s¸¦ Á¾·á½ÃÅ°Áö ¸øÇß½À´Ï´Ù.\r\n", pszFullPath);
+			//TRACE1("%së¥¼ ì¢…ë£Œì‹œí‚¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.\r\n", pszFullPath);
 		}
 	}
 	if (bKillSelf) {
@@ -1758,7 +1758,7 @@ BOOL GetNICInfo(std::vector<T_NIC_INFO>& nics) {
 			//TRACE("\tIP Address. . . . . . . . . : %s\n", pAddrStr->IpAddress.String);
 			//TRACE("\tSubnet Mask . . . . . . . . : %s\n", pAddrStr->IpMask.String);
 
-			break;	// ÇÑ °³¸¸ Àû¿ë. °¡²û °¡´Ù 2~3°³¾¿ µé¾î¿À´Â °æ¿ìµµ ÀÖÀ½.
+			break;	// í•œ ê°œë§Œ ì ìš©. ê°€ë” ê°€ë‹¤ 2~3ê°œì”© ë“¤ì–´ì˜¤ëŠ” ê²½ìš°ë„ ìˆìŒ.
 
 			pAddrStr = pAddrStr->Next;
 		}

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // canvas.h:
 //
@@ -20,6 +20,9 @@ module;
 
 #include "boost/ptr_container/ptr_deque.hpp"
 
+#include "../3rdparty/tinyspline/tinysplinecxx.h"
+
+
 export module gtls:canvas;
 import :primitives;
 import gtl;
@@ -32,12 +35,12 @@ export namespace gtl::shape {
 	// CoordSystem
 
 	////-------------------------------------------------------------------------
-	///// @brief 3Á¡(or 2Á¡) ¾ó¶óÀÎ.
+	///// @brief 3ì (or 2ì ) ì–¼ë¼ì¸.
 	//class CCoordSystem : public xCoordTransChain {
 	//public:
-	//	//ct_t ctShape2Real_;	// DXF ÁÂÇ¥°è¿¡¼­ ½Ç ÁÂÇ¥°è.
-	//	//ct_t ctAlign_;			// Align ¹Ì¼¼ º¸Á¤. (3 Á¡ º¸Á¤)
-	//	//ct_t ctReal2Canvas_;	// ½ÇÁÂÇ¥°è -> Canvas(ex, Scanner) ÁÂÇ¥°è
+	//	//ct_t ctShape2Real_;	// DXF ì¢Œí‘œê³„ì—ì„œ ì‹¤ ì¢Œí‘œê³„.
+	//	//ct_t ctAlign_;			// Align ë¯¸ì„¸ ë³´ì •. (3 ì  ë³´ì •)
+	//	//ct_t ctReal2Canvas_;	// ì‹¤ì¢Œí‘œê³„ -> Canvas(ex, Scanner) ì¢Œí‘œê³„
 
 	//public:
 	//	//CCoordSystem() = default;
@@ -50,22 +53,22 @@ export namespace gtl::shape {
 	//};
 
 	class ICanvas;
-	extern void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
+	void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
 
 	//=============================================================================================================================
 	// ICanvas : Interface of Canvas
 	class ICanvas {
 	public:
-		xCoordTransChain ct_, ctI_;
-		point_t ptLast_{};
+		xCoordTransChain m_ct, m_ctI;
+		point_t m_ptLast{};
 
 	public:
 
 		/// @brief for laser on/off
-		double min_jump_length_ = 0.0;
+		double m_min_jump_length = 0.0;
 
 		/// @brief target resolution
-		double target_interpolation_inverval_{1.0};
+		double m_target_interpolation_inverval{1.0};
 
 	public:
 		ICanvas() = default;
@@ -81,25 +84,25 @@ export namespace gtl::shape {
 		ICanvas& operator = (ICanvas &&) = default;
 
 		virtual void Init() {
-			ptLast_ = point_t::All(std::nan(""));
-			min_jump_length_ = 0.0;
-			target_interpolation_inverval_ = 1.0;
+			m_ptLast = point_t::All(std::nan(""));
+			m_min_jump_length = 0.0;
+			m_target_interpolation_inverval = 1.0;
 		}
 
 		void SetCT(ICoordTrans const& ct) {
 			if (auto* pCT = dynamic_cast<xCoordTransChain const*>(&ct); pCT) {
-				ct_ = *pCT;
-				ct_.GetInv(ctI_);
+				m_ct = *pCT;
+				m_ct.GetInv(m_ctI);
 			} else {
-				ct_.clear();
-				ct_ *= ct;
+				m_ct.clear();
+				m_ct *= ct;
 
 			}
 		}
 
 		// Scratching
-		point_t Trans(point_t const& pt) const { return ct_(pt); }
-		point_t TransI(point_t const& pt) const { return ctI_(pt); }
+		point_t Trans(point_t const& pt) const { return m_ct(pt); }
+		point_t TransI(point_t const& pt) const { return m_ctI(pt); }
 
 		virtual void MoveTo_Target(point_t const& ptTargetSystem) = 0;
 		virtual void LineTo_Target(point_t const& ptTargetSystem) = 0;
@@ -109,15 +112,15 @@ export namespace gtl::shape {
 
 		void MoveTo(point_t pt) {
 			pt = Trans(pt);
-			if ( pt.IsAllValid() and (min_jump_length_ != 0.0) and (ptLast_.Distance(pt) < min_jump_length_) )
+			if ( pt.IsAllValid() and (m_min_jump_length != 0.0) and (m_ptLast.Distance(pt) < m_min_jump_length) )
 				return;
 			MoveTo_Target(pt);
-			ptLast_ = pt;
+			m_ptLast = pt;
 		}
 		void LineTo(point_t pt) {
 			pt = Trans(pt);
 			LineTo_Target(pt);
-			ptLast_ = pt;
+			m_ptLast = pt;
 		}
 
 		virtual void Dot(point_t const& pt) {
@@ -129,7 +132,7 @@ export namespace gtl::shape {
 			LineTo(pt1);
 		}
 		virtual void Arc(point_t const& ptCenter, double radius, deg_t t0, deg_t tLength) {
-			int n = Round(std::abs(tLength * std::numbers::pi * radius / target_interpolation_inverval_));
+			int n = Round(std::abs(tLength * std::numbers::pi * radius / m_target_interpolation_inverval));
 			deg_t t1 = t0+tLength;
 			MoveTo(radius * point_t{cos(t0), sin(t0), .0}+ptCenter);
 			for (int i = 1; i <= n; i++) {
@@ -147,7 +150,7 @@ export namespace gtl::shape {
 
 			deg_t t1 = t0 + tLength;
 			MoveTo(ct(point_t{cos(t0), sin(t0)}));
-			int n = Round(tLength * std::numbers::pi * std::max(radius1, radius2) / target_interpolation_inverval_);
+			int n = Round(tLength * std::numbers::pi * std::max(radius1, radius2) / m_target_interpolation_inverval);
 			for (int i = 0; i <= n; i++) {
 				deg_t t {std::lerp(t0, t1, (double)i/n)};
 				constexpr static auto m2pi = std::numbers::pi*2;
@@ -197,28 +200,28 @@ export namespace gtl::shape {
 	// ICanvas : Interface of Canvas
 	class xCanvasMat : public ICanvas {
 	public:
-		cv::Mat& img_;
+		cv::Mat& m_img;
 
-		cv::Scalar color_{};
-		double line_thickness_ {1.};
+		cv::Scalar m_color{};
+		double m_line_thickness {1.};
 
 		// line thickness
-		int line_type_ = cv::LINE_8;
+		int m_line_type = cv::LINE_8;
 
 	public:
-		xCanvasMat(cv::Mat& img, ICoordTrans const& ct) : img_(img), ICanvas(ct) { }
+		xCanvasMat(cv::Mat& img, ICoordTrans const& ct) : m_img(img), ICanvas(ct) { }
 		virtual ~xCanvasMat() { }
 
 		virtual void PreDraw(xShape const& shape) override {
-			color_ = ColorS(shape.color);
+			m_color = ColorS(shape.m_color);
 		}
 
 		// Primative, returns End Position.
 		virtual void MoveTo_Target(point_t const& pt) override {}
 		virtual void LineTo_Target(point_t const& pt) override {
-			cv::line(img_, ptLast_, pt, color_, (int)line_thickness_, line_type_);
-			//cv::line(img_, cv::Point(ptLast_.x, ptLast_.y), cv::Point(pt.x, pt.y), color_, (int)line_thickness_, line_type_);
-			//cv::line(img_, cv::Point2d(ptLast_.x, ptLast_.y), cv::Point2d(pt.x, pt.y), color_, (int)line_thickness_, line_type_);
+			cv::line(m_img, m_ptLast, pt, m_color, (int)m_line_thickness, m_line_type);
+			//cv::line(m_img, cv::Point(m_ptLast.x, m_ptLast.y), cv::Point(pt.x, pt.y), m_color, (int)m_line_thickness, m_line_type);
+			//cv::line(m_img, cv::Point2d(m_ptLast.x, m_ptLast.y), cv::Point2d(pt.x, pt.y), m_color, (int)m_line_thickness, m_line_type);
 		}
 
 		//inline auto ColorS() { return ColorS(cr_); }
@@ -237,17 +240,13 @@ export namespace gtl::shape {
 	class xCanvasMat_RoundDown : public xCanvasMat {
 	public:
 		using base_t = xCanvasMat;
-		struct {
-			bool arc;
-			bool line;
-		} round_down;
 	public:
 		using base_t::base_t;
 
 		// Primative, returns End Position.
 		virtual void LineTo_Target(point_t const& pt) override {
 			if constexpr (round_down_line) {
-				cv::line(img_, cv::Point((int)ptLast_.x, (int)ptLast_.y), cv::Point((int)pt.x, (int)pt.y), color_, (int)line_thickness_, line_type_);
+				cv::line(m_img, cv::Point((int)m_ptLast.x, (int)m_ptLast.y), cv::Point((int)pt.x, (int)pt.y), m_color, (int)m_line_thickness, m_line_type);
 			} else {
 				xCanvasMat::LineTo_Target(pt);
 			}
@@ -329,7 +328,7 @@ export namespace gtl::shape {
 	//	//-----------------------
 	//	// Hatch :
 	//	//
-	//	//	linePolygon : ½ÃÀÛ°ú ³¡Á¡ÀÌ ´Ù¸¦ °æ¿ì, Ã¹¹øÂ° Á¡°ú ¸¶Áö¸·Á¡À» ¿¬°áÇÏ°Ô µÊ. Á¡ÀÇ °¹¼ö°¡ ÃÖ¼ÒÇÑ 3°³ ÀÌ»ó ÀÖ¾î¾ß ÇÔ.
+	//	//	linePolygon : ì‹œìž‘ê³¼ ëì ì´ ë‹¤ë¥¼ ê²½ìš°, ì²«ë²ˆì§¸ ì ê³¼ ë§ˆì§€ë§‰ì ì„ ì—°ê²°í•˜ê²Œ ë¨. ì ì˜ ê°¯ìˆ˜ê°€ ìµœì†Œí•œ 3ê°œ ì´ìƒ ìžˆì–´ì•¼ í•¨.
 	//	//
 	//	//	eHatching :	SH_NONE
 	//	//				SH_L2R
@@ -340,7 +339,7 @@ export namespace gtl::shape {
 
 	//	//-----------------------
 	//	// Text :
-	//	//	pt : ±âÁØ Á¡
+	//	//	pt : ê¸°ì¤€ ì 
 	//	//
 	//	//	dwAlign :	DT_TOP
 	//	//				DT_LEFT
@@ -349,7 +348,7 @@ export namespace gtl::shape {
 	//	//				DT_VCENTER
 	//	//				DT_BOTTOM
 	//	//
-	//	//	lf : Å©±â´Â ¹«½ÃµÊ. (±âº» 72 point(720) À¸·Î ¸¸µé¾î¾ß ÇÔ)
+	//	//	lf : í¬ê¸°ëŠ” ë¬´ì‹œë¨. (ê¸°ë³¸ 72 point(720) ìœ¼ë¡œ ë§Œë“¤ì–´ì•¼ í•¨)
 	//	//
 	//	virtual void Text(LPCWSTR pszText, const point_t& pt, DWORD dwAlign /*DT_...*/, double dHeight, double dLineSpacingFactor, const LOGFONT& lf, DWORD eHatching, double dHatching);
 	//};
@@ -403,6 +402,42 @@ export namespace gtl::shape {
 	//
 	//GTL__API std::vector<point_t> AddLaserOffsetToLine(std::span<point_t const> pts, double dThickness, bool bLoop);
 
+	void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
+		if (pts.size() < 2)
+			return;
+
+		double len{};
+		for (size_t i{1}; i < pts.size(); i++) {
+			len += pts[i].Distance(pts[i-1]);
+		}
+
+		double step = canvas.m_target_interpolation_inverval / len / 2.;
+
+		tinyspline::BSpline bspline(pts.size(), 2, degree);
+		std::vector<tinyspline::real> points(pts.size()*degree);
+		auto* pos = points.data();
+		if (degree == 2) {
+			for (size_t i{}; i < pts.size(); i++) {
+				*pos += pts[i].x;
+				*pos += pts[i].y;
+			}
+		} else if (degree == 3) {
+			for (size_t i{}; i < pts.size(); i++) {
+				*pos += pts[i].x;
+				*pos += pts[i].y;
+				*pos += pts[i].z;
+			}
+		} else {
+			// todo : error.
+			return;
+		}
+		bspline.setKnots({knots.begin(), knots.end()});
+
+		point_t pt{bspline(0.0).result()};
+		canvas.MoveTo(pt);
+		for (double t{step}; t <= 1.0; t += step)
+			canvas.LineTo(point_t(bspline(0.0).result()));
+	}
 
 #pragma warning(pop)
 }

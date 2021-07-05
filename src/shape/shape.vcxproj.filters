@@ -5,6 +5,9 @@
       <UniqueIdentifier>{652f855d-47d1-4bf8-aa6d-916a33b593d6}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="tinyspline">
+      <UniqueIdentifier>{02bbf3ba-cb84-4552-b922-4eae223a04f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="shape.ixx">
@@ -22,5 +25,30 @@
     <ClCompile Include="shape_others.ixx">
       <Filter>shape</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\3rdparty\tinyspline\tinysplinecxx.cxx">
+      <Filter>tinyspline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\tinyspline\parson.c">
+      <Filter>tinyspline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\tinyspline\tinyspline.c">
+      <Filter>tinyspline</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\3rdparty\tinyspline\parson.h">
+      <Filter>tinyspline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\tinyspline\tinyspline.h">
+      <Filter>tinyspline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\3rdparty\tinyspline\tinysplinecxx.h">
+      <Filter>tinyspline</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\3rdparty\tinyspline\LICENSE">
+      <Filter>tinyspline</Filter>
+    </None>
   </ItemGroup>
 </Project>

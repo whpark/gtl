@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -163,7 +163,7 @@ AFX_EXT_API_MISC void GetErrorText(DWORD dwLastError, CString& strMessage);
 
 AFX_EXT_API_MISC DWORD CALLBACK EditStreamCallback(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
 
-//Shellø° PathRelativePathTo(); «‘ºˆ ¿÷¿Ω.
+//ShellÏóê PathRelativePathTo(); Ìï®Ïàò ÏûàÏùå.
 AFX_EXT_API_MISC void GetRelativePath(LPCTSTR pszFolderBase, LPCTSTR pszFullPathTarget, CString& strPathRelative);
 AFX_EXT_API_MISC void GetAbsolutePath(LPCTSTR pszFolderBase, LPCTSTR pszPathRelative, CString& strPathFull);
 AFX_EXT_API_MISC CStringW GetLongPathNameUnicode(LPCWSTR szShortName);

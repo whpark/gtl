@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////
 //
 // string_primitives.h:
 //
@@ -288,7 +288,7 @@ export namespace gtl {
 
 	}
 
-#if 0	// any type <- any type.... ³Ê¹« ¸¹Àº ¿É¼Ç.
+#if 0	// any type <- any type.... ë„ˆë¬´ ë§Žì€ ì˜µì…˜.
 	template < gtlc::string_buffer_fixed tcontainer1, gtlc::string_buffer_fixed tcontainer2 >
 	requires requires (tcontainer1 t1, tcontainer2 t2) {
 		requires std::is_same_v<std::remove_cvref_t<decltype(t1[0])>, std::remove_cvref_t<decltype(t2[0])> >

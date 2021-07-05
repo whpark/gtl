@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+Ôªø//////////////////////////////////////////////////////////////////////
 //
 // string_primitives.h:
 //
@@ -289,7 +289,7 @@ export namespace gtl {
 	tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped, tchar cSplitter) {
 		if constexpr (sizeof(tchar) == sizeof(char)) {
 			if (cSplitter == 0) {
-				// ¡÷¿«!!!!!!! cSplitter ∞° 0¿œ ∞ÊøÏø°∏∏..
+				// Ï£ºÏùò!!!!!!! cSplitter Í∞Ä 0Ïùº Í≤ΩÏö∞ÏóêÎßå..
 				tvalue value;
 				auto [ptr, ec] = std::from_chars(sv.data(), sv.data()+sv.size(), value, std::chars_format::general);
 				if (ppszStopped)
