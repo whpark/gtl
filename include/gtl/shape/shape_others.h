@@ -253,7 +253,7 @@ namespace gtl::shape {
 		}
 		virtual void PrintOut(std::wostream& os) const override {
 			xShape::PrintOut(os);
-			fmt::print(os, L"\tm_pt0({},{},{}) - m_pt1({},{},{})\n", m_pt0.x, m_pt0.y, m_pt0.z, m_pt1.x, m_pt1.y, m_pt1.z);
+			fmt::print(os, L"\tpt0({},{},{}) - pt1({},{},{})\n", m_pt0.x, m_pt0.y, m_pt0.z, m_pt1.x, m_pt1.y, m_pt1.z);
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xLine);
