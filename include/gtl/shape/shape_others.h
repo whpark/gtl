@@ -101,23 +101,18 @@ namespace gtl::shape {
 		template < typename archive >
 		friend void serialize(archive& ar, xLayer& var, unsigned int const file_version) {
 			boost::serialization::base_object<xShape>(var);
+			ar & var;
+		}
+		template < typename archive >
+		friend archive& operator & (archive& ar, xLayer& var) {
 			ar & boost::serialization::base_object<xShape>(var);
 
 			ar & var.m_name & var.m_bUse &var.m_flags;
-			if (file_version < 2) {
-				ar & var.m_strLineType & var.m_lineWeight;
-			}
+			ar & var.m_strLineType & var.m_lineWeight;	// duplicated.... hot to delete ?
 			ar & var.m_shapes;
+
+			return ar;
 		}
-		//template < typename archive >
-		//friend archive& operator & (archive& ar, xLayer& var) {
-		//	ar & boost::serialization::base_object<xShape>(var);
-
-		//	ar & var.name & var.bUse &var.flags & var.m_strLineType & var.m_lineWeight;
-		//	ar & var.shapes;
-
-		//	return ar;
-		//}
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
 			xShape::LoadFromCADJson(_j);
@@ -1153,7 +1148,6 @@ namespace gtl::shape {
 }
 
 BOOST_CLASS_EXPORT_GUID(gtl::shape::xShape, "shape")
-BOOST_CLASS_VERSION(gtl::shape::xLayer, 2);
 BOOST_CLASS_EXPORT_GUID(gtl::shape::xLayer, "layer")
 BOOST_CLASS_EXPORT_GUID(gtl::shape::xDot, "dot")
 BOOST_CLASS_EXPORT_GUID(gtl::shape::xLine, "line")
