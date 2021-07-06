@@ -76,7 +76,7 @@ public:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnBnClickedTestMatTime();
 	afx_msg void OnBnClickedTestSaveCImage();
-	static cv::Mat CreateSampleImage(cv::Size size);
+	static cv::Mat CreateSampleImage(cv::Size size, int type, cv::Scalar cr1 = cv::Scalar(0, 0, 0), cv::Scalar cr2 = cv::Scalar(255, 255, 255));
 	static bool WriteSampleImage(std::filesystem::path const& folder, cv::Mat const& mat, int nBPP);
 	void TestSaveBMP(int nBPP);
 	afx_msg void OnBnClickedTestSaveBMP_1BPP();

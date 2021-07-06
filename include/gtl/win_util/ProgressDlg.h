@@ -27,13 +27,14 @@ namespace gtl::win_util {
 		gtl::callback_progress_t m_calback;
 		CString m_strMessage;
 		int m_iPercent{};
-		bool m_bCancel{};
+		bool m_bUserAbort{};
 		bool m_bDone{};
+		bool m_bError{};
 
 		std::unique_ptr<std::jthread> m_rThreadWorker;
 
 	protected:
-		CProgressCtrl m_progress;
+		CProgressCtrl m_ctrlProgress;
 		virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 		virtual BOOL OnInitDialog();
 
@@ -43,6 +44,7 @@ namespace gtl::win_util {
 		afx_msg void OnTimer(UINT_PTR nIDEvent);
 		virtual void OnOK();
 		virtual void OnCancel();
+		void OnAbort();
 		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	};
 
