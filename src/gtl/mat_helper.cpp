@@ -249,7 +249,7 @@ namespace gtl {
 
 			int width32 = (img.cols * nBPP + 31) / 32 * 4;
 			int pixel_per_byte = (8/nBPP);
-			int nColPixel = img.cols/ pixel_per_byte * pixel_per_byte;
+			int nColPixel = pixel_per_byte ? img.cols/ pixel_per_byte * pixel_per_byte : img.cols;
 
 			using Func_PackSingleRow = std::function<void(int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal)>;
 			Func_PackSingleRow PackSingleRow;
@@ -398,7 +398,7 @@ namespace gtl {
 				std::atomic<int> yCur, yWritten;
 				bool bWritten{};
 
-				auto GetBuffer = [img_rows = img.rows, &mtxBuffer, &buffers, &yCur, &yWritten]() -> BUFFER* {
+				auto GetBuffer = [img_rows = img.rows, &mtxBuffer, &buffers, &yCur, &yWritten](std::stop_token stop) -> BUFFER* {
 					if (yCur >= img_rows)
 						return nullptr;
 					std::unique_lock lock(mtxBuffer);
@@ -409,6 +409,8 @@ namespace gtl {
 					int yOld = buf.y;
 					while (yOld >= 0) {
 						buf.y.wait(yOld);
+						if (stop.stop_requested())
+							return nullptr;
 						yOld = buf.y;
 					}
 					buf.y = y;
@@ -417,9 +419,9 @@ namespace gtl {
 					return &buf;
 				};
 
-				auto PackBuffer = [&yCur, &img, &buffers, &PackSingleRow, &pal, &yWritten/*, &id*/, &GetBuffer](std::stop_token stop) {
+				auto PackBuffer = [&img, &buffers, &PackSingleRow, &pal, &yCur, &yWritten/*, &id*/, &GetBuffer](std::stop_token stop) {
 					do {
-						auto* pBuffer = GetBuffer();
+						auto* pBuffer = GetBuffer(stop);
 						if (!pBuffer)
 							break;
 						auto& buf = *pBuffer;
@@ -431,17 +433,18 @@ namespace gtl {
 					} while(!stop.stop_requested());
 				};
 
-				auto Writer = [&f, &buffers, img_rows = img.rows, &yWritten, &bWritten, &funcCallback](std::stop_token stop_token) {
+				auto Writer = [&f, &buffers, img_rows = img.rows, &yWritten, &bWritten, &funcCallback]() {
 					int iPercent{};
-					while (yWritten < img_rows /*and !stop_token.stop_requested()*/) {
+					while (yWritten < img_rows) {
 						auto index = yWritten % buffers.size();
 						auto& buf = buffers[index];
 
 						while (yWritten != buf.y) {
 							buf.y.wait(-1);
 						}
-						while (!buf.bReady)
+						while (!buf.bReady) {
 							buf.bReady.wait(false);
+						}
 
 						if (!f.write((char*)buf.line.data(), buf.line.size()))
 							return;
@@ -452,7 +455,7 @@ namespace gtl {
 
 						yWritten++;
 						yWritten.notify_one();
-					
+
 						if (funcCallback) {
 							int iPercentNew = yWritten * 100 / img_rows;
 							if (iPercent != iPercentNew) {
@@ -466,19 +469,22 @@ namespace gtl {
 					bWritten = (bool)f;
 				};
 
+				std::thread threadWriter(Writer);
 				std::vector<std::jthread> threads;
-				threads.reserve(nThread+1);
-				threads.emplace_back(Writer);
+				threads.reserve(nThread);
 				for (uint i{}; i < nThread; i++) {
 					threads.emplace_back(PackBuffer);
 				}
 
-				threads.front().join();
+				threadWriter.join();
 				if (!bWritten) {
 					for (auto& thread : threads)
 						thread.request_stop();
+					for (auto& buffer : buffers) {
+						buffer.y = -1;
+						buffer.y.notify_all();
+					}
 				}
-				threads.clear();
 				return bWritten;
 			}
 			else {
