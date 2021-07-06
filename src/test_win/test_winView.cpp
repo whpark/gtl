@@ -320,7 +320,8 @@ bool CtestwinView::WriteSampleImage(std::filesystem::path const& folder, cv::Mat
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
 
 	auto path = folder / std::format(L"{}x{}-{}bpp.bmp", mat.cols, mat.rows, nBPP);
-	bool bResult = gtlw::SaveBitmapMatProgress(path, mat, nBPP, palette, false);
+	gtl::xSize2i pelsPerMeter{gtl::Round(360*1'000/25.4), gtl::Round(360*1'000/25.4)};
+	bool bResult = gtlw::SaveBitmapMatProgress(path, mat, nBPP, pelsPerMeter, palette, false);
 
 	sw.Lap("{}rows = {}, cols = {} {}bpp", bResult ? "" : "FAILED ", mat.rows, mat.cols, nBPP);
 
@@ -350,28 +351,6 @@ void CtestwinView::OnBnClickedTestSaveBMP_1BPP()  { TestSaveBMP( 1); }
 void CtestwinView::OnBnClickedTestSaveBMP_4BPP()  { TestSaveBMP( 4); }
 void CtestwinView::OnBnClickedTestSaveBMP_8BPP()  { TestSaveBMP( 8); }
 void CtestwinView::OnBnClickedTestSaveBMP_24BPP() { TestSaveBMP(24); }
-//{
-//	CWaitCursor wc;
-//
-//	auto size = GetMatSize();
-//	if (size.width < 1'000) size.width = 1'000;
-//	if (size.height < 1'000) size.height = 1'000;
-//
-//	static cv::Mat mat;
-//	if (mat.empty() or mat.size() != size) {
-//		mat = cv::Mat::zeros(size, CV_8UC3);
-//		for (int row{}; row < mat.rows; row++) {
-//			auto v = ((row / 1'000) % 2) ? 0 : 255;
-//
-//			mat.row(row) = cv::Scalar(0, 0, v);
-//		}
-//	}
-//
-//	auto folder = GetWorkingFolder();
-//	auto path = folder / std::format(L"{}x{}-24bpp.bmp", mat.cols, mat.rows);
-//	gtlw::SaveBitmapMatProgress(path, mat, 24, {});
-//
-//}
 
 void CtestwinView::OnBnClickedTestSaveBMP_nBPP() {
 	TestSaveBMP(1);
@@ -397,7 +376,8 @@ void CtestwinView::OnBnClickedTestLoadBMP() {
 		if (m_bitmap.cols* m_bitmap.rows >= 20'000*20'000)
 			m_bitmap.release();
 		
-		img = gtlw::LoadBitmapMatProgress(path);
+		gtl::xSize2i pelsPerMeter;
+		img = gtlw::LoadBitmapMatProgress(path, pelsPerMeter);
 
 		sw.Lap("LoadBitmapMat -- ");
 	}

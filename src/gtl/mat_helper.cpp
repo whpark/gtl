@@ -505,7 +505,7 @@ namespace gtl {
 	}	// namespace internal
 
 
-	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, callback_progress_t funcCallback) {
+	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, callback_progress_t funcCallback) {
 		// todo : CV_8UC3 with palette.
 
 		bool bOK{};
@@ -536,8 +536,8 @@ namespace gtl {
 		header.planes = 1;
 		header.compression = 0;//BI_RGB;
 		header.sizeImage = 0;//cx * cy * pixel_size;
-		header.XPelsPerMeter = 0;
-		header.YPelsPerMeter = 0;
+		header.XPelsPerMeter = pelsPerMeter.cx;
+		header.YPelsPerMeter = pelsPerMeter.cy;
 
 		if (pixel_size == 3) {
 			std::ofstream f(path, std::ios_base::binary);
@@ -852,7 +852,7 @@ namespace gtl {
 	/// @param nBPP 
 	/// @param palette 
 	/// @return 
-	cv::Mat LoadBitmapMat(std::filesystem::path const& path, callback_progress_t funcCallback) {
+	cv::Mat LoadBitmapMat(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback) {
 		bool bOK{};
 
 		// Trigger notifying it's over.
@@ -886,6 +886,9 @@ namespace gtl {
 
 		if (header.compression or (header.planes != 1))
 			return img;
+
+		pelsPerMeter.cx = header.XPelsPerMeter;
+		pelsPerMeter.cy = header.YPelsPerMeter;
 
 		int cx = header.width;
 		int cy = header.height;
