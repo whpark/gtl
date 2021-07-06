@@ -145,6 +145,8 @@ namespace gtl::win_util {
 
 		auto r = dlgProgress.DoModal();
 
+		CWaitCursor wc;
+
 		dlgProgress.m_rThreadWorker->join();
 
 		bool bResult = (r == IDOK);
@@ -156,11 +158,14 @@ namespace gtl::win_util {
 
 	cv::Mat LoadBitmapMatProgress(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter) {
 		cv::Mat img;
-		gtlw::CProgressDlg dlgProgress;
+		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
 
 		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &dlgProgress, &pelsPerMeter]() { img = gtl::LoadBitmapMat(path, pelsPerMeter, dlgProgress.m_calback); });
 		auto r = dlgProgress.DoModal();
+
+		CWaitCursor wc;
+
 		dlgProgress.m_rThreadWorker->join();
 
 		bool bResult = (r == IDOK);

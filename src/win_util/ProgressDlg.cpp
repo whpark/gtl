@@ -101,6 +101,7 @@ namespace gtl::win_util {
 
 	void CProgressDlg::OnCancel() {
 		m_bUserAbort = true;
+		EndDialog(IDABORT);
 		return;
 		//CDialogEx::OnCancel();
 	}
@@ -108,6 +109,7 @@ namespace gtl::win_util {
 
 	void CProgressDlg::OnAbort() {
 		m_bUserAbort = true;
+		EndDialog(IDABORT);
 		return ;
 		//CDialogEx::OnCancel();
 	}
