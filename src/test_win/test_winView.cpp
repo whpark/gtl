@@ -12,7 +12,6 @@
 
 #include "test_winDoc.h"
 #include "test_winView.h"
-#include "gtl/win_util/ProgressDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

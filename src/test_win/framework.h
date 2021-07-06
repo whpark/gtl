@@ -29,12 +29,13 @@
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
 
-
+#include "gtl/gtl.h"
 #include "opencv2/opencv.hpp"
 
-#include "gtl/gtl.h"
+//#include "gtl/gtl.h"
 #include "gtl/win_util/win_util.h"
 #include "gtl/win_util/MatHelper.h"
+#include "gtl/win_util/ProgressDlg.h"
 
 using namespace std::literals;
 
