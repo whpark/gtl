@@ -13,6 +13,7 @@ module;
 
 #include <filesystem>
 #include <span>
+#include <variant>
 
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
@@ -234,7 +235,7 @@ export namespace gtl {
 		try {
 			double dMin, dMax;
 			cv::Point ptMin, ptMax;
-			bool bSuccess {};
+			bool bSuccess{};
 
 			//#ifdef HAVE_CUDA
 			if (s_bUseGPU) {
@@ -491,6 +492,7 @@ export namespace gtl {
 		uint32_t		profileSize;
 		uint32_t		reserved;
 	};
+	using variant_BITMAP_HEADER = std::variant<BITMAP_HEADER, BITMAP_V4_HEADER, BITMAP_V5_HEADER>;
 #pragma pack(pop)
 
 	namespace internal {
@@ -756,7 +758,7 @@ export namespace gtl {
 	}	// namespace internal
 
 
-	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, callback_progress_t funcCallback) {
+	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette = {}, bool bNoPaletteLookup = false, callback_progress_t funcCallback = nullptr) {
 		// todo : CV_8UC3 with palette.
 
 		bool bOK{};
@@ -787,8 +789,8 @@ export namespace gtl {
 		header.planes = 1;
 		header.compression = 0;//BI_RGB;
 		header.sizeImage = 0;//cx * cy * pixel_size;
-		header.XPelsPerMeter = 0;
-		header.YPelsPerMeter = 0;
+		header.XPelsPerMeter = pelsPerMeter.cx;
+		header.YPelsPerMeter = pelsPerMeter.cy;
 
 		if (pixel_size == 3) {
 			std::ofstream f(path, std::ios_base::binary);
@@ -1097,13 +1099,47 @@ export namespace gtl {
 
 	}	// namespace internal
 
+	bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, BITMAP_V5_HEADER& header) {
+		std::ifstream is(path, std::ios_base::binary);
+		if (!is)
+			return false;
+		if (!is.read((char*)&fileHeader, sizeof(fileHeader)))
+			return false;
+		uint32_t sizeHeader{};
+		if (!is.read((char*)&sizeHeader, sizeof(sizeHeader)))
+			return false;
+		return (bool)is.read((char*)&header + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
+	}
+	bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header) {
+		if (!is.read((char*)&fileHeader, sizeof(fileHeader)))
+			return false;
+		uint32_t sizeHeader{};
+		if (!is.read((char*)&sizeHeader, sizeof(sizeHeader)))
+			return false;
+		char* pos {};
+		switch (sizeHeader) {
+		case sizeof(BITMAP_HEADER)		: header.emplace<0, BITMAP_HEADER>({});		pos = (char*)&std::get<BITMAP_HEADER>(header); break;
+		case sizeof(BITMAP_V4_HEADER)	: header.emplace<1, BITMAP_V4_HEADER>({});	pos = (char*)&std::get<BITMAP_V4_HEADER>(header); break;
+		case sizeof(BITMAP_V5_HEADER)	: header.emplace<2, BITMAP_V5_HEADER>({});	pos = (char*)&std::get<BITMAP_V5_HEADER>(header); break;
+		default:
+			return false;
+		}
+		return (bool)is.read(pos + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
+	}
+	bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header) {
+		std::ifstream f(path, std::ios_base::binary);
+		if (!f)
+			return false;
+		return LoadBitmapHeader(f, fileHeader, header);
+	}
+
 	/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
 	/// @param path 
 	/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
 	/// @param nBPP 
 	/// @param palette 
 	/// @return 
-	cv::Mat LoadBitmapMat(std::filesystem::path const& path, callback_progress_t funcCallback = nullptr) {
+	cv::Mat LoadBitmapMat(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback = nullptr) {
 		bool bOK{};
 
 		// Trigger notifying it's over.
@@ -1117,26 +1153,27 @@ export namespace gtl {
 			return img;
 
 		BMP_FILE_HEADER fh;
-		BITMAP_V5_HEADER header{};
+		variant_BITMAP_HEADER varHeader{};
+		if (!LoadBitmapHeader(f, fh, varHeader))
+			return img;
 
-		if (!f.read((char*)&fh, sizeof(fh)))
-			return img;
-		uint32_t sizeHeader{};
-		if (!f.read((char*)&sizeHeader, sizeof(sizeHeader)))
-			return img;
-		switch (sizeHeader) {
-		case sizeof(BITMAP_HEADER) :
-		case sizeof(BITMAP_V4_HEADER) :
-		case sizeof(BITMAP_V5_HEADER) :
-			header.size = sizeHeader;
-			f.read(((char*)&header) + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
-			break;
-		default:
-			return img;
+		BITMAP_HEADER* pos {};
+		{
+			pos = std::get_if<BITMAP_HEADER>(&varHeader);
+			if (!pos)
+				pos = (BITMAP_HEADER*)std::get_if<BITMAP_V4_HEADER>(&varHeader);
+			if (!pos)
+				pos = (BITMAP_HEADER*)std::get_if<BITMAP_V5_HEADER>(&varHeader);
+			if (!pos)
+				return img;
 		}
+		BITMAP_HEADER& header = *pos;
 
 		if (header.compression or (header.planes != 1))
 			return img;
+
+		pelsPerMeter.cx = header.XPelsPerMeter;
+		pelsPerMeter.cy = header.YPelsPerMeter;
 
 		int cx = header.width;
 		int cy = header.height;
