@@ -60,7 +60,7 @@ export namespace gtl::win_util {
 		CStatic m_ctrlMessage;
 		CProgressCtrl m_ctrlProgress;
 		CStatic m_ctrlState;
-		CButton m_btnCancel;
+		CButton m_btnAbort;
 		virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 		virtual BOOL OnInitDialog();
 
@@ -157,11 +157,11 @@ export namespace gtl::win_util {
 		m_ctrlState.Create(_T("state"), WS_CHILD | WS_VISIBLE | /*WS_BORDER | */SS_CENTER | SS_CENTERIMAGE, rect, this, IDC_STATE);
 		//m_ctrlState.SetFont(&m_font);
 
-		// Cancel Button
+		// Abort Button Button
 		rect.right = rect.left + 70;
 		rect.MoveToXY(rectClient.right-rect.Width()-nMargin*2, rectClient.bottom-nHeight-nMargin);
-		m_btnCancel.Create(_T("Cancel"), WS_CHILD | WS_VISIBLE | /*WS_BORDER | */BS_PUSHBUTTON, rect, this, IDCANCEL);
-		//m_btnCancel.SetFont(&m_font);
+		m_btnAbort.Create(_T("Abort"), WS_CHILD | WS_VISIBLE | /*WS_BORDER | */BS_PUSHBUTTON, rect, this, IDABORT);
+		//m_btnAbort.SetFont(&m_font);
 
 		return 0;
 	}

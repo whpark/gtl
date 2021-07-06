@@ -199,7 +199,7 @@ export namespace gtl::win_util {
 		return dc.AlphaBlend(rectDst.left, rectDst.top, rectDst.Width(), rectDst.Height(), &dcMem, rectSrc.left, rectSrc.top, rectSrc.Width(), rectSrc.Height(), blend) != FALSE;
 	}
 
-	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup) {
+	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bNoPaletteLookup = true) {
 		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Saving : %s"), path.wstring().c_str());
 
@@ -218,7 +218,7 @@ export namespace gtl::win_util {
 
 	cv::Mat LoadBitmapMatProgress(std::filesystem::path const& path) {
 		cv::Mat img;
-		gtlw::CProgressDlg dlgProgress;
+		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
 
 		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &dlgProgress]() { img = gtl::LoadBitmapMat(path, dlgProgress.m_calback); });
