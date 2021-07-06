@@ -40,17 +40,18 @@ export namespace gtl::win_util {
 		CProgressDlg(CWnd* pParent = nullptr);   // standard constructor
 		virtual ~CProgressDlg();
 
-		// Dialog Data
-		//#ifdef AFX_DESIGN_TIME
-		//	enum { IDD = IDD_PROGRESS };
-		//#endif
+	// Dialog Data
+	//#ifdef AFX_DESIGN_TIME
+	//	enum { IDD = IDD_PROGRESS };
+	//#endif
 	public:
 		std::chrono::system_clock::time_point m_tStart;
 		gtl::callback_progress_t m_calback;
 		CString m_strMessage;
 		int m_iPercent{};
-		bool m_bCancel{};
+		bool m_bUserAbort{};
 		bool m_bDone{};
+		bool m_bError{};
 
 		std::unique_ptr<std::jthread> m_rThreadWorker;
 
@@ -69,6 +70,7 @@ export namespace gtl::win_util {
 		afx_msg void OnTimer(UINT_PTR nIDEvent);
 		virtual void OnOK();
 		virtual void OnCancel();
+		void OnAbort();
 		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	};
 
@@ -81,11 +83,11 @@ export namespace gtl::win_util {
 		m_strMessage = _T("Working...");
 		m_lpDialogTemplate = &m_template;
 		m_font.CreatePointFont(100, _T("Segoe UI"));
-		m_calback = [&](int iPercent, bool bDone, bool bOK)->bool{
+		m_calback = [&](int iPercent, bool bDone, bool bError)->bool{
 			m_iPercent = iPercent;
+			m_bError = bError;
 			m_bDone = bDone;
-
-			return !m_bCancel;
+			return !m_bUserAbort;
 		};
 	}
 
@@ -94,7 +96,7 @@ export namespace gtl::win_util {
 
 	void CProgressDlg::DoDataExchange(CDataExchange* pDX) {
 		CDialogEx::DoDataExchange(pDX);
-		//DDX_Control(pDX, IDC_PROGRESS, m_progress);
+		//DDX_Control(pDX, IDC_PROGRESS, m_ctrlProgress);
 		DDX_Text(pDX, IDC_MESSAGE, m_strMessage);
 	}
 
@@ -113,6 +115,7 @@ export namespace gtl::win_util {
 	BEGIN_MESSAGE_MAP(CProgressDlg, CDialogEx)
 		ON_WM_TIMER()
 		ON_WM_CREATE()
+		ON_BN_CLICKED(IDABORT, OnAbort)
 	END_MESSAGE_MAP()
 
 
@@ -171,11 +174,11 @@ export namespace gtl::win_util {
 				if (m_iPercent != iPos)
 					m_ctrlProgress.SetPos(m_iPercent);
 				auto ts = std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now() - m_tStart);
-				auto str = std::format(_T("{:.3f} sec"), ts.count());
+				auto str = std::format(_T("{:.3f} 초, {} %"), ts.count(), m_iPercent);
 				CheckAndSetDlgItemText(this, IDC_STATE, str.c_str());
 			}
 			if (m_bDone) {
-				EndDialog(m_bCancel ? IDCANCEL : IDOK);
+				EndDialog(m_bUserAbort ? IDABORT : m_bError ? IDCANCEL : IDOK);
 				return;
 			}
 			//if (m_rThread and m_rThread->) {
@@ -191,13 +194,21 @@ export namespace gtl::win_util {
 	void CProgressDlg::OnOK() {
 		return;
 
-		CDialogEx::OnOK();
+		//CDialogEx::OnOK();
 	}
 
 
 	void CProgressDlg::OnCancel() {
-		m_bCancel = true;
-		CDialogEx::OnCancel();
+		m_bUserAbort = true;
+		return;
+		//CDialogEx::OnCancel();
+	}
+
+
+	void CProgressDlg::OnAbort() {
+		m_bUserAbort = true;
+		return ;
+		//CDialogEx::OnCancel();
 	}
 
 }	// namespace gtl::win_util;

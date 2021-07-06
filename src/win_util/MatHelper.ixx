@@ -199,12 +199,11 @@ export namespace gtl::win_util {
 		return dc.AlphaBlend(rectDst.left, rectDst.top, rectDst.Width(), rectDst.Height(), &dcMem, rectSrc.left, rectSrc.top, rectSrc.Width(), rectSrc.Height(), blend) != FALSE;
 	}
 
-	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false) {
-		//AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup) {
 		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Saving : %s"), path.wstring().c_str());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, palette, false, dlgProgress.m_calback);
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, palette, bNoPaletteLookup, dlgProgress.m_calback);
 
 		auto r = dlgProgress.DoModal();
 
@@ -218,10 +217,8 @@ export namespace gtl::win_util {
 	};
 
 	cv::Mat LoadBitmapMatProgress(std::filesystem::path const& path) {
-		//AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
 		cv::Mat img;
-		CProgressDlg dlgProgress;
+		gtlw::CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
 
 		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &dlgProgress]() { img = gtl::LoadBitmapMat(path, dlgProgress.m_calback); });
