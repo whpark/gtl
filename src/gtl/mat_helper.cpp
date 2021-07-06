@@ -861,6 +861,7 @@ namespace gtl {
 		uint32_t sizeHeader{};
 		if (!is.read((char*)&sizeHeader, sizeof(sizeHeader)))
 			return false;
+		header.size = sizeHeader;
 		return (bool)is.read((char*)&header + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
 	}
 	bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header) {
@@ -877,6 +878,7 @@ namespace gtl {
 		default:
 			return false;
 		}
+		*(uint32_t*)pos = sizeHeader;
 		return (bool)is.read(pos + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
 	}
 	bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header) {
