@@ -271,7 +271,7 @@ export namespace gtl::shape {
 		rect_t rectBoundary;
 		rectBoundary.SetRectEmptyForMinMax2d();
 		UpdateBoundary(rectBoundary);
-		if (!rectBoundary.IntersectRect(rectROI).IsRectHavingLength2d())
+		if (!rectBoundary.IntersectRect(rectROI).IsNormalized())
 			return false;
 		Draw(canvas);
 		return true;
