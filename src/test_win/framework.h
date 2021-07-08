@@ -30,6 +30,7 @@
 
 
 #include "gtl/gtl.h"
+#include "gtl/mat_helper.h"
 #include "opencv2/opencv.hpp"
 
 //#include "gtl/gtl.h"

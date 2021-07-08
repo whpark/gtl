@@ -57,8 +57,13 @@ namespace gtl::shape {
 	using json_t = boost::json::value;
 
 	struct polypoint_t : public TPointT<double, 4> {
+		using base_t = TPointT<double, 4>;
+
+		//using base_t::base_t;
+
 		double& Bulge() { return w; }
 		double Bulge() const { return w; }
+		
 
 		template < typename archive >
 		friend void serialize(archive& ar, polypoint_t& var, unsigned int const file_version) {

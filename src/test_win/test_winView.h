@@ -60,6 +60,8 @@ protected:
 		theApp.WriteProfileString(_T("misc"), _T("MatSize"), strMatSize);
 
 		auto size = gtl::FromString<gtl::xSize2i>(std::wstring_view((LPCTSTR)strMatSize, strMatSize.GetLength()));
+		if (size.cx and !size.cy)
+			size.cy = size.cx;
 
 		return (cv::Size)size;
 	}

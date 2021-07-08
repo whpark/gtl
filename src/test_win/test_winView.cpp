@@ -48,6 +48,10 @@ CtestwinView::CtestwinView() noexcept
 	: CFormView(IDD_TEST_WIN_FORM) {
 	// TODO: add construction code here
 
+	auto bGPU = gtl::CheckGPU(true);
+	if (bGPU) {
+		AfxMessageBox(_T("GPGPU is enabled"));
+	}
 }
 
 CtestwinView::~CtestwinView() {

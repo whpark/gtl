@@ -297,6 +297,13 @@ namespace gtl {
 				if (this->front > this->back) std::swap(this->front, this->back);
 			}
 		}
+		bool IsNormalized() const {
+			bool bResult = (this->left <= this->right) and (this->top <= this->bottom);
+			if constexpr (dim >= 3) {
+				bResult &= this->front <= this->back;
+			}
+			return bResult;
+		}
 
 		// absolute position of rectangle
 		void MoveToX(T x)									{ this->right += (x-this->left); this->left = x; }

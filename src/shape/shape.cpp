@@ -87,11 +87,11 @@ namespace gtl::shape {
 			fOUT_CODE code {};
 			if (x < roi.left)
 				(uint8_t&)code |= fOUT_CODE::LEFT;
-			else if (x >= roi.right)
+			else if (x > roi.right)
 				(uint8_t&)code |= fOUT_CODE::RIGHT;
 			if (y < roi.top)
 				(uint8_t&)code |= fOUT_CODE::BOTTOM;
-			else if (y >= roi.bottom)
+			else if (y > roi.bottom)
 				(uint8_t&)code |= fOUT_CODE::TOP;
 			return code;
 		};
@@ -197,7 +197,7 @@ namespace gtl::shape {
 		rect_t rectBoundary;
 		rectBoundary.SetRectEmptyForMinMax2d();
 		UpdateBoundary(rectBoundary);
-		if (!rectBoundary.IntersectRect(rectROI).IsRectHavingLength2d())
+		if (!rectBoundary.IntersectRect(rectROI).IsNormalized())
 			return false;
 		Draw(canvas);
 		return true;
@@ -322,9 +322,10 @@ namespace gtl::shape {
 
 	void xPolyline::Draw(ICanvas& canvas) const {
 		xShape::Draw(canvas);
+		if (m_pts.empty())
+			return;
 
-		if (m_pts.size())
-			canvas.MoveTo(m_pts[0]);
+		canvas.MoveTo(m_pts[0]);
 
 		auto nPt = m_pts.size();
 		if (!m_bLoop)
