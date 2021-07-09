@@ -12,8 +12,8 @@ namespace gtl {
 	static bool s_bGPUChecked{};
 	static bool s_bUseGPU{};
 
-	constexpr static bool const bLoopUnrolling = true;
-	constexpr static bool const bMultiThreaded = true;
+	//constexpr static bool const bLoopUnrolling = true;
+	//constexpr static bool const bMultiThreaded = true;
 
 	bool IsGPUEnabled() {
 		return s_bUseGPU;
@@ -987,6 +987,51 @@ namespace gtl {
 		return img;
 	}
 
+	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const& mask) {
+		if (src.type() != dest.type())
+			return false;
+		if ((src.cols > dest.cols) or (src.rows > dest.rows))
+			return false;
+		cv::Rect rcROI(ptDestTopLeft.x, ptDestTopLeft.y, src.cols, src.rows);
+		cv::Rect rcSafeROI = gtl::GetSafeROI(rcROI, dest.size());
+		if (rcROI == rcSafeROI) {
+			if (mask.size() == src.size())
+				src.copyTo(dest(rcSafeROI), mask);
+			else
+				src.copyTo(dest(rcSafeROI));
+			return true;
+		}
+		else {
+			if (rcSafeROI.empty())
+				return false;
+			cv::Rect rcSrc(0, 0, src.cols, src.rows);
+			if (rcROI.x < 0) {
+				rcSrc.width += rcROI.x;
+				rcSrc.x -= rcROI.x;
+				rcROI.width += rcROI.x;
+				rcROI.x = 0;
+			}
+			if (rcROI.y < 0) {
+				rcSrc.height += rcROI.y;
+				rcSrc.y -= rcROI.y;
+				rcROI.height += rcROI.y;
+				rcROI.y = 0;
+			}
+			if (rcROI.x + rcROI.width > dest.cols) {
+				rcSrc.width = rcROI.width = dest.cols - rcROI.x;
+			}
+			if (rcROI.y + rcROI.height > dest.rows) {
+				rcSrc.height = rcROI.height = dest.rows - rcROI.y;
+			}
+			if (gtl::IsROI_Valid(rcSrc, src.size())) {
+				if (mask.size() == src.size())
+					src(rcSrc).copyTo(dest(rcROI), mask(rcSrc));
+				else
+					src(rcSrc).copyTo(dest(rcROI));
+			}
+			return true;
+		}
+	}
 	//=============================================================================
 	//
 
