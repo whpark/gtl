@@ -67,7 +67,10 @@ namespace gtl::shape {
 	// Cohen–Sutherland clipping algorithm clips a line from
 	// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
 	// diagonal from (xmin, ymin) to (xmax, ymax).
-	void CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1) {
+	bool CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1) {
+		if ( (roi.Width() <= 0) or (roi.Height() <= 0) )
+			return false;
+
 		enum fOUT_CODE : uint8_t {
 			INSIDE	= 0b0000,
 			LEFT	= 0b0001,
@@ -152,6 +155,8 @@ namespace gtl::shape {
 				}
 			}
 		}
+
+		return accept;
 	}
 
 

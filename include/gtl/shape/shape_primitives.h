@@ -284,7 +284,7 @@ namespace gtl::shape {
 	};
 
 
-	GTL__SHAPE_API void CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1);
+	GTL__SHAPE_API bool CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1);
 
 #pragma pack(pop)
 }
