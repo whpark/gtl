@@ -148,7 +148,9 @@ namespace gtl::shape {
 
 export namespace gtl::shape {
 
-	void CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1) {
+	bool CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1) {
+		if ( (roi.Width() <= 0) or (roi.Height() <= 0) )
+			return false;
 
 		auto& x0 = pt0.x;
 		auto& y0 = pt0.y;
@@ -226,6 +228,8 @@ export namespace gtl::shape {
 				}
 			}
 		}
+
+		return accept;
 	}
 
 
