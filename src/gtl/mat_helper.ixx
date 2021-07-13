@@ -502,7 +502,7 @@ export namespace gtl {
 
 			int width32 = (img.cols * nBPP + 31) / 32 * 4;
 			int pixel_per_byte = (8/nBPP);
-			int nColPixel = img.cols/ pixel_per_byte * pixel_per_byte;
+			int nColPixel = pixel_per_byte ? img.cols/ pixel_per_byte * pixel_per_byte : img.cols;
 
 			using Func_PackSingleRow = std::function<void(int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal)>;
 			Func_PackSingleRow PackSingleRow;
@@ -651,7 +651,7 @@ export namespace gtl {
 				std::atomic<int> yCur, yWritten;
 				bool bWritten{};
 
-				auto GetBuffer = [img_rows = img.rows, &mtxBuffer, &buffers, &yCur, &yWritten]() -> BUFFER* {
+				auto GetBuffer = [img_rows = img.rows, &mtxBuffer, &buffers, &yCur, &yWritten](std::stop_token stop) -> BUFFER* {
 					if (yCur >= img_rows)
 						return nullptr;
 					std::unique_lock lock(mtxBuffer);
@@ -662,6 +662,8 @@ export namespace gtl {
 					int yOld = buf.y;
 					while (yOld >= 0) {
 						buf.y.wait(yOld);
+						if (stop.stop_requested())
+							return nullptr;
 						yOld = buf.y;
 					}
 					buf.y = y;
@@ -670,9 +672,9 @@ export namespace gtl {
 					return &buf;
 				};
 
-				auto PackBuffer = [&yCur, &img, &buffers, &PackSingleRow, &pal, &yWritten/*, &id*/, &GetBuffer](std::stop_token stop) {
+				auto PackBuffer = [&img, &buffers, &PackSingleRow, &pal, &yCur, &yWritten/*, &id*/, &GetBuffer](std::stop_token stop) {
 					do {
-						auto* pBuffer = GetBuffer();
+						auto* pBuffer = GetBuffer(stop);
 						if (!pBuffer)
 							break;
 						auto& buf = *pBuffer;
@@ -684,17 +686,18 @@ export namespace gtl {
 					} while(!stop.stop_requested());
 				};
 
-				auto Writer = [&f, &buffers, img_rows = img.rows, &yWritten, &bWritten, &funcCallback](std::stop_token stop_token) {
+				auto Writer = [&f, &buffers, img_rows = img.rows, &yWritten, &bWritten, &funcCallback]() {
 					int iPercent{};
-					while (yWritten < img_rows /*and !stop_token.stop_requested()*/) {
+					while (yWritten < img_rows) {
 						auto index = yWritten % buffers.size();
 						auto& buf = buffers[index];
 
 						while (yWritten != buf.y) {
 							buf.y.wait(-1);
 						}
-						while (!buf.bReady)
+						while (!buf.bReady) {
 							buf.bReady.wait(false);
+						}
 
 						if (!f.write((char*)buf.line.data(), buf.line.size()))
 							return;
@@ -705,7 +708,7 @@ export namespace gtl {
 
 						yWritten++;
 						yWritten.notify_one();
-					
+
 						if (funcCallback) {
 							int iPercentNew = yWritten * 100 / img_rows;
 							if (iPercent != iPercentNew) {
@@ -719,19 +722,22 @@ export namespace gtl {
 					bWritten = (bool)f;
 				};
 
+				std::thread threadWriter(Writer);
 				std::vector<std::jthread> threads;
-				threads.reserve(nThread+1);
-				threads.emplace_back(Writer);
+				threads.reserve(nThread);
 				for (uint i{}; i < nThread; i++) {
 					threads.emplace_back(PackBuffer);
 				}
 
-				threads.front().join();
+				threadWriter.join();
 				if (!bWritten) {
 					for (auto& thread : threads)
 						thread.request_stop();
+					for (auto& buffer : buffers) {
+						buffer.y = -1;
+						buffer.y.notify_all();
+					}
 				}
-				threads.clear();
 				return bWritten;
 			}
 			else {
@@ -773,9 +779,11 @@ export namespace gtl {
 
 		int cx = img.cols;
 		int cy = img.rows;
-		if ((cx >= 0xffff) or (cy >= 0xffff))
-			return false;
-		if ((ptrdiff_t)cx * cy >= (ptrdiff_t)(0xffff'ffff - sizeof(BMP_FILE_HEADER) - sizeof(BITMAP_HEADER)))
+		//if ((cx >= 0xffff) or (cy >= 0xffff))
+		//	return false;
+		uint64_t lenFileExpect = sizeof(BMP_FILE_HEADER) + sizeof(BITMAP_HEADER);
+		lenFileExpect += (nBPP <= 8) ? (uint64_t)cx * cy / (8/nBPP) : (uint64_t)cx*cy*(nBPP/8);
+		if (lenFileExpect >= 0xffff'fff0)
 			return false;
 		int pixel_size = (type == CV_8UC3) ? 3 : ((type == CV_8UC1) ? 1 : 0);
 		if (pixel_size <= 0)
@@ -1186,7 +1194,7 @@ export namespace gtl {
 		else {
 			bFlipY = true;
 		}
-		if ((cx <= 0) or (cy <= 0) or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull))
+		if ((cx <= 0) or (cy <= 0) /*or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull)*/)
 			return img;
 
 		std::vector<cv::Vec3b> palette;
@@ -1248,7 +1256,10 @@ export namespace gtl {
 		cv::Rect rcROI(ptDestTopLeft.x, ptDestTopLeft.y, src.cols, src.rows);
 		cv::Rect rcSafeROI = gtl::GetSafeROI(rcROI, dest.size());
 		if (rcROI == rcSafeROI) {
-			src.copyTo(dest(rcSafeROI));
+			if (mask.size() == src.size())
+				src.copyTo(dest(rcSafeROI), mask);
+			else
+				src.copyTo(dest(rcSafeROI));
 			return true;
 		}
 		else {
@@ -1274,12 +1285,10 @@ export namespace gtl {
 				rcSrc.height = rcROI.height = dest.rows - rcROI.y;
 			}
 			if (gtl::IsROI_Valid(rcSrc, src.size())) {
-				if (src.size() == mask.size()) {
+				if (mask.size() == src.size())
 					src(rcSrc).copyTo(dest(rcROI), mask(rcSrc));
-				}
-				else {
+				else
 					src(rcSrc).copyTo(dest(rcROI));
-				}
 			}
 			return true;
 		}
