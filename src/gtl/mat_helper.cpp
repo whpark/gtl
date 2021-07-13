@@ -526,9 +526,11 @@ namespace gtl {
 
 		int cx = img.cols;
 		int cy = img.rows;
-		if ((cx >= 0xffff) or (cy >= 0xffff))
-			return false;
-		if ((ptrdiff_t)cx * cy >= (ptrdiff_t)(0xffff'ffff - sizeof(BMP_FILE_HEADER) - sizeof(BITMAP_HEADER)))
+		//if ((cx >= 0xffff) or (cy >= 0xffff))
+		//	return false;
+		uint64_t lenFileExpect = sizeof(BMP_FILE_HEADER) + sizeof(BITMAP_HEADER);
+		lenFileExpect += (nBPP <= 8) ? (uint64_t)cx * cy / (8/nBPP) : (uint64_t)cx*cy*(nBPP/8);
+		if (lenFileExpect >= 0xffff'fff0)
 			return false;
 		int pixel_size = (type == CV_8UC3) ? 3 : ((type == CV_8UC1) ? 1 : 0);
 		if (pixel_size <= 0)
@@ -939,7 +941,7 @@ namespace gtl {
 		else {
 			bFlipY = true;
 		}
-		if ((cx <= 0) or (cy <= 0) or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull))
+		if ((cx <= 0) or (cy <= 0) /*or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull)*/)
 			return img;
 
 		std::vector<cv::Vec3b> palette;
@@ -1032,6 +1034,7 @@ namespace gtl {
 			return true;
 		}
 	}
+
 	//=============================================================================
 	//
 
