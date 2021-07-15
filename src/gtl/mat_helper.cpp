@@ -992,8 +992,8 @@ namespace gtl {
 	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const& mask) {
 		if (src.type() != dest.type())
 			return false;
-		if ((src.cols > dest.cols) or (src.rows > dest.rows))
-			return false;
+		//if ((src.cols > dest.cols) or (src.rows > dest.rows))
+		//	return false;
 		cv::Rect rcROI(ptDestTopLeft.x, ptDestTopLeft.y, src.cols, src.rows);
 		cv::Rect rcSafeROI = gtl::GetSafeROI(rcROI, dest.size());
 		if (rcROI == rcSafeROI) {
