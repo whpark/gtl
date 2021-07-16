@@ -76,6 +76,9 @@
       <Project>{fba95adb-13a2-4139-ba8e-789bfe9aa1ae}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\..\..\gtl\natvis\gtl_coord.natvis" />
+  </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
