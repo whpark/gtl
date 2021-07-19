@@ -1,0 +1,4 @@
+C:\Program Files\Microsoft Visual Studio\2022\Preview\Common7\Packages\Debugger\Visualizers\
+
+@echo off
+xcopy /sdchri *.natvis "C:\Program Files\Microsoft Visual Studio\2022\Preview\Common7\Packages\Debugger\Visualizers\"

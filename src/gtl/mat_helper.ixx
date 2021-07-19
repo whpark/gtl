@@ -1248,7 +1248,7 @@ export namespace gtl {
 	//! @param ptDestTopLeft 
 	//! @param mask 
 	//! @return 
-	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const& mask = cv::Mat{}) {
+	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const* pMask = nullptr) {
 		if (src.type() != dest.type())
 			return false;
 		if ( (src.cols > dest.cols) or (src.rows > dest.rows) )
@@ -1256,8 +1256,8 @@ export namespace gtl {
 		cv::Rect rcROI(ptDestTopLeft.x, ptDestTopLeft.y, src.cols, src.rows);
 		cv::Rect rcSafeROI = gtl::GetSafeROI(rcROI, dest.size());
 		if (rcROI == rcSafeROI) {
-			if (mask.size() == src.size())
-				src.copyTo(dest(rcSafeROI), mask);
+			if (pMask and pMask->size() == src.size())
+				src.copyTo(dest(rcSafeROI), *pMask);
 			else
 				src.copyTo(dest(rcSafeROI));
 			return true;
@@ -1285,8 +1285,8 @@ export namespace gtl {
 				rcSrc.height = rcROI.height = dest.rows - rcROI.y;
 			}
 			if (gtl::IsROI_Valid(rcSrc, src.size())) {
-				if (mask.size() == src.size())
-					src(rcSrc).copyTo(dest(rcROI), mask(rcSrc));
+				if (pMask and pMask->size() == src.size())
+					src(rcSrc).copyTo(dest(rcROI), (*pMask)(rcSrc));
 				else
 					src(rcSrc).copyTo(dest(rcROI));
 			}

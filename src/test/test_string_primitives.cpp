@@ -7,7 +7,7 @@ using namespace gtl::literals;
 
 using namespace gtl;
 
-
+#pragma warning(disable:4566)
 
 #define	SUPPRESS_DEPRECATED_WARNING _Pragma ("warning(suppress:4996)")
 

@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8'?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	
+	<!-- based on http://wxwidgets.blogspot.com/2009/12/better-display-of-wxtypes-in-msvs.html -->
+
+	<Type Name="gtl::TPOINT4&lt;*&gt;">
+		<DisplayString IncludeView="noparens">{x,g},{y,g},{z,g},{w,g}</DisplayString>
+		<DisplayString ExcludeView="noparens">({x,g},{y,g},{z,g},{w,g})</DisplayString>
+		<Expand>
+			<Item Name="x">x</Item>
+			<Item Name="y">y</Item>
+			<Item Name="z">z</Item>
+			<Item Name="w">w</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="gtl::TPOINT3&lt;*&gt;">
+		<DisplayString IncludeView="noparens">{x,g},{y,g},{z,g}</DisplayString>
+		<DisplayString ExcludeView="noparens">({x,g},{y,g},{z,g})</DisplayString>
+		<Expand>
+			<Item Name="x">x</Item>
+			<Item Name="y">y</Item>
+			<Item Name="z">z</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="gtl::TPOINT2&lt;*&gt;">
+		<DisplayString IncludeView="noparens">{x,g},{y,g}</DisplayString>
+		<DisplayString ExcludeView="noparens">({x,g},{y,g})</DisplayString>
+		<Expand>
+			<Item Name="x">x</Item>
+			<Item Name="y">y</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="gtl::TSIZE3&lt;*&gt;">
+		<DisplayString IncludeView="noparens">{cx,g},{cy,g},{cz,g}</DisplayString>
+		<DisplayString ExcludeView="noparens">({cx,g},{cy,g},{cz,g})</DisplayString>
+		<Expand>
+			<Item Name="cx">cx</Item>
+			<Item Name="cy">cy</Item>
+			<Item Name="cz">cz</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="gtl::TSIZE2&lt;*&gt;">
+		<DisplayString IncludeView="noparens">{cx,g},{cy,g}</DisplayString>
+		<DisplayString ExcludeView="noparens">({cx,g},{cy,g})</DisplayString>
+		<Expand>
+			<Item Name="cx">cx</Item>
+			<Item Name="cy">cy</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="gtl::TRECT3&lt;*&gt;">
+		<DisplayString IncludeView="noparens">{left,g},{top,g},{front,g},{right,g},{bottom,g},{back,g}</DisplayString>
+		<DisplayString ExcludeView="noparens">LT({left,g},{top,g},{front,g}), RB({right,g},{bottom,g},{back,g})</DisplayString>
+		<Expand>
+			<Item Name="left">left</Item>
+			<Item Name="top">top</Item>
+			<Item Name="front">front</Item>
+			<Item Name="right">right</Item>
+			<Item Name="bottom">bottom</Item>
+			<Item Name="back">back</Item>
+			<Item Name="[width]">right-left,g</Item>
+			<Item Name="[height]">bottom-top,g</Item>
+			<Item Name="[depth]">back-front,g</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="gtl::TRECT2&lt;*&gt;">
+		<DisplayString IncludeView="noparens">{left,g},{top,g},{right,g},{bottom,g}</DisplayString>
+		<DisplayString ExcludeView="noparens">LT({left,g},{top,g}), RB({right,g},{bottom,g})</DisplayString>
+		<Expand>
+			<Item Name="left">left</Item>
+			<Item Name="top">top</Item>
+			<Item Name="right">right</Item>
+			<Item Name="bottom">bottom</Item>
+			<Item Name="width">right-left,g</Item>
+			<Item Name="height">bottom-top,g</Item>
+		</Expand>
+	</Type>
+
+</AutoVisualizer>
