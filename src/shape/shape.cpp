@@ -325,6 +325,68 @@ namespace gtl::shape {
 		return {};
 	}
 
+
+	void xLayer::Sort_Loop() {
+		if (m_shapes.size() <= 1) {
+			return;
+		}
+
+		size_t n{m_shapes.size()-1};
+		for (size_t i{}; i < n; i++) {
+			auto const& r = m_shapes[i].GetStartEndPoint();
+			if (!r)
+				continue;
+			auto pt = r->second;
+
+			auto minDist = DBL_MAX;
+			size_t jMin = (size_t)(-1);
+			bool bReverse{};
+			auto i1{i+1};
+			for (size_t j{i1}; j < m_shapes.size(); j++) {
+				if (auto const& r = m_shapes[j].GetStartEndPoint(); r) {
+					auto d1 = pt.Distance(r->first);
+					auto d2 = pt.Distance(r->second);
+					auto dist = std::min(d1, d2);
+					if (dist < minDist) {
+						bReverse = d1 > d2;
+						minDist = dist;
+						jMin = j;
+					}
+				}
+			}
+			if (jMin < m_shapes.size()) {
+				std::swap(m_shapes.base().at(i1), m_shapes.base().at(jMin));
+				if (bReverse)
+					m_shapes[i1].Reverse();
+			}
+		}
+	}
+
+	bool xLayer::IsLoop(double dMinGap) const {
+		if (m_shapes.empty())
+			return false;
+		point_t pt0, pt;
+		if (auto r = m_shapes.front().GetStartEndPoint(); r) {
+			pt0 = r->first;
+			pt = r->second;
+		}
+		else
+			return false;
+
+		for (size_t i{1}; i < m_shapes.size(); i++) {
+			if (auto const& r = m_shapes[i].GetStartEndPoint(); r) {
+				auto [ pt1, pt2 ] = *r;
+				if (pt.Distance(pt1) > dMinGap)
+					return false;
+				pt = pt2;
+			} else {
+				continue;
+			}
+		}
+
+		return pt0.Distance(pt) <= dMinGap;
+	}
+
 	void xPolyline::Draw(ICanvas& canvas) const {
 		xShape::Draw(canvas);
 		if (m_pts.empty())

@@ -211,10 +211,9 @@ namespace gtl::shape {
 	class ICanvas;
 
 	/// @brief shape interface class
-	struct GTL__SHAPE_CLASS xShape {
-	public:
+	class GTL__SHAPE_CLASS xShape {
 	protected:
-		friend struct xDrawing;
+		friend class xDrawing;
 		int m_crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
 	public:
 		string_t m_strLayer;	// temporary value. (while loading from dxf)
@@ -264,9 +263,11 @@ namespace gtl::shape {
 		static string_t const& GetShapeName(eSHAPE eType);
 
 		//virtual point_t PointAt(double t) const = 0;
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const = 0;
 		virtual void FlipX() = 0;
 		virtual void FlipY() = 0;
 		virtual void FlipZ() = 0;
+		virtual void Reverse() = 0;
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
 		virtual bool UpdateBoundary(rect_t&) const = 0;
 		int GetLineWidthInUM() const { return GetLineWidthInUM(m_lineWeight); }
