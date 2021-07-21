@@ -56,7 +56,9 @@
     <ClCompile Include="test_dynamic.cpp" />
     <ClCompile Include="test_json_proxy.cpp" />
     <ClCompile Include="test_lock.cpp" />
+    <ClCompile Include="test_misc.cpp" />
     <ClCompile Include="test_reflection.cpp" />
+    <ClCompile Include="test_shape.cpp" />
     <ClCompile Include="test_string.cpp" />
     <ClCompile Include="test_string_codepage.cpp" />
     <ClCompile Include="test_string_primitives.cpp" />
@@ -70,6 +72,9 @@
   <ItemGroup>
     <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{5b9dcfa4-22db-4fc5-b559-0bacbf04fbe7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\shape\shape.vcxproj">
+      <Project>{3edcb95c-3ba2-4bab-9ee5-53efd290c4d9}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemDefinitionGroup />

@@ -88,9 +88,26 @@ export namespace gtl::shape {
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::layer; }
 		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			if (m_shapes.empty())
+				return{};
+			auto r0 = m_shapes.front().GetStartEndPoint();
+			if (!r0)
+				return {};
+			auto r1 = m_shapes.back().GetStartEndPoint();
+			if (!r1)
+				return {};
+			return std::pair{r0->first, r1->second};
+		}
 		virtual void FlipX() override { for (auto& shape : m_shapes) shape.FlipX(); }
 		virtual void FlipY() override { for (auto& shape : m_shapes) shape.FlipY(); }
 		virtual void FlipZ() override { for (auto& shape : m_shapes) shape.FlipZ(); }
+		virtual void Reverse() override {
+			std::ranges::reverse(m_shapes.base());
+			for (auto& shape : m_shapes) {
+				shape.Reverse();
+			}
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			for (auto& shape : m_shapes)
 				shape.Transform(ct, bRightHanded);
@@ -161,17 +178,22 @@ export namespace gtl::shape {
 			m_name.clear();
 		}
 
+		virtual void Sort_Loop();
+		bool IsLoop(double dMinGap = 1.e-3) const;
+
 	protected:
-		friend struct xDrawing;
+		friend class xDrawing;
 		line_type_t* pLineType{};
 
 	};
 
 	// internally
-	struct xBlock : public xLayer {
+	class xBlock : public xLayer {
+	public:
 		string_t m_layer;
 		point_t m_pt;
 
+	public:
 		virtual eSHAPE GetShapeType() const { return eSHAPE::block; }
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xBlock);
@@ -205,15 +227,21 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct xDot : public xShape {
+	class xDot : public xShape {
+	public:
 		point_t m_pt;
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::dot; }
 
 		//virtual point_t PointAt(double t) const override { return pt; };
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			return std::pair{ m_pt, m_pt };
+		}
 		virtual void FlipX() override { m_pt.x = -m_pt.x; }
 		virtual void FlipY() override { m_pt.y = -m_pt.y; }
 		virtual void FlipZ() override { m_pt.z = -m_pt.z; }
+		virtual void Reverse() override {
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			m_pt = ct(m_pt);
 		};
@@ -257,15 +285,22 @@ export namespace gtl::shape {
 
 	};
 
-	struct xLine : public xShape {
+	class xLine : public xShape {
+	public:
 		point_t m_pt0, m_pt1;
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::line; }
 
 		//virtual point_t PointAt(double t) const override { return lerp(m_pt0, m_pt1, t); }
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			return std::pair{ m_pt0, m_pt1 };
+		}
 		virtual void FlipX() override { m_pt0.x = -m_pt0.x; m_pt1.x = -m_pt1.x; }
 		virtual void FlipY() override { m_pt0.y = -m_pt0.y; m_pt1.y = -m_pt1.y; }
 		virtual void FlipZ() override { m_pt0.z = -m_pt0.z; m_pt1.z = -m_pt1.z; }
+		virtual void Reverse() override {
+			std::swap(m_pt0, m_pt1);
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			m_pt0 = ct(m_pt0); m_pt1 = ct(m_pt1);
 		};
@@ -308,16 +343,42 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct xPolyline : public xShape {
+	class xPolyline : public xShape {
+	public:
 		bool m_bLoop{};
 		std::vector<polypoint_t> m_pts;
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::polyline; }
 
 		//virtual point_t PointAt(double t) const override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			if (m_pts.empty())
+				return {};
+			return std::pair{ m_pts.front(), m_bLoop ? m_pts.front() : m_pts.back() };
+		}
 		virtual void FlipX() override { for (auto& pt : m_pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } }
 		virtual void FlipY() override { for (auto& pt : m_pts) { pt.y = -pt.y;  pt.Bulge() = -pt.Bulge(); } }
 		virtual void FlipZ() override { for (auto& pt : m_pts) { pt.z = -pt.z;  pt.Bulge() = -pt.Bulge(); } }
+		virtual void Reverse() override {
+			if (m_bLoop) {
+				if (m_pts.size()) {
+					auto pt = m_pts.front();
+					m_pts.erase(m_pts.begin());
+					m_pts.push_back(pt);
+				}
+			}
+
+			std::ranges::reverse(m_pts);
+
+			if (m_pts.size() > 1) {
+				auto b0 = m_pts.front().Bulge();
+				for (size_t i{1}; i < m_pts.size(); i++) {
+					m_pts[i-1].Bulge() = - m_pts[i].Bulge();
+				}
+				m_pts.back().Bulge() = - b0;
+
+			}
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			for (auto& pt : m_pts) {
 				(point_t&)pt = ct((point_t&)pt);
@@ -379,7 +440,8 @@ export namespace gtl::shape {
 
 	};
 
-	struct xPolylineLW : public xPolyline {
+	class xPolylineLW : public xPolyline {
+	public:
 	//protected:
 	//	int dummy{};
 	//public:
@@ -419,7 +481,8 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct xCircle : public xShape {
+	class xCircle : public xShape {
+	public:
 		point_t m_ptCenter;
 		double m_radius{};
 		deg_t m_angle_length{360_deg};	// 회전 방향.
@@ -427,9 +490,16 @@ export namespace gtl::shape {
 		virtual eSHAPE GetShapeType() const { return eSHAPE::circle_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			auto pt = m_ptCenter+point_t{m_radius,0,0};
+			return std::pair{ pt, pt };
+		}
 		virtual void FlipX() override { m_ptCenter.x = -m_ptCenter.x; m_angle_length = -m_angle_length; }
 		virtual void FlipY() override { m_ptCenter.y = -m_ptCenter.y; m_angle_length = -m_angle_length; }
 		virtual void FlipZ() override { m_ptCenter.z = -m_ptCenter.z; m_angle_length = -m_angle_length; }
+		virtual void Reverse() override {
+			m_angle_length = -m_angle_length;
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			m_ptCenter = ct(m_ptCenter); m_radius = ct.Trans(m_radius);
 			if (!bRightHanded)
@@ -477,15 +547,29 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct xArc : public xCircle {
+	class xArc : public xCircle {
+	public:
 		deg_t m_angle_start{};
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::arc_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			auto c = gtl::cos(m_angle_start);
+			auto s = gtl::sin(m_angle_start);
+			auto pt0 = m_ptCenter+point_t{c, s};
+			c = gtl::cos(m_angle_start + m_angle_length);
+			s = gtl::sin(m_angle_start + m_angle_length);
+			auto pt1 = m_ptCenter+point_t{c, s};
+			return std::pair{ pt0, pt1 };
+		}
 		virtual void FlipX() override { xCircle::FlipX(); m_angle_start = AdjustAngle(180._deg - m_angle_start); }
 		virtual void FlipY() override { xCircle::FlipY(); m_angle_start = AdjustAngle(-m_angle_start); }
 		virtual void FlipZ() override { xCircle::FlipZ(); m_angle_start = AdjustAngle(180._deg - m_angle_start); }	// ????.....  성립 안되지만,
+		virtual void Reverse() override {
+			m_angle_start = m_angle_start+m_angle_length;
+			m_angle_length = -m_angle_length;
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			// todo : ... upgrade?
 			xCircle::Transform(ct, bRightHanded);
@@ -591,13 +675,27 @@ export namespace gtl::shape {
 
 	};
 
-	struct xEllipse : public xArc {
+	class xEllipse : public xArc {
+	public:
 		double m_radiusH{};
 		deg_t m_angle_first_axis{};
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::ellipse_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			xCoordTrans2d ct;
+			ct.Init(1.0, (rad_t)m_angle_first_axis, point_t{}, m_ptCenter);
+
+			deg_t t0 = m_angle_start;
+			deg_t t1 = m_angle_start + m_angle_length;
+			auto radius1 = m_radius;
+			auto radius2 = m_radiusH;
+			point_t pt0 = ct(point_t{radius1*cos(t0), radius2*sin(t0)});
+			point_t pt1 = ct(point_t{radius1*cos(t1), radius2*sin(t1)});
+
+			return std::pair{ pt0, pt1 };
+		}
 		virtual void FlipX() override { xArc::FlipX(); m_angle_first_axis = 180._deg - m_angle_first_axis; }
 		virtual void FlipY() override { xArc::FlipY(); m_angle_first_axis = - m_angle_first_axis; }
 		virtual void FlipZ() override { xArc::FlipZ(); m_angle_first_axis = 180._deg - m_angle_first_axis; }
@@ -671,7 +769,8 @@ export namespace gtl::shape {
 
 	};
 
-	struct xSpline : public xShape {
+	class xSpline : public xShape {
+	public:
 		enum class eFLAG { closed = 1, periodic = 2, rational = 4, planar = 8, linear = planar|16 };
 		int m_flags{};
 		point_t m_ptNormal;
@@ -689,9 +788,20 @@ export namespace gtl::shape {
 		virtual eSHAPE GetShapeType() const { return eSHAPE::spline; }
 
 		//virtual point_t PointAt(double t) const override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			if (m_ptsControl.empty())
+				return {};
+			return std::pair{ m_ptsControl.front(), m_ptsControl.back() };
+		}
 		virtual void FlipX() override { for (auto& pt : m_ptsControl) pt.x = -pt.x; for (auto& pt : m_ptsFit) pt.x = -pt.x; m_ptNormal.x = -m_ptNormal.x; m_vStart.x = -m_vStart.x; m_vEnd.x = -m_vEnd.x; }
 		virtual void FlipY() override { for (auto& pt : m_ptsControl) pt.y = -pt.y; for (auto& pt : m_ptsFit) pt.y = -pt.y; m_ptNormal.y = -m_ptNormal.y; m_vStart.y = -m_vStart.y; m_vEnd.y = -m_vEnd.y; }
 		virtual void FlipZ() override { for (auto& pt : m_ptsControl) pt.z = -pt.z; for (auto& pt : m_ptsFit) pt.z = -pt.z; m_ptNormal.z = -m_ptNormal.z; m_vStart.z = -m_vStart.z; m_vEnd.z = -m_vEnd.z; }
+		virtual void Reverse() override {
+			std::swap(m_vStart, m_vEnd);
+			std::ranges::reverse(m_knots);
+			std::ranges::reverse(m_ptsControl);
+			std::ranges::reverse(m_ptsFit);
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			m_ptNormal = ct(m_ptNormal);
 			m_vStart = ct(m_vStart);
@@ -780,7 +890,8 @@ export namespace gtl::shape {
 
 	};
 
-	struct xText : public xShape {
+	class xText : public xShape {
+	public:
 		enum class eALIGN_VERT : int { base_line = 0, bottom, mid, top };
 		enum class eALIGN_HORZ : int { left = 0, center, right, aligned, middle, fit };
 
@@ -798,9 +909,15 @@ export namespace gtl::shape {
 		virtual eSHAPE GetShapeType() const { return eSHAPE::text; }
 
 		//virtual point_t PointAt(double t) const override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			// todo : Start/End Point
+			return std::pair{ m_pt0, m_pt1 };
+		}
 		virtual void FlipX() override { m_pt0.x = -m_pt0.x; m_pt1.x = -m_pt1.x; }
 		virtual void FlipY() override { m_pt0.y = -m_pt0.y; m_pt1.y = -m_pt1.y; }
 		virtual void FlipZ() override { m_pt0.z = -m_pt0.z; m_pt1.z = -m_pt1.z; }
+		virtual void Reverse() override {
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			m_pt0 = ct(m_pt0);
 			m_pt1 = ct(m_pt1);
@@ -814,7 +931,7 @@ export namespace gtl::shape {
 		}
 		virtual void Draw(ICanvas& canvas) const override {
 			xShape::Draw(canvas);
-			// todo :
+			canvas.Text(*this);
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xText);
@@ -866,7 +983,7 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct xMText : public xText {
+	class xMText : public xText {
 	protected:
 		using xText::m_alignVert;
 	public:
@@ -897,7 +1014,7 @@ export namespace gtl::shape {
 		//virtual bool UpdateBoundary(rect_t& rectBoundary) const override { return true; };
 		virtual void Draw(ICanvas& canvas) const override {
 			xShape::Draw(canvas);
-			// todo : draw mtext
+			canvas.Text(*this);
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xMText);
@@ -925,7 +1042,8 @@ export namespace gtl::shape {
 		}
 	};
 
-	struct xHatch : public xShape {
+	class xHatch : public xShape {
+	public:
 		string_t m_name;
 		bool m_bSolid{};
 		bool m_bAssociative{};
@@ -942,9 +1060,14 @@ export namespace gtl::shape {
 		virtual eSHAPE GetShapeType() const { return eSHAPE::hatch; }
 
 		//virtual point_t PointAt(double t) const override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			return {};
+		}
 		virtual void FlipX() override { for (auto& b : m_boundaries) b.FlipX(); }
 		virtual void FlipY() override { for (auto& b : m_boundaries) b.FlipY(); }
 		virtual void FlipZ() override { for (auto& b : m_boundaries) b.FlipZ(); }
+		virtual void Reverse() override {
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 		};
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
@@ -1009,7 +1132,8 @@ export namespace gtl::shape {
 	};
 
 	// temporary object
-	struct xInsert : public xShape {
+	class xInsert : public xShape {
+	public:
 		string_t m_name;	// block name
 		point_t m_pt;
 		double m_xscale{1};
@@ -1060,13 +1184,15 @@ export namespace gtl::shape {
 		virtual eSHAPE GetShapeType() const { return eSHAPE::insert; }
 
 		//virtual point_t PointAt(double t) const = 0;
-		virtual void FlipX() override {};
-		virtual void FlipY() override {};
-		virtual void FlipZ() override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override { return {}; }
+		virtual void FlipX() override {}
+		virtual void FlipY() override {}
+		virtual void FlipZ() override {}
+		virtual void Reverse() override {}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) override {};
 		virtual bool UpdateBoundary(rect_t&) const override { return false; };
 		virtual void Draw(ICanvas& canvas) const override {
-			xShape::Draw(canvas);
+			//xShape::Draw(canvas);
 		};
 
 		virtual void PrintOut(std::wostream& os) const override {
@@ -1077,7 +1203,8 @@ export namespace gtl::shape {
 	};
 
 
-	struct xDrawing : public xShape {
+	class xDrawing : public xShape {
+	public:
 		std::map<std::string, variable_t> m_vars;
 		boost::ptr_deque<line_type_t> m_line_types;
 		//boost::ptr_deque<xBlock> blocks;
@@ -1093,9 +1220,26 @@ export namespace gtl::shape {
 		virtual eSHAPE GetShapeType() const { return eSHAPE::drawing; }
 
 		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			if (m_layers.empty())
+				return {};
+			auto r0 = m_layers.front().GetStartEndPoint();
+			if (!r0)
+				return {};
+			auto r1 = m_layers.back().GetStartEndPoint();
+			if (!r1)
+				return {};
+			return std::pair{ r0->first, r1->second };
+		}
 		virtual void FlipX() override { for (auto& layer : m_layers) layer.FlipX(); }
 		virtual void FlipY() override { for (auto& layer : m_layers) layer.FlipY(); }
 		virtual void FlipZ() override { for (auto& layer : m_layers) layer.FlipZ(); }
+		virtual void Reverse() override {
+			std::ranges::reverse(m_layers.base());
+			for (auto& layer : m_layers) {
+				layer.Reverse();
+			}
+		}
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
 			for (auto& layer : m_layers)
 				layer.Transform(ct, bRightHanded);

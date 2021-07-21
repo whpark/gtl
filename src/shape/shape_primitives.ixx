@@ -55,8 +55,13 @@ export namespace gtl::shape {
 	using json_t = boost::json::value;
 
 	struct polypoint_t : public TPointT<double, 4> {
+		using base_t = TPointT<double, 4>;
+
+		//using base_t::base_t;
+
 		double& Bulge() { return w; }
 		double Bulge() const { return w; }
+		
 
 		template < typename archive >
 		friend void serialize(archive& ar, polypoint_t& var, unsigned int const file_version) {
@@ -92,6 +97,8 @@ export namespace gtl::shape {
 	}
 
 	using color_t = color_rgba_t;
+
+	//constexpr color_t const CR_DEFAULT = ColorRGBA(255, 255, 255);
 
 	enum class eSHAPE {
 		none = -1,
@@ -202,10 +209,9 @@ export namespace gtl::shape {
 	class ICanvas;
 
 	/// @brief shape interface class
-	struct xShape {
-	public:
+	class xShape {
 	protected:
-		friend struct xDrawing;
+		friend class xDrawing;
 		int m_crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
 	public:
 		string_t m_strLayer;	// temporary value. (while loading from dxf)
@@ -255,11 +261,19 @@ export namespace gtl::shape {
 		static string_t const& GetShapeName(eSHAPE eType);
 
 		//virtual point_t PointAt(double t) const = 0;
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const = 0;
 		virtual void FlipX() = 0;
 		virtual void FlipY() = 0;
 		virtual void FlipZ() = 0;
+		virtual void Reverse() = 0;
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
 		virtual bool UpdateBoundary(rect_t&) const = 0;
+		virtual rect_t GetBoundary() const {
+			rect_t rect;
+			rect.SetRectEmptyForMinMax2d();
+			UpdateBoundary(rect);
+			return rect;
+		}
 		int GetLineWidthInUM() const { return GetLineWidthInUM(m_lineWeight); }
 		static int GetLineWidthInUM(int lineWeight);
 
@@ -273,5 +287,8 @@ export namespace gtl::shape {
 
 		static std::unique_ptr<xShape> CreateShapeFromEntityName(std::string const& strEntityName);
 	};
+
+
+	bool CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1);
 
 }

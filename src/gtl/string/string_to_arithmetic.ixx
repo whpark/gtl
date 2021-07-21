@@ -322,7 +322,12 @@ export namespace gtl {
 			*str++ += (char)*pos;
 		}
 		*str = 0;
-		return tsztod<tvalue, char>(std::string_view{buf, str+1}, ppszStopped, 0);
+		char const* pszStopped{};
+		auto value = tsztod<tvalue, char>(std::string_view{buf, str+1}, &pszStopped, 0);
+		if (ppszStopped) {
+			*ppszStopped = sv.data() + (pszStopped-buf);
+		}
+		return value;
 	}
 
 	template < typename tvalue, typename tchar > requires std::floating_point<tvalue> and gtlc::string_elem<tchar>

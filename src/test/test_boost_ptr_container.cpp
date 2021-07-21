@@ -13,19 +13,28 @@ using namespace gtl::literals;
 
 namespace gtl::test::boost_ptr_container {
 
-	struct ttt {
+	struct ITT {
+		GTL__DYNAMIC_VIRTUAL_INTERFACE(ITT);
+
+		template < typename archive >
+		friend void serialization(archive& ar, unsigned int const file_version) {
+		}
+
+		auto operator <=> (ITT const&) const = default;
+
+	};
+	struct ttt : public ITT {
 		int i, j, k;
 
 		auto operator <=> (ttt const&) const = default;
 		ttt(int i={}, int j={}, int k={}) : i(i), j(j), k(k) {}
 
-		virtual std::unique_ptr<ttt> NewClone() const {
-			return std::make_unique<ttt>(*this);
-			//return nullptr;
-		}
+		GTL__DYNAMIC_VIRTUAL_DERIVED(ttt);
 
-		friend inline ttt* new_clone(ttt const& r) {
-			return r.NewClone().release();
+		template < typename archive >
+		friend void serialization(archive& ar, ttt& object, unsigned int const file_version) {
+			ar & (ITT&)object;
+			ar & object.i & object.j & object.k;
 		}
 
 	};
@@ -40,9 +49,8 @@ namespace gtl::test::boost_ptr_container {
 
 		auto operator <=> (tt2 const&) const = default;
 
-		virtual std::unique_ptr<ttt> NewClone() const override {
-			return std::make_unique<tt2>(*this);
-		}
+		GTL__DYNAMIC_VIRTUAL_DERIVED(tt2);
+
 	};
 
 	TEST(ptr_container, test_deque) {
@@ -52,6 +60,7 @@ namespace gtl::test::boost_ptr_container {
 		lst.push_back(std::make_unique<ttt>(0, 31, 33));
 		lst.push_back(std::make_unique<tt2>(ttt{1, 2, 3}, 1.0, 2.0));
 		lst.push_back(std::make_unique<tt2>(ttt{4, 5, 6}, 1.0, 2.0));
+		//auto* ptr = new_clone(lst.back());
 		{
 			boost::ptr_deque<ttt> lst_2 = lst;
 			auto& a0 = lst_2[0];

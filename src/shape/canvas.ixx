@@ -52,6 +52,10 @@ export namespace gtl::shape {
 	//	GTL__DYNAMIC_VIRTUAL_BASE(CCoordSystem)
 	//};
 
+	//class xShape;
+	class xText;
+	class xMText;
+
 	class ICanvas;
 	void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
 
@@ -149,7 +153,7 @@ export namespace gtl::shape {
 			ct.Init(1.0, (rad_t)tFirstAxis, point_t{}, ptCenter);
 
 			deg_t t1 = t0 + tLength;
-			MoveTo(ct(point_t{cos(t0), sin(t0)}));
+			MoveTo(ct(point_t{radius1*cos(t0), radius2*sin(t0)}));
 			int n = Round(tLength * std::numbers::pi * std::max(radius1, radius2) / m_target_interpolation_inverval);
 			for (int i = 0; i <= n; i++) {
 				deg_t t {std::lerp(t0, t1, (double)i/n)};
@@ -161,6 +165,10 @@ export namespace gtl::shape {
 		}
 		virtual void Spline(int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
 			Canvas_Spline(*this, degree, pts, knots, bLoop);
+		}
+		virtual void Text(xText const& text) {
+		}
+		virtual void Text(xMText const& text) {
 		}
 
 		//public:
