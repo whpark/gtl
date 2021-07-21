@@ -270,6 +270,12 @@ namespace gtl::shape {
 		virtual void Reverse() = 0;
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
 		virtual bool UpdateBoundary(rect_t&) const = 0;
+		virtual rect_t GetBoundary() const {
+			rect_t rect;
+			rect.SetRectEmptyForMinMax2d();
+			UpdateBoundary(rect);
+			return rect;
+		}
 		int GetLineWidthInUM() const { return GetLineWidthInUM(m_lineWeight); }
 		static int GetLineWidthInUM(int lineWeight);
 

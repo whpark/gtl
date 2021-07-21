@@ -145,7 +145,7 @@ namespace gtl {
 			// source
 			using char_source_buf_t = char;	// or char const
 
-			char_source_buf_t* src = std::bit_cast<char_source_buf_t*>(svFrom.data());
+			char_source_buf_t* src = (char_source_buf_t*)(svFrom.data());
 			size_t remnant_src = svFrom.size()*sizeof(tchar_from);
 
 			auto Conv = [](iconv_t cd, std::basic_string<tchar_to>& strTo, char_source_buf_t** psrc, auto& remnant_src, auto& remnant_dst) -> std::optional<std::basic_string<tchar_to>> {
@@ -173,7 +173,8 @@ namespace gtl {
 				size_t remnant_dst = sizeof(initial_dst_buf);
 				char* out = (char*)initial_dst_buf;
 				if (iconv(cd_, &src, &remnant_src, &out, &remnant_dst) == (size_t)-1) {
-					if (errno == E2BIG) {
+					auto e = errno;
+					if (e == E2BIG) {
 						std::basic_string<tchar_to> strTo;
 						size_t const old_size = sizeof(initial_dst_buf);
 						size_t const new_size = std::max(old_size*2, svFrom.size());
