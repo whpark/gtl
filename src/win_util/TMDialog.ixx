@@ -58,7 +58,7 @@ export namespace gtl::win_util {
 	}
 	template < typename T_COORD > requires gtlc::coord<T_COORD>
 	void SetDlgItemCoord(CWnd* pWnd, int idc, T_COORD& coord, std::basic_string_view<CString::XCHAR> fmt = {}) {
-		std::wstring str = ToString<wchar_t>(coord, fmt);
+		std::wstring str = ToString<wchar_t>(coord, fmt).c_str();
 		SetDlgItemText(pWnd->GetSafeHwnd(), idc, str.c_str());
 	}
 
