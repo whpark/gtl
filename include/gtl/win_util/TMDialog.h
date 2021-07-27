@@ -54,7 +54,7 @@ namespace gtl::win_util {
 	template < typename T_COORD, class = T_COORD::coord_t >
 	void SetDlgItemCoord(CWnd* pWnd, int idc, T_COORD& coord, std::basic_string_view<CString::XCHAR> fmt = {}) {
 		CString str;
-		str = ToString(coord, fmt);
+		str = ToString(coord, fmt).c_str();
 		SetDlgItemText(pWnd->GetSafeHwnd(), idc, str);
 	}
 
