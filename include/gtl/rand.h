@@ -18,7 +18,7 @@ namespace gtl {
 	//=============================================================================================================================
 	// General Random Distribution
 	//
-	template < typename T, typename T_ENGINE, typename T_DIST, typename T_RANDOM_DEVICE = std::random_device, typename = std::is_arithmetic<T> >
+	template < typename T, typename T_ENGINE, typename T_DIST, typename T_RANDOM_DEVICE = std::random_device > requires std::is_arithmetic_v<T>
 	class TRand {
 	protected:
 		T_RANDOM_DEVICE m_rd {};
