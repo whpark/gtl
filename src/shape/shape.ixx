@@ -33,7 +33,7 @@
 #include "boost/archive/binary_oarchive.hpp"
 #include "boost/serialization/export.hpp"
 
-export module gtls;
+export module gtl.shape;
 import gtl;
 export import :color_table;
 export import :primitives;

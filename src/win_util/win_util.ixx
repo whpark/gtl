@@ -4,7 +4,7 @@
 
 #include <fstream>	// for gtl:log
 
-export module gtlw;
+export module gtl.win_util;
 import gtl;
 export import :misc;
 export import :TMDialog;

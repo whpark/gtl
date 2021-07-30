@@ -194,7 +194,7 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 				}
 			}
 
-			//gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
+			// gtlw::TStopWatch<char, std::chrono::duration<double>> sw;
 			if (nIDCtl == IDC_VIEW1) {
 				gtlw::MatToDC(img, img.size(), dc, rect, palette);
 				//sw.Lap("1 byte image");

@@ -23,7 +23,7 @@ module;
 #define FMT_HEADER_ONLY
 #include "fmt/format.h"
 
-export module gtlw:SerialPort;
+export module gtl.win_util:SerialPort;
 import gtl;
 import :misc;
 

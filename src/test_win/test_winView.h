@@ -5,8 +5,8 @@
 #pragma once
 
 import gtl;
-import gtlw;
-import gtls;
+import gtl.win_util;
+import gtl.shape;
 
 
 class CtestwinView : public CFormView {

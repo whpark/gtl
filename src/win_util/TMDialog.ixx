@@ -15,7 +15,7 @@ module;
 #define FMT_HEADER_ONLY
 #include "fmt/format.h"
 
-export module gtlw:TMDialog;
+export module gtl.win_util:TMDialog;
 import gtl;
 import :misc;
 

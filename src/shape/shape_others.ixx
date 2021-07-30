@@ -61,7 +61,7 @@ module;
 #include "gtl/_config.h"
 #include "gtl/_macro.h"
 
-export module gtls:others;
+export module gtl.shape:others;
 import :primitives;
 import :color_table;
 import :canvas;

@@ -13,7 +13,7 @@ module;
 
 #include <array>
 
-export module gtls:color_table;
+export module gtl.shape:color_table;
 import gtl;
 
 export namespace gtl::shape {

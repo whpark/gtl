@@ -39,7 +39,7 @@ module;
 #include "gtl/_macro.h"
 
 
-export module gtls:primitives;
+export module gtl.shape:primitives;
 import :color_table;
 import gtl;
 

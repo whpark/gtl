@@ -3,7 +3,7 @@
 #include "framework.h"
 #include <chrono>
 
-export module gtlw:misc;
+export module gtl.win_util:misc;
 import gtl;
 
 export namespace gtl::win_util {

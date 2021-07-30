@@ -21,7 +21,7 @@ module;
 
 #include "Resource.h"
 
-export module gtlw:ProgressDlg;
+export module gtl.win_util:ProgressDlg;
 import gtl;
 import :misc;
 import :TMDialog;

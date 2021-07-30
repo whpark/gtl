@@ -53,7 +53,7 @@
 
 #include "framework.h"
 
-export module gtlw:ListCtrlEd;
+export module gtl.win_util:ListCtrlEd;
 
 
 export namespace gtl::win_util {

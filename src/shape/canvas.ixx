@@ -23,7 +23,7 @@ module;
 #include "../3rdparty/tinyspline/tinysplinecxx.h"
 
 
-export module gtls:canvas;
+export module gtl.shape:canvas;
 import :primitives;
 import gtl;
 

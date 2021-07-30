@@ -17,7 +17,7 @@ module;
 
 #include <afxstat_.h>
 
-export module gtlw:MatHelper;
+export module gtl.win_util:MatHelper;
 import :ProgressDlg;
 import gtl;
 
