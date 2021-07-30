@@ -71,8 +71,8 @@ export namespace gtl {
 		constexpr value_type& member(size_t i) { return data()[i]; }
 		constexpr value_type const& member(size_t i) const { return data()[i]; }
 
-		constexpr coord_point_t&		pts(size_t i = 0) { return (i == 0) ? *(coord_point_t*)(&this->left) : *(coord_point_t*)(&this->right); }
-		constexpr coord_point_t const&	pts(size_t i = 0) const { return (i == 0) ? *(coord_point_t*)(&this->left) : *(coord_point_t*)(&this->right); }
+		constexpr coord_point_t&		pts(size_t i = 0)		{ return (i == 0) ? *(coord_point_t*)(&this->left) : *(coord_point_t*)(&this->right); }
+		constexpr coord_point_t const&	pts(size_t i = 0) const	{ return (i == 0) ? *(coord_point_t*)(&this->left) : *(coord_point_t*)(&this->right); }
 		constexpr coord_point_t&		pt0()		{ return *(coord_point_t*)(&this->left); }
 		constexpr coord_point_t&		pt1()		{ return *(coord_point_t*)(&this->right); }
 		constexpr coord_point_t const&	pt0() const	{ return *(coord_point_t*)(&this->left); }
@@ -296,7 +296,7 @@ export namespace gtl {
 		// translate the rectangle by moving its top and left
 		this_t& OffsetRect(T x, T y)						requires (dim == 2) { this->left += x; this->top += y; this->right += x; this->bottom += y; return *this; }
 		this_t& OffsetRect(T x, T y, T z)					requires (dim == 3) { this->left += x; this->top += y; this->front += z; this->right += x; this->bottom += y; this->back += z; return *this; }
-		this_t& OffsetRect(coord_point_t const& pt)									{ pt0() += pt; pt1() += pt; return *this; }		// for Point : move whole rect, for Size : move pt1() only.
+		this_t& OffsetRect(coord_point_t const& pt)								{ pt0() += pt; pt1() += pt; return *this; }		// for Point : move whole rect, for Size : move pt1() only.
 
 		this_t& OffsetSize(coord_size_t const& size)							{ /*pt0 += size;*/ pt1() += size; return *this; }	// for Point : move whole rect, for Size : move pt1() only.
 

@@ -139,7 +139,7 @@ export namespace gtl {
 			// source
 			using char_source_buf_t = char;	// or char const
 
-			char_source_buf_t* src = std::bit_cast<char_source_buf_t*>(svFrom.data());
+			char_source_buf_t* src = (char_source_buf_t*)(svFrom.data());
 			size_t remnant_src = svFrom.size()*sizeof(tchar_from);
 
 			auto Conv = [](iconv_t cd, std::basic_string<tchar_to>& strTo, char_source_buf_t** psrc, auto& remnant_src, auto& remnant_dst) -> std::optional<std::basic_string<tchar_to>> {
@@ -216,7 +216,7 @@ export namespace gtl {
 				return "char";
 			}
 		#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-			else if (std::is_same_v<tchar, uint16_t>) {
+			else if (std::is_same_v<tchar, charKSSM_t>) {
 				return "JOHAB";
 			}
 		#endif

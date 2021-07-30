@@ -398,7 +398,7 @@ export namespace gtl::win_util {
 		if (m_bLog) {
 			auto strs = ConvDataToHexString<wchar_t>({buf, nReadTotal}, 16);
 			for (const auto& str : strs) {
-				m_log.Log(L"Serial Read    : %s", str);
+				m_log.Log(L"Serial Read    : {}", str);
 			}
 		}
 
@@ -416,7 +416,7 @@ export namespace gtl::win_util {
 		//CancelIoEx(m_hComm, NULL);
 		// Write
 		if (!WriteFile(m_hComm, buf, nSize, &dwSize, &m_overlappedW) && (GetLastError() != ERROR_IO_PENDING)) {
-			m_log.LogTag(L"E", L"Error : %d, %s\n", GetLastError(), GetErrorMessage(GetLastError()));
+			m_log.LogTag(L"E", L"Error : {}, {}\n", GetLastError(), GetErrorMessage(GetLastError()));
 			return 0;
 		}
 
@@ -435,7 +435,7 @@ export namespace gtl::win_util {
 		if (m_bLog) {
 			auto strs = ConvDataToHexString<tchar>({(uint8_t*)_buf, (size_t)nSize}, 16, ' ', true, '|');
 			for (const auto& str : strs)
-				m_log.Log(L"Serial Written : %s", str);
+				m_log.Log(L"Serial Written : {}", str);
 		}
 
 		return dwSize;

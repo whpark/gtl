@@ -89,9 +89,9 @@ export namespace gtl {
 
 	public:
 		// returns psz
-	#if GTL__USE_WINDOWS_API
+	//#if GTL__USE_WINDOWS_API
 		operator tchar const*() const					{ return this->c_str(); }
-	#endif
+	//#endif
 
 		// returns string_view
 		operator std::basic_string_view<tchar>() const {
@@ -591,7 +591,7 @@ export namespace gtl {
 	using xStringU16 = TString<char16_t>;		// Unicode UTF-16
 	using xStringU32 = TString<char32_t>;		// Unicode UTF-32
 #if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-	using CKSSMString = TString<charKSSM_t>;		// KSSM (codepage 1361)
+	using xStringKSSM = TString<charKSSM_t>;		// KSSM (codepage 1361)
 #endif
 
 

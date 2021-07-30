@@ -134,7 +134,6 @@ export namespace gtl {
 	};
 
 
-#if 1
 	//-----------------------------------------------------------------------------
 //	template < std::floating_point T >
 	class xCoordTransChain : public ICoordTrans {
@@ -200,6 +199,7 @@ export namespace gtl {
 			}
 			return newChain;
 		}
+
 
 		virtual std::unique_ptr<ICoordTrans> GetInverse() const override {
 			auto inv = std::make_unique<xCoordTransChain>();
@@ -267,10 +267,8 @@ export namespace gtl {
 		}
 
 	};
-#endif
 
 
-#if 1
 	//-----------------------------------------------------------------------------
 	/// @brief class TCoordTransDim 
 	/// TARGET = scale * mat ( SOURCE - origin ) + offset
@@ -281,16 +279,16 @@ export namespace gtl {
 		using this_t = TCoordTransDim;
 		using base_t = ICoordTrans;
 		using mat_t = cv::Matx<double, dim, dim>;
-		//using mat_t = TMatrix<double, dim, dim>;
 		using point_t = TPointT<double, dim>;
 
 	public:
 		double m_scale{1.0};	// additional scale value
 		mat_t m_mat;			// transforming matrix
-		point_t m_origin;	// pivot of source coordinate
-		point_t m_offset;	// pivot of target coordinate
+		point_t m_origin;		// pivot of source coordinate
+		point_t m_offset;		// pivot of target coordinate
 
 	public:
+
 		//friend class boost::serialization::access;
 		template < typename Archive >
 		friend void serialize(Archive &ar, TCoordTransDim& ct, unsigned int const version) {
@@ -435,7 +433,6 @@ export namespace gtl {
 
 			// Check.
 			double d = cv::determinant(matS);
-			//double d = matS.determinant();
 			if (fabs(d) <= dMinDeterminant)
 				return false;
 
@@ -444,7 +441,6 @@ export namespace gtl {
 			m_mat = matT * matS.inv();
 
 			m_scale = fabs(cv::determinant(m_mat));
-			//m_scale = fabs(m_mat.determinant());
 			m_mat /= m_scale;
 
 			if (!bCalcScale)
@@ -490,7 +486,6 @@ export namespace gtl {
 			}
 			// Check.
 			double d = cv::determinant(matS);
-			//double d = matS.determinant();
 			if (fabs(d) <= dMinDeterminant)
 				return false;
 
@@ -504,7 +499,6 @@ export namespace gtl {
 			m_mat = matT * matS.inv();
 
 			m_scale = cv::determinant(m_mat);
-			//m_scale = m_mat.determinant();
 			m_mat /= m_scale;
 
 			if (!bCalcScale)
@@ -606,7 +600,6 @@ export namespace gtl {
 		}
 		virtual [[nodiscard]] bool IsRightHanded() const override {
 			return cv::determinant(m_mat) >= 0;
-			//return m_mat.determinant() >= 0;
 		}
 
 		TCoordTransDim& operator *= (TCoordTransDim const& B) {
@@ -635,7 +628,6 @@ export namespace gtl {
 	//template TCoordTransDim<3>;
 	using xCoordTrans3d = TCoordTransDim<3>;
 
-#endif
 
 	//GTL__CLASS xCoordTrans2d;
 	//GTL__CLASS xCoordTrans3d;

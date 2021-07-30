@@ -211,9 +211,9 @@ export namespace gtl::shape {
 		cv::Mat& m_img;
 
 		cv::Scalar m_color{};
-		double m_line_thickness {1.};
+		double m_line_width {1.};
 
-		// line thickness
+		// line width
 		int m_line_type = cv::LINE_8;
 
 	public:
@@ -227,9 +227,9 @@ export namespace gtl::shape {
 		// Primative, returns End Position.
 		virtual void MoveTo_Target(point_t const& pt) override {}
 		virtual void LineTo_Target(point_t const& pt) override {
-			cv::line(m_img, m_ptLast, pt, m_color, (int)m_line_thickness, m_line_type);
-			//cv::line(m_img, cv::Point(m_ptLast.x, m_ptLast.y), cv::Point(pt.x, pt.y), m_color, (int)m_line_thickness, m_line_type);
-			//cv::line(m_img, cv::Point2d(m_ptLast.x, m_ptLast.y), cv::Point2d(pt.x, pt.y), m_color, (int)m_line_thickness, m_line_type);
+			cv::line(m_img, m_ptLast, pt, m_color, (int)m_line_width, m_line_type);
+			//cv::line(m_img, cv::Point(m_ptLast.x, m_ptLast.y), cv::Point(pt.x, pt.y), m_color, (int)m_line_width, m_line_type);
+			//cv::line(m_img, cv::Point2d(m_ptLast.x, m_ptLast.y), cv::Point2d(pt.x, pt.y), m_color, (int)m_line_width, m_line_type);
 		}
 
 		//inline auto ColorS() { return ColorS(cr_); }
@@ -254,7 +254,7 @@ export namespace gtl::shape {
 		// Primative, returns End Position.
 		virtual void LineTo_Target(point_t const& pt) override {
 			if constexpr (round_down_line) {
-				cv::line(m_img, cv::Point((int)m_ptLast.x, (int)m_ptLast.y), cv::Point((int)pt.x, (int)pt.y), m_color, (int)m_line_thickness, m_line_type);
+				cv::line(m_img, cv::Point((int)m_ptLast.x, (int)m_ptLast.y), cv::Point((int)pt.x, (int)pt.y), m_color, (int)m_line_width, m_line_type);
 			} else {
 				xCanvasMat::LineTo_Target(pt);
 			}
@@ -274,7 +274,7 @@ export namespace gtl::shape {
 
 
 
-	////-----------------------------------------------------------------------------
+	////===============================================================================================================================
 	//// ICanvas : Interface of Canvas
 	//class AFX_EXT_CLASS_QSHAPE ICanvas {
 	//protected:
@@ -292,7 +292,7 @@ export namespace gtl::shape {
 	////	bool m_bShowOrder = false;
 	////	int m_iOrder = 0;
 	////	int m_iArrowSize = 5;
-	////	int m_iArrowThickness = 1;
+	////	int m_iArrowWidth = 1;
 
 	//public:
 	//	ICanvas() {
@@ -306,13 +306,13 @@ export namespace gtl::shape {
 	//		memset(m_ptLast.val, 0xff, sizeof(m_ptLast.val));	// not zero. set INVALID_VALUE
 	//	}
 
-	//	//void ShowDirection(bool bShow = true, bool bShowOrder = true, COLORREF crArrow = RGB(255, 0, 0), int iArrowSize = 16, int iArrowThickness = 1) {
+	//	//void ShowDirection(bool bShow = true, bool bShowOrder = true, COLORREF crArrow = RGB(255, 0, 0), int iArrowSize = 16, int iArrowWidth = 1) {
 	//	//	m_bShowDirection = bShow;
 	//	//	m_bShowOrder = bShowOrder;
 	//	//	m_crArrow = crArrow;
 	//	//	m_iArrowSize = iArrowSize;
 	//	//	m_iOrder = 0;
-	//	//	m_iArrowThickness = iArrowThickness;
+	//	//	m_iArrowWidth = iArrowWidth;
 	//	//}
 	//	//bool StopDrawingDirection();
 	//	//bool ResumeDrawingDirection();

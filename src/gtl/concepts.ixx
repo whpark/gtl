@@ -19,6 +19,15 @@ module;
 #if !defined(__cpp_lib_concepts)
 #	error ERROR! Supports C++v20 only.
 #endif
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+	using charKSSM_t = uint16_t;
+#endif
+
+#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+namespace gtl {
+	using charKSSM_t = uint16_t;
+}
+#endif
 
 export module gtl:concepts;
 
