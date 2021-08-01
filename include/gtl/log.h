@@ -184,35 +184,25 @@ namespace gtl {
 
 			time_t t = std::chrono::system_clock::to_time_t(now);
 			tm st{};
-		#ifdef _WINDOWS
+		#ifdef _MSC_VER
 			localtime_s(&st, &t);
 		#else
 			st = *std::localtime(&t);
 		#endif
+
 			auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(now - std::chrono::system_clock::from_time_t(t));
 			
-			//auto st = xSysTime(now).GetLocalSystemTime();
-
+#define GTL__FMT_EXPAND "{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {} : "
 			if constexpr (std::is_same_v<tchar_t, char>) {
-				m_ar->WriteString("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : ",
-								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
-								  svMask.size(), svMask);
+				m_ar->WriteString(GTL__FMT_EXPAND, st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
-				m_ar->WriteString(TEXT_W("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
-								  svMask.size(), svMask);
+				m_ar->WriteString(TEXT_W(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
-				m_ar->WriteString(TEXT_u8("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
-								  svMask.size(), svMask);
+				m_ar->WriteString(TEXT_u8(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
-				m_ar->WriteString(TEXT_u("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
-								  svMask.size(), svMask);
+				m_ar->WriteString(TEXT_u(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
 			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
-				m_ar->WriteString(TEXT_U("{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {8:{7}} : "),
-								  st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(),
-								  svMask.size(), svMask);
+				m_ar->WriteString(TEXT_U(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
 			} else {
 				static_assert(false);
 			}
@@ -239,6 +229,10 @@ namespace gtl {
 					m_ar->WriteString(L"{1:{0}\r\n", len, pos);
 				} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
 					m_ar->WriteString(u8"{1:{0}\r\n", len, pos);
+				} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
+					m_ar->WriteString(u"{1:{0}\r\n", len, pos);
+				} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
+					m_ar->WriteString(U"{1:{0}\r\n", len, pos);
 				}
 			}
 

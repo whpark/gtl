@@ -393,7 +393,7 @@ namespace gtl {
 
 		bool UpdateBoundary(coord_point_t const& pt) {
 			bool bModified{};
-			for (size_t i = 0; i < pt.size(); i++) {
+			for (size_t i {}; i < pt.size(); i++) {
 				if (pt0().member(i) > pt.member(i)) {
 					bModified = true;
 					pt0().member(i) = pt.member(i);

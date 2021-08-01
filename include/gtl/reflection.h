@@ -136,8 +136,8 @@ namespace gtl {
 		#if 1
 			std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::member_tuple_s);
 		#else
-			for...(auto& [m_name, pVar] : this_t::member_tuple_s) {
-				var.*pVar = j[m_name];
+			for...(auto& [name, pVar] : this_t::member_tuple_s) {
+				var.*pVar = j[name];
 			}
 		#endif
 		}
@@ -149,8 +149,8 @@ namespace gtl {
 		#if 1
 			std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, this_t::member_tuple_s);
 		#else
-			for...(auto& [m_name, pVar] : this_t::member_tuple_s) {
-				j[m_name] = var.*pVar;
+			for...(auto& [name, pVar] : this_t::member_tuple_s) {
+				j[name] = var.*pVar;
 			}
 		#endif
 		}
