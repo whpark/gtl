@@ -15,6 +15,7 @@
 #include <deque>
 #include <optional>
 
+#define FMT_HEADER_ONLY
 #include "fmt/ostream.h"
 
 #include "gtl/_config.h"
@@ -64,6 +65,7 @@ namespace gtl::shape {
 		double& Bulge() { return w; }
 		double Bulge() const { return w; }
 		
+		auto operator <=> (polypoint_t const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, polypoint_t& var, unsigned int const file_version) {
@@ -191,6 +193,8 @@ namespace gtl::shape {
 		int flags{};
 		string_t description;
 		std::vector<double> path;
+
+		auto operator <=> (line_type_t const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, line_type_t& var, unsigned int const file_version) {

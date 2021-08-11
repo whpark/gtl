@@ -3,6 +3,7 @@
 #include "gtl/gtl.h"
 
 #include "gtl/shape/shape.h"
+#define FMT_HEADER_ONLY
 #include "fmt/chrono.h"
 
 using namespace std::literals;

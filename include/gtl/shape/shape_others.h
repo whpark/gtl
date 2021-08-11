@@ -1245,6 +1245,7 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xDrawing);
 		//GTL__REFLECTION_DERIVED(xDrawing, xShape);
 		//GTL__REFLECTION_MEMBERS(vars, line_types, layers);
+		auto operator <=> (xDrawing const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xDrawing& var, unsigned int const file_version) {

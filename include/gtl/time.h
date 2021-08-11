@@ -18,6 +18,7 @@
 #include "gtl/string.h"
 #pragma warning(push)
 #pragma warning(disable: 4819)
+#define FMT_HEADER_ONLY
 #include "fmt/chrono.h"
 #pragma warning(pop)
 //#include "gtl/string_view.h"
