@@ -104,13 +104,13 @@
     <ClInclude Include="..\..\include\gtl\coord.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\coord\rect.h">
+    <ClInclude Include="..\..\include\gtl\coord\coord_rect.h">
       <Filter>gtl\coord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\coord\size.h">
+    <ClInclude Include="..\..\include\gtl\coord\coord_size.h">
       <Filter>gtl\coord</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\coord\point.h">
+    <ClInclude Include="..\..\include\gtl\coord\coord_point.h">
       <Filter>gtl\coord</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\log.h">
@@ -127,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\mat_helper.h">
       <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\string\string_to_arithmetic.h">
+      <Filter>gtl\string</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

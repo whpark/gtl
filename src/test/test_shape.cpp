@@ -22,6 +22,21 @@ TEST(gtl_shape, basic) {
 		LR"xx(shape_test/diamond.dxf.json)xx",
 	};
 
+	auto rLine1 = std::make_unique<gtl::shape::xLine>();
+	auto rLine2 = std::make_unique<gtl::shape::xLine>();
+	rLine1->m_pt0 = {1, 1};
+	rLine1->m_pt1 = {2, 2};
+	rLine2->m_pt0 = {1, 1};
+	rLine2->m_pt1 = {2, 2};
+	EXPECT_EQ(*rLine1, *rLine2);
+
+	rLine2->m_pt1 = {2, 2.1};
+	EXPECT_NE(*rLine1, *rLine2);
+
+	std::unique_ptr<gtl::shape::xShape> r1 = std::move(rLine1);
+	std::unique_ptr<gtl::shape::xShape> r2 = std::move(rLine2);
+	EXPECT_NE(*r1, *r2);
+
 	for (auto path : paths) {
 
 		DEBUG_PRINT("\t\tpath : {}\n", path.string());
@@ -50,9 +65,6 @@ TEST(gtl_shape, basic) {
 			ia & cad2;
 			EXPECT_EQ(cad, cad2);
 		}
-
-
 	}
-
 }
 

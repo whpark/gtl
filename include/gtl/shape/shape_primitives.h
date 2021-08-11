@@ -198,19 +198,22 @@ namespace gtl::shape {
 
 		template < typename archive >
 		friend void serialize(archive& ar, line_type_t& var, unsigned int const file_version) {
-			ar & var;
+			ar & var.name;
+			ar & var.flags;
+			ar & var.path;
+			if (file_version >= 1) {
+				ar & var.description;
+			}
 		}
 		template < typename archive >
 		friend archive& operator & (archive& ar, line_type_t& var) {
 			ar & var.name;
 			ar & var.flags;
 			ar & var.path;
-
+			ar & var.description;
 			return ar;
 		}
-
 	};
-
 
 	class ICanvas;
 
@@ -218,9 +221,11 @@ namespace gtl::shape {
 	class GTL__SHAPE_CLASS xShape {
 	protected:
 		friend class xDrawing;
-		int m_crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
+		mutable int m_crIndex{};		// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
 	public:
-		string_t m_strLayer;	// temporary value. (while loading from dxf)
+		mutable string_t m_strLayer;	// temporary value. (while loading from dxf)
+
+	public:
 		color_t m_color{};
 		int m_eLineType{};
 		string_t m_strLineType;
@@ -243,6 +248,9 @@ namespace gtl::shape {
 		//GTL__REFLECTION_VIRTUAL_BASE(xShape);
 		//GTL__REFLECTION_MEMBERS(m_color, m_eLineType, m_strLineType, m_lineWeight, m_bVisible, m_bTransparent, m_cookie);
 
+		bool operator == (xShape const& B) const {
+			return Compare(B);
+		}
 		auto operator <=> (xShape const&) const = default;
 
 		template < typename archive >
@@ -262,6 +270,20 @@ namespace gtl::shape {
 		}
 		virtual bool LoadFromCADJson(json_t& _j);
 
+		virtual bool Compare(xShape const& B) const {
+			if (GetShapeType() != B.GetShapeType())
+				return false;
+
+			return true
+					and (m_color		== B.m_color)
+					and (m_eLineType	== B.m_eLineType)
+					and (m_strLineType	== B.m_strLineType)
+					and (m_lineWeight	== B.m_lineWeight)
+					and (m_bVisible		== B.m_bVisible)
+					and (m_bTransparent	== B.m_bTransparent)
+					and (m_cookie		== B.m_cookie)
+				;
+		}
 		virtual eSHAPE GetShapeType() const = 0;
 		string_t const& GetShapeName() const { return GetShapeName(GetShapeType()); }
 		static string_t const& GetShapeName(eSHAPE eType);
@@ -299,5 +321,8 @@ namespace gtl::shape {
 
 #pragma pack(pop)
 }
+
+BOOST_CLASS_VERSION(gtl::shape::line_type_t, 1);
+//BOOST_CLASS_VERSION(gtl::shape::xShape, 1);
 
 #include "gtl/shape/color_table.h"

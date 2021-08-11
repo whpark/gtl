@@ -182,48 +182,6 @@ namespace gtl {
 	constexpr tchar const* tszsearch_oneof(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svSet);
 #endif
 
-	/// @brief tszto_number
-	/// @param psz 
-	/// @param pszEnd 
-	/// @param radix 
-	/// @return number
-	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
-	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-
-
-	/// <summary>
-	/// digit contants to integral type value.
-	///  - radix detecting (c++ notation)
-	///	   ex "0b1001'1100", "0xABCD1234", "0123456"
-	///  - digit seperator (such as ',' or '\'' for c++ notation.)
-	///  - only throws when (radix > 36)
-	/// </summary>
-	/// <param name="psz"></param>
-	/// <param name="pszEnd"></param>
-	/// <param name="ppszStopped">where conversion stopped</param>
-	/// <param name="radix">radix</param>
-	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
-	/// <returns>number value. (no overflow checked)</returns>
-	template < std::integral tvalue = int, gtlc::string_elem tchar >
-	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < std::integral tvalue = int, gtlc::string_elem tchar >
-	inline [[nodiscard]] tvalue tsztoi(std::basic_string<tchar> const& str, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < std::integral tvalue = int, gtlc::string_elem tchar >
-	GTL__DEPR_SEC inline [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-	template < std::integral tvalue = int, gtlc::string_elem tchar, size_t size >
-	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
-
-	template < std::floating_point tvalue = double, gtlc::string_elem tchar = char16_t >
-	[[deprecated("NOT STANDARD CONVERTING !")]] constexpr tvalue _tsztod(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
-
-	template < std::floating_point tvalue = double, gtlc::string_elem tchar >
-	inline [[nodiscard]] tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
-	template < std::floating_point tvalue = double, gtlc::string_elem tchar >
-	inline [[nodiscard]] tvalue tsztod(std::basic_string<tchar> const& str, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
-	template < std::floating_point tvalue = double, gtlc::string_elem tchar >
-	GTL__DEPR_SEC inline [[nodiscard]] tvalue tsztod(tchar const* psz, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
-
-
 #pragma pack(pop)
 };	// namespace gtl;
 

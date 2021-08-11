@@ -27,6 +27,7 @@
 #include "string/string_primitives.h"
 #include "string/convert_codepage.h"
 #include "string/string_misc.h"
+#include "string/string_to_arithmetic.h"
 
 #include "string/string_primitives.hpp"
 #include "string/string_misc.hpp"

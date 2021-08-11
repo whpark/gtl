@@ -16,9 +16,9 @@
 
 #include "boost/serialization/serialization.hpp"
 
-#include "gtl/coord/size.h"
-#include "gtl/coord/point.h"
-#include "gtl/coord/rect.h"
+#include "gtl/coord/coord_size.h"
+#include "gtl/coord/coord_point.h"
+#include "gtl/coord/coord_rect.h"
 #include "gtl/coord/coord_trans.h"
 
 //=============================================================================

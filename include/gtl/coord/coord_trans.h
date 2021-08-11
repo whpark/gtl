@@ -15,16 +15,20 @@
 #include "gtl/concepts.h"
 #include "gtl/misc.h"
 #include "gtl/unit.h"
-#include "gtl/coord.h"
 #include "gtl/dynamic.h"
 
 #include "boost/ptr_container/ptr_deque.hpp"
 #include "boost/serialization/base_object.hpp"
+#include "boost/serialization/serialization.hpp"
 //#include "boost/serialization/export.hpp"
 
 //#include "opencv2/opencv.hpp"
 #include "opencv2/opencv_modules.hpp"
 #include "opencv2/core/matx.hpp"
+
+#include "coord_size.h"
+#include "coord_point.h"
+#include "coord_rect.h"
 
 #if 1
 

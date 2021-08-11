@@ -12,8 +12,8 @@
 #include "gtl/misc.h"
 #include "gtl/concepts.h"
 
-#include "gtl/coord/size.h"
-#include "gtl/coord/point.h"
+#include "coord_size.h"
+#include "coord_point.h"
 
 //#ifdef min
 //#	undef min	// undefine WinAPI - min. ( use std::min only.)
