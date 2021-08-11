@@ -2,8 +2,9 @@
 //
 // shape_default.h:
 //
-// 2021.05.28
 // PWH
+// 2021.05.28
+// 2021.08.11 Compare
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -248,6 +249,7 @@ namespace gtl::shape {
 		//GTL__REFLECTION_VIRTUAL_BASE(xShape);
 		//GTL__REFLECTION_MEMBERS(m_color, m_eLineType, m_strLineType, m_lineWeight, m_bVisible, m_bTransparent, m_cookie);
 
+		//auto operator <=> (xShape const&) const = default;
 		bool operator == (xShape const& B) const {
 			return Compare(B);
 		}

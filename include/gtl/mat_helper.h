@@ -124,29 +124,10 @@ namespace gtl {
 
 	//-----------------------------------------------------------------------------
 	// 외곽선 글자
-	template <class TSTR >
-	void putTextC(cv::InputOutputArray img, TSTR& psz, cv::Point org,
+	GTL__API void putTextC(cv::InputOutputArray img, std::string const& str, xPoint2i org,
 		int fontFace, double fontScale, cv::Scalar color,
 		int thickness = 1, int lineType = 8,
-		bool bottomLeftOrigin = false, bool bOutline = true)
-	{
-		gtl::xStringA str(psz);
-		xSize2i size { cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
-
-		if (bOutline) {
-			cv::Scalar crBkgnd;
-			crBkgnd = cv::Scalar(255, 255, 255) - color;
-			//if (crBkgnd == Scalar(0, 0, 0))
-			//	crBkgnd = Scalar(1, 1, 1);
-			int iShift = std::max(1, thickness/2);
-			cv::putText(img, str, org-size/2+xPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+xPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+xPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+xPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-		}
-
-		cv::putText(img, str, org-size/2, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
-	}
+		bool bottomLeftOrigin = false, bool bOutline = true);
 
 
 	//-----------------------------------------------------------------------------

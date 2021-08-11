@@ -64,20 +64,25 @@ namespace gtl::shape {
 	//	return (c1 | c2) == 0;
 	//}
 
-	// Cohen–Sutherland clipping algorithm clips a line from
+
+
+	// Cohen-Sutherland clipping algorithm clips a line from
 	// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
 	// diagonal from (xmin, ymin) to (xmax, ymax).
+	enum fOUT_CODE : uint8_t {
+		INSIDE	= 0b0000,
+		LEFT	= 0b0001,
+		RIGHT	= 0b0010,
+		BOTTOM	= 0b0100,
+		TOP		= 0b1000,
+	};
+};
+
+namespace gtl::shape {
+
 	bool CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1) {
 		if ( (roi.Width() <= 0) or (roi.Height() <= 0) )
 			return false;
-
-		enum fOUT_CODE : uint8_t {
-			INSIDE	= 0b0000,
-			LEFT	= 0b0001,
-			RIGHT	= 0b0010,
-			BOTTOM	= 0b0100,
-			TOP		= 0b1000,
-		};
 
 		auto& x0 = pt0.x;
 		auto& y0 = pt0.y;
@@ -128,16 +133,16 @@ namespace gtl::shape {
 				//   y = y0 + slope * (xm - x0), where xm is xmin or xmax
 				// No need to worry about divide-by-zero because, in each case, the
 				// outcode bit being tested guarantees the denominator is non-zero
-				if (outcodeOut & TOP) {           // point is above the clip window
+				if (outcodeOut & fOUT_CODE::TOP) {           // point is above the clip window
 					x = x0 + (x1 - x0) * (roi.bottom - y0) / (y1 - y0);
 					y = roi.bottom;
-				} else if (outcodeOut & BOTTOM) { // point is below the clip window
+				} else if (outcodeOut & fOUT_CODE::BOTTOM) { // point is below the clip window
 					x = x0 + (x1 - x0) * (roi.top - y0) / (y1 - y0);
 					y = roi.top;
-				} else if (outcodeOut & RIGHT) {  // point is to the right of clip window
+				} else if (outcodeOut & fOUT_CODE::RIGHT) {  // point is to the right of clip window
 					y = y0 + (y1 - y0) * (roi.right - x0) / (x1 - x0);
 					x = roi.right;
-				} else if (outcodeOut & LEFT) {   // point is to the left of clip window
+				} else if (outcodeOut & fOUT_CODE::LEFT) {   // point is to the left of clip window
 					y = y0 + (y1 - y0) * (roi.left - x0) / (x1 - x0);
 					x = roi.left;
 				}

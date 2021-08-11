@@ -17,7 +17,6 @@
 #define new DEBUG_NEW
 #endif
 
-
 // CtestwinView
 
 IMPLEMENT_DYNCREATE(CtestwinView, CFormView)

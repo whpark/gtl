@@ -52,11 +52,11 @@ namespace gtl {
 		bool m_bOverwriteOlderFile = true;							// 오래된 파일은 덮어 씀.
 		bool m_bCloseFileAfterWrite = false;						// 로그 하나씩 쓸 때마다 파일을 열었다 닫음. 성능에 문제가 되므로 사용하면 안됨. 어쩔 수 없을때에만 사용.
 
-	#ifdef _DEBUG
+	//#ifdef _DEBUG
 		bool m_bTraceOut = true;
-	#endif
+	//#endif
 
-		std::function<int(int, int, int)> m_fun;
+		//std::function<int(int, int, int)> m_fun;
 
 		std::function<xStringA  (xSimpleLog&, archive_out_t&, xSysTime, const std::string_view svTag, const std::string_view svContent)> m_funcFormatterA;			// 로그 파일 포맷을 바꾸고 싶을 때...
 		std::function<xStringW  (xSimpleLog&, archive_out_t&, xSysTime, const std::wstring_view svTag, const std::wstring_view svContent)> m_funcFormatterW;		// 로그 파일 포맷을 바꾸고 싶을 때...
@@ -110,18 +110,47 @@ namespace gtl {
 
 	public:
 		// Write Log
-		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { _Log<char>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args) { _Log<wchar_t>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args) { _Log<char8_t>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args) { _Log<char16_t>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args) { _Log<char32_t>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args) { _Log<char>(svTag, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::wstring_view svTag, const std::wstring_view svText, Args&& ... args) { _Log<wchar_t>(svTag, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::u8string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char8_t>(svTag, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::u16string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char16_t>(svTag, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::u32string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char32_t>(svTag, fmt::format(svText, args...)); }
+		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { _Log<char>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args) { _Log<wchar_t>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args) { _Log<char8_t>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args) { _Log<char16_t>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args) { _Log<char32_t>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args) { _Log<char>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::wstring_view svTag, const std::wstring_view svText, Args&& ... args) { _Log<wchar_t>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::u8string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char8_t>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::u16string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char16_t>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::u32string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char32_t>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
 
 	};
+
+
+	//-----------------------------------------------------------------------------
+	// Simple Log Interface
+	//
+	template < class CLogWriter >
+	class ILog {
+	protected:
+		mutable CLogWriter* m_pLog = nullptr;
+	public:
+		ILog(CLogWriter* pLog = nullptr) : m_pLog(pLog) {}
+
+		void SetLog(CLogWriter* pLog) const { m_pLog = pLog; }
+		CLogWriter* GetLog() const { return m_pLog; }
+
+	public:
+		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<wchar_t>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char8_t>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char16_t>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char32_t>(nullptr, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::wstring_view svTag, const std::wstring_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<wchar_t>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::u8string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char8_t>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::u16string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char16_t>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::u32string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char32_t>(svTag, fmt::format(svText, std::forward<Args>(args)...)); }
+	};
+
+
 
 	// Write Log
 	template < typename tchar_t >
@@ -206,7 +235,7 @@ namespace gtl {
 			} else {
 				static_assert(false);
 			}
-
+#undef GTL__FMT_EXPAND
 			const tchar_t* posHead = svText.data();
 			const tchar_t* posEnd = svText.data() + svText.size();
 			const tchar_t* posNext = nullptr;
@@ -244,38 +273,11 @@ namespace gtl {
 			CloseFile();
 	}
 
-	template void xSimpleLog::_Log<char>(const std::basic_string_view<char> svMask, const std::basic_string_view<char> svText);
-	template void xSimpleLog::_Log<wchar_t>(const std::basic_string_view<wchar_t> svMask, const std::basic_string_view<wchar_t> svText);
-	template void xSimpleLog::_Log<char8_t>(const std::basic_string_view<char8_t> svMask, const std::basic_string_view<char8_t> svText);
-	template void xSimpleLog::_Log<char16_t>(const std::basic_string_view<char16_t> svMask, const std::basic_string_view<char16_t> svText);
-	template void xSimpleLog::_Log<char32_t>(const std::basic_string_view<char32_t> svMask, const std::basic_string_view<char32_t> svText);
-
-	//-----------------------------------------------------------------------------
-	// Simple Log Interface
-	//
-	template < class CLogWriter >
-	class ILog {
-	protected:
-		mutable CLogWriter* m_pLog = nullptr;
-	public:
-		ILog(CLogWriter* pLog = nullptr) : m_pLog(pLog) {}
-
-		void SetLog(CLogWriter* pLog) const { m_pLog = pLog; }
-		CLogWriter* GetLog() const { return m_pLog; }
-
-	public:
-		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<wchar_t>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char8_t>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char16_t>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char32_t>(nullptr, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char>(svTag, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::wstring_view svTag, const std::wstring_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<wchar_t>(svTag, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::u8string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char8_t>(svTag, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::u16string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char16_t>(svTag, fmt::format(svText, args...)); }
-		template < typename ... Args > void LogTag(const std::u32string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char32_t>(svTag, fmt::format(svText, args...)); }
-	};
-
+	//template void xSimpleLog::_Log<char>(const std::basic_string_view<char> svMask, const std::basic_string_view<char> svText);
+	//template void xSimpleLog::_Log<wchar_t>(const std::basic_string_view<wchar_t> svMask, const std::basic_string_view<wchar_t> svText);
+	//template void xSimpleLog::_Log<char8_t>(const std::basic_string_view<char8_t> svMask, const std::basic_string_view<char8_t> svText);
+	//template void xSimpleLog::_Log<char16_t>(const std::basic_string_view<char16_t> svMask, const std::basic_string_view<char16_t> svText);
+	//template void xSimpleLog::_Log<char32_t>(const std::basic_string_view<char32_t> svMask, const std::basic_string_view<char32_t> svText);
 
 #pragma pack(pop)
 }	// namespace gtl

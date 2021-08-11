@@ -8,6 +8,27 @@
 
 namespace gtl {
 
+	void putTextC(cv::InputOutputArray img, std::string const& str, xPoint2i org,
+		int fontFace, double fontScale, cv::Scalar color,
+		int thickness, int lineType,
+		bool bottomLeftOrigin, bool bOutline)
+	{
+		xSize2i size{ cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
+
+		if (bOutline) {
+			cv::Scalar crBkgnd;
+			crBkgnd = cv::Scalar(255, 255, 255) - color;
+			//if (crBkgnd == Scalar(0, 0, 0))
+			//	crBkgnd = Scalar(1, 1, 1);
+			int iShift = std::max(1, thickness / 2);
+			cv::putText(img, str, org - size / 2 + xPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org - size / 2 + xPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org - size / 2 + xPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org - size / 2 + xPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+		}
+
+		cv::putText(img, str, org - size / 2, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
+	}
 
 	static bool s_bGPUChecked{};
 	static bool s_bUseGPU{};
@@ -989,7 +1010,13 @@ namespace gtl {
 		return img;
 	}
 
-	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const& mask) {
+	//! @brief Copy smaller Mat to larger Mat. (to dest xy)
+	//! @param src 
+	//! @param dest 
+	//! @param ptDestTopLeft 
+	//! @param mask 
+	//! @return 
+	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const* pMask = nullptr) {
 		if (src.type() != dest.type())
 			return false;
 		//if ((src.cols > dest.cols) or (src.rows > dest.rows))
@@ -997,8 +1024,8 @@ namespace gtl {
 		cv::Rect rcROI(ptDestTopLeft.x, ptDestTopLeft.y, src.cols, src.rows);
 		cv::Rect rcSafeROI = gtl::GetSafeROI(rcROI, dest.size());
 		if (rcROI == rcSafeROI) {
-			if (mask.size() == src.size())
-				src.copyTo(dest(rcSafeROI), mask);
+			if (pMask and pMask->size() == src.size())
+				src.copyTo(dest(rcSafeROI), *pMask);
 			else
 				src.copyTo(dest(rcSafeROI));
 			return true;
@@ -1026,8 +1053,8 @@ namespace gtl {
 				rcSrc.height = rcROI.height = dest.rows - rcROI.y;
 			}
 			if (gtl::IsROI_Valid(rcSrc, src.size())) {
-				if (mask.size() == src.size())
-					src(rcSrc).copyTo(dest(rcROI), mask(rcSrc));
+				if (pMask and pMask->size() == src.size())
+					src(rcSrc).copyTo(dest(rcROI), (*pMask)(rcSrc));
 				else
 					src(rcSrc).copyTo(dest(rcROI));
 			}
