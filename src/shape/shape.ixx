@@ -15,6 +15,7 @@
 
 #include "opencv2/opencv.hpp"
 
+#define FMT_HEADER_ONLY
 #include "fmt/format.h"
 
 #include "boost/json.hpp"

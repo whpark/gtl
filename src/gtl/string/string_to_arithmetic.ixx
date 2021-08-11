@@ -33,7 +33,7 @@ export namespace gtl {
 	/// @param pszEnd 
 	/// @param radix 
 	/// @return number
-	template < typename tvalue, typename tchar > requires gtlc::arithmetic<tvalue> and gtlc::string_elem<tchar>
+	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
 	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 
@@ -97,7 +97,7 @@ export namespace gtl {
 	/// @param pszEnd 
 	/// @param radix 
 	/// @return number
-	template < typename tvalue, typename tchar > requires gtlc::arithmetic<tvalue> and gtlc::string_elem<tchar>
+	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
 	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped, int radix, tchar cSplitter) {
 		if constexpr (std::is_integral_v<tvalue>) {
 			return tsztoi<tvalue>(std::basic_string_view<tchar>{psz, pszEnd}, ppszStopped, radix, cSplitter);

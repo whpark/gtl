@@ -18,6 +18,7 @@ module;
 #include <stdexcept>
 #include <algorithm>
 
+#define FMT_HEADER_ONLY
 #include "fmt/format.h"
 
 #include "gtl/_config.h"

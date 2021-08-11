@@ -27,6 +27,8 @@
 #include "boost/serialization/export.hpp"
 
 #include "gtl/gtl.h"
+#define FMT_HEADER_ONLY
+#include "fmt/format.h"
 #include "fmt/chrono.h"
 
 import gtl;
@@ -40,6 +42,21 @@ using namespace gtl::literals;
 #else
 #define DEBUG_PRINT(...) 
 #endif
+
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xShape, "shape")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xLayer, "layer")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xDot, "dot")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xLine, "line")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xPolyline, "polyline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xPolylineLW, "lwpolyline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xCircle, "circleXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xArc, "arcXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xEllipse, "ellipseXY")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xSpline, "spline")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xText, "text")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xMText, "mtext")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xHatch, "hatch")
+	BOOST_CLASS_EXPORT_GUID(gtl::shape::xDrawing, "drawing")
 
 TEST(gtl_shape, basic) {
 	std::filesystem::path paths[] = {

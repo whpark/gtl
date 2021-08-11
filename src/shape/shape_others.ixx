@@ -39,6 +39,7 @@ module;
 
 #include <numbers>
 
+#define FMT_HEADER_ONLY
 #include "fmt/format.h"
 #include "fmt/ostream.h"
 
@@ -1272,6 +1273,13 @@ export namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xDrawing);
 		//GTL__REFLECTION_DERIVED(xDrawing, xShape);
 		//GTL__REFLECTION_MEMBERS(vars, line_types, layers);
+		auto operator <=> (xDrawing const&) const = default;
+		//bool operator == (xDrawing const& B) const {
+		//	if ( !((xShape const&)*this == (xShape const&)B) )
+		//		return false;
+		//	return (m_vars == B.m_vars) and (m_line_types == B.m_line_types) and (m_rectBoundary == B.m_rectBoundary) and (m_layers == B.m_layers);
+		//}
+		//bool operator != (xDrawing const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xDrawing& var, unsigned int const file_version) {

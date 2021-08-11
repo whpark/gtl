@@ -17,6 +17,7 @@ module;
 #include <optional>
 #include <chrono>
 
+#define FMT_HEADER_ONLY
 #include "fmt/ostream.h"
 
 #include "boost/json.hpp"
@@ -62,6 +63,7 @@ export namespace gtl::shape {
 		double& Bulge() { return w; }
 		double Bulge() const { return w; }
 		
+		auto operator <=> (polypoint_t const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, polypoint_t& var, unsigned int const file_version) {
@@ -190,6 +192,8 @@ export namespace gtl::shape {
 		string_t description;
 		std::vector<double> path;
 
+		auto operator <=> (line_type_t const&) const = default;
+
 		template < typename archive >
 		friend void serialize(archive& ar, line_type_t& var, unsigned int const file_version) {
 			ar & var;
@@ -237,7 +241,9 @@ export namespace gtl::shape {
 		//GTL__REFLECTION_VIRTUAL_BASE(xShape);
 		//GTL__REFLECTION_MEMBERS(m_color, m_eLineType, m_strLineType, m_lineWeight, m_bVisible, m_bTransparent, m_cookie);
 
-		auto operator <=> (xShape const&) const = default;
+		//auto operator <=> (xShape const&) const = default;
+		bool operator == (xShape const& b) const = default;
+		bool operator != (xShape const& b) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xShape& var, unsigned int const file_version) {
