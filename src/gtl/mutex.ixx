@@ -37,7 +37,7 @@ export namespace gtl {
 
 	//------------------------------------------------------------------------
 	/// @brief null mutex
-	class  null_mutex {
+	class null_mutex {
 	public:
 		null_mutex() noexcept { }
 		~null_mutex() noexcept { }

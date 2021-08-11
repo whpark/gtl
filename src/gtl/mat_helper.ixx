@@ -844,7 +844,7 @@ export namespace gtl {
 			BMP_FILE_HEADER fh;
 
 			auto width32 = (cx * nBPP + 31) / 32 * 4;
-			fh.offsetData = sizeof(fh) + sizeof(header) + palette.size()/*(0x01 << nBPP)*/ * sizeof(gtl::color_bgra_t);
+			fh.offsetData = (uint32_t) ( sizeof(fh) + sizeof(header) + palette.size()/*(0x01 << nBPP)*/ * sizeof(gtl::color_bgra_t) );
 			fh.sizeFile = fh.offsetData + width32 * cy;
 			header.nBPP = nBPP;
 			header.nColorUsed = header.nColorImportant = (uint32_t)palette.size();

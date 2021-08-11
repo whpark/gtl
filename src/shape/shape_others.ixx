@@ -6,31 +6,32 @@
 // 2017.07.20
 // 2021.05.27
 // 2021.06.24.  module
+// 2021.08.11 Compare
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 /*
 
-1. CShapeObject 에서 변경 내용 :
+	1. CShapeObject 에서 변경 내용 :
 
-class name :
+		class name :
 
-CShapeObject	-> xShape
-CShapeLine		-> xLine
-CShapePolyLine	-> xPolyline
-...
+			CShapeObject	-> xShape
+			CShapeLine		-> xLine
+			CShapePolyLine	-> xPolyline
+			...
 
-Container :
+		Container :
 
-TList -> boost::ptr_deque
+			TList -> boost::ptr_deque
 
-Point / Line : x, y, z 3차원으로 변경
+		Point / Line : x, y, z 3차원으로 변경
 
-typedef xSize3d					size2d_t;
-typedef xPoint3d				point_t;
-typedef xRect3d					rect_t;
-typedef std::vector<xLine>		s_lines;
+			typedef xSize3d					size2d_t;
+			typedef xPoint3d				point_t;
+			typedef xRect3d					rect_t;
+			typedef std::vector<xLine>		s_lines;
 
 */
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,7 +77,12 @@ namespace gtl::shape {
 export namespace gtl::shape {
 
 
-	struct xLayer : public xShape {
+	class xLayer : public xShape {
+	public:
+		using base_t = xShape;
+		using this_t = xLayer;
+
+	public:
 		string_t m_name;
 		bool m_bUse{true};
 		int m_flags{};
@@ -86,6 +92,17 @@ export namespace gtl::shape {
 		xLayer(xLayer const&) = default;
 		xLayer(xLayer&&) = default;
 		xLayer(string_t const& name) : m_name(name) {}
+
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return true
+				and (m_name == B.m_name)
+				and (m_bUse == B.m_bUse)
+				and (m_flags == B.m_flags)
+				and (m_shapes == B.m_shapes);
+		}
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::layer; }
 		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
@@ -191,10 +208,23 @@ export namespace gtl::shape {
 	// internally
 	class xBlock : public xLayer {
 	public:
+		using base_t = xLayer;
+		using this_t = xBlock;
+
+	public:
 		string_t m_layer;
 		point_t m_pt;
 
 	public:
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return true
+				and (m_layer == B.m_layer)
+				and (m_pt == B.m_pt)
+				;
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::block; }
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xBlock);
@@ -230,8 +260,18 @@ export namespace gtl::shape {
 
 	class xDot : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xDot;
+
+	public:
 		point_t m_pt;
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return (m_pt == B.m_pt);
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::dot; }
 
 		//virtual point_t PointAt(double t) const override { return pt; };
@@ -288,8 +328,18 @@ export namespace gtl::shape {
 
 	class xLine : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xLine;
+
+	public:
 		point_t m_pt0, m_pt1;
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return (m_pt0 == B.m_pt0) and (m_pt1 == B.m_pt1);
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::line; }
 
 		//virtual point_t PointAt(double t) const override { return lerp(m_pt0, m_pt1, t); }
@@ -346,9 +396,19 @@ export namespace gtl::shape {
 
 	class xPolyline : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xPolyline;
+
+	public:
 		bool m_bLoop{};
 		std::vector<polypoint_t> m_pts;
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return (m_bLoop == B.m_bLoop) and (m_pts == B.m_pts);
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::polyline; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -443,10 +503,19 @@ export namespace gtl::shape {
 
 	class xPolylineLW : public xPolyline {
 	public:
+		using base_t = xPolyline;
+		using this_t = xPolylineLW;
+
+	public:
 	//protected:
 	//	int dummy{};
 	//public:
 
+		//virtual bool Compare(xShape const& B_) const override {
+		//	if (!base_t::Compare(B_))
+		//		return false;
+		//	return true;
+		//}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::lwpolyline; }
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolylineLW);
@@ -484,10 +553,20 @@ export namespace gtl::shape {
 
 	class xCircle : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xCircle;
+
+	public:
 		point_t m_ptCenter;
 		double m_radius{};
 		deg_t m_angle_length{360_deg};	// 회전 방향.
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return (m_ptCenter == B.m_ptCenter) and (m_radius == B.m_radius) and (m_angle_length == B.m_angle_length);
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::circle_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -550,8 +629,18 @@ export namespace gtl::shape {
 
 	class xArc : public xCircle {
 	public:
+		using base_t = xCircle;
+		using this_t = xArc;
+
+	public:
 		deg_t m_angle_start{};
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return m_angle_start == B.m_angle_start;
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::arc_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -678,9 +767,19 @@ export namespace gtl::shape {
 
 	class xEllipse : public xArc {
 	public:
+		using base_t = xArc;
+		using this_t = xEllipse;
+
+	public:
 		double m_radiusH{};
 		deg_t m_angle_first_axis{};
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return (m_radiusH == B.m_radiusH) and (m_angle_first_axis == B.m_angle_first_axis);
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::ellipse_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -772,6 +871,10 @@ export namespace gtl::shape {
 
 	class xSpline : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xSpline;
+
+	public:
 		enum class eFLAG { closed = 1, periodic = 2, rational = 4, planar = 8, linear = planar|16 };
 		int m_flags{};
 		point_t m_ptNormal;
@@ -786,6 +889,26 @@ export namespace gtl::shape {
 		double m_toleranceControlPoint{0.0000001};
 		double m_toleranceFitPoint{0.0000001};
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return true
+				and ( m_flags					== B.m_flags )
+				and ( m_ptNormal				== B.m_ptNormal )
+				and ( m_vStart					== B.m_vStart )
+				and ( m_vEnd					== B.m_vEnd )
+				and ( m_degree					== B.m_degree )
+
+				and ( m_knots					== B.m_knots )
+				and ( m_ptsControl				== B.m_ptsControl )
+				and ( m_ptsFit					== B.m_ptsFit )
+
+				and ( m_toleranceKnot			== B.m_toleranceKnot )
+				and ( m_toleranceControlPoint	== B.m_toleranceControlPoint )
+				and ( m_toleranceFitPoint		== B.m_toleranceFitPoint )
+			;
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::spline; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -893,6 +1016,10 @@ export namespace gtl::shape {
 
 	class xText : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xText;
+
+	public:
 		enum class eALIGN_VERT : int { base_line = 0, bottom, mid, top };
 		enum class eALIGN_HORZ : int { left = 0, center, right, aligned, middle, fit };
 
@@ -907,6 +1034,24 @@ export namespace gtl::shape {
 		eALIGN_HORZ m_alignHorz{eALIGN_HORZ::left};
 		eALIGN_VERT m_alignVert{eALIGN_VERT::base_line};
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return true
+				and ( m_pt0			== B.m_pt0 )
+				and ( m_pt1			== B.m_pt1 )
+				and ( m_text		== B.m_text )
+				and ( m_height		== B.m_height )
+				and ( m_angle		== B.m_angle )
+				and ( m_widthScale	== B.m_widthScale )
+				and ( m_oblique		== B.m_oblique )
+				and ( m_textStyle	== B.m_textStyle )
+				and ( m_textgen		== B.m_textgen )
+				and ( m_alignHorz	== B.m_alignHorz )
+				and ( m_alignVert	== B.m_alignVert )
+				;
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::text; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -985,6 +1130,10 @@ export namespace gtl::shape {
 	};
 
 	class xMText : public xText {
+	public:
+		using base_t = xText;
+		using this_t = xMText;
+
 	protected:
 		using xText::m_alignVert;
 	public:
@@ -1005,6 +1154,12 @@ export namespace gtl::shape {
 		eATTACH GetAttachPoint() const { return (eATTACH)m_alignVert; }
 		void SetAttachPoint(eATTACH eAttach) { m_alignVert = (eALIGN_VERT)eAttach; }
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return m_interlin == B.m_interlin;
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::mtext; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -1045,6 +1200,10 @@ export namespace gtl::shape {
 
 	class xHatch : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xHatch;
+
+	public:
 		string_t m_name;
 		bool m_bSolid{};
 		bool m_bAssociative{};
@@ -1058,6 +1217,23 @@ export namespace gtl::shape {
 
 		std::vector<xPolyline> m_boundaries;
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return true
+				and ( m_name			== B.m_name )
+				and ( m_bSolid			== B.m_bSolid )
+				and ( m_bAssociative	== B.m_bAssociative )
+				and ( m_nLoops			== B.m_nLoops )
+				and ( m_hstyle			== B.m_hstyle )
+				and ( m_hpattern		== B.m_hpattern )
+				and ( m_bDouble			== B.m_bDouble )
+				and ( m_angle			== B.m_angle )
+				and ( m_scale			== B.m_scale )
+				and ( m_deflines		== B.m_deflines )
+				;
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::hatch; }
 
 		//virtual point_t PointAt(double t) const override {};
@@ -1135,6 +1311,10 @@ export namespace gtl::shape {
 	// temporary object
 	class xInsert : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xInsert;
+
+	public:
 		string_t m_name;	// block name
 		point_t m_pt;
 		double m_xscale{1};
@@ -1182,6 +1362,23 @@ export namespace gtl::shape {
 			return true;
 		}
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return true
+				and ( m_name		== B.m_name )
+				and ( m_pt			== B.m_pt )
+				and ( m_xscale		== B.m_xscale )
+				and ( m_yscale		== B.m_yscale )
+				and ( m_zscale		== B.m_zscale )
+				and ( m_angle		== B.m_angle )
+				and ( m_nCol		== B.m_nCol )
+				and ( m_nRow		== B.m_nRow )
+				and ( m_spacingCol	== B.m_spacingCol )
+				and ( m_spacingRow	== B.m_spacingRow )
+				;
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::insert; }
 
 		//virtual point_t PointAt(double t) const = 0;
@@ -1206,6 +1403,10 @@ export namespace gtl::shape {
 
 	class xDrawing : public xShape {
 	public:
+		using base_t = xShape;
+		using this_t = xDrawing;
+
+	public:
 		std::map<std::string, variable_t> m_vars;
 		boost::ptr_deque<line_type_t> m_line_types;
 		//boost::ptr_deque<xBlock> blocks;
@@ -1218,6 +1419,17 @@ export namespace gtl::shape {
 		//xDrawing& operator = (xDrawing const&) = default;
 		//xDrawing& operator = (xDrawing &&) = default;
 
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return true
+				and ( m_vars			== B.m_vars )
+				and ( m_line_types		== B.m_line_types )
+				and ( m_rectBoundary	== B.m_rectBoundary )
+				and ( m_layers			== B.m_layers )
+				;
+		}
 		virtual eSHAPE GetShapeType() const { return eSHAPE::drawing; }
 
 		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
@@ -1273,13 +1485,38 @@ export namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xDrawing);
 		//GTL__REFLECTION_DERIVED(xDrawing, xShape);
 		//GTL__REFLECTION_MEMBERS(vars, line_types, layers);
+	#if 0
+		bool operator == (xDrawing const& B) const {
+			if ((base_t const&)*this != (base_t const&)B)
+				return false;
+			bool bEQ = (m_vars == B.m_vars);
+			bEQ &= (m_line_types == B.m_line_types);
+			bEQ &= (m_rectBoundary == B.m_rectBoundary);
+			bEQ &= (m_layers == B.m_layers);
+			if (m_layers.size() == B.m_layers.size()) {
+				for (size_t i{}; i < m_layers.size(); i++) {
+					auto const& layerA = m_layers[i];
+					auto const& layerB = B.m_layers[i];
+					if (layerA.m_shapes.size() != layerB.m_shapes.size())
+						return false;
+					for (size_t iShape{}; iShape < layerA.m_shapes.size(); iShape++) {
+						auto const& shapeA = layerA.m_shapes[iShape];
+						auto const& shapeB = layerB.m_shapes[iShape];
+						if ((xShape const&)shapeA != (xShape const&)shapeB)
+							return false;
+						if (shapeA != shapeB)
+							return false;
+					}
+					if (layerA != layerB)
+						return false;
+				}
+			}
+			if (!bEQ)
+				return false;
+			return true;
+		}
+	#endif
 		auto operator <=> (xDrawing const&) const = default;
-		//bool operator == (xDrawing const& B) const {
-		//	if ( !((xShape const&)*this == (xShape const&)B) )
-		//		return false;
-		//	return (m_vars == B.m_vars) and (m_line_types == B.m_line_types) and (m_rectBoundary == B.m_rectBoundary) and (m_layers == B.m_layers);
-		//}
-		//bool operator != (xDrawing const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xDrawing& var, unsigned int const file_version) {
@@ -1322,5 +1559,4 @@ export namespace gtl::shape {
 	};
 
 }
-
 

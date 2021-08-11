@@ -171,11 +171,11 @@ export namespace gtl::shape {
 		virtual void Text(xMText const& text) {
 		}
 
-		//public:
-		//	virtual rad_t CalcArcInterval(double radius, double target_resolution) {
-		//		auto scale = ct_(point_t::All(0)).Distance(ct_(point_t::All(1.)));
-		//		return rad_t(target_resolution / (radius*scale*std::numbers::pi));
-		//	}
+	//public:
+	//	virtual rad_t CalcArcInterval(double radius, double target_resolution) {
+	//		auto scale = m_ct(point_t::All(0)).Distance(m_ct(point_t::All(1.)));
+	//		return rad_t(target_resolution / (radius*scale*std::numbers::pi));
+	//	}
 	};
 
 	//=============================================================================================================================

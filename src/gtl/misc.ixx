@@ -131,7 +131,7 @@ export namespace gtl {
 	/// @brief RAI helper
 	struct xTrigger {
 		std::function<void()> m_cleaner;
-		xTrigger(std::function<void()> cleaner) : m_cleaner(cleaner) {}
+		[[nodiscard]] xTrigger(std::function<void()> cleaner) : m_cleaner(cleaner) {}
 		~xTrigger() {
 			if (m_cleaner)
 				m_cleaner();

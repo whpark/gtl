@@ -43,6 +43,7 @@ using namespace gtl::literals;
 #define DEBUG_PRINT(...) 
 #endif
 
+#if 1
 	BOOST_CLASS_EXPORT_GUID(gtl::shape::xShape, "shape")
 	BOOST_CLASS_EXPORT_GUID(gtl::shape::xLayer, "layer")
 	BOOST_CLASS_EXPORT_GUID(gtl::shape::xDot, "dot")
@@ -57,6 +58,7 @@ using namespace gtl::literals;
 	BOOST_CLASS_EXPORT_GUID(gtl::shape::xMText, "mtext")
 	BOOST_CLASS_EXPORT_GUID(gtl::shape::xHatch, "hatch")
 	BOOST_CLASS_EXPORT_GUID(gtl::shape::xDrawing, "drawing")
+#endif
 
 TEST(gtl_shape, basic) {
 	std::filesystem::path paths[] = {
@@ -64,6 +66,21 @@ TEST(gtl_shape, basic) {
 		LR"xx(shape_test/cube.dxf.json)xx",
 		LR"xx(shape_test/diamond.dxf.json)xx",
 	};
+
+	auto rLine1 = std::make_unique<gtl::shape::xLine>();
+	auto rLine2 = std::make_unique<gtl::shape::xLine>();
+	rLine1->m_pt0 = {1, 1};
+	rLine1->m_pt1 = {2, 2};
+	rLine2->m_pt0 = {1, 1};
+	rLine2->m_pt1 = {2, 2};
+	EXPECT_EQ(*rLine1, *rLine2);
+
+	rLine2->m_pt1 = {2, 2.1};
+	EXPECT_NE(*rLine1, *rLine2);
+
+	std::unique_ptr<gtl::shape::xShape> r1 = std::move(rLine1);
+	std::unique_ptr<gtl::shape::xShape> r2 = std::move(rLine2);
+	EXPECT_NE(*r1, *r2);
 
 	for (auto path : paths) {
 

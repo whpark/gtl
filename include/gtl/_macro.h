@@ -212,11 +212,11 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 	using this_t = THIS_CLASS;\
 	template < typename tjson >\
 	friend void from_json(tjson const& j, this_t& var) {\
-		std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::member_tuple_s);\
+		std::apply([&j, &var](auto& ... args) { (from_json(j[args.first], var.*(args.second)), ...); }, this_t::member_tuple_s);\
 	}\
 	template < typename tjson >\
-	friend void to_json(tjson& j, this_t const& var) {\
-		std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+	friend void to_json(tjson&& j, this_t const& var) {\
+		std::apply([&j, &var](auto const& ... args) { (to_json(j[args.first], var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
 	}\
 	template < typename tarchive >\
 	friend tarchive& operator >> (tarchive& ar, this_t& var) {\
@@ -237,12 +237,12 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 	template < typename tjson >\
 	friend void from_json(tjson const& j, this_t& var) {\
 		from_json(j, (parent_t&)var);\
-		std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::member_tuple_s);\
+		std::apply([&j, &var](auto& ... args) { (from_json(j[args.first], var.*(args.second)), ...); }, this_t::member_tuple_s);\
 	}\
 	template < typename tjson >\
-	friend void to_json(tjson& j, this_t const& var) {\
+	friend void to_json(tjson&& j, this_t const& var) {\
 		to_json(j, (parent_t const&)var);\
-		std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, this_t::member_tuple_s);\
+		std::apply([&j, &var](auto const& ... args) { (to_json(j[args.first], var.*(args.second)), ...); }, this_t::member_tuple_s);\
 	}\
 	template < typename tarchive >\
 	friend tarchive& operator >> (tarchive& ar, this_t& var) {\
@@ -251,9 +251,9 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 		return ar;\
 	}\
 	template < typename tarchive >\
-	friend tarchive& operator & (tarchive& ar, this_t const& var) {\
+	friend tarchive& operator << (tarchive& ar, this_t const& var) {\
 		ar << (parent_t const&)var;\
-		std::apply([&ar, &var](auto const& ... args) { ((ar & var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+		std::apply([&ar, &var](auto const& ... args) { ((ar << var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
 		return ar;\
 	}\
 	//auto operator <=> (this_t const&) const = default;

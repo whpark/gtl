@@ -333,7 +333,6 @@ export namespace gtl {
 			} else {
 				static_assert(false);
 			}
-#undef GTL__FMT_TIME
 #undef GTL__FMT_EXPAND
 			const tchar_t* posHead = svText.data();
 			const tchar_t* posEnd = svText.data() + svText.size();

@@ -167,7 +167,8 @@ export namespace gtl {
 				size_t remnant_dst = sizeof(initial_dst_buf);
 				char* out = (char*)initial_dst_buf;
 				if (iconv(cd_, &src, &remnant_src, &out, &remnant_dst) == (size_t)-1) {
-					if (errno == E2BIG) {
+					auto e = errno;
+					if (e == E2BIG) {
 						std::basic_string<tchar_to> strTo;
 						size_t const old_size = sizeof(initial_dst_buf);
 						size_t const new_size = std::max(old_size*2, svFrom.size());

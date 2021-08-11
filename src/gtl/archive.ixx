@@ -158,7 +158,7 @@ export namespace gtl {
 		
 		/// @brief Read byte buffer
 		template < typename T > requires (bLOAD)
-		inline std::streamsize Read(void* data, std::streamsize size) {
+		inline std::streamsize Read(T* data, std::streamsize size) {
 			CHECK_ARCHIVE_LOADABLE;
 			auto pos0 = stream_.tellg();
 			if (stream_.read((std::istream::char_type*)data, size)) {

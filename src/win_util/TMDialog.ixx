@@ -425,16 +425,16 @@ export namespace gtl::win_util {
 		void OnEditPaste() { gtl::win_util::OnEditPaste(this);  }
 		void OnEditUndo()  { gtl::win_util::OnEditUndo(this);  }
 
-		const AFX_MSGMAP* GetMessageMap() const override
+		AFX_MSGMAP const* GetMessageMap() const override
 			{ return GetThisMessageMap(); }
-		const AFX_MSGMAP* PASCAL GetThisMessageMap() {
+		static AFX_MSGMAP const* PASCAL GetThisMessageMap() {
 		#pragma warning(push)
 		#pragma warning(disable: 4640) /* message maps can only be called by single threaded message pump */
 			static const AFX_MSGMAP_ENTRY _messageEntries[] = {
-				ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
-				ON_COMMAND(ID_EDIT_CUT, OnEditCut)
-				ON_COMMAND(ID_EDIT_PASTE, OnEditPaste)
-				ON_COMMAND(ID_EDIT_UNDO, OnEditUndo)
+				ON_COMMAND(ID_EDIT_COPY, &OnEditCopy)
+				ON_COMMAND(ID_EDIT_CUT, &OnEditCut)
+				ON_COMMAND(ID_EDIT_PASTE, &OnEditPaste)
+				ON_COMMAND(ID_EDIT_UNDO, &OnEditUndo)
 				{0, 0, 0, 0, AfxSig_end, (AFX_PMSG)0 },
 			};
 		#pragma warning(pop)
