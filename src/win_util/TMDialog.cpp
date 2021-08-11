@@ -8,20 +8,20 @@ namespace gtl::win_util {
 
 	// CMDialog dialog
 
-	BEGIN_MESSAGE_MAP(CMDialogEx, CDialogEx)
-		ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
-		ON_COMMAND(ID_EDIT_CUT, OnEditCut)
-		ON_COMMAND(ID_EDIT_PASTE, OnEditPaste)
-		ON_COMMAND(ID_EDIT_UNDO, OnEditUndo)
-	END_MESSAGE_MAP()
+	//BEGIN_MESSAGE_MAP(CMDialogEx, CDialogEx)
+	//	ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
+	//	ON_COMMAND(ID_EDIT_CUT, OnEditCut)
+	//	ON_COMMAND(ID_EDIT_PASTE, OnEditPaste)
+	//	ON_COMMAND(ID_EDIT_UNDO, OnEditUndo)
+	//END_MESSAGE_MAP()
 
 
 	CEdit* GetFocusedEdit(CWnd* pWnd) {
 		if (!pWnd || !pWnd->m_hWnd)
-			return NULL;
+			return nullptr;
 		CWnd* pWndFocused = pWnd->GetFocus();
 		if (!pWndFocused)
-			return NULL;
+			return nullptr;
 		if (pWndFocused->IsKindOf(RUNTIME_CLASS(CEdit)))
 			return (CEdit*)pWndFocused;
 		TCHAR szClassName[64];
@@ -29,35 +29,35 @@ namespace gtl::win_util {
 		if (_tcscmp(szClassName, _T("Edit")) == 0)
 			return (CEdit*)pWndFocused;
 
-		return NULL;
+		return nullptr;
 	}
-	BOOL OnEditCopy(CWnd* pWnd) {
+	bool OnEditCopy(CWnd* pWnd) {
 		CEdit* pEdit = GetFocusedEdit(pWnd);
 		if (!pEdit)
-			return FALSE;
+			return false;
 		pEdit->Copy();
-		return TRUE;
+		return true;
 	}
-	BOOL OnEditCut(CWnd* pWnd) {
+	bool OnEditCut(CWnd* pWnd) {
 		CEdit* pEdit = GetFocusedEdit(pWnd);
 		if (!pEdit)
-			return FALSE;
+			return false;
 		pEdit->Cut();
-		return TRUE;
+		return true;
 	}
-	BOOL OnEditPaste(CWnd* pWnd) {
+	bool OnEditPaste(CWnd* pWnd) {
 		CEdit* pEdit = GetFocusedEdit(pWnd);
 		if (!pEdit)
-			return FALSE;
+			return false;
 		pEdit->Paste();
-		return TRUE;
+		return true;
 	}
-	BOOL OnEditUndo(CWnd* pWnd) {
+	bool OnEditUndo(CWnd* pWnd) {
 		CEdit* pEdit = GetFocusedEdit(pWnd);
 		if (!pEdit)
-			return FALSE;
+			return false;
 		pEdit->Undo();
-		return TRUE;
+		return true;
 	}
 
 	int32_t GetDlgItemInt32(CWnd* pWnd, int idc, int eRadix) {
@@ -66,18 +66,16 @@ namespace gtl::win_util {
 
 		CString str;
 		pWnd->GetDlgItemText(idc, str);
-		return _tcstol(str, NULL, eRadix);
+		return _tcstol(str, nullptr, eRadix);
 	}
 
-	void SetDlgItemInt32(CWnd* pWnd, int idc, int32_t iValue, LPCTSTR pszFMT) {
+	void SetDlgItemInt32(CWnd* pWnd, int idc, int32_t iValue, std::wstring_view fmt) {
 		if (!pWnd || !pWnd->m_hWnd)
 			return;
 
-		CString str;
-		CString strFMT = pszFMT;
-		if (strFMT.IsEmpty())
-			strFMT = _T("%I32d");
-		str.Format(strFMT, iValue);
+		if (fmt.empty())
+			fmt = L"{}";
+		auto str = fmt::format(fmt, iValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 
@@ -87,18 +85,16 @@ namespace gtl::win_util {
 
 		CString str;
 		pWnd->GetDlgItemText(idc, str);
-		return _tcstoi64(str, NULL, eRadix);
+		return _tcstoi64(str, nullptr, eRadix);
 	}
 
-	void SetDlgItemInt64(CWnd* pWnd, int idc, int64_t iValue, LPCTSTR pszFMT) {
+	void SetDlgItemInt64(CWnd* pWnd, int idc, int64_t iValue, std::wstring_view fmt) {
 		if (!pWnd || !pWnd->m_hWnd)
 			return;
 
-		CString str;
-		CString strFMT = pszFMT;
-		if (strFMT.IsEmpty())
-			strFMT = _T("%I64d");
-		str.Format(strFMT, iValue);
+		if (fmt.empty())
+			fmt = L"{}";
+		auto str = fmt::format(fmt, iValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 
@@ -111,83 +107,60 @@ namespace gtl::win_util {
 		return _ttof(str);
 	}
 
-	void SetDlgItemDouble(CWnd* pWnd, int idc, double dValue, LPCTSTR pszFMT) {
+	void SetDlgItemDouble(CWnd* pWnd, int idc, double dValue, std::wstring_view fmt) {
 		if (!pWnd || !pWnd->m_hWnd)
 			return;
 
-		CString str;
-		CString strFMT = pszFMT;
-		if (strFMT.IsEmpty())
-			strFMT = _T("%.5f");
-		str.Format(strFMT, dValue);
+		if (fmt.empty())
+			fmt = L"{:.5f}";
+		auto str = fmt::format(fmt, dValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 
-	void DDX_Double(CDataExchange* pDX, int idc, double& dValue, LPCTSTR pszFMT) {
+	void DDX_Double(CDataExchange* pDX, int idc, double& dValue, std::wstring_view fmt) {
 		if (!pDX || !pDX->m_pDlgWnd)
 			return;
 		if (pDX->m_bSaveAndValidate) {
 			dValue = GetDlgItemDouble(pDX->m_pDlgWnd, idc);
 		} else {
-			SetDlgItemDouble(pDX->m_pDlgWnd, idc, dValue, pszFMT);
+			SetDlgItemDouble(pDX->m_pDlgWnd, idc, dValue, fmt);
 		}
 	}
 
 	//WARNING_PUSH_AND_DISABLE(4996)
 
-	void DDX_String(CDataExchange* pDX, int idc, char* sz, size_t nSize) {
-		CString str(sz);
-		DDX_Text(pDX, idc, str);
+	template < typename tchar > requires gtlc::string_elem<tchar>
+	void DDX_String(CDataExchange* pDX, int idc, std::basic_string<tchar>& str) {
 		if (pDX->m_bSaveAndValidate) {
+			auto strValue = GetDlgItemText(pDX->m_pDlgWnd, idc);
 
-			#ifdef _UNICODE
-			#	define STR CStringA(str)
-			#else
-			#	define STR str
-			#endif
-
-			if (nSize == (size_t)-1) {
-				//strcpy(sz, STR);
-			} else if (nSize > 0) {
-				strncpy_s(sz, nSize, STR, nSize);
+			if constexpr (std::is_same_v<tchar, TCHAR>) {
+				str = (LPCTSTR)strValue;
 			}
-
-			#undef STR
+			else {
+				str = ToString<tchar>({(LPCTSTR)strValue, (size_t)strValue.GetLength()});
+			}
 		}
-	}
-	void DDX_String(CDataExchange* pDX, int idc, wchar_t* sz, size_t nSize) {
-		CString str(sz);
-		DDX_Text(pDX, idc, str);
-		if (pDX->m_bSaveAndValidate) {
-
-			#ifdef _UNICODE
-			#	define STR str
-			#else
-			#	define STR xStringW(str)
-			#endif
-
-			if (nSize == (size_t)-1) {
-				//wcscpy(sz, xStringW(str));
-			} else if (nSize > 0) {
-				wcsncpy_s(sz, nSize, xStringW(str), nSize);
+		else {
+			if constexpr (std::is_same_v<tchar, TCHAR>) {
+				::SetDlgItemText(pDX->m_pDlgWnd, idc, str.c_str());
+			} else {
+				::SetDlgItemText(pDX->m_pDlgWnd, idc, ToString<TCHAR>(str).c_str());
 			}
-
-			#undef STR
 		}
 	}
 
 	//WARNING_POP()
 
-	bool CheckAndSetDlgItemText(CWnd* pWnd, int idc, LPCTSTR pszText, CString* pStrOrigin) {
-		CString str;
+	bool CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& str, std::wstring* pStrOrigin) {
 		if (!pWnd)
 			return false;
-		pWnd->GetDlgItemText(idc, str);
-		bool bChanged = (str != pszText);
+		auto strOrg = GetDlgItemText(pWnd, idc);
+		bool bChanged = ((LPCTSTR)strOrg != str);
 		if (bChanged)
-			pWnd->SetDlgItemText(idc, pszText);
+			pWnd->SetDlgItemText(idc, str.c_str());
 		if (pStrOrigin)
-			*pStrOrigin = str;
+			*pStrOrigin = (LPCTSTR)strOrg;
 		return bChanged;
 	}
 
@@ -198,11 +171,6 @@ namespace gtl::win_util {
 		pWnd->GetDlgItemText(idc, str);
 		return str;
 	}
-
-	void CMDialogEx::OnEditCopy()  { gtl::win_util::OnEditCopy(this); }
-	void CMDialogEx::OnEditCut()   { gtl::win_util::OnEditCut(this); }
-	void CMDialogEx::OnEditPaste() { gtl::win_util::OnEditPaste(this);  }
-	void CMDialogEx::OnEditUndo()  { gtl::win_util::OnEditUndo(this);  }
 
 
 }	// namespace gtl::win_util

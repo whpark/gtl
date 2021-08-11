@@ -124,7 +124,6 @@ namespace gtl::win_util {
 		}
 
 		CRect rect, rectSubItem;
-		xString str;
 		DWORD dwStyle = 0;
 		if (GetStyle() & LVS_REPORT) {
 			GetItemRect(iItem, rect, LVIR_BOUNDS);
@@ -450,7 +449,6 @@ namespace gtl::win_util {
 		}
 
 		CRect rect, rectSubItem;
-		xString str;
 		DWORD dwStyle = 0;
 		if (GetStyle() & LVS_REPORT) {
 			GetItemRect(iItem, rect, LVIR_BOUNDS);

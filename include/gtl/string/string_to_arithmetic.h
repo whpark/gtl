@@ -56,7 +56,7 @@ namespace gtl {
 	constexpr inline [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 	template < std::floating_point tvalue = double, gtlc::string_elem tchar = char16_t >
-	[[deprecated("NOT STANDARD CONVERTING !")]] constexpr tvalue _tsztod(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
+	[[deprecated("NOT A STANDARD CONVERTING !")]] constexpr tvalue _tsztod(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
 
 	template < std::floating_point tvalue = double, gtlc::string_elem tchar >
 	inline [[nodiscard]] tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
