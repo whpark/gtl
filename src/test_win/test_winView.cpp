@@ -12,7 +12,6 @@
 
 #include "test_winDoc.h"
 #include "test_winView.h"
-#include "gtl/win_util/ProgressDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -49,6 +48,10 @@ CtestwinView::CtestwinView() noexcept
 	: CFormView(IDD_TEST_WIN_FORM) {
 	// TODO: add construction code here
 
+	auto bGPU = gtl::CheckGPU(true);
+	if (bGPU) {
+		AfxMessageBox(_T("GPGPU is enabled"));
+	}
 }
 
 CtestwinView::~CtestwinView() {
@@ -287,22 +290,22 @@ void CtestwinView::OnBnClickedTestSaveCImage() {
 	}
 }
 
-cv::Mat CtestwinView::CreateSampleImage(cv::Size size) {
+cv::Mat CtestwinView::CreateSampleImage(cv::Size size, int type, cv::Scalar cr1, cv::Scalar cr2) {
 	static cv::Mat mat;
-	if (mat.size() == size)
+	if ( (mat.size() == size) and (mat.type() == type) )
 		return mat;
 
 	gtlw::xStopWatch sw;
-	mat = cv::Mat::zeros(size, CV_8UC1);
+	mat = cv::Mat::zeros(size, type);
 	for (int row{}; row < mat.rows; row++) {
-		auto v = ((row / 1'000) % 2) ? 0 : 255;
+		auto v = ((row / 1'000) % 2) ? cr1 : cr2;
 
 		auto r = mat.row(row);
 		r = v;//cv::Scalar(0, 0, v);
-		r.col(0) = 255;
-		r.col(1) = 0;
-		r.col(r.cols - 2) = 0;
-		r.col(r.cols - 1) = 255;
+		r.col(0) = cr2;
+		r.col(1) = cr1;
+		r.col(r.cols - 2) = cr1;
+		r.col(r.cols - 1) = cr2;
 
 		cv::Rect rect(row % r.cols/*사선*/, 0, mat.cols / 5, 1);
 		rect = gtl::GetSafeROI(rect, r.size());
@@ -321,7 +324,8 @@ bool CtestwinView::WriteSampleImage(std::filesystem::path const& folder, cv::Mat
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
 
 	auto path = folder / std::format(L"{}x{}-{}bpp.bmp", mat.cols, mat.rows, nBPP);
-	bool bResult = gtlw::SaveBitmapMatProgress(path, mat, nBPP, palette, false);
+	gtl::xSize2i pelsPerMeter{gtl::Round(360*1'000/25.4), gtl::Round(360*1'000/25.4)};
+	bool bResult = gtlw::SaveBitmapMatProgress(path, mat, nBPP, pelsPerMeter, palette, false);
 
 	sw.Lap("{}rows = {}, cols = {} {}bpp", bResult ? "" : "FAILED ", mat.rows, mat.cols, nBPP);
 
@@ -338,7 +342,7 @@ void CtestwinView::TestSaveBMP(int nBPP) {
 
 	gtlw::xStopWatch sw;
 
-	cv::Mat mat = CreateSampleImage(size);
+	cv::Mat mat = CreateSampleImage(size, nBPP <= 8 ? CV_8UC1 : CV_8UC3);
 
 	auto folder = GetWorkingFolder();
 
@@ -347,31 +351,10 @@ void CtestwinView::TestSaveBMP(int nBPP) {
 	}
 }
 
-void CtestwinView::OnBnClickedTestSaveBMP_1BPP()  { TestSaveBMP( 1);}
-void CtestwinView::OnBnClickedTestSaveBMP_4BPP()  { TestSaveBMP( 4);}
-void CtestwinView::OnBnClickedTestSaveBMP_8BPP()  { TestSaveBMP( 8);}
-void CtestwinView::OnBnClickedTestSaveBMP_24BPP() {
-	CWaitCursor wc;
-
-	auto size = GetMatSize();
-	if (size.width < 1'000) size.width = 1'000;
-	if (size.height < 1'000) size.height = 1'000;
-
-	static cv::Mat mat;
-	if (mat.empty() or mat.size() != size) {
-		mat = cv::Mat::zeros(size, CV_8UC3);
-		for (int row{}; row < mat.rows; row++) {
-			auto v = ((row / 1'000) % 2) ? 0 : 255;
-
-			mat.row(row) = cv::Scalar(0, 0, v);
-		}
-	}
-
-	auto folder = GetWorkingFolder();
-	auto path = folder / std::format(L"{}x{}-24bpp.bmp", mat.cols, mat.rows);
-	gtlw::SaveBitmapMatProgress(path, mat, 24, {});
-
-}
+void CtestwinView::OnBnClickedTestSaveBMP_1BPP()  { TestSaveBMP( 1); }
+void CtestwinView::OnBnClickedTestSaveBMP_4BPP()  { TestSaveBMP( 4); }
+void CtestwinView::OnBnClickedTestSaveBMP_8BPP()  { TestSaveBMP( 8); }
+void CtestwinView::OnBnClickedTestSaveBMP_24BPP() { TestSaveBMP(24); }
 
 void CtestwinView::OnBnClickedTestSaveBMP_nBPP() {
 	TestSaveBMP(1);
@@ -397,7 +380,8 @@ void CtestwinView::OnBnClickedTestLoadBMP() {
 		if (m_bitmap.cols* m_bitmap.rows >= 20'000*20'000)
 			m_bitmap.release();
 		
-		img = gtlw::LoadBitmapMatProgress(path);
+		gtl::xSize2i pelsPerMeter;
+		img = gtlw::LoadBitmapMatProgress(path, pelsPerMeter);
 
 		sw.Lap("LoadBitmapMat -- ");
 	}

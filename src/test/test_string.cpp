@@ -8,7 +8,7 @@
 using namespace std::literals;
 using namespace gtl::literals;
 
-#define	SUPPRESS_DEPRECATED_WARNING _Pragma ("warning(suppress:4996)")
+#define	SUPPRESS_DEPRECATED_WARNING //_Pragma ("warning(suppress:4996)")
 
 namespace gtl {
 
@@ -74,18 +74,22 @@ TEST(gtl_string, TString_Upper_Lower) {
 		u"Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz "
 		"Àà Áá Ǎǎ Ãã Ȧȧ Ââ Ää Åå Āā Ąą Ăă Ćć Ĉĉ Čč Ċċ Çç Ďď Ḑḑ Éé Ěě Ēē Èè Ęę Ẽẽ Ėė Êê "
 		"Ëë Ĝĝ Ǵǵ Ǧǧ Ģģ Ğğ Ȟȟ Ĥĥ Īī Įį Íí Ǐǐ Ïï Ĩĩ "
-		"İi "	// NOT Working !
+		"İi "
 		"Îî Ɨɨ "
-		"Iı "	// NOT Working !
+		"Iı "
 		"Ĵĵ Ǩǩ Ḱḱ Ķķ Ĺĺ Ļļ Łł "
 		"Ḿḿ Ňň Ńń Ññ Ņņ Õõ Ǒǒ Öö Őő Óó Òò Øø Ōō Ǫǫ Řř Ŕŕ Ȓȓ Şş Śś Šš Șș Ŝŝ Ťť Țț Ŧŧ "
-		"Ŭŭ Üü Ūū Ǔǔ Ųų Ůů Űű Ũũ Úú Ùù Ṽṽ Ẃẃ Ẋẋ Ȳȳ Ỹỹ Ÿÿ Ýý Žž Źź"
+		"Ŭŭ Üü Ūū Ǔǔ Ųų Ůů Űű Ũũ Úú Ùù Ṽṽ Ẃẃ Ẋẋ Ȳȳ Ỹỹ "
+		//"Ÿÿ "
+		"Ýý Žž Źź"
 		;
 
 	constexpr char16_t const szCH_Exception[] = {
 		//0x69, 0x131, 0x142, 0xF8, 0x167,
 		0x3f, 0x49, 0x141, 0xd8, 0x166,
 	};
+
+	EXPECT_TRUE(std::setlocale(LC_CTYPE, ".1250"));
 
 	auto const * const end = szCH+std::size(szCH);
 	for (auto const* pos = szCH; pos < end; pos+=3) {
@@ -118,12 +122,14 @@ TEST(gtl_string, TString_Upper_Lower) {
 		EXPECT_EQ(str2U, str1);
 
 	}
-	
+
 }
 
 
 TEST(gtl_string, TString_etc) {
 	//using namespace gtl;
+
+	EXPECT_TRUE(std::setlocale(LC_ALL, ".949"));
 
 	gtl::xStringU16 str;
 
@@ -211,7 +217,7 @@ TEST(gtl_string, TString_etc) {
 		str += u"바"sv;
 SUPPRESS_DEPRECATED_WARNING
 		str += u"사"s.c_str();	// NOT Secure
-		str += "아";
+		str += L"아";
 		str += u"자차";
 		str += U"카";
 		str += u8"타";
@@ -244,7 +250,7 @@ SUPPRESS_DEPRECATED_WARNING
 		str3 = str + str2;
 		str3 = u"가나다\n"sv + str3;
 		str3 = U"마바사\n"sv + str3;
-		str3 = "아자차\n"sv + str3;
+		str3 = L"아자차\n"sv + str3;
 		EXPECT_TRUE(str3 == u"아자차\n마바사\n가나다\nABCDEF\nABCDEF\n가나다\n마바사\n아자차\n"sv);
 
 		str = u"가나다\n";
@@ -264,21 +270,21 @@ SUPPRESS_DEPRECATED_WARNING
 		EXPECT_TRUE(str == u"가가나다"sv);
 
 		str = u"가나다"sv;
-		gtl::xStringA strA { "가"sv};
-		auto strA1 = "가" + str + u"도레미";
-		auto strA2 = "가"s + str + U"마바사";
-		auto strA3 = "가"sv + str + "솔라시";
-		auto strA4 = strA + str;
+		gtl::xStringA strA { L"가"sv};
+		auto strA1 = L"가" + str + u"도레미";
+		auto strA2 = L"가"s + str + U"마바사";
+		auto strA3 = L"가"sv + str + L"솔라시";
+		gtl::xStringW strA4 {strA + str};
 SUPPRESS_DEPRECATED_WARNING
-		auto strA5 = "가"s.c_str() + str;	// NOT Secure
-		EXPECT_TRUE(strA1 == "가가나다도레미"sv);
-		EXPECT_TRUE(strA2 == "가가나다마바사"sv);
-		EXPECT_TRUE(strA3 == "가가나다솔라시"sv);
-		EXPECT_TRUE(strA4 == "가가나다"sv);
-		EXPECT_TRUE(strA5 == "가가나다"sv);
+		auto strA5 = L"가"s.c_str() + str;	// NOT Secure
+		EXPECT_TRUE(strA1 == L"가가나다도레미"sv);
+		EXPECT_TRUE(strA2 == L"가가나다마바사"sv);
+		EXPECT_TRUE(strA3 == L"가가나다솔라시"sv);
+		EXPECT_TRUE(strA4 == L"가가나다"sv);
+		EXPECT_TRUE(strA5 == L"가가나다"sv);
 
-		auto strAc1 = 'A' + str;
-		EXPECT_TRUE(strAc1 == "A가나다"sv);
+		gtl::xStringW strAc1 {'A' + str};
+		EXPECT_TRUE(strAc1 == L"A가나다"sv);
 
 	}
 

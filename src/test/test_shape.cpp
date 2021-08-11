@@ -3,6 +3,7 @@
 #include "gtl/gtl.h"
 
 #include "gtl/shape/shape.h"
+#define FMT_HEADER_ONLY
 #include "fmt/chrono.h"
 
 using namespace std::literals;
@@ -23,7 +24,7 @@ TEST(gtl_shape, basic) {
 
 	for (auto path : paths) {
 
-		DEBUG_PRINT("path : {}\n", path.string());
+		DEBUG_PRINT("\t\tpath : {}\n", path.string());
 
 		gtl::bjson jDXF;
 		jDXF.read(path);

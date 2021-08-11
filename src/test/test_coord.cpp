@@ -7,7 +7,7 @@
 using namespace std::literals;
 using namespace gtl::literals;
 
-TEST(gtl_coord_trans, point) {
+TEST(gtl_coord, point) {
 	using namespace gtl;
 
 	xPoint3d pt;
@@ -161,7 +161,7 @@ TEST(gtl_coord_trans, point) {
 
 }
 
-TEST(gtl_coord_trans, size) {
+TEST(gtl_coord, size) {
 	using namespace gtl;
 
 	xSize3d pt;
@@ -275,5 +275,34 @@ TEST(gtl_coord_trans, size) {
 	xSize3d ptJ;
 	ptJ = j;
 	EXPECT_EQ(ptJ, xSize3d(100, 200, 300));
+
+}
+
+TEST(gtl_coord, rect) {
+	using namespace gtl;
+
+	xPoint3d pt{1., 2., 3};
+	xSize3d size{100., 200., 300.};
+	xRect3d rect{pt, size};
+	EXPECT_EQ(rect.Width(), 100);
+	EXPECT_EQ(rect.Height(), 200);
+	EXPECT_EQ(rect.Depth(), 300);
+
+	{
+		xPoint3d pt0{ 1, 2, 3 };
+		xPoint3d pt1{ 101, 202, 303 };
+		xRect3d rect2{ pt0, pt1 };
+		EXPECT_EQ(rect2.Width(), 100);
+		EXPECT_EQ(rect2.Height(), 200);
+		EXPECT_EQ(rect2.Depth(), 300);
+	}
+
+	{
+		xPoint2d pt0{ 1, 2 };
+		xPoint2d pt1{ 101, 202 };
+		xRect2d rect2{ pt0, pt1 };
+		EXPECT_EQ(rect2.Width(), 100);
+		EXPECT_EQ(rect2.Height(), 200);
+	}
 
 }

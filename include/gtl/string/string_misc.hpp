@@ -184,6 +184,9 @@ namespace gtl {
 		if constexpr (std::is_same_v<tchar, char>) {
 			return std::tolower(c);
 		} else {
+			//static std::locale loc {fmt::format(".{}", (int)eCODEPAGE_DEFAULT<tchar>)};
+			////static std::locale loc {".1201"};
+			//return std::tolower<tchar>(c, loc);
 			return std::towlower(c);
 		}
 	}
@@ -192,6 +195,9 @@ namespace gtl {
 		if constexpr (std::is_same_v<tchar, char>) {
 			return std::toupper(c);
 		} else {
+			//static std::locale loc {fmt::format(".{}", (int)eCODEPAGE_DEFAULT<tchar>)};
+			////static std::locale loc {"English_US.1201"};
+			//return std::toupper<tchar>(c, loc);
 			return std::towupper(c);
 		}
 	}

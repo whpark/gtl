@@ -15,6 +15,7 @@
 #include <deque>
 #include <optional>
 
+#define FMT_HEADER_ONLY
 #include "fmt/ostream.h"
 
 #include "gtl/_config.h"
@@ -57,8 +58,14 @@ namespace gtl::shape {
 	using json_t = boost::json::value;
 
 	struct polypoint_t : public TPointT<double, 4> {
+		using base_t = TPointT<double, 4>;
+
+		//using base_t::base_t;
+
 		double& Bulge() { return w; }
 		double Bulge() const { return w; }
+		
+		auto operator <=> (polypoint_t const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, polypoint_t& var, unsigned int const file_version) {
@@ -187,6 +194,8 @@ namespace gtl::shape {
 		string_t description;
 		std::vector<double> path;
 
+		auto operator <=> (line_type_t const&) const = default;
+
 		template < typename archive >
 		friend void serialize(archive& ar, line_type_t& var, unsigned int const file_version) {
 			ar & var;
@@ -206,10 +215,9 @@ namespace gtl::shape {
 	class ICanvas;
 
 	/// @brief shape interface class
-	struct GTL__SHAPE_CLASS xShape {
-	public:
+	class GTL__SHAPE_CLASS xShape {
 	protected:
-		friend struct xDrawing;
+		friend class xDrawing;
 		int m_crIndex{};	// 0 : byblock, 256 : bylayer, negative : layer is turned off (optional)
 	public:
 		string_t m_strLayer;	// temporary value. (while loading from dxf)
@@ -259,11 +267,19 @@ namespace gtl::shape {
 		static string_t const& GetShapeName(eSHAPE eType);
 
 		//virtual point_t PointAt(double t) const = 0;
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const = 0;
 		virtual void FlipX() = 0;
 		virtual void FlipY() = 0;
 		virtual void FlipZ() = 0;
+		virtual void Reverse() = 0;
 		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded /*= ct.IsRightHanded()*/) = 0;
 		virtual bool UpdateBoundary(rect_t&) const = 0;
+		virtual rect_t GetBoundary() const {
+			rect_t rect;
+			rect.SetRectEmptyForMinMax2d();
+			UpdateBoundary(rect);
+			return rect;
+		}
 		int GetLineWidthInUM() const { return GetLineWidthInUM(m_lineWeight); }
 		static int GetLineWidthInUM(int lineWeight);
 
@@ -279,7 +295,7 @@ namespace gtl::shape {
 	};
 
 
-	GTL__SHAPE_API void CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1);
+	GTL__SHAPE_API bool CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1);
 
 #pragma pack(pop)
 }

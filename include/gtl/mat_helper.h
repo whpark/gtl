@@ -204,29 +204,6 @@ namespace gtl {
 	GTL__API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Scalar const& crTransparent);
 
 
-	/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
-	/// @param path 
-	/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
-	/// @param nBPP 
-	/// @param palette 
-	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
-	/// @return 
-	GTL__API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false, callback_progress_t funcCallback = nullptr);
-	GTL__API cv::Mat LoadBitmapMat(std::filesystem::path const& path, callback_progress_t funcCallback = nullptr);
-
-
-	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {
-		cv::Mat img;
-		if (auto buf = FileToBuffer<uint8_t>(path); buf) {
-			try {
-				img = cv::imdecode(*buf, -1);
-			}
-			catch (...) {
-			}
-		}
-		return img;
-	}
-
 #pragma pack(push, 1)
 	struct BMP_FILE_HEADER {
 		char sign[2]{ 'B', 'M' };
@@ -306,8 +283,37 @@ namespace gtl {
 		uint32_t		profileSize;
 		uint32_t		reserved;
 	};
+	using variant_BITMAP_HEADER = std::variant<BITMAP_HEADER, BITMAP_V4_HEADER, BITMAP_V5_HEADER>;
 #pragma pack(pop)
 
+	/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
+	/// @param path 
+	/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
+	/// @param nBPP 
+	/// @param palette 
+	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
+	/// @return 
+	GTL__API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false, callback_progress_t funcCallback = nullptr);
+
+	GTL__API bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, BITMAP_V5_HEADER& header);
+	GTL__API bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header);
+	GTL__API bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header);
+	GTL__API cv::Mat LoadBitmapMat(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback = nullptr);
+
+
+	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {
+		cv::Mat img;
+		if (auto buf = FileToBuffer<uint8_t>(path); buf) {
+			try {
+				img = cv::imdecode(*buf, -1);
+			}
+			catch (...) {
+			}
+		}
+		return img;
+	}
+
+	GTL__API bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const& mask = cv::Mat{});
 
 #pragma pack(pop)
 }

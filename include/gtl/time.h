@@ -18,6 +18,7 @@
 #include "gtl/string.h"
 #pragma warning(push)
 #pragma warning(disable: 4819)
+#define FMT_HEADER_ONLY
 #include "fmt/chrono.h"
 #pragma warning(pop)
 //#include "gtl/string_view.h"
@@ -80,6 +81,7 @@ namespace gtl {
 		TSysTime& operator = (TSysTime&&) = default;
 
 		using base_t::base_t;
+		TSysTime(base_t t) : base_t{t} {}
 		TSysTime(std::time_t t) : base_t{clock_t::from_time_t(t)} {}
 		TSysTime(file_time_t t) : base_t(tclock::duration(t.time_since_epoch().count() - eSysTimeToFileTime)) {}
 		TSysTime(const char*) : base_t(base_t::clock::now()) {}		// tclock::now() 함수가. 타이핑 하기 귀찮으니까, "" or "now" 등으로...

@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 
 #include "gtl/gtl.h"
+#include "gtl/iconv_wrapper.h"
 
 using namespace std::literals;
 using namespace gtl::literals;
@@ -8,6 +9,7 @@ using namespace gtl::literals;
 using namespace gtl;
 
 
+#pragma warning(disable:4566)
 
 #define	SUPPRESS_DEPRECATED_WARNING _Pragma ("warning(suppress:4996)")
 
@@ -128,7 +130,7 @@ TEST(gtl_string, tszlen) {
 	EXPECT_EQ(3, gtl::tszlen(U"가나다"));
 	EXPECT_EQ(4, gtl::tszlen(u"가나다라"));
 	EXPECT_EQ(4, gtl::tszlen(L"가나다라"));
-	EXPECT_EQ(8, gtl::tszlen("가나다라"));
+	EXPECT_EQ(8, gtl::tszlen(*gtl::ToString_iconv<char>(L"가나다라"sv, "CP949")));
 	constexpr char16_t const* sz3 = u"가나다";
 	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	constexpr auto l0 = tszlen(sz3);

@@ -9,7 +9,7 @@
 #define NOMINMAX
 #pragma warning(push)
 #pragma warning(disable: 5104 5105)
-#include <windows.h>
+//#include <windows.h>
 #pragma warning(pop)
 
 #include "gtl/_config.h"

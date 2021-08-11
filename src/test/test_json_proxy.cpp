@@ -145,7 +145,7 @@ TEST(json_proxy, basic) {
 		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
 		j = a;
 
-		std::cout << '\n' << std::setw(4) << j.json() << '\n';
+		std::cout << '\n\t\t' << std::setw(4) << j.json() << '\n';
 
 		gtl::CTestClassDerived b;
 		b = j;
@@ -160,7 +160,7 @@ TEST(json_proxy, basic) {
 		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
 		j = a;
 
-		std::cout << '\n' << std::setw(4) << j.json() << '\n';
+		std::cout << '\n\t\t' << std::setw(4) << j.json() << '\n';
 
 		gtl::CTestClassDerived b;
 		b = j;
@@ -175,7 +175,7 @@ TEST(json_proxy, basic) {
 		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
 		j = a;
 
-		std::cout << '\n' << std::setw(4) << j.json() << '\n';
+		std::cout << '\n\t\t' << std::setw(4) << j.json() << '\n';
 
 		gtl::CTestClassDerived b;
 		b = j;

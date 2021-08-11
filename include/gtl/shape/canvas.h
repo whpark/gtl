@@ -41,6 +41,10 @@ namespace gtl::shape {
 	//	GTL__DYNAMIC_VIRTUAL_BASE(CCoordSystem)
 	//};
 
+	//class xShape;
+	class xText;
+	class xMText;
+
 	class ICanvas;
 	extern GTL__SHAPE_API void Canvas_Spline(ICanvas& canvas, int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop);
 
@@ -138,7 +142,7 @@ namespace gtl::shape {
 			ct.Init(1.0, (rad_t)tFirstAxis, point_t{}, ptCenter);
 
 			deg_t t1 = t0 + tLength;
-			MoveTo(ct(point_t{cos(t0), sin(t0)}));
+			MoveTo(ct(point_t{radius1*cos(t0), radius2*sin(t0)}));
 			int n = Round(tLength * std::numbers::pi * std::max(radius1, radius2) / m_target_interpolation_inverval);
 			for (int i = 0; i <= n; i++) {
 				deg_t t {std::lerp(t0, t1, (double)i/n)};
@@ -150,6 +154,10 @@ namespace gtl::shape {
 		}
 		virtual void Spline(int degree, std::span<point_t const> pts, std::span<double const> knots, bool bLoop) {
 			Canvas_Spline(*this, degree, pts, knots, bLoop);
+		}
+		virtual void Text(xText const& text) {
+		}
+		virtual void Text(xMText const& text) {
 		}
 
 	//public:
@@ -192,9 +200,9 @@ namespace gtl::shape {
 		cv::Mat& m_img;
 
 		cv::Scalar m_color{};
-		double m_line_thickness {1.};
+		double m_line_width {1.};
 
-		// line thickness
+		// line width
 		int m_line_type = cv::LINE_8;
 
 	public:
@@ -208,9 +216,9 @@ namespace gtl::shape {
 		// Primative, returns End Position.
 		virtual void MoveTo_Target(point_t const& pt) override {}
 		virtual void LineTo_Target(point_t const& pt) override {
-			cv::line(m_img, m_ptLast, pt, m_color, (int)m_line_thickness, m_line_type);
-			//cv::line(m_img, cv::Point(m_ptLast.x, m_ptLast.y), cv::Point(pt.x, pt.y), m_color, (int)m_line_thickness, m_line_type);
-			//cv::line(m_img, cv::Point2d(m_ptLast.x, m_ptLast.y), cv::Point2d(pt.x, pt.y), m_color, (int)m_line_thickness, m_line_type);
+			cv::line(m_img, m_ptLast, pt, m_color, (int)m_line_width, m_line_type);
+			//cv::line(m_img, cv::Point(m_ptLast.x, m_ptLast.y), cv::Point(pt.x, pt.y), m_color, (int)m_line_width, m_line_type);
+			//cv::line(m_img, cv::Point2d(m_ptLast.x, m_ptLast.y), cv::Point2d(pt.x, pt.y), m_color, (int)m_line_width, m_line_type);
 		}
 
 		//inline auto ColorS() { return ColorS(cr_); }
@@ -235,7 +243,7 @@ namespace gtl::shape {
 		// Primative, returns End Position.
 		virtual void LineTo_Target(point_t const& pt) override {
 			if constexpr (round_down_line) {
-				cv::line(m_img, cv::Point((int)m_ptLast.x, (int)m_ptLast.y), cv::Point((int)pt.x, (int)pt.y), m_color, (int)m_line_thickness, m_line_type);
+				cv::line(m_img, cv::Point((int)m_ptLast.x, (int)m_ptLast.y), cv::Point((int)pt.x, (int)pt.y), m_color, (int)m_line_width, m_line_type);
 			} else {
 				xCanvasMat::LineTo_Target(pt);
 			}
@@ -255,7 +263,7 @@ namespace gtl::shape {
 
 
 
-	////-----------------------------------------------------------------------------
+	////===============================================================================================================================
 	//// ICanvas : Interface of Canvas
 	//class AFX_EXT_CLASS_QSHAPE ICanvas {
 	//protected:
@@ -273,7 +281,7 @@ namespace gtl::shape {
 	////	bool m_bShowOrder = false;
 	////	int m_iOrder = 0;
 	////	int m_iArrowSize = 5;
-	////	int m_iArrowThickness = 1;
+	////	int m_iArrowWidth = 1;
 
 	//public:
 	//	ICanvas() {
@@ -287,13 +295,13 @@ namespace gtl::shape {
 	//		memset(m_ptLast.val, 0xff, sizeof(m_ptLast.val));	// not zero. set INVALID_VALUE
 	//	}
 
-	//	//void ShowDirection(bool bShow = true, bool bShowOrder = true, COLORREF crArrow = RGB(255, 0, 0), int iArrowSize = 16, int iArrowThickness = 1) {
+	//	//void ShowDirection(bool bShow = true, bool bShowOrder = true, COLORREF crArrow = RGB(255, 0, 0), int iArrowSize = 16, int iArrowWidth = 1) {
 	//	//	m_bShowDirection = bShow;
 	//	//	m_bShowOrder = bShowOrder;
 	//	//	m_crArrow = crArrow;
 	//	//	m_iArrowSize = iArrowSize;
 	//	//	m_iOrder = 0;
-	//	//	m_iArrowThickness = iArrowThickness;
+	//	//	m_iArrowWidth = iArrowWidth;
 	//	//}
 	//	//bool StopDrawingDirection();
 	//	//bool ResumeDrawingDirection();
