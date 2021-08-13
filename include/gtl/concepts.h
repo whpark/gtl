@@ -172,7 +172,9 @@ namespace gtl::concepts {
 	template < typename T_COORD > concept coord3 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 3> >;
 	template < typename T_COORD > concept coord_rect2 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 4> >;
 	template < typename T_COORD > concept coord_rect3 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 6> >;
-	template < typename T_COORD > concept coord = coord2<T_COORD> or coord3<T_COORD> or coord_rect2<T_COORD> or coord_rect3<T_COORD>;
+	template < typename T_COORD > concept coord_srect2 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 4> > and requires (T_COORD a) { a.width; a.height; };
+	template < typename T_COORD > concept coord_srect3 = std::is_convertible_v< typename T_COORD::coord_t, std::array<typename T_COORD::value_type, 6> > and requires (T_COORD a) { a.width; a.height; a.depth; };
+	template < typename T_COORD > concept coord = coord2<T_COORD> or coord3<T_COORD> or coord_rect2<T_COORD> or coord_rect3<T_COORD> or coord_srect2<T_COORD> or coord_srect3<T_COORD>;
 
 	template < typename T_COORD, typename T > concept tcoord2 = std::is_same_v< typename T_COORD::coord_t, std::array<T, 2> >;
 	template < typename T_COORD, typename T > concept tcoord3 = std::is_same_v< typename T_COORD::coord_t, std::array<T, 3> >;
@@ -189,6 +191,9 @@ namespace gtl::concepts {
 	template < typename T_COORD > concept rect = requires (T_COORD a) { a.pt0(); a.pt1(); a.left; a.top; a.right; a.bottom; };
 	template < typename T_COORD > concept rect2 = ( gtl::concepts::rect<T_COORD> and requires (T_COORD a) { a.left; a.top; a.right; a.bottom; } and !requires (T_COORD a) { a.front; a.back; } );
 	template < typename T_COORD > concept rect3 = ( gtl::concepts::rect<T_COORD> and requires (T_COORD a) { a.left; a.top; a.right; a.bottom; a.front; a.back;} );
+	template < typename T_COORD > concept srect = requires (T_COORD a) { a.tl(); a.coord_size(); a.left; a.top; a.width; a.height; };
+	template < typename T_COORD > concept srect2 = ( gtl::concepts::srect<T_COORD> and requires (T_COORD a) { a.x; a.y; a.width; a.height; } and !requires (T_COORD a) { a.z; a.depth; } );
+	template < typename T_COORD > concept srect3 = ( gtl::concepts::srect<T_COORD> and requires (T_COORD a) { a.x; a.y; a.width; a.height; a.z; a.depth;} );
 
 	template < typename T_COORD > concept wnd_point = requires (T_COORD a) { a.x; a.y; };
 	template < typename T_COORD > concept wnd_size = requires (T_COORD a) { a.cx; a.cy; };

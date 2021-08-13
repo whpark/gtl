@@ -76,6 +76,8 @@ void CtestwinView::OnInitialUpdate() {
 
 	auto strMatSize = theApp.GetProfileString(_T("misc"), _T("MatSize"), _T("20000,20000"));
 	SetDlgItemText(IDC_MAT_SIZE, strMatSize);
+
+	gtl::win_util::GetDlgItemString(this, IDC_MAT_SIZE);
 }
 
 

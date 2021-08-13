@@ -132,7 +132,7 @@ namespace gtl::win_util {
 	template < typename tchar > requires gtlc::string_elem<tchar>
 	void DDX_String(CDataExchange* pDX, int idc, std::basic_string<tchar>& str) {
 		if (pDX->m_bSaveAndValidate) {
-			auto strValue = GetDlgItemText(pDX->m_pDlgWnd, idc);
+			auto strValue = GetDlgItemString(pDX->m_pDlgWnd, idc);
 
 			if constexpr (std::is_same_v<tchar, TCHAR>) {
 				str = (LPCTSTR)strValue;
@@ -152,19 +152,19 @@ namespace gtl::win_util {
 
 	//WARNING_POP()
 
-	bool CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& str, std::wstring* pStrOrigin) {
+	bool CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& str, CString* pStrOrigin) {
 		if (!pWnd)
 			return false;
-		auto strOrg = GetDlgItemText(pWnd, idc);
+		auto strOrg = GetDlgItemString(pWnd, idc);
 		bool bChanged = ((LPCTSTR)strOrg != str);
 		if (bChanged)
 			pWnd->SetDlgItemText(idc, str.c_str());
 		if (pStrOrigin)
-			*pStrOrigin = (LPCTSTR)strOrg;
+			*pStrOrigin = strOrg;
 		return bChanged;
 	}
 
-	CString GetDlgItemText(CWnd* pWnd, int idc) {
+	CString GetDlgItemString(CWnd* pWnd, int idc) {
 		CString str;
 		if (!pWnd)
 			return str;

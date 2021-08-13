@@ -294,7 +294,7 @@ namespace gtl {
 		return img;
 	}
 
-	GTL__API bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const& mask = cv::Mat{});
+	GTL__API bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const* pMask = nullptr);
 
 #pragma pack(pop)
 }
