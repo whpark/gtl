@@ -257,52 +257,62 @@ namespace gtl {
 		void SetRect(coord_point_t const& pt, coord_size_t const& size)			{ tl() = pt; coord_size() = size; }
 		void SetRect(coord_point_t const& pt0, coord_point_t const& pt1)		{ tl() = pt0; coord_size() = pt1-pt0; }
 		void SetRectEmpty()														{ SetRect(); }
-		void SetRectEmptyForMinMax()											{ pt0().SetAll(DBL_MAX); pt1().SetAll(-DBL_MAX); }
-		void SetRectEmptyForMinMax2d()											{ this->left = this->top = DBL_MAX; this->right = this->bottom = -DBL_MAX; }
+		void SetRectEmptyForMinMax()											{ tl().SetAll(DBL_MAX); coord_size().SetAll(-DBL_MAX); }
+		void SetRectEmptyForMinMax2d()											{ this->x = this->y = DBL_MAX; this->width = this->height = -DBL_MAX; }
 
 		// infflate the rectangles's width, height and depth
-		this_t& InflateRect(T x, T y)						requires (dim == 2) { this->left -= x; this->top -= y; this->right += x; this->bottom += y; return *this; }
-		this_t& InflateRect(T x, T y, T z)					requires (dim == 3) { this->left -= x; this->top -= y; this->front -= z; this->right += x; this->bottom += y; this->back += z; return *this; }
-		this_t& InflateRect(coord_size_t const& size)							{ pt0() -= size; pt1() += size; return *this; }
-		this_t& InflateRect(this_t const& rect)									{ pt0() -= rect.pt0(); pt1() += rect.pt1(); return *this; }
-		this_t& InflateRect(T l, T t, T r, T b)				requires (dim == 2) { this->left -= l; this->top -= t; this->right += r; this->bottom += b; return *this; }
-		this_t& InflateRect(T l, T t, T f, T r, T b, T bk)	requires (dim == 3) { this->left -= l; this->top -= t; this->front -= f; this->right += r; this->bottom += b; this->back += bk; return *this; }
+		this_t& InflateRect(T x, T y)						requires (dim == 2) { this->x -= x; this->y -= y; this->width += 2*x; this->height += 2*y; return *this; }
+		this_t& InflateRect(T x, T y, T z)					requires (dim == 3) { this->x -= x; this->y -= y; this->z -= z; this->widht += 2*x; this->height += 2*y; this->depth += 2*z; return *this; }
+		this_t& InflateRect(coord_size_t const& size)							{ tl() -= size; coord_size() += 2*size; return *this; }
+		//this_t& InflateRect(this_t const& rect)									{ pt0() -= rect.pt0(); coord_size() += 2*rect.coord_size(); return *this; }
+		this_t& InflateRect(T l, T t, T r, T b)				requires (dim == 2) { this->x -= l; this->y -= t; this->width += l+r; this->y += t+b; return *this; }
+		this_t& InflateRect(T l, T t, T f, T r, T b, T bk)	requires (dim == 3) { this->x -= l; this->y -= t; this->z -= f; this->width += l+r; this->y += t+b; this->z += f+bk; return *this; }
 
 		// deflate the rectangle's width, height and depth
-		this_t& DeflateRect(T x, T y)						requires (dim == 2) { this->left += x; this->top += y; this->right -= x; this->bottom -= y; return *this; }
-		this_t& DeflateRect(T x, T y, T z)					requires (dim == 3) { this->left += x; this->top += y; this->front += z; this->right -= x; this->bottom -= y; this->back -= z; return *this; }
-		this_t& DeflateRect(coord_size_t const& size)							{ pt0() += size; pt1() -= size; return *this; }
-		this_t& DeflateRect(this_t const& rect)									{ pt0() += rect.pt0(); pt1() -= rect.pt1(); return *this; }
-		this_t& DeflateRect(T l, T t, T r, T b)				requires (dim == 2) { this->left += l; this->top += t; this->right -= r; this->bottom -= b; return *this; }
-		this_t& DeflateRect(T l, T t, T f, T r, T b, T bk)	requires (dim == 3) { this->left += l; this->top += t; this->front += f; this->right -= r; this->bottom -= b; this->back -= bk; return *this; }
+		this_t& DeflateRect(T x, T y)						requires (dim == 2) { this->x += x; this->y += y; this->widht -= 2*x; this->y -= 2*y; return *this; }
+		this_t& DeflateRect(T x, T y, T z)					requires (dim == 3) { this->x += x; this->y += y; this->z += z; this->width -= 2*x; this->height -= 2*y; this->depth -= 2*z; return *this; }
+		this_t& DeflateRect(coord_size_t const& size)							{ tl() += size; coord_size() -= 2*size; return *this; }
+		//this_t& DeflateRect(this_t const& rect)									{ pt0() += rect.pt0(); pt1() -= rect.pt1(); return *this; }
+		this_t& DeflateRect(T l, T t, T r, T b)				requires (dim == 2) { this->x += l; this->y += t; this->width -= l+r; this->height -= t+b; return *this; }
+		this_t& DeflateRect(T l, T t, T f, T r, T b, T bk)	requires (dim == 3) { this->x += l; this->y += t; this->z += f; this->width -= l+r; this->height -= t+b; this->depth -= f+bk; return *this; }
 
 		// translate the rectangle by moving its top and left
-		this_t& OffsetRect(T x, T y)						requires (dim == 2) { this->left += x; this->top += y; this->right += x; this->bottom += y; return *this; }
-		this_t& OffsetRect(T x, T y, T z)					requires (dim == 3) { this->left += x; this->top += y; this->front += z; this->right += x; this->bottom += y; this->back += z; return *this; }
-		this_t& OffsetRect(coord_point_t const& pt)								{ pt0() += pt; pt1() += pt; return *this; }		// for Point : move whole rect, for Size : move pt1() only.
+		this_t& OffsetRect(T x, T y)						requires (dim == 2) { this->x += x; this->y += y; return *this; }
+		this_t& OffsetRect(T x, T y, T z)					requires (dim == 3) { this->x += x; this->y += y; this->z += z; return *this; }
+		this_t& OffsetRect(coord_point_t const& pt)								{ tl() += pt; return *this; }		// for Point : move whole rect, for Size : move pt1() only.
 
-		this_t& OffsetSize(coord_size_t const& size)							{ /*pt0 += size;*/ pt1() += size; return *this; }	// for Point : move whole rect, for Size : move pt1() only.
+		this_t& OffsetSize(coord_size_t const& size)							{ coord_size() += size; return *this; }	// for Point : move whole rect, for Size : move pt1() only.
 
 	public:
 		void NormalizeRect() {
-			if (this->left > this->right) std::swap(this->left, this->right);
-			if (this->top > this->bottom) std::swap(this->top, this->bottom);
+			if (this->width < 0) {
+				this->x = this->x + this->width;
+				this->width = -this->width;
+			}
+			if (this->height < 0) {
+				this->y = this->y + this->height;
+				this->height = -this->height;
+			}
 			if constexpr (dim >= 3) {
-				if (this->front > this->back) std::swap(this->front, this->back);
+				if (this->depth < 0) {
+					this->z = this->z + this->depth;
+					this->depth = -this->depth;
+				}
 			}
 		}
 		bool IsNormalized() const {
-			bool bResult = (this->left <= this->right) and (this->top <= this->bottom);
 			if constexpr (dim >= 3) {
-				bResult &= this->front <= this->back;
+				return (this->width >= 0) and (this->height >= 0) and (this->depth >= 0);
 			}
-			return bResult;
+			else {
+				return (this->width >= 0) and (this->height >= 0);
+			}
 		}
 
 		// absolute position of rectangle
-		void MoveToX(T x)									{ this->right += (x-this->left); this->left = x; }
-		void MoveToY(T y)									{ this->bottom += (y-this->top); this->top = y; }
-		void MoveToZ(T z)				requires (dim >= 3)	{ this->back += (z-this->front); this->front = z; }
+		void MoveToX(T x)									{ this->x = x; }
+		void MoveToY(T y)									{ this->y = y; }
+		void MoveToZ(T z)				requires (dim >= 3)	{ this->z = z; }
 		//void MoveToN(int i, T v) { assert(pt0.data().size() > i); pt1[i] += (v-pt0[i]); pt0[i] = v; }
 
 		void MoveToXY(T x, T y)								{ MoveToX(x); MoveToY(y); }
@@ -311,10 +321,7 @@ namespace gtl {
 		void MoveToXYZ(T x, T y, T z)	requires (dim >= 3) { MoveToX(x); MoveToY(y); MoveToZ(z); }
 
 		void MoveTo(coord_point_t const& pt) {
-			MoveToX(pt.x);
-			MoveToY(pt.y);
-			if constexpr (dim >= 3)
-				MoveToZ(pt.z);
+			tl() = pt;
 		}
 
 		// set this rectangle to intersection of two others
@@ -322,15 +329,15 @@ namespace gtl {
 			NormalizeRect();
 			rect2.NormalizeRect();
 
-			pt0().x = std::max(pt0().x, rect2.pt0().x);
-			pt0().y = std::max(pt0().y, rect2.pt0().y);
+			this->x = std::max(this->x, rect2.x);
+			this->y = std::max(this->y, rect2.y);
 			if constexpr (dim >= 3)
-				pt0().z = std::max(pt0().z, rect2.pt0().z);
+				this->z = std::max(this->z, rect2.z);
 
-			pt1().x = std::min(pt1().x, rect2.pt1().x);
-			pt1().y = std::min(pt1().y, rect2.pt1().y);
+			this->width = std::min(this->x + this->width, rect2.x + rect2.width) - this->x;
+			this->height = std::min(this->y+this->height, rect2.y + rect2.height) - this->y;
 			if constexpr (dim >= 3)
-				pt1().z = std::min(pt1().z, rect2.pt1().z);
+				this->depth = std::min(this->z + this->depth, rect2.z + this->depth) - this->z;
 
 			return *this;
 		}
@@ -340,15 +347,15 @@ namespace gtl {
 			NormalizeRect();
 			rect2.NormalizeRect();
 
-			pt0().x = std::min(pt0().x, rect2.pt0().x);
-			pt0().y = std::min(pt0().y, rect2.pt0().y);
+			this->x = std::min(this->x, rect2.x);
+			this->y = std::min(this->y, rect2.y);
 			if constexpr (dim >= 3)
-				pt0().z = std::min(pt0().z, rect2.pt0().z);
+				this->z = std::min(this->z, rect2.z);
 
-			pt1().x = std::max(pt1().x, rect2.pt1().x);
-			pt1().y = std::max(pt1().y, rect2.pt1().y);
+			this->width = std::max(this->x + this->width, rect2.x + rect2.width) - this->x;
+			this->height = std::max(this->y + this->height, rect2.x + rect2.height) this->y;
 			if constexpr (dim >= 3)
-				pt1().z = std::max(pt1().z, rect2.pt1().z);
+				this->depth = std::max(this->z, rect2.z + rect2.depth) - this->z;
 
 			return *this;
 		}
@@ -358,8 +365,8 @@ namespace gtl {
 		this_t& operator -= (coord_point_t const& pt)		{ return OffsetRect(-pt); }
 		this_t& operator += (coord_size_t const& size)		{ return OffsetSize(size); }
 		this_t& operator -= (coord_size_t const& size)		{ return OffsetSize(-size); }
-		this_t& operator += (this_t const& rect)			{ return InflateRect(rect); }
-		this_t& operator -= (this_t const& rect)			{ return DeflateRect(rect); }
+		//this_t& operator += (this_t const& rect)			{ return InflateRect(rect); }
+		//this_t& operator -= (this_t const& rect)			{ return DeflateRect(rect); }
 		this_t& operator &= (this_t const& rect)			{ return IntersectRect(rect); }
 		this_t& operator |= (this_t const& rect)			{ return UnionRect(rect); }
 
@@ -368,8 +375,8 @@ namespace gtl {
 		this_t operator - (coord_point_t const& pt) const	{ return this_t(*this) -= pt; }
 		this_t operator + (coord_size_t const& size) const	{ return this_t(*this) += size; }
 		this_t operator - (coord_size_t const& size) const	{ return this_t(*this) -= size; }
-		this_t operator + (this_t const& rect) const		{ return this_t(*this) += rect; }
-		this_t operator - (this_t const& rect) const		{ return this_t(*this) -= rect; }
+		//this_t operator + (this_t const& rect) const		{ return this_t(*this) += rect; }
+		//this_t operator - (this_t const& rect) const		{ return this_t(*this) -= rect; }
 		this_t operator & (this_t const& rect) const		{ return this_t(*this).IntersectRect(rect); }
 		this_t operator | (this_t const& rect) const		{ return this_t(*this).UnionRect(rect); }
 
@@ -379,24 +386,24 @@ namespace gtl {
 			ar & rect;
 		}
 		template < typename Archive > friend Archive& operator & (Archive& ar, this_t& B) {
-			return ar & B.pt0() & B.pt1();
+			return ar & B.tl() & B.coord_size();
 		}
-		template < typename JSON > friend void from_json(JSON const& j, this_t& B) { B.pt0() = j["pt0"]; B.pt1() = j["pt1"]; }
-		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) { j["pt0"] = B.pt0(); j["pt1"] = B.pt1(); }
+		template < typename JSON > friend void from_json(JSON const& j, this_t& B) { B.tl() = j["tl"]; B.coord_size() = j["coord_size"]; }
+		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) { j["tl"] = B.tl(); j["coord_size"] = B.coord_size(); }
 
 
 		bool UpdateBoundary(coord_point_t const& pt) {
 			bool bModified{};
 			for (size_t i {}; i < pt.size(); i++) {
-				if (pt0().member(i) > pt.member(i)) {
+				if (tl().member(i) > pt.member(i)) {
 					bModified = true;
-					pt0().member(i) = pt.member(i);
+					tl().member(i) = pt.member(i);
 				}
 			}
 			for (size_t i = 0; i < pt.size(); i++) {
 				if (pt1().member(i) < pt.member(i)) {
 					bModified = true;
-					pt1().member(i) = pt.member(i);
+					coord_size().member(i) = pt.member(i) - tl().member(i);
 				}
 			}
 			return bModified;
@@ -413,10 +420,10 @@ namespace gtl {
 			}
 
 			return 1
-				&& (this->left >= 0)
-				&& (this->top >= 0)
-				&& ( (sizeImage.cx < 0) || ( (this->left < sizeImage.cx) && (this->right < sizeImage.cx) && (this->left < this->right) ) )
-				&& ( (sizeImage.cy < 0) || ( (this->top < sizeImage.cy) && (this->bottom < sizeImage.cy) && (this->top < this->bottom) ) )
+				&& (this->x >= 0)
+				&& (this->y >= 0)
+				&& ( (sizeImage.cx < 0) || ( (this->x < sizeImage.cx) && (this->x + this->width < sizeImage.cx) && (this->width > 0) ) )
+				&& ( (sizeImage.cy < 0) || ( (this->y < sizeImage.cy) && (this->y + this->height < sizeImage.cy) && (this->height > 0) ) )
 				;
 		}
 
@@ -456,8 +463,8 @@ namespace gtl {
 
 	};
 
-	template < typename T > using TRect2 = TSRectT<T, 2>;
-	template < typename T > using TRect3 = TSRectT<T, 3>;
+	template < typename T > using TSRect2 = TSRectT<T, 2>;
+	template < typename T > using TSRect3 = TSRectT<T, 3>;
 
 
 #pragma pack(pop)
