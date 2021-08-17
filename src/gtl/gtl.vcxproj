@@ -216,6 +216,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
     <ClCompile Include="coord\coord_point.ixx" />
     <ClCompile Include="coord\coord_rect.ixx" />
     <ClCompile Include="coord\coord_size.ixx" />
+    <ClCompile Include="coord\coord_srect.ixx" />
     <ClCompile Include="coord\coord_trans.ixx" />
     <ClCompile Include="dynamic.ixx" />
     <ClCompile Include="gtl.ixx" />

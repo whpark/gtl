@@ -125,5 +125,8 @@
     <ClCompile Include="mat_helper.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="coord\coord_srect.ixx">
+      <Filter>Source Files\coord</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

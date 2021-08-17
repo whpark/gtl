@@ -304,3 +304,50 @@ TEST(gtl_coord, rect) {
 	}
 
 }
+
+TEST(gtl_coord, srect) {
+	using namespace gtl;
+
+	{
+		xPoint3d pt{ 1., 2., 3 };
+		xSize3d size{ 100., 200., 300. };
+		xSRect3d rect{ pt, size };
+		EXPECT_EQ(rect.Width(), 100);
+		EXPECT_EQ(rect.Height(), 200);
+		EXPECT_EQ(rect.Depth(), 300);
+	}
+
+	{
+		xSRect3d rect(xRect2d(10, 20, 110, 220));
+		EXPECT_EQ(rect.x, 10.);
+		EXPECT_EQ(rect.y, 20.);
+		EXPECT_EQ(rect.width, 100.);
+		EXPECT_EQ(rect.height, 200.);
+	}
+
+	{
+		xRect3d rect(xSRect2d(10, 20, 100, 200));
+		EXPECT_EQ(rect.left, 10.);
+		EXPECT_EQ(rect.top, 20.);
+		EXPECT_EQ(rect.right, 110.);
+		EXPECT_EQ(rect.bottom, 220.);
+	}
+
+	{
+		xPoint3d pt0{ 1, 2, 3 };
+		xPoint3d pt1{ 101, 202, 303 };
+		xSRect3d rect2{ pt0, pt1 };
+		EXPECT_EQ(rect2.Width(), 100);
+		EXPECT_EQ(rect2.Height(), 200);
+		EXPECT_EQ(rect2.Depth(), 300);
+	}
+
+	{
+		xPoint2d pt0{ 1, 2 };
+		xPoint2d pt1{ 101, 202 };
+		xSRect2d rect2{ pt0, pt1 };
+		EXPECT_EQ(rect2.Width(), 100);
+		EXPECT_EQ(rect2.Height(), 200);
+	}
+
+}

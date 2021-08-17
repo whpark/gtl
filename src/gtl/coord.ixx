@@ -33,6 +33,7 @@ import :string_to_arithmetic;
 export import :coord_point;
 export import :coord_size;
 export import :coord_rect;
+export import :coord_srect;
 export import :coord_trans;
 
 export namespace gtl {
@@ -53,6 +54,8 @@ export namespace gtl {
 	using xPoint2d	= TPoint2<double>;
 	using xRect3d	= TRect3<double>;
 	using xRect2d	= TRect2<double>;
+	using xSRect3d	= TSRect3<double>;
+	using xSRect2d	= TSRect2<double>;
 	using xSize3i	= TSize3<int>;
 	using xSize2i	= TSize2<int>;
 	using xPoint4i	= TPoint4<int>;
@@ -60,6 +63,8 @@ export namespace gtl {
 	using xPoint2i	= TPoint2<int>;
 	using xRect3i	= TRect3<int>;
 	using xRect2i	= TRect2<int>;
+	using xSRect3i	= TSRect3<int>;
+	using xSRect2i	= TSRect2<int>;
 
 
 	/// @brief Interpolation (lerp)
