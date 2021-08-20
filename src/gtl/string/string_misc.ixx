@@ -308,17 +308,18 @@ export namespace gtl {
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
 	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToLower(tchar c) {
 		if constexpr (std::is_same_v<tchar, char>) {
-			return std::tolower(c);
+			return (tchar)std::tolower(c);
 		} else {
-			return std::towlower(c);
+			return (tchar)std::towlower(c);
 		}
 	}
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
 	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToUpper(tchar c) {
 		if constexpr (std::is_same_v<tchar, char>) {
-			return std::toupper(c);
+			return (tchar)std::toupper(c);
 		} else {
-			return std::towupper(c);
+			return (tchar)
+				std::towupper(c);
 		}
 	}
 
