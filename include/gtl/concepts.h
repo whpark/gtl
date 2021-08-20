@@ -15,9 +15,6 @@
 #if !defined(__cpp_lib_concepts)
 #	error ERROR! Supports C++v20 only.
 #endif
-#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-	using charKSSM_t = uint16_t;
-#endif
 
 #if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
 namespace gtl {
@@ -82,7 +79,7 @@ namespace gtl::concepts {
 	template < typename tchar >
 	concept string_elem = is_one_of<std::remove_cvref_t<tchar>, char, char8_t, char16_t, char32_t, wchar_t
 #if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-		, charKSSM_t// charKSSM_t for KSSM (Johab)
+		, charKSSM_t	// charKSSM_t for KSSM (Johab)
 #endif
 	>;
 

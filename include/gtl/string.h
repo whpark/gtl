@@ -72,6 +72,14 @@ namespace gtl {
 		}
 
 
+		///// @brief Constructor from other codepage (sz[])
+		///// @param pszOther 
+		//template < size_t N, gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
+		//explicit TString(tchar_other const (&szOther)[N]) {
+		//#pragma warning(suppress:4996)
+		//	*this = szOther;
+		//}
+
 		/// @brief Constructor from other codepage (psz)
 		/// @param pszOther 
 		template < gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
@@ -137,6 +145,11 @@ namespace gtl {
 			*this = gtl::ToString<tchar, tchar_other>(str);
 			return *this;
 		}
+		//template < size_t N, gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
+		//TString& operator = (tchar_other const (&szOther)[N]) {
+		//#pragma warning(suppress:4996)
+		//	*this = gtl::ToString<tchar, tchar_other>(std::basic_string_view<tchar_other>(szOther, tszlen(szOther, N)));
+		//}
 		template < gtlc::string_elem tchar_other >
 		requires (!std::is_same_v<std::remove_cvref_t<tchar_other>, std::remove_cvref_t<tchar>>)
 		GTL__DEPR_SEC TString& operator = (tchar_other const* const& psz) {

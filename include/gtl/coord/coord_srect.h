@@ -23,7 +23,7 @@ namespace gtl {
 #pragma pack(push, 1)
 
 
-	template < typename T, int dim, int DEFAULT_FRONT = -1, int DEFAULT_DEPTH = 1 > struct TSRectT;
+	template < typename T, int dim, int DEFAULT_FRONT = -1, int DEFAULT_DEPTH = 2 > struct TSRectT;
 
 	template < typename T, int DEFAULT_FRONT = -1, int DEFAULT_DEPTH = 2 >
 	struct TSRECT3 {
@@ -38,7 +38,7 @@ namespace gtl {
 	//--------------------------------------------------------------------------------------------------------------------------------
 	// Rect 3 (left, top, front, right, bottom, back)
 	//
-	template < typename T, int dim, int DEFAULT_FRONT = -1, int DEFAULT_DEPT = 2 >
+	template < typename T, int dim, int DEFAULT_FRONT, int DEFAULT_DEPTH >
 	struct TSRectT : std::conditional_t<dim == 2, TSRECT2<T>, TSRECT3<T, DEFAULT_FRONT, DEFAULT_DEPTH> > {
 	public:
 		//T left{}, top{}, front{DEFAULT_FRONT};
@@ -101,7 +101,7 @@ namespace gtl {
 			}
 			else if constexpr ( ((dim == 3) and gtlc::rect3<T_COORD>) or ( (dim == 2) and gtlc::rect2<T_COORD>) ) {
 				pt0() = B.pt0();
-				coord_size() = B.coord_size();
+				coord_size() = B.GetSize();
 			}
 			else {
 				if constexpr (gtlc::has__xy<T_COORD>) {
@@ -141,7 +141,7 @@ namespace gtl {
 		// 3d
 		template < gtlc::has__xyz T_POINT >
 		TSRectT(T_POINT const& pt0, T_POINT const& pt1) requires (dim == 3)
-			: base_t{ RoundOrForward<T>(pt0.x), RoundOrForward<T>(pt0.y), RoundOrForward<T>(pt0.z), RoundOrForward<T>(pt1.x-pt0.x), RoundOrForward<T>(pt1.y-pt1.y), RoundOrForward<T>(pt1.z-pt0.z)} { };
+			: base_t{ RoundOrForward<T>(pt0.x), RoundOrForward<T>(pt0.y), RoundOrForward<T>(pt0.z), RoundOrForward<T>(pt1.x-pt0.x), RoundOrForward<T>(pt1.y-pt0.y), RoundOrForward<T>(pt1.z-pt0.z)} { };
 
 		template < gtlc::has__xyz T_POINT, gtlc::has__cxyz T_SIZE>
 		TSRectT(T_POINT const& pt, T_SIZE const& size) requires (dim == 3)
@@ -199,6 +199,12 @@ namespace gtl {
 		auto operator <=> (TSRectT const&) const = default;
 		auto operator <=> (T const& v) const { return *this <=> All(v); }
 
+		T Width() const						{ return this->width; }
+		T Height() const					{ return this->height; }
+		T Depth() const requires (dim == 3)	{ return this->depth; }
+		T& Width() 							{ return this->width; }
+		T& Height() 						{ return this->height; }
+		T& Depth() requires (dim == 3)		{ return this->depth; }
 		T Right() const						{ return this->x + this->width; }
 		T Bottom() const					{ return this->y + this->height;; }
 		T Back() const requires (dim == 3)	{ return this->z + this->depth; }
@@ -216,7 +222,7 @@ namespace gtl {
 			}
 		}
 		bool IsRectHavingLength2d() const {
-			return (width > 0) or (height > 0);
+			return (this->width > 0) or (this->height > 0);
 		}
 		// returns true if rectangle is at (0,0,0) and has no area
 		bool IsRectNull() const {
@@ -335,7 +341,7 @@ namespace gtl {
 				this->z = std::max(this->z, rect2.z);
 
 			this->width = std::min(this->x + this->width, rect2.x + rect2.width) - this->x;
-			this->height = std::min(this->y+this->height, rect2.y + rect2.height) - this->y;
+			this->height = std::min(this->y + this->height, rect2.y + rect2.height) - this->y;
 			if constexpr (dim >= 3)
 				this->depth = std::min(this->z + this->depth, rect2.z + this->depth) - this->z;
 
@@ -353,9 +359,9 @@ namespace gtl {
 				this->z = std::min(this->z, rect2.z);
 
 			this->width = std::max(this->x + this->width, rect2.x + rect2.width) - this->x;
-			this->height = std::max(this->y + this->height, rect2.x + rect2.height) this->y;
+			this->height = std::max(this->y + this->height, rect2.x + rect2.height) - this->y;
 			if constexpr (dim >= 3)
-				this->depth = std::max(this->z, rect2.z + rect2.depth) - this->z;
+				this->depth = std::max(this->z + this->depth, rect2.z + rect2.depth) - this->z;
 
 			return *this;
 		}
@@ -431,14 +437,14 @@ namespace gtl {
 		bool AdjustROI(TSize2<T> const& sizeImage) {
 			NormalizeRect();
 
-			if (this->left < 0)
-				this->left = 0;
-			if (this->top < 0)
-				this->top = 0;
-			if ( (sizeImage.cx > 0) && (this->right > sizeImage.cx) )
-				this->right = sizeImage.cx;
-			if ( (sizeImage.cy > 0) && (this->bottom > sizeImage.cy) )
-				this->bottom = sizeImage.cy;
+			if (this->x < 0)
+				this->x = 0;
+			if (this->y < 0)
+				this->y = 0;
+			if ( (sizeImage.cx > 0) && (this->x + this->width > sizeImage.cx) )
+				this->width = std::max(0, sizeImage.cx - this->x);
+			if ( (sizeImage.cy > 0) && (this->y + this->height > sizeImage.cy) )
+				this->height = std::max(0, sizeImage.cy - this->y);
 
 			return !IsRectEmpty();
 		}
@@ -449,14 +455,14 @@ namespace gtl {
 
 			rect.NormalizeRect();
 
-			if (rect.left < 0)
-				rect.left = 0;
-			if (rect.top < 0)
-				rect.top = 0;
-			if ( (sizeImage.cx > 0) && (rect.right > sizeImage.cx) )
-				rect.right = sizeImage.cx;
-			if ( (sizeImage.cy > 0) && (rect.bottom > sizeImage.cy) )
-				rect.bottom = sizeImage.cy;
+			if (rect.x < 0)
+				rect.x = 0;
+			if (rect.y < 0)
+				rect.y = 0;
+			if ( (sizeImage.cx > 0) && (rect.x + rect.width > sizeImage.cx) )
+				rect.width = std::max(0, sizeImage.cx - rect.x);
+			if ( (sizeImage.cy > 0) && (rect.y + rect.height > sizeImage.cy) )
+				rect.height = std::max(0, sizeImage.cy - rect.y);
 
 			return rect;
 		}
