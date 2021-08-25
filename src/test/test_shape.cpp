@@ -85,6 +85,8 @@ TEST(gtl_shape, basic) {
 	for (auto path : paths) {
 
 		DEBUG_PRINT("\t\tpath : {}\n", path.string());
+		//if (!std::filesystem::exists(path))
+		//	continue;
 
 		gtl::bjson jDXF;
 		jDXF.read(path);

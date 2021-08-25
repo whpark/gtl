@@ -320,3 +320,5 @@ export namespace gtl::shape {
 	bool CohenSutherlandLineClip(gtl::xRect2d roi, gtl::xPoint2d& pt0, gtl::xPoint2d& pt1);
 
 }
+
+export BOOST_CLASS_VERSION(gtl::shape::line_type_t, 1);
