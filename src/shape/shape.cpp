@@ -653,13 +653,16 @@ namespace gtl::shape {
 					for (int x = 0; x < pInsert->m_nCol; x++) {
 
 						std::unique_ptr<xBlock> rBlockNew { dynamic_cast<xBlock*>(pBlock->NewClone().release()) };
+						if (!rBlockNew)
+							continue;
 
 						ct.m_offset.x = x*pInsert->m_spacingCol + pInsert->m_pt.x;
 						ct.m_offset.y = y*pInsert->m_spacingRow + pInsert->m_pt.y;
+						bool const bIsRightHanded = ct.IsRightHanded();
 
 						for (auto const& rShape : rBlockNew->m_shapes) {
 							auto rShapeNew = rShape.NewClone();
-							rShapeNew->Transform(ct, ct.IsRightHanded());
+							rShapeNew->Transform(ct, bIsRightHanded);
 							// color
 							if (rShapeNew->m_crIndex == 0) {
 								rShapeNew->m_crIndex = pBlock->m_crIndex;
