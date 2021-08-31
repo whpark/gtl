@@ -659,7 +659,7 @@ namespace gtl::shape {
 
 						for (auto const& rShape : rBlockNew->m_shapes) {
 							auto rShapeNew = rShape.NewClone();
-							rBlockNew->Transform(ct, ct.IsRightHanded());
+							rShapeNew->Transform(ct, ct.IsRightHanded());
 							// color
 							if (rShapeNew->m_crIndex == 0) {
 								rShapeNew->m_crIndex = pBlock->m_crIndex;
