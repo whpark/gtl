@@ -655,7 +655,7 @@ namespace gtl::shape {
 						std::unique_ptr<xBlock> rBlockNew { dynamic_cast<xBlock*>(pBlock->NewClone().release()) };
 
 						ct.m_offset.x = x*pInsert->m_spacingCol + pInsert->m_pt.x;
-						ct.m_offset.y = y*pInsert->m_spacingRow + pInsert->m_pt.x;
+						ct.m_offset.y = y*pInsert->m_spacingRow + pInsert->m_pt.y;
 
 						for (auto const& rShape : rBlockNew->m_shapes) {
 							auto rShapeNew = rShape.NewClone();

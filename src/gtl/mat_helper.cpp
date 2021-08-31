@@ -33,8 +33,8 @@ namespace gtl {
 	static bool s_bGPUChecked{};
 	static bool s_bUseGPU{};
 
-	constexpr static bool const bLoopUnrolling = false;
-	constexpr static bool const bMultiThreaded = false;
+	constexpr static bool const bLoopUnrolling = true;
+	constexpr static bool const bMultiThreaded = true;
 
 	bool IsGPUEnabled() {
 		return s_bUseGPU;
