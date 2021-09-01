@@ -231,7 +231,7 @@ namespace gtl::shape {
 		int m_eLineType{};
 		string_t m_strLineType;
 		int m_lineWeight{1};
-		bool m_bVisible{};
+		bool m_bVisible{true};
 		bool m_bTransparent{};
 		boost::optional<cookie_t> m_cookie;
 
