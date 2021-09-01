@@ -19,6 +19,7 @@
 #include "gtl/coord/coord_size.h"
 #include "gtl/coord/coord_point.h"
 #include "gtl/coord/coord_rect.h"
+#include "gtl/coord/coord_srect.h"
 #include "gtl/coord/coord_trans.h"
 
 //=============================================================================
@@ -46,6 +47,8 @@ namespace gtl {
 	using xPoint2d	= TPoint2<double>;
 	using xRect3d	= TRect3<double>;
 	using xRect2d	= TRect2<double>;
+	using xSRect3d	= TSRect3<double>;
+	using xSRect2d	= TSRect2<double>;
 	using xSize3i	= TSize3<int>;
 	using xSize2i	= TSize2<int>;
 	using xPoint4i	= TPoint4<int>;
@@ -53,6 +56,8 @@ namespace gtl {
 	using xPoint2i	= TPoint2<int>;
 	using xRect3i	= TRect3<int>;
 	using xRect2i	= TRect2<int>;
+	using xSRect3i	= TSRect3<int>;
+	using xSRect2i	= TSRect2<int>;
 
 
 	/// @brief Interpolation (lerp)

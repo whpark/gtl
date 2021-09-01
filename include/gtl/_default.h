@@ -112,7 +112,7 @@
 #	include <source_location>
 #endif
 
-#define GTL__DEPR_SEC [[deprecated("NOT Secure")]]
+#define GTL__DEPR_SEC [[deprecated("NOT Secure. use 'sv' instead.")]]
 
 #include "gtl/_config.h"
 

@@ -33,8 +33,8 @@ namespace gtl {
 	static bool s_bGPUChecked{};
 	static bool s_bUseGPU{};
 
-	constexpr static bool const bLoopUnrolling = false;
-	constexpr static bool const bMultiThreaded = false;
+	constexpr static bool const bLoopUnrolling = true;
+	constexpr static bool const bMultiThreaded = true;
 
 	bool IsGPUEnabled() {
 		return s_bUseGPU;
@@ -1016,7 +1016,7 @@ namespace gtl {
 	//! @param ptDestTopLeft 
 	//! @param mask 
 	//! @return 
-	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const* pMask = nullptr) {
+	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const* pMask) {
 		if (src.type() != dest.type())
 			return false;
 		//if ((src.cols > dest.cols) or (src.rows > dest.rows))

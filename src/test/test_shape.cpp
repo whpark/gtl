@@ -40,6 +40,8 @@ TEST(gtl_shape, basic) {
 	for (auto path : paths) {
 
 		DEBUG_PRINT("\t\tpath : {}\n", path.string());
+		//if (!std::filesystem::exists(path))
+		//	continue;
 
 		gtl::bjson jDXF;
 		jDXF.read(path);
@@ -64,6 +66,10 @@ TEST(gtl_shape, basic) {
 			boost::archive::text_iarchive ia(ar);
 			ia & cad2;
 			EXPECT_EQ(cad, cad2);
+
+			cad2.m_layers[0].m_shapes.push_back(r1->NewClone());
+			EXPECT_NE(cad, cad2);
+
 		}
 	}
 }

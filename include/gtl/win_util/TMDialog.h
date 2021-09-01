@@ -18,20 +18,20 @@ namespace gtl::win_util {
 
 	// TMDialog dialog
 
-	GTL__WINUTIL_API int32_t		GetDlgItemInt32(CWnd* pWnd, int idc, int eRadix = 0);
+	GTL__WINUTIL_API int32_t	GetDlgItemInt32(CWnd* pWnd, int idc, int eRadix = 0);
 	GTL__WINUTIL_API void		SetDlgItemInt32(CWnd* pWnd, int idc, int32_t iValue, std::wstring_view fmt = L"{}");
-	GTL__WINUTIL_API int64_t		GetDlgItemInt64(CWnd* pWnd, int idc, int eRadix = 0);
+	GTL__WINUTIL_API int64_t	GetDlgItemInt64(CWnd* pWnd, int idc, int eRadix = 0);
 	GTL__WINUTIL_API void		SetDlgItemInt64(CWnd* pWnd, int idc, int64_t iValue, std::wstring_view fmt = L"{}");
 	GTL__WINUTIL_API double		GetDlgItemDouble(CWnd* pWnd, int idc);
 	GTL__WINUTIL_API void		SetDlgItemDouble(CWnd* pWnd, int idc, double dValue, std::wstring_view fmt = _T("{:.5f}"));
 	GTL__WINUTIL_API void		DDX_Double(CDataExchange* pDX, int idc, double& value, std::wstring_view fmt = _T("{:.5f}"));
 	template < typename tchar > requires gtlc::string_elem<tchar>
 	void		DDX_String(CDataExchange* pDX, int idc, std::basic_string<tchar>& str);
-	GTL__WINUTIL_API bool		CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& sv, std::wstring* pStrOrigin = nullptr);	// returns true if changed
-	CString GetDlgItemText(CWnd* pWnd, int idc);
+	GTL__WINUTIL_API bool		CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& sv, CString* pStrOrigin = nullptr);	// returns true if changed
+	GTL__WINUTIL_API CString	GetDlgItemString(CWnd* pWnd, int idc);
 
 	template < typename T_COORD > requires gtlc::coord<T_COORD>
-	void DDX_Coord(CDataExchange* pDX, int idc, T_COORD& coord, std::basic_string_view<CString::XCHAR> fmt = {}) {
+	void DDX_Coord(CDataExchange* pDX, int idc, T_COORD& coord, std::basic_string_view<xString::value_type> fmt = {}) {
 		if (!pDX)
 			return;
 		CString str;
@@ -47,7 +47,7 @@ namespace gtl::win_util {
 	template < typename T_COORD > requires gtlc::coord<T_COORD>
 	T_COORD GetDlgItemCoord(CWnd* pWnd, int idc) {
 		T_COORD coord;
-		auto str = GetDlgItemText(pWnd, idc);
+		auto str = GetDlgItemString(pWnd, idc);
 		coord = FromString<T_COORD>(std::wstring_view(str));
 		return coord;
 	}
@@ -254,21 +254,18 @@ namespace gtl::win_util {
 
 		template < typename T_COORD, class = T_COORD::coord_t >
 		T_COORD GetDlgItemCoord(int idc) {
-			T_COORD coord;
-			CString str = GetDlgItemText(idc);
-			Text2Coord(coord, str);
+			T_COORD coord = FromString<T_COORD, xString::value_type>(GetDlgItemString(idc));
 			return coord;
 		}
 		template < typename T_COORD, class = T_COORD::coord_t >
 		T_COORD GetDlgItemCoord(int idc, T_COORD& coord) {
-			CString str = GetDlgItemText(idc);
-			Text2Coord(coord, str);
+			coord = FromString<T_COORD, xString::value_type>(GetDlgItemString(idc));
 			return coord;
 		}
 		template < typename T_COORD, class = T_COORD::coord_t >
 		void SetDlgItemCoord(int idc, T_COORD& coord, std::wstring_view fmt = {}) {
 			CString str;
-			Coord2Text(coord, str, fmt);
+			str = ToString(coord, fmt).c_str();
 			CheckAndSetDlgItemText(idc, str);
 		}
 
@@ -278,7 +275,7 @@ namespace gtl::win_util {
 		using base_t::GetDlgItemText;
 		//int GetDlgItemText(int idc, CString& str) { return __super::GetDlgItemText(idc, str); }
 		//int GetDlgItemText(int idc, LPTSTR lpStr, int nMaxCount ) { return __super::GetDlgItemText(idc, lpStr, nMaxCount); }
-		CString GetDlgItemText(int idc) { return gtl::win_util::GetDlgItemText(this, idc); }
+		CString GetDlgItemString(int idc) { return gtl::win_util::GetDlgItemString(this, idc); }
 
 	public:
 		//DECLARE_MESSAGE_MAP()

@@ -182,23 +182,23 @@ namespace gtl {
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
 	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToLower(tchar c) {
 		if constexpr (std::is_same_v<tchar, char>) {
-			return std::tolower(c);
+			return (tchar)std::tolower(c);
 		} else {
 			//static std::locale loc {fmt::format(".{}", (int)eCODEPAGE_DEFAULT<tchar>)};
 			////static std::locale loc {".1201"};
 			//return std::tolower<tchar>(c, loc);
-			return std::towlower(c);
+			return (tchar)std::towlower(c);
 		}
 	}
 	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
 	template < gtlc::string_elem tchar > inline [[nodiscard]] tchar ToUpper(tchar c) {
 		if constexpr (std::is_same_v<tchar, char>) {
-			return std::toupper(c);
+			return (tchar)std::toupper(c);
 		} else {
 			//static std::locale loc {fmt::format(".{}", (int)eCODEPAGE_DEFAULT<tchar>)};
 			////static std::locale loc {"English_US.1201"};
 			//return std::toupper<tchar>(c, loc);
-			return std::towupper(c);
+			return (tchar)std::towupper(c);
 		}
 	}
 

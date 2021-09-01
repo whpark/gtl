@@ -131,6 +131,9 @@
     <ClInclude Include="..\..\include\gtl\string\string_to_arithmetic.h">
       <Filter>gtl\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\coord\coord_srect.h">
+      <Filter>gtl\coord</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">

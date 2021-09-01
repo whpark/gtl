@@ -35,6 +35,7 @@
 
 //#include "gtl/gtl.h"
 #include "gtl/win_util/win_util.h"
+#include "gtl/win_util/TMDialog.h"
 #include "gtl/win_util/MatHelper.h"
 #include "gtl/win_util/ProgressDlg.h"
 

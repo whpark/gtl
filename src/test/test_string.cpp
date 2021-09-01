@@ -34,6 +34,8 @@ TEST(gtl_string, TString_CodepageConversion) {
 	auto len1 = gtl::tszlen(u"ABCDEF"sv);
 	static_assert(gtl::tszlen(u"ABCDEF"sv) == 6);
 
+	gtl::xStringU8 strU8 (L"가다다라😊"sv);
+
 	gtl::xStringU16 str;
 	str = u"가나다라😊";
 	EXPECT_TRUE(str == u"가나다라😊"sv);
