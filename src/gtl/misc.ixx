@@ -105,44 +105,22 @@ export namespace gtl {
 	};
 
 
-	//-----------------------------------------------------------------------------
-	// Clean Up
-	//
-	// ex 
-	//
-	//		int* pValue = new int(3);
-	//		{
-	//			XCleaner cleanup([&]() { delete pValue; pValue = nullptr; });
-	//			...
-	//		}// 블럭 나가면서 pValue 삭제.
-	//
-	template < typename tfcleaner >
-	class TCleaner {
-	public:
-		tfcleaner m_cleaner;
-	public:
-		~TCleaner() { if (m_cleaner) m_cleaner(); }
-
-	public:
-		void CleanUp() { if (m_cleaner) m_cleaner(); m_cleaner = nullptr; }
-	};
-
-
 	/// @brief RAI helper
-	struct xTrigger {
-		std::function<void()> m_cleaner;
-		[[nodiscard]] xTrigger(std::function<void()> cleaner) : m_cleaner(cleaner) {}
-		~xTrigger() {
-			if (m_cleaner)
-				m_cleaner();
+	// xTrigger -> xFinalAction (naming from gsl::final_action)
+	struct xFinalAction {
+		std::function<void()> m_action;
+		[[nodiscard]] xFinalAction(std::function<void()> action) noexcept : m_action(action) {}
+
+		~xFinalAction() {
+			DoAction();
 		}
-		void Trigger() {
-			if (m_cleaner)
-				m_cleaner();
-			m_cleaner = nullptr;
+		void DoAction() {
+			if (auto action = std::exchange(m_action, nullptr)) {
+				action();
+			}
 		}
 		void Release() {
-			m_cleaner = nullptr;
+			m_action = nullptr;
 		}
 	};
 
