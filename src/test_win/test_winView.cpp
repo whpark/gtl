@@ -152,7 +152,7 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 		{
 			CDC dc;
 			dc.Attach(lpDrawItemStruct->hDC);
-			gtl::xTrigger detacher([&dc]{dc.Detach();});
+			gtl::xFinalAction detacher([&dc]{dc.Detach();});
 
 			CRect rect(lpDrawItemStruct->rcItem);
 

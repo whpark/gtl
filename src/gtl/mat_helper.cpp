@@ -538,7 +538,7 @@ namespace gtl {
 		bool bOK{};
 
 		// Trigger notifying it's over.
-		xTrigger trigger([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, !bOK);});
+		xFinalAction fa([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, !bOK);});
 
 		if (img.empty())
 			return false;
@@ -921,7 +921,7 @@ namespace gtl {
 		bool bOK{};
 
 		// Trigger notifying it's over.
-		xTrigger trigger([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, !bOK); });
+		xFinalAction fa([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, !bOK); });
 
 
 		cv::Mat img;
