@@ -50,8 +50,8 @@ export namespace gtl {
 			return lst;
 		}
 
-		const T_ENGINE GetEngine() const { return m_engine; }
-		const T_DIST GetDitributor() const { return m_distribution; }
+		T_ENGINE const& GetEngine() const { return m_engine; }
+		T_DIST const& GetDitributor() const { return m_distribution; }
 
 	};
 
