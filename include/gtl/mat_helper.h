@@ -149,7 +149,7 @@ namespace gtl {
 					ar & EncodeBase64(std::span(mat.datastart, mat.dataend));
 				} else {
 					std::string str;
-					str.reserve(mat.cols * mat.rows * mat.elemSize() +1 )* 8 / 6;
+					str.reserve((mat.cols * mat.rows * mat.elemSize() +1 ) * 8 / 6);
 					size_t len = mat.cols*mat.elemSize();
 					for (int y {}; y < mat.rows; y++) {
 						auto const* p = mat.ptr(y);
