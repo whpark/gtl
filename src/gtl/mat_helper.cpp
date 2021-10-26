@@ -8,6 +8,26 @@
 
 namespace gtl {
 
+	bool IsMatEqual(cv::Mat const& a, cv::Mat const& b) {
+		if (a.cols != b.cols or a.rows != b.rows or a.size != b.size or a.type() != b.type())
+			return false;
+
+		if (a.isContinuous() and b.isContinuous()) {
+			return std::equal(a.datastart, a.dataend, b.datastart);
+		} else {
+			size_t len = a.cols * a.elemSize();
+			for (int y{}; y < a.rows; y++) {
+				auto const* pA = a.ptr(y);
+				auto const* pB = b.ptr(y);
+				if (!std::equal(pA, pA+len, pB))
+					return false;
+			}
+			return true;
+		}
+
+		return false;
+	}
+
 	void putTextC(cv::InputOutputArray img, std::string const& str, xPoint2i org,
 		int fontFace, double fontScale, cv::Scalar color,
 		int thickness, int lineType,
