@@ -11,7 +11,8 @@ namespace gtl {
 	bool IsMatEqual(cv::Mat const& a, cv::Mat const& b) {
 		if (a.cols != b.cols or a.rows != b.rows or a.size != b.size or a.type() != b.type())
 			return false;
-
+		if (a.empty())
+			return true;
 		if (a.isContinuous() and b.isContinuous()) {
 			return std::equal(a.datastart, a.dataend, b.datastart);
 		} else {
@@ -552,7 +553,7 @@ namespace gtl {
 	}	// namespace internal
 
 
-	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, callback_progress_t funcCallback) {
+	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, bool bBottom2Top, callback_progress_t funcCallback) {
 		// todo : CV_8UC3 with palette.
 
 		bool bOK{};
@@ -581,12 +582,16 @@ namespace gtl {
 
 		header.size = sizeof(header);
 		header.width = cx;
-		header.height = -cy;
+		header.height = bBottom2Top ? cy : -cy;
 		header.planes = 1;
 		header.compression = 0;//BI_RGB;
 		header.sizeImage = 0;//cx * cy * pixel_size;
 		header.XPelsPerMeter = pelsPerMeter.cx;
 		header.YPelsPerMeter = pelsPerMeter.cy;
+
+		cv::Mat img2 = img;
+		if (bBottom2Top)
+			cv::flip(img, img2, 0);
 
 		if (pixel_size == 3) {
 			std::ofstream f(path, std::ios_base::binary);
@@ -612,8 +617,7 @@ namespace gtl {
 			//	f.write(redundant, sr);
 			//}
 			//bOK = true;
-
-			bOK = gtl::internal::MatToBitmapFile<true, false, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, {}, funcCallback);
+			bOK = gtl::internal::MatToBitmapFile<true, false, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, {}, funcCallback);
 
 			return true;
 		}
@@ -650,9 +654,9 @@ namespace gtl {
 			}
 
 			if (bNoPaletteLookup)
-				bOK = gtl::internal::MatToBitmapFile<true, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
+				bOK = gtl::internal::MatToBitmapFile<true, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, pal, funcCallback);
 			else
-				bOK = gtl::internal::MatToBitmapFile<false, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
+				bOK = gtl::internal::MatToBitmapFile<false, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, pal, funcCallback);
 			return bOK;
 		}
 
