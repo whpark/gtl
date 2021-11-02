@@ -30,6 +30,8 @@ export namespace gtl::win_util {
 	double		GetDlgItemDouble(CWnd* pWnd, int idc);
 	void		SetDlgItemDouble(CWnd* pWnd, int idc, double dValue, std::wstring_view fmt = _T("{:.5f}"));
 	void		DDX_Double(CDataExchange* pDX, int idc, double& value, std::wstring_view fmt = _T("{:.5f}"));
+	void		DDX_DoubleScaled(CDataExchange* pDX, int idc, double& value, double scaleToView, std::wstring_view fmt = _T("{:.5f}"));
+	void		DDX_CheckBool(CDataExchange* pDX, int idc, bool& value);
 	template < typename tchar > requires gtlc::string_elem<tchar>
 	void		DDX_String(CDataExchange* pDX, int idc, std::basic_string<tchar>& str);
 	bool		CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& sv, CString* pStrOrigin = nullptr);	// returns true if changed
@@ -216,6 +218,26 @@ export namespace gtl::win_util {
 			dValue = GetDlgItemDouble(pDX->m_pDlgWnd, idc);
 		} else {
 			SetDlgItemDouble(pDX->m_pDlgWnd, idc, dValue, fmt);
+		}
+	}
+
+	void DDX_DoubleScaled(CDataExchange* pDX, int idc, double& value, double scaleToView, std::wstring_view fmt) {
+		if (!pDX || !pDX->m_pDlgWnd)
+			return;
+		double dScaledValue = value * scaleToView;
+		DDX_Double(pDX, idc, dScaledValue, fmt);
+		if (pDX->m_bSaveAndValidate) {
+			value = dScaledValue / scaleToView;
+		}
+	}
+
+	void DDX_CheckBool(CDataExchange* pDX, int idc, bool& value) {
+		if (!pDX || !pDX->m_pDlgWnd)
+			return;
+		BOOL bCheck = value;
+		DDX_Check(pDX, idc, bCheck);
+		if (pDX->m_bSaveAndValidate) {
+			value = bCheck ? true : false;
 		}
 	}
 

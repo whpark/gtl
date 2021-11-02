@@ -866,7 +866,7 @@ export namespace gtl {
 	}	// namespace internal
 
 
-	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette = {}, bool bNoPaletteLookup = false, callback_progress_t funcCallback = nullptr, bool bBottom2Top = false) {
+	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette = {}, bool bNoPaletteLookup = false, bool bBottom2Top = false, callback_progress_t funcCallback = nullptr) {
 		// todo : CV_8UC3 with palette.
 
 		bool bOK{};
