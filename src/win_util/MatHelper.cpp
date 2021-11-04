@@ -161,7 +161,26 @@ namespace gtl::win_util {
 		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &dlgProgress, &pelsPerMeter]() { img = gtl::LoadBitmapMat(path, pelsPerMeter, dlgProgress.m_calback); });
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &pelsPerMeter, &dlgProgress]() { img = gtl::LoadBitmapMat(path, pelsPerMeter, dlgProgress.m_calback); });
+		auto r = dlgProgress.DoModal();
+
+		CWaitCursor wc;
+
+		dlgProgress.m_rThreadWorker->join();
+
+		bool bResult = (r == IDOK);
+		if (!bResult)
+			img.release();
+
+		return img;
+	}
+
+	cv::Mat LoadBitmapMatPixelArrayProgress(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette) {
+		cv::Mat img;
+		CProgressDlg dlgProgress;
+		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
+
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &pelsPerMeter, &palette, &dlgProgress]() { img = gtl::LoadBitmapMatPixelArray(path, pelsPerMeter, palette, dlgProgress.m_calback); });
 		auto r = dlgProgress.DoModal();
 
 		CWaitCursor wc;

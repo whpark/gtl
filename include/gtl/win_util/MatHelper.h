@@ -24,6 +24,7 @@ namespace gtl::win_util {
 
 	GTL__WINUTIL_API bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette = {}, bool bNoPaletteLookup = false, bool bBottom2Top = false);
 	GTL__WINUTIL_API cv::Mat LoadBitmapMatProgress(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter);
+	GTL__WINUTIL_API cv::Mat LoadBitmapMatPixelArrayProgress(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette);
 
 #pragma pack(pop)
 }
