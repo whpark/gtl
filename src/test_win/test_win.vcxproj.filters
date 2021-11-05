@@ -56,6 +56,9 @@
     <ClInclude Include="ViewTree.h">
       <Filter>[ MFC Framework ]</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\MatView.h">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="calendarbar.cpp">
@@ -92,6 +95,9 @@
       <Filter>[ MFC Framework ]</Filter>
     </ClCompile>
     <ClCompile Include="ViewTree.cpp">
+      <Filter>[ MFC Framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="..\win_util\MatView.cpp">
       <Filter>[ MFC Framework ]</Filter>
     </ClCompile>
   </ItemGroup>
