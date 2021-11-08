@@ -1,10 +1,10 @@
 ﻿#pragma once
-#if 0
 
 // CMatView
 
 #include "gtl/coord.h"
 #include "gtl/json_proxy.h"
+#include "gtl/2dMatArray.h"
 #include "gtl/win_util/_lib_gtl_win_util.h"
 #include "gtl/win_util/win_util.h"
 
@@ -65,7 +65,7 @@ namespace gtl::win_util {
 			int eAutoScrollMethod = 1;							// 0 : pgdn, 1 : space bottom, 2 : space top
 			int tSmoothScroll{ 0 };								// Smooth Scroll Duration in ms
 
-			void SyncJson(bool bStore, gtl::njson<>& section);
+			void SyncJson(bool bStore, gtl::bjson<>& section);
 			void SyncRegistry(bool bStore, LPCTSTR pszSection, CWinApp& app);
 		};
 		CString m_strRegistrySection;	// Load/Store Settings from/to ...
@@ -103,7 +103,8 @@ namespace gtl::win_util {
 		xCoordTrans2d m_ctI2S;	// Image to Screen
 		std::unique_ptr<ICoordTrans> m_rCTI2M;
 		std::array<bool, 3> m_bChannels;
-		cv::Mat m_imgOrg;
+		//cv::Mat m_imgOrg;
+		C2dMatArray m_imgOrg;
 		cv::Mat m_imgView;
 
 		// Attributes
@@ -160,15 +161,15 @@ namespace gtl::win_util {
 			int operator == (LPCTSTR pszName) const { return strName == pszName; }
 		};
 		struct {
-			TList<T_CROSS_MARK> crosses;
-			TList<T_RECT_REGION> rects;
+			std::deque<std::unique_ptr<T_CROSS_MARK>> crosses;
+			std::deque<std::unique_ptr<T_RECT_REGION>> rects;
 			T_RECT_REGION rectCurrent;
 		} m_display;
 		struct {
 			xPoint2d pt0, delta;
 			std::chrono::steady_clock::time_point t0, t1;
 		} m_smooth_scroll;
-		static HCURSOR m_hCursorMag;
+		inline static HCURSOR m_hCursorMag = nullptr;
 
 	public:
 		CMatView();   // standard constructor
@@ -179,8 +180,8 @@ namespace gtl::win_util {
 		// operations
 	public:
 		bool InitView(double dZoom = -1);
-		bool SetImage(const cv::Mat& img, double dZoom = -1, bool bCopyImage = false);
-		bool SetImageCenter(const xPoint2d& pt = xPoint2d(-1, -1), double dZoom = -1, bool bDelayedUpdate = false);
+		bool SetImage(cv::Mat const& img, double dZoom = -1, bool bCopyImage = false);
+		bool SetImageCenter(xPoint2d const& pt = xPoint2d(-1, -1), double dZoom = -1, bool bDelayedUpdate = false);
 		double GetZoom() { double dZoom = -1; CheckAndGetZoom(dZoom); return dZoom; }
 		void SetZoom(double dZoom);
 		void SetMouseFunction(eMOUSE_FUNCTION eMFLButton = MF_DRAG_IMAGE, eMOUSE_FUNCTION eMFMButton = MF_DRAG_IMAGE, eMOUSE_FUNCTION eMFRButton = MF_SELECT_REGION,
@@ -198,22 +199,36 @@ namespace gtl::win_util {
 		bool IsToolVisible() const { return m_setting.bShowTool; }
 		void UpdateTool();
 
-		bool GetImage(cv::Mat& img) { if (m_imgOrg.empty()) return FALSE; cv::Rect rc(0, 0, m_imgOrg.cols, m_imgOrg.rows); m_imgOrg(rc).copyTo(img); return TRUE; }
-		bool GetImageView(cv::Mat& img) const { if (m_imgView.empty()) return FALSE; m_imgView.copyTo(img); return TRUE; }
+		bool GetImage(cv::Mat& img) { if (m_imgOrg.empty()) return false; cv::Rect rc(0, 0, m_imgOrg.GetWidth(), m_imgOrg.GetHeight()); m_imgOrg.GetROI(rc).copyTo(img); return true; }
+		bool GetImageView(cv::Mat& img) const { if (m_imgView.empty()) return false; m_imgView.copyTo(img); return true; }
 		cv::Mat GetImage() { cv::Mat img; GetImage(img); return std::move(img); }
 		bool GetCurrentImageRect(xRect2d& rect) const;
-		bool SetCurrentImageRect(const xRect2d& rect);
+		bool SetCurrentImageRect(xRect2d const& rect);
 
-		bool StartSelectionMode(const xPoint2d& ptImage);
+		bool StartSelectionMode(xPoint2d const& ptImage);
 		bool EndSelectionMode();
 		bool GetSelectedImageRect(xRect2d& rect) const;
-		bool SetSelectedImageRect(const xRect2d& rect, bool bSelect = true);
+		bool SetSelectedImageRect(xRect2d const& rect, bool bSelect = true);
 
 		//const cv::Mat& GetImage() const { return m_imgOrg; }
-		cv::Mat& GetMatImage() { return m_imgOrg; }
-		const cv::Mat& GetMatImage() const { return m_imgOrg; }
+		C2dMatArray const& GetMatImage() { return m_imgOrg; }
 		const cv::Mat& GetImageView() const { return m_imgView; }
 
+		template < typename tcontainer >
+		auto Find(tcontainer& container, LPCTSTR pszName) {
+			return std::find_if(container.begin(), container.end(), [pszName](auto const& a){return a->strName == pszName;});
+		}
+		auto FindAttr(LPCTSTR pszName) {
+			return std::find_if(m_imgsAttribute.begin(), m_imgsAttribute.end(), [pszName](auto const& a){return a->strName == pszName;});
+		}
+		T_ATTRIBUTE& GetAttr(LPCTSTR pszName) {
+			auto pos = std::find_if(m_imgsAttribute.begin(), m_imgsAttribute.end(), [pszName](auto const& a){return a->strName == pszName;});
+			if (pos == m_imgsAttribute.end()) {
+				m_imgsAttribute.push_back(std::make_unique<T_ATTRIBUTE>());
+				pos = m_imgsAttribute.end()-1;
+			}
+			return *(*pos);
+		}
 		bool AddAttributeLayer(LPCTSTR pszName, const cv::Mat& img, COLORREF crTransparent);
 		bool AddAttributeLayer(LPCTSTR pszName, const cv::Mat& img, BLENDFUNCTION blend);
 		bool AddAttributeLayer(LPCTSTR pszName, const cv::Point& ptLT, const cv::Mat& img, COLORREF crTransparent);
@@ -221,12 +236,12 @@ namespace gtl::win_util {
 		bool SetAttributeLayer(LPCTSTR pszName, const cv::Mat& img);
 		bool DeleteAttributeLayer(LPCTSTR pszName = NULL);
 
-		bool ShowCrossMark(LPCTSTR pszName = NULL, bool bShow = TRUE);
-		int AddCrossMark(LPCTSTR pszName, const xPoint2d& pt, LPCTSTR pszLabel = NULL, int iSizeX = 5, int iSizeY = 5, int nPenStyle = PS_SOLID, int iThick = 3, COLORREF cr = RGB(255, 0, 0));
+		bool ShowCrossMark(LPCTSTR pszName = NULL, bool bShow = true);
+		bool AddCrossMark(LPCTSTR pszName, xPoint2d const& pt, LPCTSTR pszLabel = nullptr, int iSizeX = 5, int iSizeY = 5, int nPenStyle = PS_SOLID, int iThick = 3, COLORREF cr = RGB(255, 0, 0));
 		bool DeleteCrossMark(LPCTSTR pszName = NULL);
 
-		bool ShowRectRegion(LPCTSTR pszName = NULL, bool bShow = TRUE);
-		int AddRectRegion(LPCTSTR pszName, const xRect2d& rect, LPCTSTR pszLabel = NULL, int nPenStyle = PS_DOT, int iThick = 3, COLORREF crPen = RGB(255, 255, 255));
+		bool ShowRectRegion(LPCTSTR pszName = NULL, bool bShow = true);
+		bool AddRectRegion(LPCTSTR pszName, const xRect2d& rect, LPCTSTR pszLabel = NULL, int nPenStyle = PS_DOT, int iThick = 3, COLORREF crPen = RGB(255, 255, 255));
 		bool DeleteRectRegion(LPCTSTR pszName = NULL);
 
 	protected:
@@ -245,7 +260,7 @@ namespace gtl::win_util {
 		void SetCT_I2M(std::unique_ptr<ICoordTrans> rCTI2M) { m_rCTI2M = std::move(rCTI2M); }
 		void SetCT_I2M(const xCoordTrans2d& ctI2M) { m_rCTI2M.reset(new xCoordTrans2d(ctI2M)); }
 		ICoordTrans* GetCT_I2M() { return m_rCTI2M.get(); }
-		bool UpdateMousePosition(const CPoint& pt);
+		bool UpdateMousePosition(CPoint const& pt);
 		bool UpdateTrackPosition(LPCRECT lpRect);
 		bool UpdateToolTip(LPCTSTR psz);
 		int GetScaleDownMethod() const { return m_imgOrg.GetScaleDownMethod(); }
@@ -254,7 +269,8 @@ namespace gtl::win_util {
 
 	protected:
 		bool UpdateDisplayImage(double dZoom = -1, bool bDelayedUpdate = false);
-		bool PrepareDisplayImage(const cv::Mat& imgOrg, cv::Mat& imgView, const cv::Point& ptPatch, CPoint& ptOffset, const CRect& rectClient, double dZoom = -1);
+		bool PrepareDisplayImage(cv::Mat const& imgOrg, cv::Mat& imgView, const cv::Point& ptPatch, CPoint& ptOffset, const CRect& rectClient, double dZoom = -1);
+		bool PrepareDisplayImage(C2dMatArray const& imgSet, cv::Mat& imgView, CRect const& rectClient, double dZoom);
 		bool UpdateScrollBars(double dZoom = -1);
 		int OnScroll(int eBar, UINT nSBCode, UINT nPos);
 
@@ -292,7 +308,7 @@ namespace gtl::win_util {
 		afx_msg void OnZoomReset();
 		afx_msg void OnSave();
 		afx_msg void OnPatternMatching();
-		afx_msg void OnSettings();
+		//afx_msg void OnSettings();
 		//afx_msg void OnSelchangeScaleDownMethod();
 		//afx_msg void OnSelchangeScaleUpMethod();
 		afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
@@ -303,6 +319,3 @@ namespace gtl::win_util {
 
 #pragma pack(pop)
 }
-
-
-#endif

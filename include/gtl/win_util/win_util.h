@@ -49,6 +49,14 @@
 #include "_lib_gtl_win_util.h"
 #include "gtl/gtl.h"
 
+
+#define EXT_DEFAULT_IMAGE_FILE	_T(".png")
+#define FILTER_IMAGE_FILES		_T("Image Files(*.bmp;*.jpg;*.tiff;*.png)|*.bmp;*.jpg;*.tiff;*.png|Bitmap(*.bmp)|*.bmp|PNG File(*.png)|*.png|JPEG File(*.jpg)|*.jpg|All Files(*.*)|*.*||")
+#define IMAGE_FILE_EXTS			_T("*.bmp;*.jpg;*.jpeg;*.tiff;*.png;*.gif")
+
+#define INVALID_CHAR_FOR_FILE_NAME _T("\\/:*?<>|")
+
+
 namespace gtl::win_util {
 #pragma pack(push, 8)	// default align. (8 bytes)
 
@@ -134,6 +142,72 @@ namespace gtl::win_util {
 	};
 
 	using xStopWatch = TStopWatch;
+
+	//-----------------------------------------------------------------------------
+	// Rect Tracker with Center Cross Mark
+	class GTL__WINUTIL_CLASS CRectTrackerCenterMark : public CRectTracker {
+	public:
+		using base_t = CRectTracker;
+		CRect m_rectExclude;
+		COLORREF m_crCrossMark;
+	protected:
+		CPoint m_ptCenterLast;
+	public:
+		CRectTrackerCenterMark(COLORREF crCrossMark = RGB(255, 255, 255)) : CRectTracker(), m_crCrossMark(crCrossMark) {  }
+		CRectTrackerCenterMark(LPCRECT lpSrcRect, UINT nStyle, COLORREF crCrossMark = RGB(255, 255, 255)) : CRectTracker(lpSrcRect, nStyle), m_crCrossMark(crCrossMark) {}
+
+		virtual void DrawTrackerRect(LPCRECT lpRect, CWnd* pWndClipTo, CDC* pDC, CWnd* pWnd) override {
+			base_t::DrawTrackerRect(lpRect, pWndClipTo, pDC, pWnd);
+			if (lpRect && pDC) {
+				CRect rect(*lpRect);
+				// convert to client coordinates
+				if (pWndClipTo) {
+					pWnd->ClientToScreen(rect);
+					pWndClipTo->ScreenToClient(rect);
+				}
+
+				CRect rectExclude(m_rectExclude);
+				if (!rectExclude.IsRectEmpty()) {
+					if (pWndClipTo) {
+						pWnd->ClientToScreen(rectExclude);
+						pWndClipTo->ScreenToClient(rectExclude);
+					}
+					pDC->ExcludeClipRect(rectExclude);
+				}
+
+				const int nSize = 30;
+
+				int eOldMode = pDC->SetROP2(R2_XORPEN);
+				CPen pen(PS_SOLID, 1, m_crCrossMark);
+				CPen* pOldPen = pDC->SelectObject(&pen);
+
+				CPoint ptCenter;
+				if (m_bErase) {
+					if (m_ptCenterLast.x >= 0) {
+						ptCenter = m_ptCenterLast;
+						pDC->MoveTo(ptCenter.x - nSize/2, ptCenter.y);
+						pDC->LineTo(ptCenter.x + nSize/2, ptCenter.y);
+						pDC->MoveTo(ptCenter.x, ptCenter.y - nSize/2);
+						pDC->LineTo(ptCenter.x, ptCenter.y + nSize/2);
+					}
+				} else {
+					ptCenter = rect.CenterPoint();
+					pDC->MoveTo(ptCenter.x - nSize/2, ptCenter.y);
+					pDC->LineTo(ptCenter.x + nSize/2, ptCenter.y);
+					pDC->MoveTo(ptCenter.x, ptCenter.y - nSize/2);
+					pDC->LineTo(ptCenter.x, ptCenter.y + nSize/2);
+
+					m_ptCenterLast = ptCenter;
+				}
+
+				pDC->SelectObject(pOldPen);
+				pDC->SetROP2(eOldMode);
+			}
+		}
+		BOOL Track(CWnd* pWnd, CPoint point, BOOL bAllowInvert = FALSE, CWnd* pWndClipTo = NULL)	{ m_ptCenterLast.x = -1000; return __super::Track(pWnd, point, bAllowInvert, pWndClipTo); }
+		BOOL TrackRubberBand(CWnd* pWnd, CPoint point, BOOL bAllowInvert = TRUE)					{ m_ptCenterLast.x = -1000; return __super::TrackRubberBand(pWnd, point, bAllowInvert); }
+	};
+
 
 #pragma pack(pop)
 }

@@ -1,21 +1,32 @@
 #include "pch.h"
-#if 0
-
 // MatView.cpp : implementation file
 //
 
-#include "resource.h"
+#include "gtl/_default.h"
 #include "gtl/mat_helper.h"
 #include "gtl/win_util/MatView.h"
 #include "gtl/win_util/MatHelper.h"
 #include "gtl/win_util/TMDialog.h"
 
+#include "resource.h"
 #include <VersionHelpers.h>
+
+using namespace std::literals;
 
 namespace gtl::win_util {
 
 	enum {
 		WM_UPDATE_DISPLAY_IMAGE = WM_APP+30,
+
+	};
+
+	enum {
+		IDB_ZOOM_IN = 1040,
+		IDB_ZOOM_OUT,
+		IDB_ZOOM_RESET,
+		IDB_SAVE,
+		IDB_SEARCH,
+		IDB_SETTINGS
 
 	};
 
@@ -26,25 +37,31 @@ namespace gtl::win_util {
 	// CMatView dialog
 
 	static const bool g_bWindows7OrGreater = IsWindows7OrGreater();
-	extern HINSTANCE g_hInstance;
+	//extern HINSTANCE g_hInstance;
 
-	void CMatView::CSetting::SyncJson(bool bStore, CProfileSection& section) {
-		section.SyncItemValueBoolean(bStore, _T("ShowTool"), bShowTool);
-
-		section.SyncItemValue(bStore, _T("ScaleUpMethod"), eScaleUpMethod);
-		section.SyncItemValue(bStore, _T("ScaleDownMethod"), eScaleDownMethod);
-		section.SyncItemValueBoolean(bStore, _T("2ClickSelection"), b2ClickSelection);
-		section.SyncItemValueBoolean(bStore, _T("ClickToMagnifySelectedRect"), bClickToMagnifySelectedRect);
-		section.SyncItemValueBoolean(bStore, _T("PatternMatching"), bPatternMatching);
-		section.SyncItemValueBoolean(bStore, _T("TooltipOnCursor"), bToolTipOnCursor);
-		section.SyncItemValueBoolean(bStore, _T("ClearSelectionOnMouseButton"), bClearSelectionOnMouseButton);
-		section.SyncItemValueBoolean(bStore, _T("MapWindow"), bMapWindow);
-		section.SyncItemValueBoolean(bStore, _T("StatusOnBottom"), bStatusOnBottom);
-		section.SyncItemValue(bStore, _T("ZoomRate"), dZoomRate);
-		section.SyncItemValue(bStore, _T("JPGQuality"), iJPGQuality);
-		section.SyncItemValue(bStore, _T("KeyboardNavigation"), bKeyboardNavigation);
-		section.SyncItemValue(bStore, _T("AutoScrollMethod"), eAutoScrollMethod);
-		section.SyncItemValue(bStore, _T("SmoothScrollDuration"), tSmoothScroll);
+	void CMatView::CSetting::SyncJson(bool bStore, gtl::bjson<>& section) {
+		auto SyncItem = [bStore, &section]<typename T>(std::u8string_view svItem, T& item) {
+			if (bStore) {
+				section[svItem] = item;
+			} else {
+				item = section[svItem].value_or(item);
+			}
+		};
+		SyncItem(u8"ShowTool"sv,					bShowTool);
+		SyncItem(u8"ScaleUpMethod"sv,				eScaleUpMethod);
+		SyncItem(u8"ScaleDownMethod"sv,				eScaleDownMethod);
+		SyncItem(u8"2ClickSelection"sv,				b2ClickSelection);
+		SyncItem(u8"ClickToMagnifySelectedRect"sv,	bClickToMagnifySelectedRect);
+		SyncItem(u8"PatternMatching"sv,				bPatternMatching);
+		SyncItem(u8"TooltipOnCursor"sv,				bToolTipOnCursor);
+		SyncItem(u8"ClearSelectionOnMouseButton"sv,	bClearSelectionOnMouseButton);
+		SyncItem(u8"MapWindow"sv,					bMapWindow);
+		SyncItem(u8"StatusOnBottom"sv,				bStatusOnBottom);
+		SyncItem(u8"ZoomRate"sv,					dZoomRate);
+		SyncItem(u8"JPGQuality"sv,					iJPGQuality);
+		SyncItem(u8"KeyboardNavigation"sv,			bKeyboardNavigation);
+		SyncItem(u8"AutoScrollMethod"sv,			eAutoScrollMethod);
+		SyncItem(u8"SmoothScrollDuration"sv,		tSmoothScroll);
 	}
 	void CMatView::CSetting::SyncRegistry(bool bStore, LPCTSTR pszSection, CWinApp& app) {
 		if (bStore) {
@@ -58,7 +75,7 @@ namespace gtl::win_util {
 			app.WriteProfileInt(pszSection, _T("ClearSelectionOnMouseButton"), bClearSelectionOnMouseButton);
 			app.WriteProfileInt(pszSection, _T("MapWindow"), bMapWindow);
 			app.WriteProfileInt(pszSection, _T("StatusOnBottom"), bStatusOnBottom);
-			app.WriteProfileString(pszSection, _T("ZoomRate"), Format(_T("%g"), dZoomRate));
+			app.WriteProfileString(pszSection, _T("ZoomRate"), std::format(_T("{}"), dZoomRate).c_str());
 			app.WriteProfileInt(pszSection, _T("JPGQuality"), iJPGQuality);
 			app.WriteProfileInt(pszSection, _T("KeyboardNavigation"), bKeyboardNavigation);
 			app.WriteProfileInt(pszSection, _T("AutoScrollMethod"), eAutoScrollMethod);
@@ -74,7 +91,7 @@ namespace gtl::win_util {
 			bClearSelectionOnMouseButton	= app.GetProfileInt(pszSection, _T("ClearSelectionOnMouseButton"), bClearSelectionOnMouseButton);
 			bMapWindow						= app.GetProfileInt(pszSection, _T("MapWindow"), bMapWindow);
 			bStatusOnBottom					= app.GetProfileInt(pszSection, _T("StatusOnBottom"), bStatusOnBottom);
-			CString str 					= app.GetProfileString(pszSection, _T("ZoomRate"), Format(_T("%g"), dZoomRate));
+			CString str 					= app.GetProfileString(pszSection, _T("ZoomRate"), std::format(_T("{}"), dZoomRate).c_str());
 			dZoomRate = _ttof(str);
 			if (dZoomRate <= 1.0)
 				dZoomRate = 1.1;
@@ -86,23 +103,21 @@ namespace gtl::win_util {
 	}
 
 
-	HCURSOR CMatView::m_hCursorMag = nullptr;
-
 	IMPLEMENT_DYNAMIC(CMatView, CWnd)
 
 	CMatView::CMatView() : CWnd() {
-		m_mouse.bDragMode = FALSE;
+		m_mouse.bDragMode = false;
 
 		SetMouseFunction();
 
-		UseGPU(TRUE);
+		//UseGPU(true);
 
-		m_pDlgPatternMatching = nullptr;
+		//m_pDlgPatternMatching = nullptr;
 
 		if (!m_hCursorMag)
-			m_hCursorMag = LoadCursor(g_hInstance, _T("IDC_MAGNIFYING"));
+			m_hCursorMag = LoadCursor(AfxGetInstanceHandle(), _T("IDC_MAGNIFYING"));
 
-		m_imgOrg.SetNotifier([&](CPoint2i& pt, const C2dMatArray::T_ITEM& item) -> bool {
+		m_imgOrg.SetNotifier([&](xPoint2i& pt, const C2dMatArray::T_ITEM& item) -> bool {
 			int nRetry = 3;
 			for (int i = 0; i < nRetry; i++) {
 				if (PostMessage(WM_UPDATE_DISPLAY_IMAGE, (WPARAM)(intptr_t)(-1 * dZoomRateWParam), (LPARAM)true))
@@ -116,8 +131,8 @@ namespace gtl::win_util {
 
 		m_imgOrg.ResetNotifier();
 
-		if (m_pDlgPatternMatching)
-			delete m_pDlgPatternMatching;
+		//if (m_pDlgPatternMatching)
+		//	delete m_pDlgPatternMatching;
 	}
 
 	//void CMatView::DoDataExchange(CDataExchange* pDX) {
@@ -150,8 +165,8 @@ namespace gtl::win_util {
 		ON_COMMAND(eIDZoomUp, OnZoomUp)
 		ON_COMMAND(eIDZoomDown, OnZoomDown)
 		ON_COMMAND(eIDZoomReset, OnZoomReset)
-		ON_COMMAND(eIDPatternMatching, OnPatternMatching)
-		ON_COMMAND(eIDSettings, OnSettings)
+		//ON_COMMAND(eIDPatternMatching, OnPatternMatching)
+		//ON_COMMAND(eIDSettings, OnSettings)
 		//ON_CBN_SELCHANGE(eIDScaleDownMethod, OnSelchangeScaleDownMethod)
 		//ON_CBN_SELCHANGE(eIDScaleUpMethod, OnSelchangeScaleUpMethod)
 		ON_COMMAND(eIDSave, OnSave)
@@ -163,13 +178,13 @@ namespace gtl::win_util {
 
 	//BOOL CMatView::OnInitDialog() {
 	//	CWnd::OnInitDialog();
-	//	return TRUE;
+	//	return true;
 	//}
 	//
 	static const int s_nSpace = 2;
 	int CMatView::OnCreate(LPCREATESTRUCT lpCreateStruct) {
-		//CHECK_MOCHA_LICENSE();
-		if (!mocha_features::IsFeatureEnabled(mocha_features::KF_XMATH_UTIL)) return -1;
+		////CHECK_MOCHA_LICENSE();
+		//if (!mocha_features::IsFeatureEnabled(mocha_features::KF_XMATH_UTIL)) return -1;
 
 		lpCreateStruct->style |= WS_TABSTOP;
 
@@ -239,7 +254,7 @@ namespace gtl::win_util {
 		m_staticInfo.Create(WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_BORDER|ES_AUTOHSCROLL|ES_NOHIDESEL|ES_READONLY, CRect(), this, eIDInfo);	// Rect 는 ShowTool(), OnSize() 함수에서 설정
 																																		//m_ttInfo.Create(this, WS_VISIBLE|TTS_ALWAYSTIP|TTS_NOPREFIX/*|TTS_NOANIMATE*/|TTS_BALLOON);
 																																		//m_ttInfo.AddTool(this, _T(""), rect, eIDInfo);
-																																		//EnableToolTips(TRUE);
+																																		//EnableToolTips(true);
 
 		if (AfxGetApp() && !m_strRegistrySection.IsEmpty())
 			m_setting.SyncRegistry(false, m_strRegistrySection, *AfxGetApp());
@@ -292,21 +307,21 @@ namespace gtl::win_util {
 			{
 				auto t = std::chrono::steady_clock::now();
 				auto& ss = m_smooth_scroll;
-				CPoint2d ptNew;
+				xPoint2d ptNew;
 				if (t < ss.t1) {
-					double len = (ss.t1-ss.t0).count();
-					double pos = (t-ss.t0).count();
+					double len = (double)(ss.t1-ss.t0).count();
+					double pos = (double)(t-ss.t0).count();
 					//double t = (-cos(pos / len * std::numbers::pi) + 1)/2.;
-					double t = sin(pos / len * std::numbers::pi/2.);
+					double t = std::sin(pos / len * std::numbers::pi/2.);
 					ptNew = ss.pt0 + ss.delta * t;
 				} else {
 					KillTimer(nIDEvent);
 					ptNew = ss.pt0 + ss.delta;
-					ss.delta = CPoint2d{};
+					ss.delta = xPoint2d{};
 				}
-				if (m_ctI2S.m_ptShift == ptNew)
+				if (m_ctI2S.m_origin == ptNew)
 					return;
-				m_ctI2S.m_ptShift = ptNew;
+				m_ctI2S.m_origin = ptNew;
 				UpdateScrollBars();
 				UpdateDisplayImage();
 			}
@@ -320,34 +335,34 @@ namespace gtl::win_util {
 		if (!pMsg)
 			return CWnd::PreTranslateMessage(pMsg);
 
-		auto Scroll = [&](CPoint2d deltaImage) {
-			if (deltaImage == CPoint2d{})
+		auto Scroll = [&](xPoint2d deltaImage) {
+			if (deltaImage == xPoint2d{})
 				return;
 			if (m_setting.tSmoothScroll > 0) {
 				auto& ss = m_smooth_scroll;
-				if (ss.delta != CPoint2d{})
+				if (ss.delta != xPoint2d{})
 					return;
 				auto interval = std::chrono::milliseconds(15);
 				ss.t0 = std::chrono::steady_clock::now() - interval;
 
 				// 시간
-				double len = m_ctI2S.TransLength(deltaImage.GetLength());
+				double len = m_ctI2S.Trans(deltaImage.GetLength());
 				CRect rect;
 				GetClientRect(rect);
 				double w = std::max(rect.Width(), rect.Height());
 				std::chrono::duration t = std::chrono::milliseconds((int64_t)(m_setting.tSmoothScroll * std::clamp(len / w, 0.2, 1.1)));
 				if (t <= std::chrono::milliseconds(100)) {
-					m_ctI2S.m_ptShift += deltaImage;
+					m_ctI2S.m_origin += deltaImage;
 					UpdateScrollBars();
 					UpdateDisplayImage();
 					return;
 				}
 				ss.t1 = ss.t0 + t;
-				ss.pt0 = m_ctI2S.m_ptShift;
+				ss.pt0 = m_ctI2S.m_origin;
 				ss.delta = deltaImage;
-				SetTimer(T_SMOOTH_SCROLL, interval.count(), nullptr);
+				SetTimer(T_SMOOTH_SCROLL, (UINT)interval.count(), nullptr);
 			} else {
-				m_ctI2S.m_ptShift += deltaImage;
+				m_ctI2S.m_origin += deltaImage;
 				UpdateScrollBars();
 				UpdateDisplayImage();
 			}
@@ -363,7 +378,7 @@ namespace gtl::win_util {
 
 					bool bReturn = false;
 					if (m_display.rectCurrent.bShow) {
-						SetSelectedImageRect(CRect2d(), false);
+						SetSelectedImageRect(xRect2d(), false);
 						bReturn = true;
 					}
 					if (m_mouse.bSelectionMode) {
@@ -373,7 +388,7 @@ namespace gtl::win_util {
 					Invalidate(true);
 
 					if (bReturn)
-						return TRUE;
+						return true;
 				}
 				break;
 
@@ -382,10 +397,10 @@ namespace gtl::win_util {
 					if (GetCapture() == this)
 						ReleaseCapture();
 
-					if ( (GetKeyState(VK_MENU) < 0) && (GetKeyState(VK_CONTROL) < 0) ) {
-						OnSettings();
-						return TRUE;
-					}
+					//if ( (GetKeyState(VK_MENU) < 0) && (GetKeyState(VK_CONTROL) < 0) ) {
+					//	OnSettings();
+					//	return true;
+					//}
 				}
 				break;
 
@@ -396,7 +411,7 @@ namespace gtl::win_util {
 
 					if ( (GetKeyState(VK_MENU) < 0) && (GetKeyState(VK_CONTROL) < 0) ) {
 						ShowTool(!m_setting.bShowTool);
-						return TRUE;
+						return true;
 					}
 				}
 				break;
@@ -413,11 +428,12 @@ namespace gtl::win_util {
 					CRect rectClient;
 					GetClientRect(rectClient);
 
-					CPoint2d ptShift = m_ctI2S.TransI<CPoint2d>(100., 100.) - m_ctI2S.TransI<CPoint2d>(0., 0.);
-					CPoint2d ptShiftPage = m_ctI2S.TransI<CPoint2d>(rectClient.BottomRight()) - m_ctI2S.TransI<CPoint2d>(rectClient.TopLeft());
+					xPoint2d ptShift = m_ctI2S.TransI(xPoint2d(100., 100.)) - m_ctI2S.TransI(xPoint2d(0., 0.));
+					xPoint2d ptShiftPage;
+					ptShiftPage = m_ctI2S.TransI(rectClient.BottomRight()) - m_ctI2S.TransI(rectClient.TopLeft());
 					ptShiftPage *= 0.9;
 
-					CPoint2d delta;
+					xPoint2d delta;
 					if (key == VK_LEFT)			delta.x -= ptShift.x;
 					else if (key == VK_RIGHT)	delta.x += ptShift.x;
 					else if (key == VK_UP)		delta.y -= ptShift.y;
@@ -436,16 +452,16 @@ namespace gtl::win_util {
 					CRect rectClient;
 					GetClientRect(rectClient);
 
-					CPoint2i ptCenter{ rectClient.CenterPoint() };
-					//CPoint2i pt = ptCenter;
+					xPoint2i ptCenter{ rectClient.CenterPoint() };
+					//xPoint2i pt = ptCenter;
 
 					int heightMin { (int) (m_ctI2S.TransI((double)rectClient.Height()) * 5.0 / 10) };
 					int deltaDefaultScreen{ rectClient.Height() * 95 / 100 };
 					double deltaImage { m_ctI2S.TransI((double)deltaDefaultScreen) };
 					int heightMax { (int) (m_ctI2S.TransI((double)rectClient.Height()) * 9.5 / 10) };
-					auto ptImgBottom = m_ctI2S.TransI<CPoint2i>(rectClient.left, rectClient.bottom);
-					auto ptImgTop = m_ctI2S.TransI<CPoint2i>(rectClient.left, rectClient.top);
-					auto y0 = std::min(ptImgBottom.y + heightMax, m_imgOrg.GetHeight() - 1);
+					auto ptImgBottom = m_ctI2S.TransI(xPoint2d(rectClient.left, rectClient.bottom));
+					auto ptImgTop = m_ctI2S.TransI(xPoint2d(rectClient.left, rectClient.top));
+					auto y0 = std::min(Round(ptImgBottom.y) + heightMax, m_imgOrg.GetHeight() - 1);
 
 					auto CheckIfBlank = [&](int y) -> bool {
 						cv::Rect rc(0, y, m_imgOrg.GetWidth(), 1);
@@ -487,10 +503,10 @@ namespace gtl::win_util {
 
 					if (m_setting.eAutoScrollMethod == 0) {
 					} else if (m_setting.eAutoScrollMethod == 1) {
-						if (CheckIfBlank(ptImgBottom.y)) {
+						if (CheckIfBlank((int)ptImgBottom.y)) {
 							auto yE = m_imgOrg.GetHeight();
 							for (auto y = ptImgBottom.y; y < yE; y++) {
-								if (!CheckIfBlank(y)) {
+								if (!CheckIfBlank((int)y)) {
 									deltaImage = y-ptImgTop.y;
 									break;
 								}
@@ -501,7 +517,7 @@ namespace gtl::win_util {
 							auto y2 = ptImgTop.y + heightMin*1/2;
 							auto y = ptImgBottom.y;
 							for (; y >= y2; y--) {
-								if (CheckIfBlank(y)) {
+								if (CheckIfBlank((int)y)) {
 									deltaImage = y - ptImgTop.y;
 									break;
 								}
@@ -509,7 +525,7 @@ namespace gtl::win_util {
 							if (y < y2) {	// not found
 								auto yE = ptImgBottom.y + heightMax;
 								for (; y < yE; y++) {
-									if (CheckIfBlank(y)) {
+									if (CheckIfBlank((int)y)) {
 										deltaImage = y - ptImgBottom.y;
 										break;
 									}
@@ -536,17 +552,17 @@ namespace gtl::win_util {
 					} else if (m_setting.eAutoScrollMethod == 3) {
 						auto y = ptImgTop.y;
 						auto y1 = ptImgTop.y + heightMax;
-						if (CheckIfBlank(y)) {
-							while (y < y1 and CheckIfBlank(y++))
+						if (CheckIfBlank((int)y)) {
+							while (y < y1 and CheckIfBlank((int)y++))
 								;
 						}
 						auto yUp = ptImgTop.y + heightMin*3/5;
 						y = std::max(y, yUp);
 
-						while (y < y1 and !CheckIfBlank(y++))
+						while (y < y1 and !CheckIfBlank((int)y++))
 							;
 
-						while (y < y1 and CheckIfBlank(y++))
+						while (y < y1 and CheckIfBlank((int)y++))
 							;
 
 						deltaImage = y - ptImgTop.y;
@@ -559,7 +575,7 @@ namespace gtl::win_util {
 						//delta--;
 					}
 
-					Scroll(CPoint2d(0., deltaImage));
+					Scroll(xPoint2d(0., deltaImage));
 
 					return true;
 				}
@@ -572,17 +588,17 @@ namespace gtl::win_util {
 					//GetClientRect(rectClient);
 
 					//if (key == VK_HOME) {
-					//	Scroll(CPoint2d(0, -m_ctI2S.m_ptShift.y));
-					//	m_ctI2S.m_ptShift.y = 0;
+					//	Scroll(xPoint2d(0, -m_ctI2S.m_origin.y));
+					//	m_ctI2S.m_origin.y = 0;
 					//}
 					//else {
-					//	m_ctI2S.m_ptShift.y = m_imgOrg.GetHeight();
+					//	m_ctI2S.m_origin.y = m_imgOrg.GetHeight();
 					//}
 
 					//UpdateScrollBars();
 					//UpdateDisplayImage();
 
-					Scroll(CPoint2d(0, (key == VK_HOME) ? -m_ctI2S.m_ptShift.y : m_imgOrg.GetHeight()-m_ctI2S.m_ptShift.y));
+					Scroll(xPoint2d(0, (key == VK_HOME) ? -m_ctI2S.m_origin.y : m_imgOrg.GetHeight()-m_ctI2S.m_origin.y));
 					return true;
 				}
 				break;
@@ -644,8 +660,8 @@ namespace gtl::win_util {
 		if (!m_imgView.empty()) {
 			MatToDC(m_imgView, m_imgView.size(), dc, rectClient);
 		}
-		for (int i = 0; i < m_imgsAttribute.N(); i++) {
-			const T_ATTRIBUTE& attr = m_imgsAttribute[i];
+		for (size_t i {}; i < m_imgsAttribute.size(); i++) {
+			T_ATTRIBUTE const& attr = *m_imgsAttribute[i];
 			if (attr.imgView.empty())
 				continue;
 			CRect rectTarget(rectClient);
@@ -665,8 +681,8 @@ namespace gtl::win_util {
 		}
 
 		// cross mark
-		for (int i = 0; i < m_display.crosses.N(); i++) {
-			const T_CROSS_MARK& cross = m_display.crosses[i];
+		for (size_t i {}; i < m_display.crosses.size(); i++) {
+			T_CROSS_MARK const& cross = *m_display.crosses[i];
 			if (!cross.bShow)
 				continue;
 			CPoint pt;
@@ -688,27 +704,27 @@ namespace gtl::win_util {
 		}
 
 		// rect region
-		for (int i = 0; i < m_display.rects.N(); i++) {
-			const T_RECT_REGION& rect = m_display.rects[i];
+		for (size_t i{}; i < m_display.rects.size(); i++) {
+			T_RECT_REGION const& rect = *m_display.rects[i];
 			if (!rect.bShow)
 				continue;
-			CRect2d rc;
+			xRect2d rc;
 			if (m_imgOrg.empty()) {
 				rc = rect.rect;
 			} else {
-				rc.pt0 = m_ctI2S(rect.rect.pt0);
-				rc.pt1 = m_ctI2S(rect.rect.pt1);
+				rc.pt0() = m_ctI2S(rect.rect.pt0());
+				rc.pt1() = m_ctI2S(rect.rect.pt1());
 			}
-			if ( ! (CRect2d(rectClient) & rc).IsRectEmpty() ) {
+			if ( ! (xRect2d(rectClient) & rc).IsRectEmpty() ) {
 				CPen pen(rect.nPenStyle, rect.iThick, rect.cr & RGB(0xff, 0xff, 0xff));
 				dc.SelectObject(&pen);
 				dc.SelectStockObject(NULL_BRUSH);
 				//dc.Rectangle(CRect(rc));
-				dc.MoveTo(_round(rc.pt0.x), _round(rc.pt0.y));
-				dc.LineTo(_round(rc.pt1.x), _round(rc.pt0.y));
-				dc.LineTo(_round(rc.pt1.x), _round(rc.pt1.y));
-				dc.LineTo(_round(rc.pt0.x), _round(rc.pt1.y));
-				dc.LineTo(_round(rc.pt0.x), _round(rc.pt0.y));
+				dc.MoveTo(Round(rc.pt0().x), Round(rc.pt0().y));
+				dc.LineTo(Round(rc.pt1().x), Round(rc.pt0().y));
+				dc.LineTo(Round(rc.pt1().x), Round(rc.pt1().y));
+				dc.LineTo(Round(rc.pt0().x), Round(rc.pt1().y));
+				dc.LineTo(Round(rc.pt0().x), Round(rc.pt0().y));
 				if (!rect.strLabel.IsEmpty()) {
 					dc.SetBkMode(TRANSPARENT);
 					dc.SetTextColor(rect.cr & RGB(0xff, 0xff, 0xff));
@@ -720,31 +736,31 @@ namespace gtl::win_util {
 		// Selected Rect
 		const auto& r = m_display.rectCurrent;
 		if (!m_imgOrg.empty() && r.bShow) {
-			CRect2d rc;
+			xRect2d rc;
 
-			rc.pt0 = m_ctI2S(r.rect.pt0);
-			rc.pt1 = m_ctI2S(r.rect.pt1);
-			if ( ! (CRect2d(rectClient) & rc).IsRectEmpty() ) {
+			rc.pt0() = m_ctI2S(r.rect.pt0());
+			rc.pt1() = m_ctI2S(r.rect.pt1());
+			if ( ! (xRect2d(rectClient) & rc).IsRectEmpty() ) {
 				CPen pen(r.nPenStyle, r.iThick, r.cr);
 				dc.SelectObject(&pen);
 				dc.SelectStockObject(NULL_BRUSH);
 				//dc.Rectangle(CRect(rc));
-				dc.MoveTo(_round(rc.pt0.x), _round(rc.pt0.y));
-				dc.LineTo(_round(rc.pt1.x), _round(rc.pt0.y));
-				dc.LineTo(_round(rc.pt1.x), _round(rc.pt1.y));
-				dc.LineTo(_round(rc.pt0.x), _round(rc.pt1.y));
-				dc.LineTo(_round(rc.pt0.x), _round(rc.pt0.y));
+				dc.MoveTo(Round(rc.pt0().x), Round(rc.pt0().y));
+				dc.LineTo(Round(rc.pt1().x), Round(rc.pt0().y));
+				dc.LineTo(Round(rc.pt1().x), Round(rc.pt1().y));
+				dc.LineTo(Round(rc.pt0().x), Round(rc.pt1().y));
+				dc.LineTo(Round(rc.pt0().x), Round(rc.pt0().y));
 
 				// Cross
 				int rop = dc.SetROP2(R2_XORPEN);
 
 				dc.SelectStockObject(WHITE_PEN);
 				const int nSize = 30;
-				CPoint2d pt = rc.CenterPoint();
-				dc.MoveTo(_round(pt.x - nSize/2), _round(pt.y));
-				dc.LineTo(_round(pt.x + nSize/2), _round(pt.y));
-				dc.MoveTo(_round(pt.x), _round(pt.y - nSize/2));
-				dc.LineTo(_round(pt.x), _round(pt.y + nSize/2));
+				xPoint2d pt = rc.CenterPoint();
+				dc.MoveTo(Round(pt.x - nSize/2), Round(pt.y));
+				dc.LineTo(Round(pt.x + nSize/2), Round(pt.y));
+				dc.MoveTo(Round(pt.x), Round(pt.y - nSize/2));
+				dc.LineTo(Round(pt.x), Round(pt.y + nSize/2));
 
 				dc.SetROP2(rop);
 			}
@@ -752,30 +768,30 @@ namespace gtl::win_util {
 		}
 
 		if (!m_imgOrg.empty() && m_mouse.bSelectionMode) {
-			CRect2d rc;
-			rc.pt0 = m_ctI2S(m_mouse.ptSelect0);
-			rc.pt1 = m_ctI2S(m_mouse.ptSelect1);
-			if ( ! (CRect2d(rectClient) & rc).IsRectEmpty() ) {
+			xRect2d rc;
+			rc.pt0() = m_ctI2S(m_mouse.ptSelect0);
+			rc.pt1() = m_ctI2S(m_mouse.ptSelect1);
+			if ( ! (xRect2d(rectClient) & rc).IsRectEmpty() ) {
 				CPen pen(PS_DOT, 1, RGB(255, 255, 0));
 				dc.SelectObject(&pen);
 				dc.SelectStockObject(NULL_BRUSH);
 				//dc.Rectangle(CRect(rc));
-				dc.MoveTo(_round(rc.pt0.x), _round(rc.pt0.y));
-				dc.LineTo(_round(rc.pt1.x), _round(rc.pt0.y));
-				dc.LineTo(_round(rc.pt1.x), _round(rc.pt1.y));
-				dc.LineTo(_round(rc.pt0.x), _round(rc.pt1.y));
-				dc.LineTo(_round(rc.pt0.x), _round(rc.pt0.y));
+				dc.MoveTo(Round(rc.pt0().x), Round(rc.pt0().y));
+				dc.LineTo(Round(rc.pt1().x), Round(rc.pt0().y));
+				dc.LineTo(Round(rc.pt1().x), Round(rc.pt1().y));
+				dc.LineTo(Round(rc.pt0().x), Round(rc.pt1().y));
+				dc.LineTo(Round(rc.pt0().x), Round(rc.pt0().y));
 
 				// Cross
 				int rop = dc.SetROP2(R2_XORPEN);
 
 				dc.SelectStockObject(WHITE_PEN);
 				const int nSize = 30;
-				CPoint2d pt = rc.CenterPoint();
-				dc.MoveTo(_round(pt.x - nSize/2), _round(pt.y));
-				dc.LineTo(_round(pt.x + nSize/2), _round(pt.y));
-				dc.MoveTo(_round(pt.x), _round(pt.y - nSize/2));
-				dc.LineTo(_round(pt.x), _round(pt.y + nSize/2));
+				xPoint2d pt = rc.CenterPoint();
+				dc.MoveTo(Round(pt.x - nSize/2), Round(pt.y));
+				dc.LineTo(Round(pt.x + nSize/2), Round(pt.y));
+				dc.MoveTo(Round(pt.x), Round(pt.y - nSize/2));
+				dc.LineTo(Round(pt.x), Round(pt.y + nSize/2));
 
 				dc.SetROP2(rop);
 			}
@@ -784,12 +800,13 @@ namespace gtl::win_util {
 		// Mini Map
 		if (!m_imgOrg.empty() && m_setting.bMapWindow) {
 			CRect rect;
-			CSize2i size(m_imgOrg.size());
+			xSize2i size(m_imgOrg.size());
 
 			int cx = m_imgOrg.GetWidth();
 			int cy = m_imgOrg.GetHeight();
 
-			CCoordTrans ctI(m_ctI2S.GetInverse());
+			xCoordTrans2d ctI;
+			m_ctI2S.GetInv(ctI);
 			CPoint ptImgTopLeft = ctI(rectClient.TopLeft());
 			ptImgTopLeft.x = std::clamp<int>(ptImgTopLeft.x, 0, cx);
 			ptImgTopLeft.y = std::clamp<int>(ptImgTopLeft.y, 0, cy);
@@ -809,10 +826,10 @@ namespace gtl::win_util {
 			int rcx = std::max(2, int(dRate * cx));
 			int rcy = std::max(2, int(dRate * cy));
 
-			CCoordTrans ct(dRate, {1, 0, 0, 1}, {cx/2., cy/2.}, {rcx/2., rcy/2.} );
+			xCoordTrans2d ct(dRate, {1, 0, 0, 1}, {cx/2., cy/2.}, {rcx/2., rcy/2.} );
 
-			CRect rectFullSize(ct.Trans(CPoint2d(0, 0)), ct.Trans(CPoint2d(cx, cy)));
-			CRect rectDisplayed(ct.Trans(ptImgTopLeft), ct.Trans(ptImgBottomRight));
+			CRect rectFullSize((CPoint)ct.Trans(xPoint2d(0, 0)), (CPoint)ct.Trans(xPoint2d(cx, cy)));
+			CRect rectDisplayed((CPoint)ct.Trans(xPoint2d(ptImgTopLeft)), (CPoint)ct.Trans(xPoint2d(ptImgBottomRight)));
 			int nMinLength = 2;
 			if (rectDisplayed.Width() < nMinLength)
 				rectDisplayed.right = rectDisplayed.left + nMinLength;
@@ -900,9 +917,9 @@ namespace gtl::win_util {
 
 	void CMatView::OnMouseMove(UINT nFlags, CPoint point) {
 		if (m_mouse.bDragMode && !m_imgOrg.empty() && (GetCapture() == this)) {
-			CPoint2d pt0(m_mouse.ptLast);
-			CPoint2d pt1(point);
-			CPoint2d ptShift((pt0-pt1)/m_ctI2S.GetScale()*2 + m_mouse.ptImgLast);
+			xPoint2d pt0(m_mouse.ptLast);
+			xPoint2d pt1(point);
+			xPoint2d ptShift((pt0-pt1)/m_ctI2S.m_scale*2 + m_mouse.ptImgLast);
 			SetImageCenter(ptShift, -1, !m_bDraggingProcessed);
 		}
 
@@ -921,33 +938,33 @@ namespace gtl::win_util {
 
 	BOOL CMatView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) {
 		if (m_imgOrg.empty())
-			return TRUE;
+			return true;
 
 		if (GetKeyState(VK_CONTROL) < 0) {
-			DoMouseFunction((zDelta >= 0) ? m_eMFWheelUpCtrl : m_eMFWheelDownCtrl, TRUE, nFlags, pt, (short)abs(zDelta));
+			DoMouseFunction((zDelta >= 0) ? m_eMFWheelUpCtrl : m_eMFWheelDownCtrl, true, nFlags, pt, (short)abs(zDelta));
 		}
 		else {
-			DoMouseFunction((zDelta >= 0) ? m_eMFWheelUp : m_eMFWheelDown, TRUE, nFlags, pt, (short)abs(zDelta));
+			DoMouseFunction((zDelta >= 0) ? m_eMFWheelUp : m_eMFWheelDown, true, nFlags, pt, (short)abs(zDelta));
 		}
 
 		//return CWnd::OnMouseWheel(nFlags, zDelta, pt);
-		return TRUE;
+		return true;
 	}
 
-	BOOL CMatView::DoMouseFunction(eMOUSE_FUNCTION eMF, BOOL bDown, UINT /*nFlags*/, CPoint point, short zDelta) {
+	bool CMatView::DoMouseFunction(eMOUSE_FUNCTION eMF, bool bDown, UINT /*nFlags*/, CPoint point, short zDelta) {
 		//ScreenToClient(&point);
 
 		if (bDown) {
 			if (m_setting.bClearSelectionOnMouseButton && m_display.rectCurrent.bShow) {
-				SetSelectedImageRect(CRect2d(), false);
+				SetSelectedImageRect(xRect2d(), false);
 				Invalidate(false);
 			}
 		} else {
 			if (m_mouse.bDragMode) {
-				m_mouse.bDragMode = FALSE;
+				m_mouse.bDragMode = false;
 				if (GetCapture() == this)
 					ReleaseCapture();
-				return TRUE;
+				return true;
 			}
 		}
 
@@ -966,14 +983,14 @@ namespace gtl::win_util {
 				m_mouse.ptScrollLast.x = GetScrollPos(SB_HORZ);
 				m_mouse.ptScrollLast.y = GetScrollPos(SB_VERT);
 				m_mouse.ptLast = point;
-				m_ctI2S.GetShift(m_mouse.ptImgLast);
-				m_mouse.bDragMode = TRUE;
+				m_mouse.ptImgLast = m_ctI2S.m_origin;
+				m_mouse.bDragMode = true;
 
 			} else {
-				m_mouse.bDragMode = FALSE;
+				m_mouse.bDragMode = false;
 				if ( (GetCapture() == this) && !m_mouse.bSelectionMode )
 					ReleaseCapture();
-				return TRUE;
+				return true;
 			}
 			break;
 
@@ -986,14 +1003,14 @@ namespace gtl::win_util {
 					bool bShift = (GetKeyState(VK_CONTROL) < 0);
 					if (b2ClickSelection ^ bShift) {
 						// 2-Click-Selection
-						StartSelectionMode(m_ctI2S.TransI<CPoint2d>(point));
+						StartSelectionMode(m_ctI2S.TransI(xPoint2d(point)));
 					} else {
 						// 1-Click-Selection
 						CRect rectClient;
 						GetClientRect(rectClient);
 						if (rectClient.PtInRect(point)) {
-							CRect2d rect;
-							rect.pt0 = point;
+							xRect2d rect;
+							rect.pt0() = point;
 							if (SelectRegion(rect))
 								NotifyEvent(NC_SEL_REGION, rect);
 						}
@@ -1018,14 +1035,14 @@ namespace gtl::win_util {
 
 				CRect rectClient;
 				GetClientRect(rectClient);
-				CPoint2d ptShift;
-				ptShift = m_ctI2S.TransI<CPoint2d>(point.x, point.y);
-				CCoordTrans ct(m_ctI2S);
-				ct.SetShift(ptShift);
-				ct.SetOffset(point);
-				ct.SetScale(dZoom);
-				CPoint2d ptCenter(rectClient.CenterPoint());
-				m_ctI2S.SetShift(ct.TransI(ptCenter));
+				xPoint2d ptShift;
+				ptShift = m_ctI2S.TransI(xPoint2d{point.x, point.y});
+				xCoordTrans2d ct(m_ctI2S);
+				ct.m_scale = dZoom;
+				ct.m_origin = ptShift;
+				ct.m_offset = point;
+				xPoint2d ptCenter(rectClient.CenterPoint());
+				m_ctI2S.m_origin = ct.TransI(ptCenter);
 
 				SetDlgItemDouble(this, eIDZoom, dZoom, _T("%g"));
 
@@ -1049,13 +1066,13 @@ namespace gtl::win_util {
 
 				CRect rectClient;
 				GetClientRect(rectClient);
-				CPoint2d ptShift;
-				ptShift = m_ctI2S.TransI<CPoint2d>(point.x, point.y-zDelta);
-				CCoordTrans ct(m_ctI2S);
-				ct.SetShift(ptShift);
-				ct.SetOffset(point);
-				CPoint2d ptCenter(rectClient.CenterPoint());
-				m_ctI2S.SetShift(ct.TransI(ptCenter));
+				xPoint2d ptShift;
+				ptShift = m_ctI2S.TransI(xPoint2d{point.x, point.y-zDelta});
+				xCoordTrans2d ct(m_ctI2S);
+				ct.m_origin = ptShift;
+				ct.m_offset = point;
+				xPoint2d ptCenter(rectClient.CenterPoint());
+				m_ctI2S.m_origin = ct.TransI(ptCenter);
 
 				//SetDlgItemDouble(this, eIDZoom, dZoom, _T("%g"));
 
@@ -1065,7 +1082,7 @@ namespace gtl::win_util {
 			break;
 		}
 
-		return TRUE;
+		return true;
 	}
 
 	// Rect Tracker with Center Cross Mark
@@ -1085,55 +1102,55 @@ namespace gtl::win_util {
 			if (m_pView && m_pView->m_hWnd)
 				m_pView->UpdateTrackPosition(lpRect);
 		}
-		BOOL Track(CWnd* pWnd, CPoint point, BOOL bAllowInvert = FALSE, CWnd* pWndClipTo = NULL)	{ m_ptCenterLast.x = -1000; return __super::Track(pWnd, point, bAllowInvert, pWndClipTo); }
-		BOOL TrackRubberBand(CWnd* pWnd, CPoint point, BOOL bAllowInvert = TRUE)					{ m_ptCenterLast.x = -1000; return __super::TrackRubberBand(pWnd, point, bAllowInvert); }
+		BOOL Track(CWnd* pWnd, CPoint point, BOOL bAllowInvert = false, CWnd* pWndClipTo = NULL)	{ m_ptCenterLast.x = -1000; return __super::Track(pWnd, point, bAllowInvert, pWndClipTo); }
+		BOOL TrackRubberBand(CWnd* pWnd, CPoint point, BOOL bAllowInvert = true)					{ m_ptCenterLast.x = -1000; return __super::TrackRubberBand(pWnd, point, bAllowInvert); }
 	};
 
-	BOOL CMatView::UpdateMousePosition(const CPoint& point) {
-		CPoint2d ptImage;
-		ptImage = m_ctI2S.TransI(CPoint2d(point));
+	bool CMatView::UpdateMousePosition(CPoint const& point) {
+		xPoint2d ptImage;
+		ptImage = m_ctI2S.TransI(point);
 
-		auto PrintSelection = [&] (CString& str, const CPoint2d& ptStart, const CPoint2d& ptEnd) {
-			CRect2d rc;
-			rc.pt0 = m_ctI2S(ptStart);
-			rc.pt1 = m_ctI2S(ptEnd);
-			CPoint2d ptI0 = ptStart;
-			CPoint2d ptI1 = ptEnd;
-			CPoint2d ptIC = (ptI0+ptI1)/2;
-			str += Format(_T("IC(%.1f, %.1f) IS<%.1f, %.1f>"), ptIC.x, ptIC.y,ptI1.x-ptI0.x, ptI1.y-ptI0.y);
+		auto PrintSelection = [&] (std::wstring& str, const xPoint2d& ptStart, const xPoint2d& ptEnd) {
+			xRect2d rc;
+			rc.pt0() = m_ctI2S(ptStart);
+			rc.pt1() = m_ctI2S(ptEnd);
+			xPoint2d ptI0 = ptStart;
+			xPoint2d ptI1 = ptEnd;
+			xPoint2d ptIC = (ptI0+ptI1)/2;
+			str += std::format(_T("IC({:.1f}, {:.1f}) IS<{:.1f}, {:.1f}>"), ptIC.x, ptIC.y,ptI1.x-ptI0.x, ptI1.y-ptI0.y);
 			if (m_rCTI2M) {
-				CPoint2d pt0 = m_rCTI2M->Trans(ptI0);
-				CPoint2d pt1 = m_rCTI2M->Trans(ptI1);
-				CPoint2d ptC = (pt0+pt1)/2;
-				str += Format(_T(", MC(%.3f, %.3f) MS<%.3f, %.3f>"), ptC.x, ptC.y, pt1.x-pt0.x, pt1.y-pt0.y);
+				xPoint2d pt0 = m_rCTI2M->Trans(ptI0);
+				xPoint2d pt1 = m_rCTI2M->Trans(ptI1);
+				xPoint2d ptC = (pt0+pt1)/2;
+				str += std::format(_T(", MC({:.3f}, {:.3f}) MS<{:.3f}, {:.3f}>"), ptC.x, ptC.y, pt1.x-pt0.x, pt1.y-pt0.y);
 			}
 		};
 
-		CString str;
+		std::wstring str;
 		if ( (ptImage.x >= 0) && (ptImage.x <= m_imgOrg.GetWidth()) && (ptImage.y >= 0) && (ptImage.y <= m_imgOrg.GetHeight()) && (m_imgOrg.depth() == CV_8U) ) {
-			CPoint2i pt(int(ptImage.x), int(ptImage.y));	// drop the floating points
+			xPoint2i pt(int(ptImage.x), int(ptImage.y));	// drop the floating points
 			if (pt.x < 0) pt.x = 0;
 			if (pt.y < 0) pt.y = 0;
-			if (pt.x >= m_imgOrg.GetWidth())	pt.x = m_imgOrg.GetWidth() -1;
-			if (pt.y >= m_imgOrg.GetHeight())	pt.y = m_imgOrg.GetHeight()-1;
+			if (pt.x >= m_imgOrg.GetWidth()) 	pt.x = m_imgOrg.GetWidth()-1;
+			if (pt.y >= m_imgOrg.GetHeight()) 	pt.y = m_imgOrg.GetHeight()-1;
 
 			// Color
 			if (m_imgOrg.channels() == 1) {
-				str += Format(_T("cr[%02x]"), (int)m_imgOrg.at<BYTE>(pt));
+				str += std::format(_T("cr[{:02x}]"), (int)m_imgOrg.at<BYTE>(pt));
 			} else if (m_imgOrg.channels() == 3) {
 				Vec3b cr = m_imgOrg.at<Vec3b>(pt);
-				str += Format(_T("cr[%02x%02x%02x]"), (int)cr[2], (int)cr[1], (int)cr[0]);
+				str += std::format(_T("cr[{:02x}{:02x}{:02x}]"), (int)cr[2], (int)cr[1], (int)cr[0]);
 			}
 
 			// Mouse Position
-			if (!str.IsEmpty())
+			if (!str.empty())
 				str += _T(", ");
-			str += Format(_T("I(%.1f, %.1f)"), ptImage.x, ptImage.y);
+			str += std::format(_T("I({:.1f}, {:.1f})"), ptImage.x, ptImage.y);
 			if (m_rCTI2M) {
-				CPoint2d ptM(m_rCTI2M->Trans(ptImage));
-				if (!str.IsEmpty())
+				xPoint2d ptM(m_rCTI2M->Trans(ptImage));
+				if (!str.empty())
 					str += _T(", ");
-				str += Format(_T("M(%.3f, %.3f)"), ptM.x, ptM.y);
+				str += std::format(_T("M({:.3f}, {:.3f})"), ptM.x, ptM.y);
 			}
 
 		} else {
@@ -1144,52 +1161,52 @@ namespace gtl::win_util {
 		}
 
 		if (m_mouse.bSelectionMode) {
-			if (!str.IsEmpty())
+			if (!str.empty())
 				str += _T(", ");
 			PrintSelection(str, m_mouse.ptSelect0, m_mouse.ptSelect1);
 		}
 
 		if (m_display.rectCurrent.bShow /*&& m_display.rectCurrent.rect.PtInRect(ptImage)*/) {
-			if (!str.IsEmpty())
+			if (!str.empty())
 				str += _T(", ");
-			PrintSelection(str, m_display.rectCurrent.rect.pt0, m_display.rectCurrent.rect.pt1);
+			PrintSelection(str, m_display.rectCurrent.rect.pt0(), m_display.rectCurrent.rect.pt1());
 		}
 
 		CString strC;
 		m_staticInfo.GetWindowText(strC);
-		if (str != strC) {
-			m_staticInfo.SetWindowText(str);
-			UpdateToolTip(str);
+		if (str != std::wstring_view(strC, strC.GetLength())) {
+			m_staticInfo.SetWindowText(str.c_str());
+			UpdateToolTip(str.c_str());
 		}
 
 		if (m_mouse.bSelectionMode) {
-			m_mouse.ptSelect1 = m_ctI2S.TransI<CPoint2d>(point);
+			m_mouse.ptSelect1 = m_ctI2S.TransI(xPoint2d(point));
 			Invalidate(false);
 		}
 
 		return 0;
 	}
 
-	BOOL CMatView::UpdateTrackPosition(LPCRECT lpRect) {
+	bool CMatView::UpdateTrackPosition(LPCRECT lpRect) {
 		if (!m_staticInfo)
-			return FALSE;
+			return false;
 		CRect rect(lpRect);
-		CString str;
-		CPoint2d ptI0 = m_ctI2S.TransI<CPoint2d>(rect.left, rect.top);
-		CPoint2d ptI1 = m_ctI2S.TransI<CPoint2d>(rect.right, rect.bottom);
-		CPoint2d ptIC = (ptI0+ptI1)/2;
-		str.Format(_T("IC(%.1f, %.1f) IS<%.1f, %.1f>"), ptIC.x, ptIC.y,ptI1.x-ptI0.x, ptI1.y-ptI0.y);
+		std::wstring str;
+		xPoint2d ptI0 = m_ctI2S.TransI(xPoint2d(rect.left, rect.top));
+		xPoint2d ptI1 = m_ctI2S.TransI(xPoint2d(rect.right, rect.bottom));
+		xPoint2d ptIC = (ptI0+ptI1)/2;
+		str = std::format(L"IC({:.1f}, {:.1f}) IS<{:.1f}, {:.1f}>"sv, ptIC.x, ptIC.y,ptI1.x-ptI0.x, ptI1.y-ptI0.y);
 		if (m_rCTI2M) {
-			CPoint2d pt0 = m_rCTI2M->Trans(ptI0);
-			CPoint2d pt1 = m_rCTI2M->Trans(ptI1);
-			CPoint2d ptC = (pt0+pt1)/2;
-			str += Format(_T(", MC(%.3f, %.3f) MS<%.3f, %.3f>"), ptC.x, ptC.y, pt1.x-pt0.x, pt1.y-pt0.y);
+			xPoint2d pt0 = m_rCTI2M->Trans(ptI0);
+			xPoint2d pt1 = m_rCTI2M->Trans(ptI1);
+			xPoint2d ptC = (pt0+pt1)/2;
+			str += std::format(_T(", MC({:.3f}, {:.3f}) MS<{:.3f}, {:.3f}>"), ptC.x, ptC.y, pt1.x-pt0.x, pt1.y-pt0.y);
 		}
-		m_staticInfo.SetWindowText(str);
-		return TRUE;
+		m_staticInfo.SetWindowText(str.c_str());
+		return true;
 	}
 
-	BOOL CMatView::UpdateToolTip(LPCTSTR psz) {
+	bool CMatView::UpdateToolTip(LPCTSTR psz) {
 		//if (!m_ttInfo)
 		//	return false;
 		//CToolInfo ti;
@@ -1225,85 +1242,83 @@ namespace gtl::win_util {
 		UpdateDisplayImage();
 	}
 
-	BOOL CMatView::SelectRegion(CRect2d& rect) {
+	bool CMatView::SelectRegion(xRect2d& rect) {
 		if (m_imgOrg.empty())
 			return false;
 
 		CRectTrackerCenterMarkCalback tracker(this, RGB(255, 255, 255));
 		tracker.m_sizeMin.SetSize(8, 8);
 		tracker.m_rectExclude = m_rectTool;
-		if (!tracker.TrackRubberBand(this, rect.TopLeft(), TRUE))
+		if (!tracker.TrackRubberBand(this, rect.pt0(), true))
 			return false;
 		CRect rectSelected;
 		tracker.GetTrueRect(rectSelected);
-		rect.pt0 = CPoint2d(rectSelected.left, rectSelected.top);
-		rect.pt1 = CPoint2d(rectSelected.right, rectSelected.bottom);
+		rect.pt0() = xPoint2d(rectSelected.left, rectSelected.top);
+		rect.pt1() = xPoint2d(rectSelected.right, rectSelected.bottom);
 
 		if ( (abs(rectSelected.Width()) <= tracker.m_sizeMin.cx) && (abs(rectSelected.Height()) <= tracker.m_sizeMin.cy) )
 			return false;
 
-		CRect2d rectSelectedImage;
-		rectSelectedImage.pt0 = m_ctI2S.TransI<CPoint2d>(rectSelected.left, rectSelected.top);
-		rectSelectedImage.pt1 = m_ctI2S.TransI<CPoint2d>(rectSelected.right, rectSelected.bottom);
+		xRect2d rectSelectedImage;
+		rectSelectedImage.pt0() = m_ctI2S.TransI(xPoint2d(rectSelected.left, rectSelected.top));
+		rectSelectedImage.pt1() = m_ctI2S.TransI(xPoint2d(rectSelected.right, rectSelected.bottom));
 
 		SetSelectedImageRect(rectSelectedImage, true);
 		//auto& r = m_display.rectCurrent;
 		//r.bShow = true;
-		//r.rect.pt0 = m_ctI2S.TransI<CPoint2d>(rectSelected.left, rectSelected.top);
-		//r.rect.pt1 = m_ctI2S.TransI<CPoint2d>(rectSelected.right, rectSelected.bottom);
+		//r.rect.pt0 = m_ctI2S.TransI<xPoint2d>(rectSelected.left, rectSelected.top);
+		//r.rect.pt1 = m_ctI2S.TransI<xPoint2d>(rectSelected.right, rectSelected.bottom);
 		//r.cr = RGB(255, 255, 255);
 		//r.iThick = 1;
 		//r.nPenStyle = PS_DASH;
 		//r.strLabel.Empty();
 		//r.strName.Empty();
-		//Invalidate(FALSE);
+		//Invalidate(false);
 		return true;
 	}
 
-	LRESULT CMatView::NotifyEvent(eNOTIFY_CODE evtCode, const CRect2d& rect, bool bImageRect) {
-		NOTIFY_DATA nm;
-		ZeroVar(nm);
+	LRESULT CMatView::NotifyEvent(eNOTIFY_CODE evtCode, const xRect2d& rect, bool bImageRect) {
+		NOTIFY_DATA nm{};
 		nm.hdr.code = evtCode;
 		nm.hdr.hwndFrom = m_hWnd;
 		nm.hdr.idFrom = GetDlgCtrlID();
 
-		CRect2d rectImage;
+		xRect2d rectImage;
 		if (bImageRect) {
 			rectImage = rect;
 		} else {
-			rectImage.pt0 = m_ctI2S.TransI<CPoint2d>(rect.left,  rect.top);
-			rectImage.pt1 = m_ctI2S.TransI<CPoint2d>(rect.right, rect.bottom);
+			rectImage.pt0() = m_ctI2S.TransI(xPoint2d(rect.left,  rect.top));
+			rectImage.pt1() = m_ctI2S.TransI(xPoint2d(rect.right, rect.bottom));
 		}
 		nm.rect = rectImage;
 
 		if (m_rCTI2M) {
-			nm.rectReal.pt0 = m_rCTI2M->Trans(rectImage.pt0);
-			nm.rectReal.pt1 = m_rCTI2M->Trans(rectImage.pt1);
+			nm.rectReal.pt0() = (*m_rCTI2M)(rectImage.pt0());
+			nm.rectReal.pt1() = (*m_rCTI2M)(rectImage.pt1());
 		}
 
 		Rect rcImage(rectImage);
-		AdjustROI(rcImage, nm.rcImage, m_imgOrg.size());
+		nm.rcImage = GetSafeROI(rcImage, m_imgOrg.size());
 
-		if ( (evtCode == NC_SEL_REGION)
-			&& m_pDlgPatternMatching && m_pDlgPatternMatching->m_hWnd && m_pDlgPatternMatching->IsWindowVisible()
-			&& m_pDlgPatternMatching->IsDlgButtonChecked(IDC_CB_SELECT_IMAGE)
-			)
-		{
-			return m_pDlgPatternMatching->SendMessage(WM_PATTERN_MATCHING_DLG_SEL_MARK, nm.hdr.idFrom, (LPARAM)&nm);
-		}
+		//if ( (evtCode == NC_SEL_REGION)
+		//	&& m_pDlgPatternMatching && m_pDlgPatternMatching->m_hWnd && m_pDlgPatternMatching->IsWindowVisible()
+		//	&& m_pDlgPatternMatching->IsDlgButtonChecked(IDC_CB_SELECT_IMAGE)
+		//	)
+		//{
+		//	return m_pDlgPatternMatching->SendMessage(WM_PATTERN_MATCHING_DLG_SEL_MARK, nm.hdr.idFrom, (LPARAM)&nm);
+		//}
 
 		return GetParent()->SendMessage(WM_NOTIFY, nm.hdr.idFrom, (LPARAM)&nm);
 	}
 
 	LRESULT CMatView::NotifyMouseEvent(eNOTIFY_CODE evtCode, CPoint pt) {
-		NOTIFY_DATA nm;
-		ZeroVar(nm);
+		NOTIFY_DATA nm{};
 		nm.hdr.code = evtCode;
 		nm.hdr.hwndFrom = m_hWnd;
 		nm.hdr.idFrom = GetDlgCtrlID();
 
 		nm.ptWindow = pt;
-		nm.ptImage = m_ctI2S.TransI<CPoint2d>(pt);
+		nm.ptImage = m_ctI2S.TransI(pt);
 		if (m_rCTI2M) {
 			nm.ptReal = m_rCTI2M->Trans(nm.ptImage);
 		}
@@ -1318,24 +1333,24 @@ namespace gtl::win_util {
 
 		if (m_setting.bClickToMagnifySelectedRect && m_display.rectCurrent.bShow) {
 			auto& r = m_display.rectCurrent;
-			CRect2i rect;
-			rect.pt0 = m_ctI2S.Trans(r.rect.pt0);
-			rect.pt1 = m_ctI2S.Trans(r.rect.pt1);
+			xRect2i rect;
+			rect.pt0() = m_ctI2S(r.rect.pt0());
+			rect.pt1() = m_ctI2S(r.rect.pt1());
 
-			if (!rect.IsRectEmpty() && rect.PtInRect(point)) {
+			if (!rect.IsRectEmpty() && rect.PtInRect(xPoint2i(point))) {
 				SetCurrentImageRect(r.rect);
 				return;
 			}
 
-			SetSelectedImageRect(CRect2d(), false);
+			SetSelectedImageRect(xRect2d(), false);
 		}
 
 		if (GetFocus() != this)
 			SetFocus();
-		DoMouseFunction((GetKeyState(VK_SHIFT) < 0) ? m_eMFRButton : m_eMFLButton, TRUE, nFlags, point);
+		DoMouseFunction((GetKeyState(VK_SHIFT) < 0) ? m_eMFRButton : m_eMFLButton, true, nFlags, point);
 		CWnd::OnLButtonDown(nFlags, point);
 
-		NotifyEvent((eNOTIFY_CODE)NM_CLICK, CRect2d(point, point));
+		NotifyEvent((eNOTIFY_CODE)NM_CLICK, xRect2d(point, point));
 
 	}
 
@@ -1344,7 +1359,7 @@ namespace gtl::win_util {
 			NotifyMouseEvent(NC_LBUTTON_UP, point);
 		}
 
-		DoMouseFunction((GetKeyState(VK_SHIFT) < 0) ? m_eMFRButton : m_eMFLButton, FALSE, nFlags, point);
+		DoMouseFunction((GetKeyState(VK_SHIFT) < 0) ? m_eMFRButton : m_eMFLButton, false, nFlags, point);
 		CWnd::OnLButtonUp(nFlags, point);
 	}
 
@@ -1355,10 +1370,10 @@ namespace gtl::win_util {
 
 		if (GetFocus() != this)
 			SetFocus();
-		DoMouseFunction((GetKeyState(VK_SHIFT) < 0) ? m_eMFLButton : m_eMFRButton, TRUE, nFlags, point);
+		DoMouseFunction((GetKeyState(VK_SHIFT) < 0) ? m_eMFLButton : m_eMFRButton, true, nFlags, point);
 		CWnd::OnRButtonDown(nFlags, point);
 
-		NotifyEvent((eNOTIFY_CODE)NM_RCLICK, CRect2d(point, point));
+		NotifyEvent((eNOTIFY_CODE)NM_RCLICK, xRect2d(point, point));
 	}
 
 	void CMatView::OnRButtonUp(UINT nFlags, CPoint point) {
@@ -1366,7 +1381,7 @@ namespace gtl::win_util {
 			NotifyMouseEvent(NC_RBUTTON_UP, point);
 		}
 
-		DoMouseFunction((GetKeyState(VK_SHIFT) < 0) ? m_eMFLButton : m_eMFRButton, FALSE, nFlags, point);
+		DoMouseFunction((GetKeyState(VK_SHIFT) < 0) ? m_eMFLButton : m_eMFRButton, false, nFlags, point);
 		CWnd::OnRButtonUp(nFlags, point);
 	}
 
@@ -1377,7 +1392,7 @@ namespace gtl::win_util {
 
 		if (GetFocus() != this)
 			SetFocus();
-		DoMouseFunction(m_eMFMButton, TRUE, nFlags, point);
+		DoMouseFunction(m_eMFMButton, true, nFlags, point);
 		CWnd::OnMButtonDown(nFlags, point);
 	}
 
@@ -1386,13 +1401,13 @@ namespace gtl::win_util {
 			NotifyMouseEvent(NC_MBUTTON_UP, point);
 		}
 
-		DoMouseFunction(m_eMFMButton, FALSE, nFlags, point);
+		DoMouseFunction(m_eMFMButton, false, nFlags, point);
 		CWnd::OnMButtonUp(nFlags, point);
 	}
 
 	int CMatView::OnScroll(int eBar, UINT nSBCode, UINT /*nPos*/) {
 		if (!m_hWnd)
-			return FALSE;
+			return false;
 
 		SCROLLINFO si;
 		GetScrollInfo(eBar, &si, SIF_ALL);
@@ -1445,14 +1460,13 @@ namespace gtl::win_util {
 		if (nNewPos > si.nMax-(int)si.nPage)
 			nNewPos = si.nMax-(int)si.nPage;
 
-		CPoint2d ptShift;
-		m_ctI2S.GetShift(ptShift);
+		xPoint2d ptShift = m_ctI2S.m_origin;
 		if (eBar == SB_HORZ) {
-			ptShift.x = (nNewPos + si.nPage/2) / m_ctI2S.GetScale();
+			ptShift.x = (nNewPos + si.nPage/2) / m_ctI2S.m_scale;
 		} else if (eBar == SB_VERT) {
-			ptShift.y = (nNewPos + si.nPage/2) / m_ctI2S.GetScale();
+			ptShift.y = (nNewPos + si.nPage/2) / m_ctI2S.m_scale;
 		}
-		m_ctI2S.SetShift(ptShift);
+		m_ctI2S.m_origin = ptShift;
 
 		SetScrollPos(eBar, nNewPos);
 
@@ -1473,42 +1487,42 @@ namespace gtl::win_util {
 
 	BOOL CMatView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message) {
 		if (m_setting.bClickToMagnifySelectedRect && m_display.rectCurrent.bShow && m_hCursorMag) {
-			CRect2i rect;
-			rect.pt0 = m_ctI2S(m_display.rectCurrent.rect.pt0);
-			rect.pt1 = m_ctI2S(m_display.rectCurrent.rect.pt1);
+			xRect2i rect;
+			rect.pt0() = m_ctI2S(m_display.rectCurrent.rect.pt0());
+			rect.pt1() = m_ctI2S(m_display.rectCurrent.rect.pt1());
 			CPoint pt = GetCurrentMessage()->pt;
 			ScreenToClient(&pt);
-			if (rect.PtInRect(pt)) {
+			if (rect.PtInRect(xPoint2i(pt))) {
 				SetCursor(m_hCursorMag);
-				return TRUE;
+				return true;
 			}
 		}	
 		return CWnd::OnSetCursor(pWnd, nHitTest, message);
 	}
 
-	BOOL CMatView::CheckAndGetZoom(double& dZoom) {
+	bool CMatView::CheckAndGetZoom(double& dZoom) {
 		if (dZoom < 0)
 			dZoom = GetDlgItemDouble(this, eIDZoom);
 		BOOL bResult = (dZoom != 0.0);
 
 		if (m_imgOrg.empty()) {
 			dZoom = 1.0;
-			return FALSE;
+			return false;
 		}
 
 		CRect rectClient;
 		GetClientRect(rectClient);
 		if (rectClient.IsRectEmpty()) {
 			dZoom = 1.0;
-			return FALSE;
+			return false;
 		}
 
 		double dMinZoom = 1;
-		const double dFitZoom = _min((double)rectClient.Width()/m_imgOrg.GetWidth(), (double)rectClient.Height()/m_imgOrg.GetHeight());
+		double const dFitZoom = std::min((double)rectClient.Width()/m_imgOrg.GetWidth(), (double)rectClient.Height()/m_imgOrg.GetHeight());
 		double dMaxZoom = 10.0;
 
 		//if (dZoom < dFitZoom)
-		//	bResult = FALSE;
+		//	bResult = false;
 
 		if (dMinZoom > dFitZoom)
 			dMinZoom = dFitZoom;
@@ -1532,7 +1546,7 @@ namespace gtl::win_util {
 	}
 
 	void CMatView::OnSelchangeZoom() {
-		CRect2d rect;
+		xRect2d rect;
 		GetCurrentImageRect(rect);
 
 		int iSel = m_comboZoom.GetCurSel();
@@ -1545,7 +1559,7 @@ namespace gtl::win_util {
 			double dZoom = _ttof(str);
 			//Size s = m_imgOrg.size();
 			//m_ctI2S.SetShift(s.width/2, s.height/2);
-			m_ctI2S.SetShift(rect.CenterPoint());
+			m_ctI2S.m_origin = rect.CenterPoint();
 			UpdateScrollBars(dZoom);
 			UpdateDisplayImage(dZoom);
 
@@ -1556,9 +1570,9 @@ namespace gtl::win_util {
 		//Size s = m_imgOrg.size();
 		//m_ctI2S.SetShift(s.width/2, s.height/2);
 
-		CRect2d rect;
+		xRect2d rect;
 		GetCurrentImageRect(rect);
-		m_ctI2S.SetShift(rect.CenterPoint());
+		m_ctI2S.m_origin = rect.CenterPoint();
 
 		UpdateScrollBars();
 		UpdateDisplayImage();
@@ -1583,7 +1597,7 @@ namespace gtl::win_util {
 			return;
 
 		CWaitCursor wc;
-		CFileDialog dlg(FALSE, _T(".png"), nullptr, OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, FILTER_IMAGE_FILES, this);
+		CFileDialog dlg(false, _T(".png"), nullptr, OFN_OVERWRITEPROMPT | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, FILTER_IMAGE_FILES, this);
 		wc.Restore();
 		if (dlg.DoModal() != IDOK)
 			return;
@@ -1591,8 +1605,7 @@ namespace gtl::win_util {
 		try {
 			Mat img;
 			if (m_display.rectCurrent.bShow) {
-				cv::Rect rc;
-				AdjustROI(m_display.rectCurrent.rect, rc, m_imgOrg.size());
+				cv::Rect rc = GetSafeROI(cv::Rect(m_display.rectCurrent.rect), m_imgOrg.size());
 				img = m_imgOrg.GetROI(rc);
 			} else {
 				img = m_imgOrg.GetMergedImage();
@@ -1606,34 +1619,34 @@ namespace gtl::win_util {
 		}
 	}
 
-	void CMatView::OnPatternMatching() {
-		if (m_imgOrg.empty())
-			return;
+	//void CMatView::OnPatternMatching() {
+	//	if (m_imgOrg.empty())
+	//		return;
 
-		if (!m_pDlgPatternMatching) {
-			m_pDlgPatternMatching = new CMatViewPatternMatchingDlg(this);
-			m_pDlgPatternMatching->Create(this);
-		}
+	//	if (!m_pDlgPatternMatching) {
+	//		m_pDlgPatternMatching = new CMatViewPatternMatchingDlg(this);
+	//		m_pDlgPatternMatching->Create(this);
+	//	}
 
-		m_pDlgPatternMatching->ShowWindow(SW_SHOW);
-		m_pDlgPatternMatching->SetFocus();
-	}
+	//	m_pDlgPatternMatching->ShowWindow(SW_SHOW);
+	//	m_pDlgPatternMatching->SetFocus();
+	//}
 
-	void CMatView::OnSettings() {
-		CMatViewSettingDlg dlg(this);
-		dlg.m_setting = m_setting;
-		if (dlg.DoModal() != IDOK)
-			return;
+	//void CMatView::OnSettings() {
+	//	CMatViewSettingDlg dlg(this);
+	//	dlg.m_setting = m_setting;
+	//	if (dlg.DoModal() != IDOK)
+	//		return;
 
-		m_setting = dlg.m_setting;
-		SetResizingMethod(m_setting.eScaleDownMethod, m_setting.eScaleUpMethod);
+	//	m_setting = dlg.m_setting;
+	//	SetResizingMethod(m_setting.eScaleDownMethod, m_setting.eScaleUpMethod);
 
-		if (AfxGetApp() && !m_strRegistrySection.IsEmpty())
-			m_setting.SyncRegistry(true, m_strRegistrySection, *AfxGetApp());
+	//	if (AfxGetApp() && !m_strRegistrySection.IsEmpty())
+	//		m_setting.SyncRegistry(true, m_strRegistrySection, *AfxGetApp());
 
-		UpdateTool();
-		ShowTool(m_setting.bShowTool);
-	}
+	//	UpdateTool();
+	//	ShowTool(m_setting.bShowTool);
+	//}
 
 	//-----------------------------------------------------------------------------
 	//
@@ -1649,28 +1662,28 @@ namespace gtl::win_util {
 
 	//-----------------------------------------------------------------------------
 	//
-	BOOL CMatView::PrepareDisplayImage(const cv::Mat& imgOrg, cv::Mat& imgView, const cv::Point& ptPatch, CPoint& ptOffset, const CRect& rectClient, double dZoom) {
+	bool CMatView::PrepareDisplayImage(cv::Mat const& imgOrg, cv::Mat& imgView, const cv::Point& ptPatch, CPoint& ptOffset, const CRect& rectClient, double dZoom) {
 		if (!m_hWnd || imgOrg.empty() || rectClient.IsRectEmpty())
-			return FALSE;
+			return false;
 
 		//CWaitCursor wc;
 
-		CRect2d rectDispatch;
-		rectDispatch.pt0 = m_ctI2S(ptPatch);
-		rectDispatch.pt1 = m_ctI2S(CPoint2d(ptPatch)+CSize2d(imgOrg.size()));
-		CRect2d rectTarget(rectClient);
+		xRect2d rectDispatch;
+		rectDispatch.pt0() = m_ctI2S(ptPatch);
+		rectDispatch.pt1() = m_ctI2S(xPoint2d(ptPatch)+xSize2d(imgOrg.size()));
+		xRect2d rectTarget(rectClient);
 		rectTarget &= rectDispatch;
 		//rectTarget.NormalizeRect();
 
 		if ( rectTarget.IsRectEmpty() ) {
 			imgView.release();
 			ptOffset = {0, 0};
-			return FALSE;
+			return false;
 		}
 
 		// dZoom 값 무시. m_ctI2S 사용하면 되는데....
-		dZoom = m_ctI2S.m_dScale;
-		if (m_ctI2S.m_dScale == 1.0) {
+		dZoom = m_ctI2S.m_scale;
+		if (m_ctI2S.m_scale == 1.0) {
 			imgView = imgOrg;
 		} else {
 			int eInterpolation = cv::INTER_NEAREST;// dZoom >= 1.0 ? m_imgOrg.GetScaleUpMethod() : m_imgOrg.GetScaleDownMethod();
@@ -1699,8 +1712,8 @@ namespace gtl::win_util {
 		//	return false;
 		//}
 		// round down
-		ptOffset.x = (int)rectDispatch.pt0.x;
-		ptOffset.y = (int)rectDispatch.pt0.y;
+		ptOffset.x = (int)rectDispatch.pt0().x;
+		ptOffset.y = (int)rectDispatch.pt0().y;
 
 		//if (!CheckAndGetZoom(dZoom)) {
 		//	if (dZoom == 1.0)
@@ -1708,13 +1721,13 @@ namespace gtl::win_util {
 		//	else
 		//		ResizeImage(imgOrg, imgView, dZoom, dZoom >= 1.0 ? m_imgOrg.GetScaleUpMethod() : m_imgOrg.GetScaleDownMethod());
 		//} else if (dZoom > 0.0) {
-		//	CCoordTrans ctI2S(m_ctI2S);
+		//	xCoordTrans2d ctI2S(m_ctI2S);
 		//	ctI2S.SetScale(dZoom);
-		//	CRect2d rectDOrg;
-		//	rectDOrg.pt0 = ctI2S.TransI(CPoint2d(rectClient.TopLeft()));
-		//	rectDOrg.pt1 = ctI2S.TransI(CPoint2d(rectClient.BottomRight()));
+		//	xRect2d rectDOrg;
+		//	rectDOrg.pt0 = ctI2S.TransI(xPoint2d(rectClient.TopLeft()));
+		//	rectDOrg.pt1 = ctI2S.TransI(xPoint2d(rectClient.BottomRight()));
 
-		//	cv::Rect rectOrg(_round(rectDOrg.left-0.5), _round(rectDOrg.top-0.5), _round(rectDOrg.Width()+1.0), _round(rectDOrg.Height()+1.0));
+		//	cv::Rect rectOrg(Round(rectDOrg.left-0.5), Round(rectDOrg.top-0.5), Round(rectDOrg.Width()+1.0), Round(rectDOrg.Height()+1.0));
 
 		//	cv::Rect r;
 		//	AdjustROI(rectOrg, r, imgOrg.size());
@@ -1726,10 +1739,10 @@ namespace gtl::win_util {
 		//		ResizeImage(img, imgView, dZoom, dZoom >= 1.0 ? m_imgOrg.GetScaleUpMethod() : m_imgOrg.GetScaleDownMethod());
 		//		// 확대할 경우, 이미지 위치 보정
 		//		if ( (imgView.cols > rectClient.Width()) || (imgView.rows > rectClient.Height()) ) {
-		//			CPoint2d pt0(rectClient.TopLeft());// = m_ctI2S.Trans(rectdOrg.TopLeft());
-		//			CPoint2d pt1 = m_ctI2S.Trans(CPoint2d(rectOrg.x, rectOrg.y));
-		//			int x = _max(0, _round(pt0.x - pt1.x));
-		//			int y = _max(0, _round(pt0.y - pt1.y));
+		//			xPoint2d pt0(rectClient.TopLeft());// = m_ctI2S.Trans(rectdOrg.TopLeft());
+		//			xPoint2d pt1 = m_ctI2S.Trans(xPoint2d(rectOrg.x, rectOrg.y));
+		//			int x = _max(0, Round(pt0.x - pt1.x));
+		//			int y = _max(0, Round(pt0.y - pt1.y));
 		//			int cx = _min(imgView.cols - x, rectClient.Width());
 		//			int cy = _min(imgView.rows - y, rectClient.Height());
 		//			imgView = imgView(Rect(x, y, cx, cy));
@@ -1738,15 +1751,15 @@ namespace gtl::win_util {
 		//}
 
 		if (!imgView.empty() && (imgView.channels() == 1)) {
-			cvtColor(imgView, imgView, CV_GRAY2BGR);
+			cvtColor(imgView, imgView, cv::COLOR_GRAY2BGR);
 		}
 
-		return TRUE;
+		return true;
 	}
 
-	BOOL CMatView::PrepareDisplayImage(C2dMatArray& imgSet, cv::Mat& imgView, const CRect& rectClient, double dZoom) {
+	bool CMatView::PrepareDisplayImage(C2dMatArray const& imgSet, cv::Mat& imgView, CRect const& rectClient, double dZoom) {
 		if (!m_hWnd || imgSet.empty() || rectClient.IsRectEmpty())
-			return FALSE;
+			return false;
 
 		//CWaitCursor wc;
 
@@ -1754,69 +1767,69 @@ namespace gtl::win_util {
 
 		CheckAndGetZoom(dZoom);
 		if (dZoom > 0.0) {
-			CCoordTrans ctI2S(m_ctI2S);
-			ctI2S.SetScale(dZoom);
-			CRect2d rectDOrg;
-			rectDOrg.pt0 = ctI2S.TransI(CPoint2d(rectClient.TopLeft()));
-			rectDOrg.pt1 = ctI2S.TransI(CPoint2d(rectClient.BottomRight()));
+			xCoordTrans2d ctI2S(m_ctI2S);
+			ctI2S.m_scale = dZoom;
+			xRect2d rectDOrg;
+			rectDOrg.pt0() = ctI2S.TransI(xPoint2d(rectClient.TopLeft()));
+			rectDOrg.pt1() = ctI2S.TransI(xPoint2d(rectClient.BottomRight()));
 
-			cv::Rect rectOrg(_round(rectDOrg.left-0.5), _round(rectDOrg.top-0.5), _round(rectDOrg.Width()+1.0), _round(rectDOrg.Height()+1.0));
+			cv::Rect rectOrg(Round(rectDOrg.left-0.5), Round(rectDOrg.top-0.5), Round(rectDOrg.Width()+1.0), Round(rectDOrg.Height()+1.0));
 
 			cv::Rect r;
-			AdjustROI(rectOrg, r, imgSet.size());
+			r = GetSafeROI(rectOrg, imgSet.size());
 
 			imgView = imgSet.GetResizedImage(r, dZoom);
 
 			if (dZoom >= 1.0) {
 				// 확대할 경우, 이미지 위치 보정
 				if ( (imgView.cols > rectClient.Width()) || (imgView.rows > rectClient.Height()) ) {
-					CPoint2d pt0(rectClient.TopLeft());// = m_ctI2S.Trans(rectdOrg.TopLeft());
-					CPoint2d pt1 = m_ctI2S.Trans(CPoint2d(rectOrg.x, rectOrg.y));
-					int x = _max(0, _round(pt0.x - pt1.x));
-					int y = _max(0, _round(pt0.y - pt1.y));
-					int cx = _min(imgView.cols - x, rectClient.Width());
-					int cy = _min(imgView.rows - y, rectClient.Height());
+					xPoint2d pt0(rectClient.TopLeft());// = m_ctI2S.Trans(rectdOrg.TopLeft());
+					xPoint2d pt1 = m_ctI2S.Trans(xPoint2d(rectOrg.x, rectOrg.y));
+					int x = std::max(0, Round(pt0.x - pt1.x));
+					int y = std::max(0, Round(pt0.y - pt1.y));
+					int cx = std::min(imgView.cols - x, rectClient.Width());
+					int cy = std::min(imgView.rows - y, rectClient.Height());
 					imgView = imgView(Rect(x, y, cx, cy));
 				}
 			}
 		}
 
 		if (!imgView.empty() && (imgView.channels() == 1)) {
-			cvtColor(imgView, imgView, CV_GRAY2BGR);
+			cvtColor(imgView, imgView, cv::COLOR_GRAY2BGR);
 		}
 
 		//DWORD dwTick1 = GetTickCount();
 		//TRACE("UpdateDisplay : %d msec\n", dwTick1-dwTick);
 
-		return TRUE;
+		return true;
 	}
 
-	BOOL CMatView::UpdateDisplayImage(double dZoom, bool bDelayedUpdate) {
+	bool CMatView::UpdateDisplayImage(double dZoom, bool bDelayedUpdate) {
 		if (!m_hWnd)
-			return FALSE;
+			return false;
 		if (m_imgOrg.empty())
-			return FALSE;
+			return false;
 
 		CRect rectClient;
 		GetClientRect(rectClient);
 		if (rectClient.IsRectEmpty())
-			return FALSE;
+			return false;
 
 		if (!m_bDraggingProcessed && bDelayedUpdate) {
 			SetTimer(T_UPDATE_DISPLAY_IMAGE, 100, nullptr);
-			return TRUE;
+			return true;
 		}	
 		//CWaitCursor wc;
 
 		PrepareDisplayImage(m_imgOrg, m_imgView, rectClient, dZoom);
 
-		for (int i = 0; i < m_imgsAttribute.N(); i++) {
-			m_imgsAttribute[i].imgView.release();
-			PrepareDisplayImage(m_imgsAttribute[i].img, m_imgsAttribute[i].imgView, m_imgsAttribute[i].ptPatch, m_imgsAttribute[i].ptTargetOffset, rectClient, dZoom);
+		for (auto& r : m_imgsAttribute) {
+			r->imgView.release();
+			PrepareDisplayImage(r->img, r->imgView, r->ptPatch, r->ptTargetOffset, rectClient, dZoom);
 		}
 
 		m_bDraggingProcessed = false;
-		InvalidateRect(rectClient, FALSE);
+		InvalidateRect(rectClient, false);
 
 		{
 			MSG msg;
@@ -1825,14 +1838,14 @@ namespace gtl::win_util {
 			KillTimer(T_UPDATE_DISPLAY_IMAGE);
 		}
 
-		return TRUE;
+		return true;
 	}
 
-	BOOL CMatView::UpdateScrollBars(double dZoom) {
+	bool CMatView::UpdateScrollBars(double dZoom) {
 		if (!m_hWnd)
-			return FALSE;
+			return false;
 		if (m_imgOrg.empty())
-			return FALSE;
+			return false;
 
 		//	CRefCounter rcUpdateScroll(m_rcUpdateScroll);
 
@@ -1845,24 +1858,23 @@ namespace gtl::win_util {
 			//GetScrollInfo(SB_HORZ, &siH);
 			//GetScrollInfo(SB_VERT, &siV);
 
-			CSize2i size;
-			CRect2i rectClient;
+			xSize2i size;
+			xRect2i rectClient;
 			GetClientRect((CRect&)rectClient);
 
 			if (!CheckAndGetZoom(dZoom)) {
-				size = (CSize2i&)rectClient;
+				size = (xSize2i&)rectClient;
 			} else {
 				size.cx = (int)(m_imgOrg.GetWidth() * dZoom);
 				size.cy = (int)(m_imgOrg.GetHeight() * dZoom);
 			}
 
 			// Backup Center Position
-			CPoint2i ptScroll;
-			CPoint2d ptShift;
-			m_ctI2S.GetShift(ptShift);
-			m_ctI2S.SetScale(dZoom);
+			xPoint2i ptScroll;
+			xPoint2d ptShift = m_ctI2S.m_origin;
+			m_ctI2S.m_scale = dZoom;
 			CRect rect(0, 0, m_imgOrg.GetWidth(), m_imgOrg.GetHeight());
-			rect.DeflateRect(_round_int(rectClient.Width() / m_ctI2S.GetScale() / 2.), _round_int(rectClient.Height() / m_ctI2S.GetScale() / 2.));
+			rect.DeflateRect(Round(rectClient.Width() / m_ctI2S.m_scale / 2.), Round(rectClient.Height() / m_ctI2S.m_scale / 2.));
 
 			// Point Validation
 			if (rect.left <= rect.right) {
@@ -1881,8 +1893,8 @@ namespace gtl::win_util {
 			} else {
 				ptShift.y = rect.CenterPoint().y;
 			}
-			m_ctI2S.SetShift(ptShift);
-			m_ctI2S.SetOffset(rectClient.CenterPoint());
+			m_ctI2S.m_origin = ptShift;
+			m_ctI2S.m_offset = rectClient.CenterPoint();
 
 			if (GetStyle() & WS_HSCROLL) {
 				siH.cbSize = sizeof(siH);
@@ -1895,7 +1907,7 @@ namespace gtl::win_util {
 				} else {
 					siH.nPage = rectClient.Width();
 					siH.nMax = size.cx;
-					siH.nPos = _round_int(ptShift.x * m_ctI2S.GetScale() - siH.nPage/2);
+					siH.nPos = Round(ptShift.x * m_ctI2S.m_scale - siH.nPage/2);
 				}
 				SetScrollInfo(SB_HORZ, &siH);
 			}
@@ -1911,7 +1923,7 @@ namespace gtl::win_util {
 				} else {
 					siV.nPage = rectClient.Height();
 					siV.nMax = size.cy;
-					siV.nPos = _round_int(ptShift.y * m_ctI2S.GetScale() - siV.nPage/2);
+					siV.nPos = Round(ptShift.y * m_ctI2S.m_scale - siV.nPage/2);
 				}
 				SetScrollInfo(SB_VERT, &siV);
 			}
@@ -1921,13 +1933,13 @@ namespace gtl::win_util {
 	}
 
 	//BOOL CMatView::UpdateScrollBarPosition() {
-	//	return TRUE;
+	//	return true;
 	//}
 
-	BOOL CMatView::InitView(double dZoom) {
-		m_ctI2S.Set();
+	bool CMatView::InitView(double dZoom) {
+		m_ctI2S.Init();
 		if (dZoom >= 0)
-			m_ctI2S.SetShift(m_imgOrg.GetWidth()/2, m_imgOrg.GetHeight()/2);
+			m_ctI2S.m_origin = xPoint2d{m_imgOrg.GetWidth()/2, m_imgOrg.GetHeight()/2};
 
 		if (dZoom == 0.0) {
 			m_comboZoom.SetCurSel(0);
@@ -1944,7 +1956,7 @@ namespace gtl::win_util {
 		return true;
 	}
 
-	BOOL CMatView::SetImage(const Mat& img, double dZoom, BOOL bCopyImage) {
+	bool CMatView::SetImage(Mat const& img, double dZoom, bool bCopyImage) {
 		m_imgOrg.Destroy();
 		m_imgView.release();
 
@@ -1956,18 +1968,18 @@ namespace gtl::win_util {
 
 		if (img.empty()) {
 			InitView(dZoom);
-			Invalidate(FALSE);
+			Invalidate(false);
 		} else {
 			if (bCopyImage) {
-				if (!m_imgOrg.Create(CSize2i(1, 1)))
+				if (!m_imgOrg.Create(xSize2i(1, 1)))
 					return false;
 				m_imgOrg.SetPartialImage({0, 0}, img, bCopyImage);
 			} else {
-				if (!m_imgOrg.Create((Mat&)img, img.size(), CSize2i(1, 1)) ) //, { { 1, 2}, {1, 4}, }, 2);
+				if (!m_imgOrg.Create((Mat&)img, xSize2i(img.size()), xSize2i(1, 1)) ) //, { { 1, 2}, {1, 4}, }, 2);
 					return false;
 			}
 
-			m_ctI2S.SetShift(m_imgOrg.GetWidth()/2, m_imgOrg.GetHeight()/2);
+			m_ctI2S.m_origin = {m_imgOrg.GetWidth()/2, m_imgOrg.GetHeight()/2};
 
 			InitView(dZoom);
 			UpdateDisplayImage();
@@ -1976,7 +1988,7 @@ namespace gtl::win_util {
 		return true;
 	}
 
-	BOOL CMatView::SetImageCenter(const CPoint2d& pt, double dZoom, bool bDelayedUpdate) {
+	bool CMatView::SetImageCenter(xPoint2d const& pt, double dZoom, bool bDelayedUpdate) {
 		if (!m_hWnd || m_imgOrg.empty())
 			return false;
 
@@ -1984,13 +1996,9 @@ namespace gtl::win_util {
 
 		CRect rectClient;
 		GetClientRect(rectClient);
-		CPoint2d ptShift(pt);
-		CCoordTrans ct(m_ctI2S);
-		ct.SetShift(ptShift);
-		ct.SetOffset(rectClient.CenterPoint());
-		ct.SetScale(dZoom);
-		CPoint2d ptCenter(rectClient.CenterPoint());
-		m_ctI2S.SetShift(ct.TransI(ptCenter));
+		xPoint2d ptCenter(rectClient.CenterPoint());
+		xCoordTrans2d ct(dZoom, m_ctI2S.m_mat, xPoint2d(pt), ptCenter);
+		m_ctI2S.m_origin = ct.TransI(ptCenter);
 
 		SetDlgItemDouble(this, eIDZoom, dZoom, _T("%g"));
 
@@ -2011,7 +2019,7 @@ namespace gtl::win_util {
 		UpdateDisplayImage();
 	}
 
-	void CMatView::ShowTool(BOOL bShow) {
+	void CMatView::ShowTool(bool bShow) {
 		m_setting.bShowTool = bShow;
 
 		if (!m_hWnd)
@@ -2090,7 +2098,7 @@ namespace gtl::win_util {
 			switch (idc) {
 			case eIDPatternMatching :
 				{
-					BOOL bVisible = pCtrl->IsWindowVisible();
+					bool bVisible = pCtrl->IsWindowVisible();
 					if (m_setting.bPatternMatching) {
 						pCtrl->ShowWindow(SW_SHOW);
 					} else {
@@ -2121,26 +2129,26 @@ namespace gtl::win_util {
 		}
 	}
 
-	BOOL CMatView::GetCurrentImageRect(CRect2d& rect) const {
+	bool CMatView::GetCurrentImageRect(xRect2d& rect) const {
 		if (m_imgOrg.empty())
-			return FALSE;
+			return false;
 
 		CRect rectClient;
 		GetClientRect(rectClient);
-		rect.pt0 = m_ctI2S.TransI(CPoint2d(rectClient.TopLeft()));
-		rect.pt1 = m_ctI2S.TransI(CPoint2d(rectClient.BottomRight()));
+		rect.pt0() = m_ctI2S.TransI(xPoint2d(rectClient.TopLeft()));
+		rect.pt1() = m_ctI2S.TransI(xPoint2d(rectClient.BottomRight()));
 
 		if (rect.left < 0) rect.left = 0;
 		if (rect.top < 0) rect.top = 0;
 		if (rect.right >= m_imgOrg.GetWidth()) rect.right = m_imgOrg.GetWidth();
 		if (rect.bottom >= m_imgOrg.GetHeight()) rect.bottom = m_imgOrg.GetHeight();
 
-		return TRUE;
+		return true;
 	}
 
-	BOOL CMatView::SetCurrentImageRect(const CRect2d& rect) {
+	bool CMatView::SetCurrentImageRect(xRect2d const& rect) {
 		if (m_imgOrg.empty())
-			return FALSE;
+			return false;
 
 		CRect rectClient;
 		GetClientRect(rectClient);
@@ -2150,7 +2158,7 @@ namespace gtl::win_util {
 		double dZoomX = rectClient.Width() / rect.Width();
 		double dZoomY = rectClient.Height() / rect.Height();
 
-		double dZoom = _min(dZoomX, dZoomY);
+		double dZoom = std::min(dZoomX, dZoomY);
 		if (dZoom > 10)
 			dZoom = 10.;
 
@@ -2159,7 +2167,7 @@ namespace gtl::win_util {
 
 	//-----------------------------------------------------------------------------
 
-	BOOL CMatView::StartSelectionMode(const CPoint2d& ptImage) {
+	bool CMatView::StartSelectionMode(xPoint2d const& ptImage) {
 		SetCapture();
 
 		m_mouse.bSelectionMode = true;
@@ -2168,7 +2176,7 @@ namespace gtl::win_util {
 		return true;
 	}
 
-	BOOL CMatView::EndSelectionMode() {
+	bool CMatView::EndSelectionMode() {
 		if (!m_mouse.bSelectionMode)
 			return false;
 
@@ -2176,24 +2184,24 @@ namespace gtl::win_util {
 			ReleaseCapture();
 
 		m_mouse.bSelectionMode = false;
-		CRect2d rect(m_mouse.ptSelect0, m_mouse.ptSelect1);
+		xRect2d rect(m_mouse.ptSelect0, m_mouse.ptSelect1);
 		rect.NormalizeRect();
 		SetSelectedImageRect(rect, true);
 		NotifyEvent(NC_SEL_REGION, rect, true);
 
-		return TRUE;
+		return true;
 	}
 
-	BOOL CMatView::GetSelectedImageRect(CRect2d& rect) const {
+	bool CMatView::GetSelectedImageRect(xRect2d& rect) const {
 		if (m_imgOrg.empty())
 			return false;
 
 		rect = m_display.rectCurrent.rect;
 
-		return CheckROI(rect, m_imgOrg.size());
+		return IsROI_Valid(cv::Rect(rect), m_imgOrg.size());
 	}
 
-	BOOL CMatView::SetSelectedImageRect(const CRect2d& rect, bool bSelect) {
+	bool CMatView::SetSelectedImageRect(const xRect2d& rect, bool bSelect) {
 		auto& r = m_display.rectCurrent;
 		r.bShow = bSelect;
 		if (bSelect) {
@@ -2209,113 +2217,100 @@ namespace gtl::win_util {
 			//m_rectSelected.SetRectEmpty();
 		}
 
-		Invalidate(FALSE);
+		Invalidate(false);
 
 		return false;
 	}
 
 	//-----------------------------------------------------------------------------
 
-	BOOL CMatView::AddAttributeLayer(LPCTSTR pszName, const cv::Mat& img, COLORREF crTransparent) {
-		int iIndex = m_imgsAttribute.FindByValue(pszName);
-		if (iIndex < 0) {
-			iIndex = m_imgsAttribute.Push(new T_ATTRIBUTE);
-		}
-		m_imgsAttribute[iIndex].ptPatch = {0, 0};
-		m_imgsAttribute[iIndex].img = img;
-		m_imgsAttribute[iIndex].bm = BM_TRANSPARENT;
-		m_imgsAttribute[iIndex].crTransparent = crTransparent;
+	bool CMatView::AddAttributeLayer(LPCTSTR pszName, const cv::Mat& img, COLORREF crTransparent) {
+		auto& r = GetAttr(pszName);
+		r.ptPatch = {0, 0};
+		r.img = img;
+		r.bm = BM_TRANSPARENT;
+		r.crTransparent = crTransparent;
 		UpdateDisplayImage();
-		return TRUE;
+		return true;
 	}
-	BOOL CMatView::AddAttributeLayer(LPCTSTR pszName, const cv::Mat& img, BLENDFUNCTION blend) {
-		int iIndex = m_imgsAttribute.FindByValue(pszName);
-		if (iIndex < 0) {
-			iIndex = m_imgsAttribute.Push(new T_ATTRIBUTE);
-		}
-		m_imgsAttribute[iIndex].ptPatch = {0, 0};
-		m_imgsAttribute[iIndex].img = img;
-		m_imgsAttribute[iIndex].bm = BM_ALPHABLEND;
-		m_imgsAttribute[iIndex].blend = blend;
+	bool CMatView::AddAttributeLayer(LPCTSTR pszName, const cv::Mat& img, BLENDFUNCTION blend) {
+		auto& r = GetAttr(pszName);
+		r.ptPatch = {0, 0};
+		r.img = img;
+		r.bm = BM_ALPHABLEND;
+		r.blend = blend;
 		UpdateDisplayImage();
-		return TRUE;
+		return true;
 	}
-	BOOL CMatView::AddAttributeLayer(LPCTSTR pszName, const cv::Point& ptLT, const cv::Mat& img, COLORREF crTransparent) {
-		int iIndex = m_imgsAttribute.FindByValue(pszName);
-		if (iIndex < 0) {
-			iIndex = m_imgsAttribute.Push(new T_ATTRIBUTE);
-		}
-		m_imgsAttribute[iIndex].ptPatch = ptLT;
-		m_imgsAttribute[iIndex].img = img;
-		m_imgsAttribute[iIndex].bm = BM_TRANSPARENT;
-		m_imgsAttribute[iIndex].crTransparent = crTransparent;
+	bool CMatView::AddAttributeLayer(LPCTSTR pszName, const cv::Point& ptLT, const cv::Mat& img, COLORREF crTransparent) {
+		auto& r = GetAttr(pszName);
+		r.ptPatch = ptLT;
+		r.img = img;
+		r.bm = BM_TRANSPARENT;
+		r.crTransparent = crTransparent;
 		UpdateDisplayImage();
-		return TRUE;
+		return true;
 	}
-	BOOL CMatView::AddAttributeLayer(LPCTSTR pszName, const cv::Point& ptLT, const cv::Mat& img, BLENDFUNCTION blend) {
-		int iIndex = m_imgsAttribute.FindByValue(pszName);
-		if (iIndex < 0) {
-			iIndex = m_imgsAttribute.Push(new T_ATTRIBUTE);
-		}
-		m_imgsAttribute[iIndex].ptPatch = ptLT;
-		m_imgsAttribute[iIndex].img = img;
-		m_imgsAttribute[iIndex].bm = BM_ALPHABLEND;
-		m_imgsAttribute[iIndex].blend = blend;
+	bool CMatView::AddAttributeLayer(LPCTSTR pszName, const cv::Point& ptLT, const cv::Mat& img, BLENDFUNCTION blend) {
+		auto& r = GetAttr(pszName);
+		r.ptPatch = ptLT;
+		r.img = img;
+		r.bm = BM_ALPHABLEND;
+		r.blend = blend;
 		UpdateDisplayImage();
-		return TRUE;
+		return true;
 	}
-	BOOL CMatView::SetAttributeLayer(LPCTSTR pszName, const cv::Mat& img) {
-		int iIndex = m_imgsAttribute.FindByValue(pszName);
-		if (iIndex < 0) {
-			return FALSE;
-		}
-		m_imgsAttribute[iIndex].img = img;
+	bool CMatView::SetAttributeLayer(LPCTSTR pszName, const cv::Mat& img) {
+		auto iter = FindAttr(pszName);
+		if (iter == m_imgsAttribute.end())
+			return false;
+		(*iter)->img = img;
 		UpdateDisplayImage();
-		return TRUE;
+		return true;
 	}
-	BOOL CMatView::DeleteAttributeLayer(LPCTSTR pszName) {
+	bool CMatView::DeleteAttributeLayer(LPCTSTR pszName) {
 		if (pszName) {
-			while (m_imgsAttribute.DeleteByValue(pszName)) ;
+			for (auto iter = FindAttr(pszName); iter != m_imgsAttribute.end(); iter = FindAttr(pszName)) {
+				m_imgsAttribute.erase(iter);
+			}
 		} else {
-			m_imgsAttribute.DeleteAll();
+			m_imgsAttribute.clear();
 		}
 		UpdateDisplayImage();
-		return TRUE;
+		return true;
 	}
 
 
-	BOOL CMatView::ShowCrossMark(LPCTSTR pszName, BOOL bShow) {
+	bool CMatView::ShowCrossMark(LPCTSTR pszName, bool bShow) {
 		if (pszName) {
-			int iIndex = -1;
-			do {
-				iIndex = m_display.crosses.FindByValue(pszName, iIndex);
-				if (iIndex >= 0)
-					m_display.crosses[iIndex].bShow = bShow;
-				else
-					break;
-			} while (TRUE);
+			for (auto& r : m_display.crosses) {
+				if (r->strName == pszName) {
+					r->bShow = bShow;
+				}
+			}
 		} else {
-			for (int i = 0; i < m_display.crosses.N(); i++) {
-				m_display.crosses[i].bShow = bShow;
+			for (auto& r : m_display.crosses) {
+				r->bShow = bShow;
 			}
 		}
 
 		if (m_hWnd)
-			Invalidate(FALSE);
-		return TRUE;
+			Invalidate(false);
+		return true;
 	}
-	int CMatView::AddCrossMark(LPCTSTR pszName, const CPoint2d& pt, LPCTSTR pszLabel, int iSizeX, int iSizeY, int nPenStyle, int iThick, COLORREF cr) {
-		int iIndex = -1;
-		if (pszName)
-			iIndex = m_display.crosses.FindByValue(pszName);
-		if (iIndex < 0)
-			iIndex = m_display.crosses.Push(new T_CROSS_MARK);
-		if (iIndex < 0)
-			return iIndex;
-		T_CROSS_MARK& cross = m_display.crosses[iIndex];
+	bool CMatView::AddCrossMark(LPCTSTR pszName, xPoint2d const& pt, LPCTSTR pszLabel, int iSizeX, int iSizeY, int nPenStyle, int iThick, COLORREF cr) {
+		auto iter = m_display.crosses.end();
+		if (pszName) {
+			iter = Find(m_display.crosses, pszName);
+		} else {
+			if (m_display.crosses.empty())
+				m_display.crosses.push_back(std::make_unique<T_CROSS_MARK>());
+			iter = m_display.crosses.begin();
+		}
+		auto& cross = *(*iter);
 		cross.strName = pszName;
 		cross.strLabel = pszLabel;
-		cross.bShow = TRUE;
+		cross.bShow = true;
 		cross.pt = pt;
 		cross.size.cx = iSizeX >= 0 ? iSizeX : 0;
 		cross.size.cy = iSizeY >= 0 ? iSizeY : 0;
@@ -2323,72 +2318,69 @@ namespace gtl::win_util {
 		cross.cr = cr;
 
 		if (m_hWnd)
-			Invalidate(FALSE);
-		return TRUE;
+			Invalidate(false);
+		return true;
 	}
-	BOOL CMatView::DeleteCrossMark(LPCTSTR pszName) {
+	bool CMatView::DeleteCrossMark(LPCTSTR pszName) {
 		if (pszName) {
-			while(m_display.crosses.DeleteByValue(pszName)) ;
+			std::erase_if(m_display.crosses, [&pszName](auto& r){return r->strName == pszName;});
 		} else {
-			m_display.crosses.DeleteAll();
+			m_display.crosses.clear();
 		}
 
 		if (m_hWnd)
-			Invalidate(FALSE);
-		return TRUE;
+			Invalidate(false);
+		return true;
 	}
 
-	BOOL CMatView::ShowRectRegion(LPCTSTR pszName, BOOL bShow) {
+	bool CMatView::ShowRectRegion(LPCTSTR pszName, bool bShow) {
 		if (pszName) {
-			int iIndex = -1;
-			do {
-				iIndex = m_display.rects.FindByValue(pszName, iIndex);
-				if (iIndex >= 0)
-					m_display.rects[iIndex].bShow = bShow;
-				else
-					break;
-			} while (TRUE);
+			for (auto& r : m_display.rects) {
+				if (r->strName == pszName)
+					r->bShow = bShow;
+			}
 		} else {
-			for (int i = 0; i < m_display.rects.N(); i++) {
-				m_display.rects[i].bShow = bShow;
+			for (auto& r : m_display.rects) {
+				r->bShow = bShow;
 			}
 		}
 
 		if (m_hWnd)
-			Invalidate(FALSE);
-		return TRUE;
+			Invalidate(false);
+		return true;
 	}
-	int CMatView::AddRectRegion(LPCTSTR pszName, const CRect2d& rect, LPCTSTR pszLabel, int nPenStyle, int iThick, COLORREF crPen) {
-		int iIndex = -1;
-		if (pszName)
-			iIndex = m_display.rects.FindByValue(pszName);
-		if (iIndex < 0)
-			iIndex = m_display.rects.Push(new T_RECT_REGION);
-		if (iIndex < 0)
-			return iIndex;
-		T_RECT_REGION& region = m_display.rects[iIndex];
+	bool CMatView::AddRectRegion(LPCTSTR pszName, const xRect2d& rect, LPCTSTR pszLabel, int nPenStyle, int iThick, COLORREF crPen) {
+		auto iter = m_display.rects.end();
+		if (pszName) {
+			iter = Find(m_display.rects, pszName);
+		} else {
+			if (m_display.rects.empty())
+				m_display.rects.push_back(std::make_unique<T_RECT_REGION>());
+			iter = m_display.rects.begin();
+		}
+		auto& region = *(*iter);
 		region.strName = pszName;
 		region.strLabel = pszLabel;
-		region.bShow = TRUE;
+		region.bShow = true;
 		region.rect = rect;
 		region.nPenStyle = nPenStyle;
 		region.iThick = iThick;
 		region.cr = crPen;
 
 		if (m_hWnd)
-			Invalidate(FALSE);
-		return iIndex;
+			Invalidate(false);
+		return true;
 	}
-	BOOL CMatView::DeleteRectRegion(LPCTSTR pszName) {
+	bool CMatView::DeleteRectRegion(LPCTSTR pszName) {
 		if (pszName) {
-			while (m_display.rects.DeleteByValue(pszName)) ;
+			std::erase_if(m_display.rects, [&pszName](auto& r){return r->strName == pszName;});
 		} else {
-			m_display.rects.DeleteAll();
+			m_display.rects.clear();
 		}
 
 		if (m_hWnd)
-			Invalidate(FALSE);
-		return TRUE;
+			Invalidate(false);
+		return true;
 	}
 
 	LRESULT CMatView::OnUpdateDisplayImage(WPARAM wParam, LPARAM lParam) {
@@ -2404,5 +2396,3 @@ namespace gtl::win_util {
 
 }
 
-
-#endif
