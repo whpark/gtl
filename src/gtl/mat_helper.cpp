@@ -1265,11 +1265,14 @@ namespace gtl {
 		palette.clear();
 		// Load Palette
 		ptrdiff_t sizePalette = fh.offsetData - sizeof(fh) - header.size;
-		for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
-			gtl::color_bgra_t color{};
-			if (!f.read((char*)&color, sizeof(color)))
-				return img;
-			palette.push_back(color);
+		if (sizePalette/4 > 0) {
+			palette.reserve(sizePalette/4);
+			for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
+				gtl::color_bgra_t color{};
+				if (!f.read((char*)&color, sizeof(color)))
+					return img;
+				palette.push_back(color);
+			}
 		}
 		if (!f.seekg(fh.offsetData))
 			return img;
