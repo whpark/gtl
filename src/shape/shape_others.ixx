@@ -394,163 +394,6 @@ export namespace gtl::shape {
 		}
 	};
 
-	class xPolyline : public xShape {
-	public:
-		using base_t = xShape;
-		using this_t = xPolyline;
-
-	public:
-		bool m_bLoop{};
-		std::vector<polypoint_t> m_pts;
-
-		virtual bool Compare(xShape const& B_) const override {
-			if (!base_t::Compare(B_))
-				return false;
-			this_t const& B = (this_t const&)B_;
-			return (m_bLoop == B.m_bLoop) and (m_pts == B.m_pts);
-		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::polyline; }
-
-		//virtual point_t PointAt(double t) const override {};
-		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
-			if (m_pts.empty())
-				return {};
-			return std::pair{ m_pts.front(), m_bLoop ? m_pts.front() : m_pts.back() };
-		}
-		virtual void FlipX() override { for (auto& pt : m_pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } }
-		virtual void FlipY() override { for (auto& pt : m_pts) { pt.y = -pt.y;  pt.Bulge() = -pt.Bulge(); } }
-		virtual void FlipZ() override { for (auto& pt : m_pts) { pt.z = -pt.z;  pt.Bulge() = -pt.Bulge(); } }
-		virtual void Reverse() override {
-			if (m_bLoop) {
-				if (m_pts.size()) {
-					auto pt = m_pts.front();
-					m_pts.erase(m_pts.begin());
-					m_pts.push_back(pt);
-				}
-			}
-
-			std::ranges::reverse(m_pts);
-
-			if (m_pts.size() > 1) {
-				auto b0 = m_pts.front().Bulge();
-				for (size_t i{1}; i < m_pts.size(); i++) {
-					m_pts[i-1].Bulge() = - m_pts[i].Bulge();
-				}
-				m_pts.back().Bulge() = - b0;
-
-			}
-		}
-		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
-			for (auto& pt : m_pts) {
-				(point_t&)pt = ct((point_t&)pt);
-			}
-			if (!bRightHanded) {
-				for (auto& pt : m_pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } 
-			}
-		};
-		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
-			bool bModified{};
-			for (auto const& pt : m_pts)
-				bModified |= rectBoundary.UpdateBoundary(pt);
-			return bModified;
-		};
-		virtual void Draw(ICanvas& canvas) const override;
-		virtual void PrintOut(std::wostream& os) const override {
-			xShape::PrintOut(os);
-			fmt::print(os, L"\t{}", m_bLoop ? L"loop ":L"");
-			for (auto const& pt : m_pts)
-				fmt::print(os, L"({},{},{},{}), ", pt.x, pt.y, pt.z, pt.w);
-			fmt::print(os, L"\n");
-		}
-
-		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolyline);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(xPolyline, xShape);
-		//GTL__REFLECTION_MEMBERS(m_pts);
-		auto operator <=> (xPolyline const&) const = default;
-
-		template < typename archive >
-		friend void serialize(archive& ar, xPolyline& var, unsigned int const file_version) {
-			boost::serialization::base_object<xShape>(var);
-			ar & var;
-		}
-		template < typename archive >
-		friend archive& operator & (archive& ar, xPolyline& var) {
-			ar & boost::serialization::base_object<xShape>(var);
-			ar & var.m_pts;
-			ar & var.m_bLoop;
-			return ar;
-		}
-
-		virtual bool LoadFromCADJson(json_t& _j) override {
-			xShape::LoadFromCADJson(_j);
-			using namespace std::literals;
-			gtl::bjson j(_j);
-
-			auto jpts = j["vertlist"sv];
-			auto apts = jpts.json().as_array();
-			for (auto iter = apts.begin(); iter != apts.end(); iter++) {
-				m_pts.push_back(polypoint_t{});
-				m_pts.back() = PolyPointFromVertex(*iter);
-			}
-
-			m_bLoop = (j["flags"].value_or(0) & 1) != 0;
-			return true;
-		}
-
-		boost::ptr_deque<xShape> Split() const;
-
-	};
-
-	class xPolylineLW : public xPolyline {
-	public:
-		using base_t = xPolyline;
-		using this_t = xPolylineLW;
-
-	public:
-	//protected:
-	//	int dummy{};
-	//public:
-
-		//virtual bool Compare(xShape const& B_) const override {
-		//	if (!base_t::Compare(B_))
-		//		return false;
-		//	return true;
-		//}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::lwpolyline; }
-
-		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolylineLW);
-		//GTL__REFLECTION_VIRTUAL_DERIVED(xPolylineLW, xPolyline);
-		//GTL__REFLECTION_MEMBERS(dummy);
-		auto operator <=> (xPolylineLW const&) const = default;
-
-		template < typename archive >
-		friend void serialize(archive& ar, xPolylineLW& var, unsigned int const file_version) {
-			boost::serialization::base_object<xPolyline>(var);
-			ar & var;
-		}
-		template < typename archive >
-		friend archive& operator & (archive& ar, xPolylineLW& var) {
-			ar & boost::serialization::base_object<xPolyline>(var);
-			return ar;
-		}
-
-		virtual bool LoadFromCADJson(json_t& _j) override {
-			xShape::LoadFromCADJson(_j);
-			using namespace std::literals;
-			gtl::bjson j(_j);
-
-			auto jpts = j["vertlist"sv];
-			auto apts = jpts.json().as_array();
-			for (auto iter = apts.begin(); iter != apts.end(); iter++) {
-				m_pts.push_back(polypoint_t{});
-				m_pts.back() = PolyPointFrom(*iter);
-			}
-
-			m_bLoop = (j["flags"].value_or(0) & 1) != 0;
-			return true;
-		}
-	};
-
 	class xCircle : public xShape {
 	public:
 		using base_t = xShape;
@@ -867,6 +710,203 @@ export namespace gtl::shape {
 			return true;
 		}
 
+	};
+
+	class xPolyline : public xShape {
+	public:
+		using base_t = xShape;
+		using this_t = xPolyline;
+
+	public:
+		bool m_bLoop{};
+		std::vector<polypoint_t> m_pts;
+
+		virtual bool Compare(xShape const& B_) const override {
+			if (!base_t::Compare(B_))
+				return false;
+			this_t const& B = (this_t const&)B_;
+			return (m_bLoop == B.m_bLoop) and (m_pts == B.m_pts);
+		}
+		virtual eSHAPE GetShapeType() const { return eSHAPE::polyline; }
+
+		//virtual point_t PointAt(double t) const override {};
+		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
+			if (m_pts.empty())
+				return {};
+			return std::pair{ m_pts.front(), m_bLoop ? m_pts.front() : m_pts.back() };
+		}
+		virtual void FlipX() override { for (auto& pt : m_pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } }
+		virtual void FlipY() override { for (auto& pt : m_pts) { pt.y = -pt.y;  pt.Bulge() = -pt.Bulge(); } }
+		virtual void FlipZ() override { for (auto& pt : m_pts) { pt.z = -pt.z;  pt.Bulge() = -pt.Bulge(); } }
+		virtual void Reverse() override {
+			if (m_bLoop) {
+				if (m_pts.size()) {
+					auto pt = m_pts.front();
+					m_pts.erase(m_pts.begin());
+					m_pts.push_back(pt);
+				}
+			}
+
+			std::ranges::reverse(m_pts);
+
+			if (m_pts.size() > 1) {
+				auto b0 = m_pts.front().Bulge();
+				for (size_t i{1}; i < m_pts.size(); i++) {
+					m_pts[i-1].Bulge() = - m_pts[i].Bulge();
+				}
+				m_pts.back().Bulge() = - b0;
+
+			}
+		}
+		virtual void Transform(xCoordTrans3d const& ct, bool bRightHanded) override {
+			for (auto& pt : m_pts) {
+				(point_t&)pt = ct((point_t&)pt);
+			}
+			if (!bRightHanded) {
+				for (auto& pt : m_pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } 
+			}
+		};
+		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
+			bool bModified{};
+			for (auto const& pt : m_pts)
+				bModified |= rectBoundary.UpdateBoundary(pt);
+			return bModified;
+		};
+		virtual void Draw(ICanvas& canvas) const override;
+		virtual void PrintOut(std::wostream& os) const override {
+			xShape::PrintOut(os);
+			fmt::print(os, L"\t{}", m_bLoop ? L"loop ":L"");
+			for (auto const& pt : m_pts)
+				fmt::print(os, L"({},{},{},{}), ", pt.x, pt.y, pt.z, pt.w);
+			fmt::print(os, L"\n");
+		}
+
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolyline);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xPolyline, xShape);
+		//GTL__REFLECTION_MEMBERS(m_pts);
+		auto operator <=> (xPolyline const&) const = default;
+
+		template < typename archive >
+		friend void serialize(archive& ar, xPolyline& var, unsigned int const file_version) {
+			boost::serialization::base_object<xShape>(var);
+			ar & var;
+		}
+		template < typename archive >
+		friend archive& operator & (archive& ar, xPolyline& var) {
+			ar & boost::serialization::base_object<xShape>(var);
+			ar & var.m_pts;
+			ar & var.m_bLoop;
+			return ar;
+		}
+
+		virtual bool LoadFromCADJson(json_t& _j) override {
+			xShape::LoadFromCADJson(_j);
+			using namespace std::literals;
+			gtl::bjson j(_j);
+
+			auto jpts = j["vertlist"sv];
+			auto apts = jpts.json().as_array();
+			for (auto iter = apts.begin(); iter != apts.end(); iter++) {
+				m_pts.push_back(polypoint_t{});
+				m_pts.back() = PolyPointFromVertex(*iter);
+			}
+
+			m_bLoop = (j["flags"].value_or(0) & 1) != 0;
+			return true;
+		}
+
+		boost::ptr_deque<xShape> Split() const;
+
+		template < typename t_iterator >
+		std::unique_ptr<xPolyline> MergeShapeAsPolyline(t_iterator begin, t_iterator end, double dThreshold) {
+			if (begin == end)
+				return {};
+			auto rPolyline = std::make_unique<xPolyline>();
+			rPolyline->m_color = begin->m_color;
+			rPolyline->m_bLoop = false;
+			auto& pts = rPolyline->m_pts;
+			if (auto ptSE = begin->GetStartEndPoint()) {
+				pts.push_back(ptSE->first);
+			} else {
+				return {};
+			}
+
+			for (auto pos = begin; pos != end; pos++) {
+				xShape const& shape = *pos;
+				auto const& ptBack = pts.back();
+				if (shape.GetShapeType() == eSHAPE::line) {
+					auto const& line = (xLine const&)shape;
+					//if (ptBack.Distance(line.m_pt0) > dThreshold) {
+					//	continue;
+					//}
+					pts.push_back(line.m_pt1);
+				} else if (shape.GetShapeType() == eSHAPE::arc_xy) {
+					auto const& arc = (xArc const&)shape;
+					auto ptC = arc.GetStartEndPoint();
+					if (!ptC)
+						continue;
+					auto pt0 = ptC->first;
+					auto pt1 = ptC->second;
+					if (ptBack.Distance(pt0) > dThreshold) {
+						continue;
+					}
+					pts.back().w = gtl::rad_t(arc.m_angle_length)/4.;
+					pts.push_back(pt1);
+				}
+			}
+			return rPolyline;
+		}
+
+	};
+
+	class xPolylineLW : public xPolyline {
+	public:
+		using base_t = xPolyline;
+		using this_t = xPolylineLW;
+
+	public:
+		//protected:
+		//	int dummy{};
+		//public:
+
+		//virtual bool Compare(xShape const& B_) const override {
+		//	if (!base_t::Compare(B_))
+		//		return false;
+		//	return true;
+		//}
+		virtual eSHAPE GetShapeType() const { return eSHAPE::lwpolyline; }
+
+		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolylineLW);
+		//GTL__REFLECTION_VIRTUAL_DERIVED(xPolylineLW, xPolyline);
+		//GTL__REFLECTION_MEMBERS(dummy);
+		auto operator <=> (xPolylineLW const&) const = default;
+
+		template < typename archive >
+		friend void serialize(archive& ar, xPolylineLW& var, unsigned int const file_version) {
+			boost::serialization::base_object<xPolyline>(var);
+			ar & var;
+		}
+		template < typename archive >
+		friend archive& operator & (archive& ar, xPolylineLW& var) {
+			ar & boost::serialization::base_object<xPolyline>(var);
+			return ar;
+		}
+
+		virtual bool LoadFromCADJson(json_t& _j) override {
+			xShape::LoadFromCADJson(_j);
+			using namespace std::literals;
+			gtl::bjson j(_j);
+
+			auto jpts = j["vertlist"sv];
+			auto apts = jpts.json().as_array();
+			for (auto iter = apts.begin(); iter != apts.end(); iter++) {
+				m_pts.push_back(polypoint_t{});
+				m_pts.back() = PolyPointFrom(*iter);
+			}
+
+			m_bLoop = (j["flags"].value_or(0) & 1) != 0;
+			return true;
+		}
 	};
 
 	class xSpline : public xShape {
