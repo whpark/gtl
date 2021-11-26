@@ -647,10 +647,10 @@ export namespace gtl::shape {
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
 			auto c = gtl::cos(m_angle_start);
 			auto s = gtl::sin(m_angle_start);
-			auto pt0 = m_ptCenter+point_t{c, s};
+			auto pt0 = m_ptCenter+m_radius*point_t{c, s};
 			c = gtl::cos(m_angle_start + m_angle_length);
 			s = gtl::sin(m_angle_start + m_angle_length);
-			auto pt1 = m_ptCenter+point_t{c, s};
+			auto pt1 = m_ptCenter+m_radius*point_t{c, s};
 			return std::pair{ pt0, pt1 };
 		}
 		virtual void FlipX() override { xCircle::FlipX(); m_angle_start = AdjustAngle(180._deg - m_angle_start); }
