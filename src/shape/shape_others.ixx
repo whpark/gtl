@@ -199,6 +199,42 @@ export namespace gtl::shape {
 		virtual void Sort_Loop();
 		bool IsLoop(double dMinGap = 1.e-3) const;
 
+		static bool RemoveConnectedComponents(std::deque<xShape const*>& shapes, xShape const* pSeed, double const dMinDistance = 0.000'1) {
+			if (!pSeed)
+				return false;
+
+			std::deque<xShape const*> lst_found;
+			lst_found.push_back(pSeed);
+
+			while (lst_found.size()) {
+
+				auto* p0 = lst_found.front();
+				lst_found.pop_front();
+
+				auto r = p0->GetStartEndPoint();
+				if (!r)
+					continue;
+				auto [pt0, pt1] = *r;
+
+				for (size_t i{}; i < shapes.size(); i++) {
+					auto const* pNext = shapes[i];
+					auto pts = pNext->GetStartEndPoint();
+					if (!pts)
+						continue;
+					if ((pt0.Distance(pts->first) <= dMinDistance) or (pt0.Distance(pts->second) <= dMinDistance) or
+						(pt1.Distance(pts->first) <= dMinDistance) or (pt1.Distance(pts->second) <= dMinDistance)) {
+						lst_found.push_back(pNext);
+						shapes.erase(shapes.begin()+i--);
+					}
+				}
+
+				if (shapes.empty())
+					break;
+			}
+
+			return true;
+		}
+
 	protected:
 		friend class xDrawing;
 		line_type_t* pLineType{};
@@ -818,7 +854,7 @@ export namespace gtl::shape {
 		boost::ptr_deque<xShape> Split() const;
 
 		template < typename t_iterator >
-		std::unique_ptr<xPolyline> MergeShapeAsPolyline(t_iterator begin, t_iterator end, double dThreshold) {
+		static std::unique_ptr<xPolyline> MergeShapeAsPolyline(t_iterator begin, t_iterator end, double dThreshold) {
 			if (begin == end)
 				return {};
 			auto rPolyline = std::make_unique<xPolyline>();
@@ -826,7 +862,7 @@ export namespace gtl::shape {
 			rPolyline->m_bLoop = false;
 			auto& pts = rPolyline->m_pts;
 			if (auto ptSE = begin->GetStartEndPoint()) {
-				pts.push_back(ptSE->first);
+				pts.push_back(polypoint_t(ptSE->first));
 			} else {
 				return {};
 			}
@@ -836,10 +872,10 @@ export namespace gtl::shape {
 				auto const& ptBack = pts.back();
 				if (shape.GetShapeType() == eSHAPE::line) {
 					auto const& line = (xLine const&)shape;
-					//if (ptBack.Distance(line.m_pt0) > dThreshold) {
-					//	continue;
-					//}
-					pts.push_back(line.m_pt1);
+					if (ptBack.Distance(line.m_pt0) > dThreshold) {
+						continue;
+					}
+					pts.push_back(polypoint_t(line.m_pt1));
 				} else if (shape.GetShapeType() == eSHAPE::arc_xy) {
 					auto const& arc = (xArc const&)shape;
 					auto ptC = arc.GetStartEndPoint();
@@ -850,8 +886,8 @@ export namespace gtl::shape {
 					if (ptBack.Distance(pt0) > dThreshold) {
 						continue;
 					}
-					pts.back().w = gtl::rad_t(arc.m_angle_length)/4.;
-					pts.push_back(pt1);
+					pts.back().Bulge() = gtl::rad_t(arc.m_angle_length)/4.;
+					pts.push_back(polypoint_t(pt1));
 				}
 			}
 			return rPolyline;
