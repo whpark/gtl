@@ -788,7 +788,6 @@ namespace gtl::shape {
 
 		boost::ptr_deque<xShape> Split() const;
 
-
 		template < typename t_iterator >
 		std::unique_ptr<xPolyline> MergeShapeAsPolyline(t_iterator begin, t_iterator end, double dThreshold) {
 			if (begin == end)
