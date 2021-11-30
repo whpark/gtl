@@ -11,6 +11,9 @@ namespace gtl::test::misc {
 	using namespace gtl;
 
 	TEST(misc, xFinalAction) {
+
+		auto* p = std::bit_cast<int64_t*>(nullptr);
+
 		int i{};
 		{
 			xFinalAction fa{[&]{ i = 3;} };

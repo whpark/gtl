@@ -860,8 +860,15 @@ namespace gtl::shape {
 						continue;
 					}
 					pts.back().Bulge() = gtl::rad_t(arc.m_angle_length)/4.;
+					//if (pts.back().Bulge() <= dThreshold*0.01) {
+					//	pts.back().Bulge() = 0.0;
+					//}
 					pts.push_back(polypoint_t(pt1));
 				}
+			}
+			if ( (pts.size() > 1) and xPoint3d(pts.front()) == xPoint3d(pts.back())) {
+				pts.pop_back();
+				rPolyline->m_bLoop = true;
 			}
 			return rPolyline;
 		}
