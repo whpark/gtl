@@ -419,32 +419,58 @@ export namespace gtl::shape {
 			len += pts[i].Distance(pts[i-1]);
 		}
 
-		double step = canvas.m_target_interpolation_inverval / len / 2.;
+		double scale = canvas.m_ct.Trans(1.0);
+		double step = canvas.m_target_interpolation_inverval / len / scale;
+		//double step = 0.001;
 
-		tinyspline::BSpline bspline(pts.size(), 2, degree);
-		std::vector<tinyspline::real> points(pts.size()*degree);
+		constexpr static int const dim = 2;
+		tinyspline::BSpline bspline(pts.size(), dim, degree);
+		std::vector<tinyspline::real> points((pts.size()+bLoop)*dim);
 		auto* pos = points.data();
-		if (degree == 2) {
+		if constexpr (dim == 2) {
 			for (size_t i{}; i < pts.size(); i++) {
-				*pos += pts[i].x;
-				*pos += pts[i].y;
+				*pos++ += pts[i].x;
+				*pos++ += pts[i].y;
 			}
-		} else if (degree == 3) {
+			//if (bLoop) {
+			//	*pos++ += pts[0].x;
+			//	*pos++ += pts[0].y;
+			//}
+		} else if (dim == 3) {
 			for (size_t i{}; i < pts.size(); i++) {
-				*pos += pts[i].x;
-				*pos += pts[i].y;
-				*pos += pts[i].z;
+				*pos++ += pts[i].x;
+				*pos++ += pts[i].y;
+				*pos++ += pts[i].z;
 			}
+			//if (bLoop) {
+			//	*pos++ += pts[0].x;
+			//	*pos++ += pts[0].y;
+			//	*pos++ += pts[0].z;
+			//}
 		} else {
 			// todo : error.
 			return;
 		}
-		bspline.setKnots({knots.begin(), knots.end()});
+		bspline.setControlPoints(points);
+		//std::vector<double> knotsv{knots.begin(), knots.end()};
+		//bspline.setKnots(knotsv);
 
-		point_t pt{bspline(0.0).result()};
+		//auto cr = dynamic_cast<xCanvasMat&>(canvas).m_color;
+		//dynamic_cast<xCanvasMat&>(canvas).m_color = cv::Scalar(0, 0, 255);
+		//canvas.MoveTo(pts.front());
+		//for (auto const& pt : pts) {
+		//	canvas.LineTo(pt);
+		//}
+		//dynamic_cast<xCanvasMat&>(canvas).m_color = cr;
+
+		point_t pt{bspline.eval(0.0).result()};
 		canvas.MoveTo(pt);
-		for (double t{step}; t <= 1.0; t += step)
-			canvas.LineTo(point_t(bspline(0.0).result()));
+		for (double t{ step }; t < 1.0; t += step) {
+			auto pt = bspline.eval(t).result();
+			canvas.LineTo(point_t(pt));
+		}
+		canvas.LineTo(point_t(bspline.eval(1.).result()));
+
 	}
 
 #pragma warning(pop)
