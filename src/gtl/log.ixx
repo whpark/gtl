@@ -22,6 +22,7 @@ module;
 #pragma warning(disable: 4819)
 #define FMT_HEADER_ONLY
 #include "fmt/format.h"
+#include "fmt/xchar.h"
 #include "fmt/chrono.h"
 #pragma warning(pop)
 

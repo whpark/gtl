@@ -18,6 +18,7 @@ module;
 #include "framework.h"
 #define FMT_HEADER_ONLY
 #include "fmt/format.h"
+#include "fmt/xchar.h"
 
 #include "Resource.h"
 

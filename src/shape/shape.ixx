@@ -17,6 +17,7 @@
 
 #define FMT_HEADER_ONLY
 #include "fmt/format.h"
+#include "fmt/xchar.h"
 
 #include "boost/json.hpp"
 #include "boost/variant.hpp"

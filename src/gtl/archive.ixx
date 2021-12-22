@@ -20,6 +20,7 @@ module;
 
 #define FMT_HEADER_ONLY
 #include "fmt/format.h"
+#include "fmt/xchar.h"
 #include "fmt/chrono.h"
 
 #include "gtl/_config.h"
