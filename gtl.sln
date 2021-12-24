@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "win_util", "src\win_util\wi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_win", "src\test_win\test_win.vcxproj", "{0F115BD6-A104-41EB-8F5D-194C4E66DD0C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TEST and BENCH", "TEST and BENCH", "{8390BA04-4F3F-4E69-9090-913CB688FEF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -81,6 +83,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ACFF3502-B999-4380-988D-94DF9020AE6C} = {8390BA04-4F3F-4E69-9090-913CB688FEF6}
+		{14CA3D40-1D88-4BF7-A9E0-505198D5B747} = {8390BA04-4F3F-4E69-9090-913CB688FEF6}
+		{446FCEAB-4FBE-4BE2-9B32-84B7B99F61FE} = {8390BA04-4F3F-4E69-9090-913CB688FEF6}
+		{0F115BD6-A104-41EB-8F5D-194C4E66DD0C} = {8390BA04-4F3F-4E69-9090-913CB688FEF6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E7CA12F-04CC-430D-95C2-232C1D5F8C57}

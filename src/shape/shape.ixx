@@ -60,11 +60,6 @@ export {
 
 }
 
-#ifdef _DEBUG
-#define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
-#else
-#define DEBUG_PRINT(...) 
-#endif
 
 namespace gtl::shape {
 	using namespace std::literals;
@@ -81,6 +76,32 @@ namespace gtl {
 
 
 namespace gtl::shape {
+
+	template <typename... T>
+	constexpr void print_local(std::wstring_view fmt, T&&... args) {
+		return fmt::vprint(fmt, fmt::make_wformat_args(args...));
+	}
+
+	template <typename... T>
+	constexpr void print_local(std::string_view fmt, T&&... args) {
+		return fmt::vprint(fmt, fmt::make_format_args(args...));
+	}
+
+	template < typename ... T>
+	constexpr void DEBUG_PRINT(std::wstring_view fmt, T&& ... args) {
+	#ifdef _DEBUG
+		print_local(fmt, std::forward<T>(args)...);
+	#else
+	#endif
+	}
+	template < typename ... T>
+	constexpr void DEBUG_PRINT(std::string_view fmt, T&& ... args) {
+	#ifdef _DEBUG
+		print_local(fmt, std::forward<T>(args)...);
+	#else
+	#endif
+	}
+
 
 	//// from openCV
 	//bool clipLine(gtl::xSize2i size, gtl::xPoint2d& pt1, gtl::xPoint2d& pt2) {
