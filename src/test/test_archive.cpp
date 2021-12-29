@@ -1,10 +1,5 @@
 ﻿#include "pch.h"
 
-//#include "gtl/archive.h"
-#define FMT_HEADER_ONLY
-#include "fmt/format.h"
-#include "fmt/xchar.h"
-
 import gtl;
 
 #pragma warning(disable:4566)	// character encoding
