@@ -51,7 +51,7 @@ namespace gtl::test::misc {
 		EXPECT_EQ(i, 3);
 
 
-		Func1(4, 5, 6);
+		//Func1(4, 5, 6);
 
 		xTestVirtualBase ob1;
 		ob1.data.push_back(1);
