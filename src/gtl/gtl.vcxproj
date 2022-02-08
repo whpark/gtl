@@ -227,6 +227,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\gtl\2dMatArray.h" />
     <ClInclude Include="..\..\include\gtl\archive.h" />
     <ClInclude Include="..\..\include\gtl\concepts.h" />
     <ClInclude Include="..\..\include\gtl\coord.h" />
@@ -240,6 +241,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h" />
     <ClInclude Include="..\..\include\gtl\json_proxy.h" />
     <ClInclude Include="..\..\include\gtl\log.h" />
+    <ClInclude Include="..\..\include\gtl\matrix.h" />
     <ClInclude Include="..\..\include\gtl\mat_helper.h" />
     <ClInclude Include="..\..\include\gtl\misc.h" />
     <ClInclude Include="..\..\include\gtl\mutex.h" />
@@ -267,6 +269,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="2dMatArray.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="HangeulCodeMapKSSM_UTF16.cpp" />
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp" />

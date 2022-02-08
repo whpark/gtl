@@ -58,25 +58,28 @@ namespace gtl::shape {
 	struct line_t { point_t beg, end; };
 	using json_t = boost::json::value;
 
-	struct polypoint_t : public TPointT<double, 4> {
-		using base_t = TPointT<double, 4>;
+	template < typename T >
+	struct tpolypoint_t : public TPointT<T, 4> {
+		using base_t = TPointT<T, 4>;
 
-		//using base_t::base_t;
+		using base_t::base_t;
 
-		double& Bulge() { return w; }
-		double Bulge() const { return w; }
-		
-		auto operator <=> (polypoint_t const&) const = default;
+		T& Bulge() { return base_t::w; }
+		T Bulge() const { return base_t::w; }
+
+		auto operator <=> (tpolypoint_t const&) const = default;
 
 		template < typename archive >
-		friend void serialize(archive& ar, polypoint_t& var, unsigned int const file_version) {
-			ar & (TPointT<double, 4>&)var;
+		friend void serialize(archive& ar, tpolypoint_t& var, unsigned int const file_version) {
+			ar & (base_t&)var;
 		}
 		template < typename archive >
-		friend archive& operator & (archive& ar, polypoint_t& var) {
-			ar & (TPointT<double, 4>&)var;
+		friend archive& operator & (archive& ar, tpolypoint_t& var) {
+			ar & (base_t&)var;
 		}
 	};
+
+	using polypoint_t = tpolypoint_t<double>;
 
 	inline point_t PointFrom(gtl::bjson<json_t> j) {
 		point_t pt;
@@ -231,7 +234,7 @@ namespace gtl::shape {
 		int m_eLineType{};
 		string_t m_strLineType;
 		int m_lineWeight{1};
-		bool m_bVisible{};
+		bool m_bVisible{true};
 		bool m_bTransparent{};
 		boost::optional<cookie_t> m_cookie;
 

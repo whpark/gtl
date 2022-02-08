@@ -127,6 +127,26 @@ namespace gtl::win_util {
 		}
 	}
 
+	void DDX_DoubleScaled(CDataExchange* pDX, int idc, double& value, double scaleToView, std::wstring_view fmt) {
+		if (!pDX || !pDX->m_pDlgWnd)
+			return;
+		double dScaledValue = value * scaleToView;
+		gtlw::DDX_Double(pDX, idc, dScaledValue, fmt);
+		if (pDX->m_bSaveAndValidate) {
+			value = dScaledValue / scaleToView;
+		}
+	}
+
+	void DDX_CheckBool(CDataExchange* pDX, int idc, bool& value) {
+		if (!pDX || !pDX->m_pDlgWnd)
+			return;
+		BOOL bCheck = value;
+		DDX_Check(pDX, idc, bCheck);
+		if (pDX->m_bSaveAndValidate) {
+			value = bCheck ? true : false;
+		}
+	}
+
 	//WARNING_PUSH_AND_DISABLE(4996)
 
 	template < typename tchar > requires gtlc::string_elem<tchar>

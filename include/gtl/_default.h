@@ -60,7 +60,8 @@
 #else
 #endif
 #define FMT_HEADER_ONLY
-#include <fmt/format.h>
+#include "fmt/format.h"
+#include "fmt/xchar.h"
 
 #include <regex>
 //#if defined (__cpp_lib_ctre)

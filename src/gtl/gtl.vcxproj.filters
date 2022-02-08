@@ -134,6 +134,12 @@
     <ClInclude Include="..\..\include\gtl\coord\coord_srect.h">
       <Filter>gtl\coord</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\2dMatArray.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\matrix.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">
@@ -158,6 +164,9 @@
       <Filter>gtl.impl</Filter>
     </ClCompile>
     <ClCompile Include="mat_helper.cpp">
+      <Filter>gtl.impl</Filter>
+    </ClCompile>
+    <ClCompile Include="2dMatArray.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
   </ItemGroup>

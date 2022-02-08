@@ -8,6 +8,27 @@
 
 namespace gtl {
 
+	bool IsMatEqual(cv::Mat const& a, cv::Mat const& b) {
+		if (a.cols != b.cols or a.rows != b.rows or a.size != b.size or a.type() != b.type())
+			return false;
+		if (a.empty())
+			return true;
+		if (a.isContinuous() and b.isContinuous()) {
+			return std::equal(a.datastart, a.dataend, b.datastart);
+		} else {
+			size_t len = a.cols * a.elemSize();
+			for (int y{}; y < a.rows; y++) {
+				auto const* pA = a.ptr(y);
+				auto const* pB = b.ptr(y);
+				if (!std::equal(pA, pA+len, pB))
+					return false;
+			}
+			return true;
+		}
+
+		return false;
+	}
+
 	void putTextC(cv::InputOutputArray img, std::string const& str, xPoint2i org,
 		int fontFace, double fontScale, cv::Scalar color,
 		int thickness, int lineType,
@@ -261,7 +282,6 @@ namespace gtl {
 
 		return false;
 	}
-
 
 	namespace internal {
 
@@ -532,13 +552,13 @@ namespace gtl {
 	}	// namespace internal
 
 
-	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, callback_progress_t funcCallback) {
+	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, bool bBottom2Top, callback_progress_t funcCallback) {
 		// todo : CV_8UC3 with palette.
 
 		bool bOK{};
 
 		// Trigger notifying it's over.
-		xTrigger trigger([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, !bOK);});
+		xFinalAction fa([&funcCallback, &bOK]{if (funcCallback) funcCallback(-1, true, !bOK);});
 
 		if (img.empty())
 			return false;
@@ -561,12 +581,16 @@ namespace gtl {
 
 		header.size = sizeof(header);
 		header.width = cx;
-		header.height = -cy;
+		header.height = bBottom2Top ? cy : -cy;
 		header.planes = 1;
 		header.compression = 0;//BI_RGB;
 		header.sizeImage = 0;//cx * cy * pixel_size;
 		header.XPelsPerMeter = pelsPerMeter.cx;
 		header.YPelsPerMeter = pelsPerMeter.cy;
+
+		cv::Mat img2 = img;
+		if (bBottom2Top)
+			cv::flip(img, img2, 0);
 
 		if (pixel_size == 3) {
 			std::ofstream f(path, std::ios_base::binary);
@@ -592,8 +616,7 @@ namespace gtl {
 			//	f.write(redundant, sr);
 			//}
 			//bOK = true;
-
-			bOK = gtl::internal::MatToBitmapFile<true, false, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, {}, funcCallback);
+			bOK = gtl::internal::MatToBitmapFile<true, false, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, {}, funcCallback);
 
 			return true;
 		}
@@ -630,9 +653,9 @@ namespace gtl {
 			}
 
 			if (bNoPaletteLookup)
-				bOK = gtl::internal::MatToBitmapFile<true, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
+				bOK = gtl::internal::MatToBitmapFile<true, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, pal, funcCallback);
 			else
-				bOK = gtl::internal::MatToBitmapFile<false, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img, nBPP, pal, funcCallback);
+				bOK = gtl::internal::MatToBitmapFile<false, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, pal, funcCallback);
 			return bOK;
 		}
 
@@ -650,7 +673,6 @@ namespace gtl {
 			//auto type = img.type();
 			//if ( (type != CV_8UC3) and (type != CV_8UC4) and (type != CV_8UC1) )
 			//	return false;
-			size_t s = img.elemSize();
 			if (sizeof(telement) != img.elemSize())
 				return false;
 
@@ -873,6 +895,181 @@ namespace gtl {
 			return true;
 		}
 
+		template < typename telement = cv::Vec3b, bool bLoopUnrolling = true, bool bMultiThreaded = false >
+		bool MatFromBitmapFilePixelArray(std::istream& f, cv::Mat& img, int nBPP, callback_progress_t funcCallback) {
+
+			if ((nBPP != 1) and (nBPP != 4) and (nBPP != 8) and (nBPP != 24) and (nBPP != 32) )
+				return false;
+
+			if (sizeof(telement) != img.elemSize())
+				return false;
+
+			int width32 = (img.cols * nBPP + 31) / 32 * 4;
+			int pixel_per_byte = (8/nBPP);
+			int nColPixel = pixel_per_byte ? img.cols/ pixel_per_byte * pixel_per_byte : img.cols;
+
+			using Func_UnPackSingleRow = std::function<void(int y, std::vector<uint8> const& line, telement* ptr)>;
+			Func_UnPackSingleRow UnPackSingleRow;
+
+			using Func_UnpackLine = std::function<void()>;
+
+			if (nBPP == 1) {
+				UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr) {
+					int x{};
+					for (; x < nColPixel; x += pixel_per_byte) {
+						int col = x / pixel_per_byte;
+						ptr[x + 0] = (line[col] >> 7) & 0b0000'0001;
+						ptr[x + 1] = (line[col] >> 6) & 0b0000'0001;
+						ptr[x + 2] = (line[col] >> 5) & 0b0000'0001;
+						ptr[x + 3] = (line[col] >> 4) & 0b0000'0001;
+						ptr[x + 4] = (line[col] >> 3) & 0b0000'0001;
+						ptr[x + 5] = (line[col] >> 2) & 0b0000'0001;
+						ptr[x + 6] = (line[col] >> 1) & 0b0000'0001;
+						ptr[x + 7] = (line[col] >> 0) & 0b0000'0001;
+					}
+					int col = x / pixel_per_byte;
+					for (int shift{ 8-nBPP }; x < img_cols; x++, shift -= nBPP) {
+						ptr[x] = (line[col] >> shift) & 0b0000'0001;
+					}
+				};
+			}
+			else if (nBPP == 4) {
+				UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr) {
+					int x{};
+					for (; x < nColPixel; x += 2) {
+						int col = x / 2;
+						ptr[x + 0] = (line[col] >> 4) & 0b0000'1111;
+						ptr[x + 1] = (line[col] >> 0) & 0b0000'1111;
+					}
+					int col = x / 2;
+					for (int shift{ 4 }; x < img_cols; x++, shift -= 4) {
+						ptr[x] = (line[col] >> shift) & 0b0000'1111;
+					}
+				};
+			}
+			else if (nBPP == 8) {
+				UnPackSingleRow = [img_cols = img.cols](int y, std::vector<uint8> const& line, telement* ptr) {
+					for (int x{}; x < img_cols; x++) {
+						ptr[x] = line[x];
+					}
+				};
+			}
+			else if ((nBPP == 24) or (nBPP == 32)) {
+				// nothing here.
+			}
+			else {
+				return false;
+			}
+
+			if ( (nBPP == 24) or (nBPP == 32) ) {
+				UnPackSingleRow = [img_cols = img.cols](int y, std::vector<uint8> const& line, telement* ptr) {
+					for (int x{}; x < img_cols; x++) {
+						int xc = x * sizeof(telement);
+						if constexpr (sizeof(telement) == sizeof(cv::Vec3b)) {
+							ptr[x][0] = line[xc + 0];
+							ptr[x][1] = line[xc + 1];
+							ptr[x][2] = line[xc + 2];
+						} else if constexpr (sizeof(telement) == sizeof(cv::Vec4b)) {
+							ptr[x][0] = line[xc + 0];
+							ptr[x][1] = line[xc + 1];
+							ptr[x][2] = line[xc + 2];
+							ptr[x][3] = line[xc + 3];
+						}
+					}
+				};
+			}
+
+			auto nCPUDetected = std::thread::hardware_concurrency();
+			auto nThread = std::min((uint)img.rows, (nCPUDetected <= 0) ? 2 : nCPUDetected);
+
+			struct BUFFER {
+				std::atomic<int> y{-1};
+				std::vector<uint8> line;
+			};
+			std::vector<BUFFER> buffers((size_t)nThread*2);
+			for (auto& buf : buffers)
+				buf.line.assign((size_t)width32, (uint8)0);
+
+			std::condition_variable cv;
+			std::mutex mtxQ;
+			std::queue<BUFFER*> q;
+			bool bError{};
+
+			auto Reader = [&f, &buffers, img_rows = img.rows, &q, &mtxQ, &cv, &bError, &funcCallback]() {
+				int y{};
+				int iPercent{};
+				for (; y < img_rows; y++) {
+					auto index = y % buffers.size();
+					auto& buf = buffers[index];
+					int yOld = buf.y;
+					while (yOld >= 0) {
+						buf.y.wait(yOld);
+						yOld = buf.y;
+					}
+					if (!f.read((char*)buf.line.data(), buf.line.size())) {
+						bError = true;
+						break;
+					}
+					buf.y = y;
+					//buf.y.notify_one();
+					{
+						std::unique_lock lock(mtxQ);
+						q.push(&buf);
+					}
+					cv.notify_one();
+
+					if (funcCallback) {
+						int iPercentNew = y * 100 / img_rows;
+						if (iPercent != iPercentNew) {
+							iPercent = iPercentNew;
+							if (!funcCallback(iPercent, false, false)) {
+								bError = true;
+								break;
+							}
+						}
+					}
+				}
+			};
+
+			auto UnpackBuffer = [&q, &mtxQ, &cv, &UnPackSingleRow, &img](std::stop_token tk) {
+				do {
+					BUFFER* pBuf{};
+					while (!pBuf) {
+						std::unique_lock lock(mtxQ);
+						if (q.empty()) {
+							if (tk.stop_requested())
+								return;
+							cv.wait(lock);
+						}
+						else {
+							pBuf = q.front();
+							q.pop();
+						}
+					}
+
+					UnPackSingleRow(pBuf->y, pBuf->line, img.ptr<telement>(pBuf->y));
+					pBuf->y = -1;
+					pBuf->y.notify_one();
+
+				} while (true);
+			};
+
+			std::thread reader{Reader};
+			std::stop_source ss;
+			std::vector<std::jthread> threads;
+			threads.reserve(nThread);
+			for (uint i{}; i < nThread; i++) {
+				threads.emplace_back(UnpackBuffer, ss.get_token());
+			}
+
+			reader.join();
+			ss.request_stop();
+			cv.notify_all();
+
+			return !bError;
+
+		}
+
 	}	// namespace internal
 
 	bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, BITMAP_V5_HEADER& header) {
@@ -911,7 +1108,7 @@ namespace gtl {
 		return LoadBitmapHeader(f, fileHeader, header);
 	}
 
-	/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
+	/// @brief Load Image from BITMAP file. Image is COLOR or GRAY level image.
 	/// @param path 
 	/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
 	/// @param nBPP 
@@ -921,7 +1118,7 @@ namespace gtl {
 		bool bOK{};
 
 		// Trigger notifying it's over.
-		xTrigger trigger([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, !bOK); });
+		xFinalAction fa([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, !bOK); });
 
 
 		cv::Mat img;
@@ -1000,6 +1197,99 @@ namespace gtl {
 		else {
 			bOK = gtl::internal::MatFromBitmapFile<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, palette, funcCallback);
 		}
+		if (!bOK)
+			img.release();
+
+		if (!img.empty() and bFlipY) {
+			cv::flip(img, img, 0);
+		}
+
+		return img;
+	}
+
+	/// @brief Load Image into Mat. Image is Pixel ColorIndex.
+	/// @param path 
+	/// @param img : CV_8UC1 : pixel palette index, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
+	/// @param nBPP 
+	/// @param palette 
+	/// @return 
+	cv::Mat LoadBitmapMatPixelArray(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette, callback_progress_t funcCallback) {
+		bool bOK{};
+
+		// Trigger notifying it's over.
+		xFinalAction fa([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, !bOK); });
+
+
+		cv::Mat img;
+
+		std::ifstream f(path, std::ios_base::binary);
+		if (!f)
+			return img;
+
+		BMP_FILE_HEADER fh;
+		variant_BITMAP_HEADER varHeader{};
+		if (!LoadBitmapHeader(f, fh, varHeader))
+			return img;
+
+		BITMAP_HEADER* pos {};
+		{
+			pos = std::get_if<BITMAP_HEADER>(&varHeader);
+			if (!pos)
+				pos = (BITMAP_HEADER*)std::get_if<BITMAP_V4_HEADER>(&varHeader);
+			if (!pos)
+				pos = (BITMAP_HEADER*)std::get_if<BITMAP_V5_HEADER>(&varHeader);
+			if (!pos)
+				return img;
+		}
+		BITMAP_HEADER& header = *pos;
+
+		if (header.compression or (header.planes != 1))
+			return img;
+
+		pelsPerMeter.cx = header.XPelsPerMeter;
+		pelsPerMeter.cy = header.YPelsPerMeter;
+
+		int cx = header.width;
+		int cy = header.height;
+		bool bFlipY{};
+		if (cy < 0) {
+			cy = -cy;
+		}
+		else {
+			bFlipY = true;
+		}
+		if ((cx <= 0) or (cy <= 0) /*or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull)*/)
+			return img;
+
+		palette.clear();
+		// Load Palette
+		ptrdiff_t sizePalette = fh.offsetData - sizeof(fh) - header.size;
+		if (sizePalette/4 > 0) {
+			palette.reserve(sizePalette/4);
+			for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
+				gtl::color_bgra_t color{};
+				if (!f.read((char*)&color, sizeof(color)))
+					return img;
+				palette.push_back(color);
+			}
+		}
+		if (!f.seekg(fh.offsetData))
+			return img;
+
+		if (header.nBPP <= 8) {
+			img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC1);
+			bOK = gtl::internal::MatFromBitmapFilePixelArray<uint8, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, funcCallback);
+		} else if (header.nBPP <= 16) {
+			img = cv::Mat::zeros(cv::Size(cx, cy), CV_16UC1);
+			bOK = gtl::internal::MatFromBitmapFilePixelArray<uint16, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, funcCallback);
+		} else if (header.nBPP <= 24) {
+			img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC3);
+			bOK = gtl::internal::MatFromBitmapFilePixelArray<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, funcCallback);
+		} else if (header.nBPP <= 32) {
+			img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC4);
+			bOK = gtl::internal::MatFromBitmapFilePixelArray<cv::Vec4b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, funcCallback);
+		}
+
 		if (!bOK)
 			img.release();
 

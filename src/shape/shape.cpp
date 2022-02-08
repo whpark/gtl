@@ -4,13 +4,40 @@
 
 using namespace std::literals;
 
-#ifdef _DEBUG
-#define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
-#else
-#define DEBUG_PRINT(...) 
-#endif
+//#ifdef _DEBUG
+//#define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
+//#else
+//#define DEBUG_PRINT(...) 
+//#endif
 
 namespace gtl::shape {
+
+
+	template <typename... T>
+	constexpr void print_local(std::wstring_view fmt, T&&... args) {
+		return fmt::vprint(fmt, fmt::make_wformat_args(args...));
+	}
+
+	template <typename... T>
+	constexpr void print_local(std::string_view fmt, T&&... args) {
+		return fmt::vprint(fmt, fmt::make_format_args(args...));
+	}
+
+	template < typename ... T>
+	constexpr void DEBUG_PRINT(std::wstring_view fmt, T&& ... args) {
+	#ifdef _DEBUG
+		print_local(fmt, std::forward<T>(args)...);
+	#else
+	#endif
+	}
+	template < typename ... T>
+	constexpr void DEBUG_PRINT(std::string_view fmt, T&& ... args) {
+	#ifdef _DEBUG
+		print_local(fmt, std::forward<T>(args)...);
+	#else
+	#endif
+	}
+
 
 	//// from openCV
 	//bool clipLine(gtl::xSize2i size, gtl::xPoint2d& pt1, gtl::xPoint2d& pt2) {
@@ -336,7 +363,46 @@ namespace gtl::shape {
 			return;
 		}
 
+		// Search EndPoint if any -> Move it to front
+		auto const dThreshold = 1.e-3;
 		size_t n{m_shapes.size()-1};
+		for (size_t i{}; i < n; i++) {
+			auto const& r = m_shapes[i].GetStartEndPoint();
+			if (!r)
+				continue;
+			auto [pt0, pt1] = *r;
+			bool bFound0{}, bFound1{};
+			for (size_t j{}; j < m_shapes.size(); j++) {
+				if (i == j)
+					continue;
+				if (auto const& r = m_shapes[j].GetStartEndPoint(); r) {
+					if (!bFound0) {
+						auto d0 = pt0.Distance(r->first);
+						auto d1 = pt0.Distance(r->second);
+						if (d0 <= dThreshold or d1 <= dThreshold) {
+							bFound0 = true;
+						}
+					}
+					if (!bFound1) {
+						auto d0 = pt1.Distance(r->first);
+						auto d1 = pt1.Distance(r->second);
+						if (d0 <= dThreshold or d1 <= dThreshold) {
+							bFound1 = true;
+						}
+					}
+					if (bFound0 and bFound1)
+						break;
+				}
+			}
+			if (!bFound0 or !bFound1) {
+				if (i)
+					std::swap(m_shapes.base().at(0), m_shapes.base().at(i));
+				if (bFound0 and !bFound1)
+					m_shapes.front().Reverse();
+				break;
+			}
+		}
+
 		for (size_t i{}; i < n; i++) {
 			auto const& r = m_shapes[i].GetStartEndPoint();
 			if (!r)
@@ -524,8 +590,7 @@ namespace gtl::shape {
 
 				try {
 					rBlock->LoadFromCADJson(item);
-				} catch (std::exception& e) {
-					e;
+				} catch ([[maybe_unused]] std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -551,8 +616,7 @@ namespace gtl::shape {
 
 					try {
 						rShape->LoadFromCADJson(jEntity);
-					} catch (std::exception& e) {
-						e;
+					} catch ([[maybe_unused]] std::exception& e) {
 						DEBUG_PRINT("{}\n", e.what());
 						continue;
 					} catch (...) {
@@ -590,8 +654,7 @@ namespace gtl::shape {
 				try {
 					rShape->LoadFromCADJson(jEntity);
 					//rShape->UpdateBoundary(rectBoundary);
-				} catch (std::exception& e) {
-					e;
+				} catch ([[maybe_unused]] std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {

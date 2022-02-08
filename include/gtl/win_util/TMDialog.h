@@ -25,6 +25,8 @@ namespace gtl::win_util {
 	GTL__WINUTIL_API double		GetDlgItemDouble(CWnd* pWnd, int idc);
 	GTL__WINUTIL_API void		SetDlgItemDouble(CWnd* pWnd, int idc, double dValue, std::wstring_view fmt = _T("{:.5f}"));
 	GTL__WINUTIL_API void		DDX_Double(CDataExchange* pDX, int idc, double& value, std::wstring_view fmt = _T("{:.5f}"));
+	GTL__WINUTIL_API void		DDX_DoubleScaled(CDataExchange* pDX, int idc, double& value, double scaleToView, std::wstring_view fmt = _T("{:.5f}"));
+	GTL__WINUTIL_API void		DDX_CheckBool(CDataExchange* pDX, int idc, bool& value);
 	template < typename tchar > requires gtlc::string_elem<tchar>
 	void		DDX_String(CDataExchange* pDX, int idc, std::basic_string<tchar>& str);
 	GTL__WINUTIL_API bool		CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& sv, CString* pStrOrigin = nullptr);	// returns true if changed

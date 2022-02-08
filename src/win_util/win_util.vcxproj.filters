@@ -38,6 +38,9 @@
     <ClCompile Include="ProgressDlg.cpp">
       <Filter>win_util</Filter>
     </ClCompile>
+    <ClCompile Include="MatView.cpp">
+      <Filter>win_util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\win_util.rc2">
@@ -79,6 +82,9 @@
       <Filter>win_util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\win_util\ProgressDlg.h">
+      <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\MatView.h">
       <Filter>win_util</Filter>
     </ClInclude>
   </ItemGroup>

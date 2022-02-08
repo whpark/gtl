@@ -122,6 +122,64 @@ namespace gtl {
 	}
 
 
+#if 0	// using boost
+	template < typename TData > requires (sizeof(TData) == 1)
+		std::string EncodeBase64(std::span<TData> data) {
+		using namespace boost::archive::iterators;
+		using It = base64_from_binary<transform_width<std::span<TData>::iterator, 6, 8>>;
+		auto tmp = std::string(It(std::begin(data)), It(std::end(data)));
+		return tmp.append((3 - data.size() % 3) % 3, '=');
+	}
+
+	template < typename TString, typename TOutpytIterator >
+	void DecodeBase64(TString const& str, TOutpytIterator iterOutput) {
+		using namespace boost::archive::iterators;
+		using str2bin = transform_width<binary_from_base64<TString::const_iterator>, 8, 6>;
+		std::copy(str2bin(str.begin()), str2bin(str.end()), iterOutput);
+	}
+
+	template < typename archive >
+	void SyncMatBase64(archive& ar, cv::Mat& mat) {
+		if constexpr (archive::is_saving::value) {
+			ar & mat.cols;
+			ar & mat.rows;
+			ar & mat.type();
+			if (mat.cols and mat.rows) {
+				if (mat.isContinuous()) {
+					ar & EncodeBase64(std::span(mat.datastart, mat.dataend));
+				} else {
+					std::string str;
+					str.reserve((mat.cols * mat.rows * mat.elemSize() +1 ) * 8 / 6);
+					size_t len = mat.cols*mat.elemSize();
+					for (int y {}; y < mat.rows; y++) {
+						auto const* p = mat.ptr(y);
+						str += EncodeBase64(std::span(p, len));
+					}
+					ar & str;
+				}
+			}
+		} else if constexpr (archive::is_loading::value) {
+			int rows{};
+			int cols{};
+			int type{};
+
+			ar & cols;
+			ar & rows;
+			ar & type;
+			if (!rows or !cols) {
+				return;
+			}
+			std::string str;
+			ar & str;
+			mat = cv::Mat::zeros(rows, cols, type);
+			DecodeBase64(str, mat.begin<uchar>());
+		}
+	}
+#endif
+
+	GTL__API bool IsMatEqual(cv::Mat const& a, cv::Mat const& b);
+
+
 	//-----------------------------------------------------------------------------
 	// 외곽선 글자
 	GTL__API void putTextC(cv::InputOutputArray img, std::string const& str, xPoint2i org,
@@ -183,6 +241,8 @@ namespace gtl {
 	}
 	GTL__API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Mat const& matMask);
 	GTL__API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Scalar const& crTransparent);
+	//GTL__API cv::Mat LoadImageMat(std::filesystem::path const& path);
+
 
 
 #pragma pack(push, 1)
@@ -274,12 +334,13 @@ namespace gtl {
 	/// @param palette 
 	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
 	/// @return 
-	GTL__API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false, callback_progress_t funcCallback = nullptr);
+	GTL__API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette = {}, bool bPixelIndex = false, bool bBottom2Top = false, callback_progress_t funcCallback = nullptr);
 
 	GTL__API bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, BITMAP_V5_HEADER& header);
 	GTL__API bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header);
 	GTL__API bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header);
 	GTL__API cv::Mat LoadBitmapMat(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback = nullptr);
+	GTL__API cv::Mat LoadBitmapMatPixelArray(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette, callback_progress_t funcCallback = nullptr);
 
 
 	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {
