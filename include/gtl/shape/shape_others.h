@@ -838,9 +838,7 @@ namespace gtl::shape {
 				return {};
 			}
 
-			size_t count{};
 			for (auto pos = begin; pos != end; pos++) {
-				count++;
 				xShape const& shape = *pos;
 				auto const& ptBack = pts.back();
 				if (shape.GetShapeType() == eSHAPE::line) {
@@ -860,9 +858,6 @@ namespace gtl::shape {
 						continue;
 					}
 					pts.back().Bulge() = gtl::rad_t(arc.m_angle_length)/4.;
-					//if (pts.back().Bulge() <= dThreshold*0.01) {
-					//	pts.back().Bulge() = 0.0;
-					//}
 					pts.push_back(polypoint_t(pt1));
 				}
 			}
@@ -872,7 +867,6 @@ namespace gtl::shape {
 			}
 			return rPolyline;
 		}
-
 
 	};
 

@@ -137,6 +137,9 @@
     <ClInclude Include="..\..\include\gtl\2dMatArray.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\matrix.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">

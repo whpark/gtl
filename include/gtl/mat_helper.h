@@ -241,6 +241,8 @@ namespace gtl {
 	}
 	GTL__API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Mat const& matMask);
 	GTL__API bool MatToMatTransparent(cv::Mat const& imgSource, cv::Mat& imgTarget, cv::Scalar const& crTransparent);
+	GTL__API cv::Mat LoadImageMat(std::filesystem::path const& path);
+
 
 
 #pragma pack(push, 1)

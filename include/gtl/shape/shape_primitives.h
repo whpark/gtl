@@ -66,7 +66,7 @@ namespace gtl::shape {
 
 		T& Bulge() { return base_t::w; }
 		T Bulge() const { return base_t::w; }
-		
+
 		auto operator <=> (tpolypoint_t const&) const = default;
 
 		template < typename archive >

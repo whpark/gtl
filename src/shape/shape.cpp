@@ -38,6 +38,7 @@ namespace gtl::shape {
 	#endif
 	}
 
+
 	//// from openCV
 	//bool clipLine(gtl::xSize2i size, gtl::xPoint2d& pt1, gtl::xPoint2d& pt2) {
 	//	if( size.cx <= 0 || size.cy <= 0 )
@@ -589,7 +590,7 @@ namespace gtl::shape {
 
 				try {
 					rBlock->LoadFromCADJson(item);
-				} catch (std::exception& e) {
+				} catch ([[maybe_unused]] std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -615,8 +616,7 @@ namespace gtl::shape {
 
 					try {
 						rShape->LoadFromCADJson(jEntity);
-					} catch (std::exception& e) {
-						e;
+					} catch ([[maybe_unused]] std::exception& e) {
 						DEBUG_PRINT("{}\n", e.what());
 						continue;
 					} catch (...) {
@@ -654,8 +654,7 @@ namespace gtl::shape {
 				try {
 					rShape->LoadFromCADJson(jEntity);
 					//rShape->UpdateBoundary(rectBoundary);
-				} catch (std::exception& e) {
-					e;
+				} catch ([[maybe_unused]] std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
