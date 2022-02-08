@@ -78,6 +78,7 @@ export namespace gtl::shape {
 			ar & (base_t&)var;
 		}
 	};
+
 	using polypoint_t = tpolypoint_t<double>;
 
 	inline point_t PointFrom(gtl::bjson<json_t> j) {

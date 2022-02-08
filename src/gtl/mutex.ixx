@@ -31,8 +31,8 @@ import :concepts;
 
 export namespace gtl {
 
-	class null_mutex;
-	class recursive_shared_mutex;
+	//class null_mutex;
+	//class recursive_shared_mutex;
 
 
 	//------------------------------------------------------------------------

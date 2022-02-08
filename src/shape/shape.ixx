@@ -1,5 +1,41 @@
 ﻿module;
 
+//////////////////////////////////////////////////////////////////////
+//
+// shape.h:
+//
+// PWH
+// 2017.07.20
+// 2021.05.27
+//
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+/*
+
+	1. CShapeObject 에서 변경 내용 :
+
+		class name :
+
+			CShapeObject	-> xShape
+			CShapeLine		-> xLine
+			CShapePolyLine	-> xPolyline
+			...
+
+		Container :
+
+			TList -> boost::ptr_deque
+
+		Point / Line : x, y, z 3차원으로 변경
+
+			typedef xSize3d					size2d_t;
+			typedef xPoint3d				point_t;
+			typedef xRect3d					rect_t;
+			typedef std::vector<xLine>		s_lines;
+
+*/
+///////////////////////////////////////////////////////////////////////////////
+
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -76,6 +112,7 @@ namespace gtl {
 
 
 namespace gtl::shape {
+
 
 	template <typename... T>
 	constexpr void print_local(std::wstring_view fmt, T&&... args) {
@@ -320,7 +357,7 @@ export namespace gtl::shape {
 			m_crIndex = 0;
 			m_color.cr = (int)j["color24"];
 		} else {
-			if ( (m_crIndex > 0) and (m_crIndex < colorTable_s.size()) )
+			if ( (m_crIndex > 0) and (m_crIndex < std::size(colorTable_s)) )
 				m_color = colorTable_s[m_crIndex];
 		}
 		m_bVisible = j["visible"].value_or(true);
@@ -654,8 +691,7 @@ export namespace gtl::shape {
 
 				try {
 					rBlock->LoadFromCADJson(item);
-				} catch (std::exception& e) {
-					e;
+				} catch ([[maybe_unused]] std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -681,8 +717,7 @@ export namespace gtl::shape {
 
 					try {
 						rShape->LoadFromCADJson(jEntity);
-					} catch (std::exception& e) {
-						e;
+					} catch ([[maybe_unused]] std::exception& e) {
 						DEBUG_PRINT("{}\n", e.what());
 						continue;
 					} catch (...) {
@@ -720,8 +755,7 @@ export namespace gtl::shape {
 				try {
 					rShape->LoadFromCADJson(jEntity);
 					//rShape->UpdateBoundary(rectBoundary);
-				} catch (std::exception& e) {
-					e;
+				} catch ([[maybe_unused]] std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -827,7 +861,7 @@ export namespace gtl::shape {
 						rShape->m_color = pLayer->m_color;
 					}
 					if (rShape->m_color.cr == -1) {
-						if ( (m_crIndex > 0) and (m_crIndex < colorTable_s.size()) )
+						if ( (m_crIndex > 0) and (m_crIndex < std::size(colorTable_s)) )
 							rShape->m_color = colorTable_s[m_crIndex];
 					}
 				}

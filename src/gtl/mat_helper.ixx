@@ -206,21 +206,21 @@ export namespace gtl {
 		int thickness = 1, int lineType = 8,
 		bool bottomLeftOrigin = false, bool bOutline = true)
 	{
-		xSize2i size { cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
+		xSize2i size{ cv::getTextSize(str, fontFace, fontScale, thickness, nullptr) };
 
 		if (bOutline) {
 			cv::Scalar crBkgnd;
 			crBkgnd = cv::Scalar(255, 255, 255) - color;
 			//if (crBkgnd == Scalar(0, 0, 0))
 			//	crBkgnd = Scalar(1, 1, 1);
-			int iShift = std::max(1, thickness/2);
-			cv::putText(img, str, org-size/2+xPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+xPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+xPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
-			cv::putText(img, str, org-size/2+xPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			int iShift = std::max(1, thickness / 2);
+			cv::putText(img, str, org - size / 2 + xPoint2i(0, iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org - size / 2 + xPoint2i(iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org - size / 2 + xPoint2i(-iShift, 0), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
+			cv::putText(img, str, org - size / 2 + xPoint2i(0, -iShift), fontFace, fontScale, crBkgnd, thickness, lineType, bottomLeftOrigin);
 		}
 
-		cv::putText(img, str, org-size/2, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
+		cv::putText(img, str, org - size / 2, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
 	}
 
 
@@ -902,7 +902,7 @@ export namespace gtl {
 		header.XPelsPerMeter = pelsPerMeter.cx;
 		header.YPelsPerMeter = pelsPerMeter.cy;
 
-		auto img2 = img;
+		cv::Mat img2 = img;
 		if (bBottom2Top)
 			cv::flip(img, img2, 0);
 
@@ -988,7 +988,6 @@ export namespace gtl {
 			//auto type = img.type();
 			//if ( (type != CV_8UC3) and (type != CV_8UC4) and (type != CV_8UC1) )
 			//	return false;
-			size_t s = img.elemSize();
 			if (sizeof(telement) != img.elemSize())
 				return false;
 
@@ -1425,7 +1424,7 @@ export namespace gtl {
 		return LoadBitmapHeader(f, fileHeader, header);
 	}
 
-	/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
+	/// @brief Load Image from BITMAP file. Image is COLOR or GRAY level image.
 	/// @param path 
 	/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
 	/// @param nBPP 
@@ -1581,11 +1580,14 @@ export namespace gtl {
 		palette.clear();
 		// Load Palette
 		ptrdiff_t sizePalette = fh.offsetData - sizeof(fh) - header.size;
-		for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
-			gtl::color_bgra_t color{};
-			if (!f.read((char*)&color, sizeof(color)))
-				return img;
-			palette.push_back(color);
+		if (sizePalette/4 > 0) {
+			palette.reserve(sizePalette/4);
+			for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
+				gtl::color_bgra_t color{};
+				if (!f.read((char*)&color, sizeof(color)))
+					return img;
+				palette.push_back(color);
+			}
 		}
 		if (!f.seekg(fh.offsetData))
 			return img;

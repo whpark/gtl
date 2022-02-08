@@ -1,523 +1,523 @@
-Type:LAYER - Color(00,00,00), lineType:CONTINUOUS, lineWeight:0
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LAYER - Color(ff,ff,ff), lineType:CONTINUOUS, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.004042,-0.091303,0) - pt1(0.007453,-0.088746,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.002689,-0.096351,0) - pt1(0.004042,-0.091303,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.011156,-0.102699,0) - pt1(-0.002689,-0.096351,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.021838,-0.110707,0) - pt1(-0.011156,-0.102699,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.032129,-0.118424,0) - pt1(-0.021838,-0.110707,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.042899,-0.1265,0) - pt1(-0.032129,-0.118424,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.05391,-0.134756,0) - pt1(-0.042899,-0.1265,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.064888,-0.142988,0) - pt1(-0.05391,-0.134756,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.076438,-0.151647,0) - pt1(-0.064888,-0.142988,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.085502,-0.158444,0) - pt1(-0.076438,-0.151647,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.093041,-0.164098,0) - pt1(-0.085502,-0.158444,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.096871,-0.166969,0) - pt1(-0.093041,-0.164098,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.0877,-0.158443,0) - pt1(-0.088164,-0.159741,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.090123,-0.161099,0) - pt1(-0.088164,-0.159741,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.0877,-0.158443,0) - pt1(-0.079942,-0.16996,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.090123,-0.161099,0) - pt1(-0.090789,-0.162467,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.091168,-0.160927,0) - pt1(-0.090123,-0.161099,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.090866,-0.159382,0) - pt1(-0.091168,-0.160927,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.090123,-0.161099,0) - pt1(-0.090866,-0.159382,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.080451,-0.171349,0) - pt1(-0.079942,-0.16996,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.088164,-0.159741,0) - pt1(-0.080451,-0.171349,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089492,-0.158529,0) - pt1(-0.088164,-0.159741,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.0877,-0.158443,0) - pt1(-0.089492,-0.158529,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.082569,-0.172686,0) - pt1(-0.084111,-0.17261,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.082854,-0.17362,0) - pt1(-0.082569,-0.172686,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081266,-0.173604,0) - pt1(-0.082854,-0.17362,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.082569,-0.172686,0) - pt1(-0.081266,-0.173604,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.080451,-0.171349,0) - pt1(-0.082569,-0.172686,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.080184,-0.173003,0) - pt1(-0.080451,-0.171349,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.079721,-0.171706,0) - pt1(-0.080184,-0.173003,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.080451,-0.171349,0) - pt1(-0.079721,-0.171706,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.082569,-0.172686,0) - pt1(-0.080451,-0.171349,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.090123,-0.161099,0) - pt1(-0.082569,-0.172686,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.079721,-0.171706,0) - pt1(-0.079942,-0.16996,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.080184,-0.173003,0) - pt1(-0.079721,-0.171706,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081266,-0.173604,0) - pt1(-0.080184,-0.173003,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.082854,-0.17362,0) - pt1(-0.081266,-0.173604,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.084111,-0.17261,0) - pt1(-0.082854,-0.17362,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.090789,-0.162467,0) - pt1(-0.084111,-0.17261,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.091168,-0.160927,0) - pt1(-0.090789,-0.162467,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.090866,-0.159382,0) - pt1(-0.091168,-0.160927,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089492,-0.158529,0) - pt1(-0.090866,-0.159382,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.0877,-0.158443,0) - pt1(-0.089492,-0.158529,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001362,-0.091189,0) - pt1(0.000899,-0.092487,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.00106,-0.093844,0) - pt1(0.000899,-0.092487,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001362,-0.091189,0) - pt1(0.00912,-0.102707,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.00106,-0.093844,0) - pt1(-0.001727,-0.095211,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.002105,-0.093672,0) - pt1(-0.00106,-0.093844,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.001803,-0.092126,0) - pt1(-0.002105,-0.093672,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.00106,-0.093844,0) - pt1(-0.001803,-0.092126,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008612,-0.104095,0) - pt1(0.00912,-0.102707,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.000899,-0.092487,0) - pt1(0.008612,-0.104095,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.000428,-0.091274,0) - pt1(0.000899,-0.092487,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001362,-0.091189,0) - pt1(-0.000428,-0.091274,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.006495,-0.105431,0) - pt1(0.004952,-0.105356,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.006208,-0.106364,0) - pt1(0.006495,-0.105431,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.007796,-0.106349,0) - pt1(0.006208,-0.106364,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.006495,-0.105431,0) - pt1(0.007796,-0.106349,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008612,-0.104095,0) - pt1(0.006495,-0.105431,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008879,-0.105748,0) - pt1(0.008612,-0.104095,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.009342,-0.10445,0) - pt1(0.008879,-0.105748,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008612,-0.104095,0) - pt1(0.009342,-0.10445,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.006495,-0.105431,0) - pt1(0.008612,-0.104095,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.00106,-0.093844,0) - pt1(0.006495,-0.105431,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.009342,-0.10445,0) - pt1(0.00912,-0.102707,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008879,-0.105748,0) - pt1(0.009342,-0.10445,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.007796,-0.106349,0) - pt1(0.008879,-0.105748,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.006208,-0.106364,0) - pt1(0.007796,-0.106349,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.004952,-0.105356,0) - pt1(0.006208,-0.106364,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.001727,-0.095211,0) - pt1(0.004952,-0.105356,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.002105,-0.093672,0) - pt1(-0.001727,-0.095211,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.001803,-0.092126,0) - pt1(-0.002105,-0.093672,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.000428,-0.091274,0) - pt1(-0.001803,-0.092126,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001362,-0.091189,0) - pt1(-0.000428,-0.091274,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.011409,-0.102736,0) - pt1(0.01482,-0.100179,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.004678,-0.107783,0) - pt1(0.011409,-0.102736,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.003789,-0.114132,0) - pt1(0.004678,-0.107783,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.014469,-0.12214,0) - pt1(-0.003789,-0.114132,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.024762,-0.129857,0) - pt1(-0.014469,-0.12214,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.035532,-0.137933,0) - pt1(-0.024762,-0.129857,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.046541,-0.146189,0) - pt1(-0.035532,-0.137933,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.057521,-0.154422,0) - pt1(-0.046541,-0.146189,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.069069,-0.16308,0) - pt1(-0.057521,-0.154422,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.078135,-0.169877,0) - pt1(-0.069069,-0.16308,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.085674,-0.175531,0) - pt1(-0.078135,-0.169877,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089503,-0.178402,0) - pt1(-0.085674,-0.175531,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001416,-0.110228,0) - pt1(0.000781,-0.093749,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.016452,-0.106669,0) - pt1(0.001416,-0.110228,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.019645,-0.126021,0) - pt1(-0.016452,-0.106669,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.037035,-0.122103,0) - pt1(-0.019645,-0.126021,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.041186,-0.142173,0) - pt1(-0.037035,-0.122103,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.059055,-0.138615,0) - pt1(-0.041186,-0.142173,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.063205,-0.158683,0) - pt1(-0.059055,-0.138615,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081553,-0.155484,0) - pt1(-0.063205,-0.158683,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081875,-0.172682,0) - pt1(-0.081553,-0.155484,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089242,-0.161249,0) - pt1(-0.081875,-0.172682,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.074186,-0.166916,0) - pt1(-0.089242,-0.161249,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.070574,-0.14725,0) - pt1(-0.074186,-0.166916,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.051688,-0.150048,0) - pt1(-0.070574,-0.14725,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.048554,-0.13074,0) - pt1(-0.051688,-0.150048,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.029668,-0.133536,0) - pt1(-0.048554,-0.13074,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.027012,-0.114588,0) - pt1(-0.029668,-0.133536,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.009085,-0.118102,0) - pt1(-0.027012,-0.114588,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.005951,-0.098795,0) - pt1(-0.009085,-0.118102,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008149,-0.105182,0) - pt1(-0.005951,-0.098795,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.000781,-0.093749,0) - pt1(0.008149,-0.105182,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.004042,-0.091303,0) - pt1(0.003952,-0.09137,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.002689,-0.096351,0) - pt1(-0.00266,-0.096328,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.011156,-0.102699,0) - pt1(-0.011186,-0.102721,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.021838,-0.110707,0) - pt1(-0.021867,-0.11073,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.032129,-0.118424,0) - pt1(-0.032129,-0.118424,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.042899,-0.1265,0) - pt1(-0.042929,-0.126523,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.05391,-0.134756,0) - pt1(-0.053969,-0.134801,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.064888,-0.142988,0) - pt1(-0.064919,-0.14301,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.076438,-0.151647,0) - pt1(-0.076438,-0.151647,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.085502,-0.158444,0) - pt1(-0.085533,-0.158467,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.093041,-0.164098,0) - pt1(-0.093012,-0.164076,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089242,-0.161249,0) - pt1(-0.089242,-0.161249,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081553,-0.155484,0) - pt1(-0.081553,-0.155484,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.070574,-0.14725,0) - pt1(-0.070603,-0.147273,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.059055,-0.138615,0) - pt1(-0.059115,-0.138659,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.048554,-0.13074,0) - pt1(-0.048554,-0.13074,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.037035,-0.122103,0) - pt1(-0.037095,-0.122148,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.027012,-0.114588,0) - pt1(-0.027043,-0.114611,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.016452,-0.106669,0) - pt1(-0.016482,-0.106692,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.005951,-0.098795,0) - pt1(-0.00592,-0.098773,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.000781,-0.093749,0) - pt1(0.000721,-0.093794,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.093041,-0.164098,0) - pt1(-0.096931,-0.167014,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089242,-0.161249,0) - pt1(-0.093041,-0.164098,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.085502,-0.158444,0) - pt1(-0.089242,-0.161249,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081553,-0.155484,0) - pt1(-0.085502,-0.158444,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.076438,-0.151647,0) - pt1(-0.081553,-0.155484,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.070603,-0.147273,0) - pt1(-0.076438,-0.151647,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.064888,-0.142988,0) - pt1(-0.070603,-0.147273,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.059115,-0.138659,0) - pt1(-0.064888,-0.142988,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.05391,-0.134756,0) - pt1(-0.059115,-0.138659,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.048554,-0.13074,0) - pt1(-0.05391,-0.134756,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.042899,-0.1265,0) - pt1(-0.048554,-0.13074,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.037095,-0.122148,0) - pt1(-0.042899,-0.1265,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.032129,-0.118424,0) - pt1(-0.037095,-0.122148,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.027043,-0.114611,0) - pt1(-0.032129,-0.118424,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.021838,-0.110707,0) - pt1(-0.027043,-0.114611,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.016482,-0.106692,0) - pt1(-0.021838,-0.110707,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.011156,-0.102699,0) - pt1(-0.016482,-0.106692,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.00592,-0.098773,0) - pt1(-0.011156,-0.102699,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.002689,-0.096351,0) - pt1(-0.00592,-0.098773,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.000721,-0.093794,0) - pt1(-0.002689,-0.096351,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.004042,-0.091303,0) - pt1(0.000721,-0.093794,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.007512,-0.088701,0) - pt1(0.004042,-0.091303,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.007453,-0.088746,0) - pt1(0.007512,-0.088701,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.003952,-0.09137,0) - pt1(0.007512,-0.088701,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.000721,-0.093794,0) - pt1(0.003952,-0.09137,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.00266,-0.096328,0) - pt1(0.000721,-0.093794,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.00592,-0.098773,0) - pt1(-0.00266,-0.096328,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.011186,-0.102721,0) - pt1(-0.00592,-0.098773,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.016482,-0.106692,0) - pt1(-0.011186,-0.102721,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.021867,-0.11073,0) - pt1(-0.016482,-0.106692,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.027043,-0.114611,0) - pt1(-0.021867,-0.11073,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.032129,-0.118424,0) - pt1(-0.027043,-0.114611,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.037095,-0.122148,0) - pt1(-0.032129,-0.118424,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.042929,-0.126523,0) - pt1(-0.037095,-0.122148,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.048554,-0.13074,0) - pt1(-0.042929,-0.126523,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.053969,-0.134801,0) - pt1(-0.048554,-0.13074,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.059115,-0.138659,0) - pt1(-0.053969,-0.134801,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.064919,-0.14301,0) - pt1(-0.059115,-0.138659,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.070603,-0.147273,0) - pt1(-0.064919,-0.14301,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.076438,-0.151647,0) - pt1(-0.070603,-0.147273,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081553,-0.155484,0) - pt1(-0.076438,-0.151647,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.085533,-0.158467,0) - pt1(-0.081553,-0.155484,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089242,-0.161249,0) - pt1(-0.085533,-0.158467,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.093012,-0.164076,0) - pt1(-0.089242,-0.161249,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.096931,-0.167014,0) - pt1(-0.093012,-0.164076,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.096871,-0.166969,0) - pt1(-0.096931,-0.167014,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089242,-0.161249,0) - pt1(-0.096871,-0.166969,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081553,-0.155484,0) - pt1(-0.089242,-0.161249,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.070574,-0.14725,0) - pt1(-0.081553,-0.155484,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.059055,-0.138615,0) - pt1(-0.070574,-0.14725,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.048554,-0.13074,0) - pt1(-0.059055,-0.138615,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.037035,-0.122103,0) - pt1(-0.048554,-0.13074,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.027012,-0.114588,0) - pt1(-0.037035,-0.122103,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.016452,-0.106669,0) - pt1(-0.027012,-0.114588,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.005951,-0.098795,0) - pt1(-0.016452,-0.106669,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.000781,-0.093749,0) - pt1(-0.005951,-0.098795,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.007453,-0.088746,0) - pt1(0.000781,-0.093749,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.011409,-0.102736,0) - pt1(0.011319,-0.102803,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.004678,-0.107783,0) - pt1(0.004709,-0.107761,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.003789,-0.114132,0) - pt1(-0.003819,-0.114154,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.014469,-0.12214,0) - pt1(-0.014499,-0.122163,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.024762,-0.129857,0) - pt1(-0.024762,-0.129857,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.035532,-0.137933,0) - pt1(-0.035561,-0.137956,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.046541,-0.146189,0) - pt1(-0.046602,-0.146234,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.057521,-0.154422,0) - pt1(-0.057552,-0.154445,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.069069,-0.16308,0) - pt1(-0.069069,-0.16308,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.078135,-0.169877,0) - pt1(-0.078164,-0.1699,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.085674,-0.175531,0) - pt1(-0.085644,-0.175509,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081875,-0.172682,0) - pt1(-0.081875,-0.172682,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.074186,-0.166916,0) - pt1(-0.074186,-0.166916,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.063205,-0.158683,0) - pt1(-0.063236,-0.158706,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.051688,-0.150048,0) - pt1(-0.051747,-0.150092,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.041186,-0.142173,0) - pt1(-0.041186,-0.142173,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.029668,-0.133536,0) - pt1(-0.029728,-0.133581,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.019645,-0.126021,0) - pt1(-0.019675,-0.126044,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.009085,-0.118102,0) - pt1(-0.009114,-0.118125,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001416,-0.110228,0) - pt1(0.001447,-0.110206,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008149,-0.105182,0) - pt1(0.008089,-0.105227,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.085674,-0.175531,0) - pt1(-0.089563,-0.178447,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081875,-0.172682,0) - pt1(-0.085674,-0.175531,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.078135,-0.169877,0) - pt1(-0.081875,-0.172682,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.074186,-0.166916,0) - pt1(-0.078135,-0.169877,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.069069,-0.16308,0) - pt1(-0.074186,-0.166916,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.063236,-0.158706,0) - pt1(-0.069069,-0.16308,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.057521,-0.154422,0) - pt1(-0.063236,-0.158706,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.051747,-0.150092,0) - pt1(-0.057521,-0.154422,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.046541,-0.146189,0) - pt1(-0.051747,-0.150092,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.041186,-0.142173,0) - pt1(-0.046541,-0.146189,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.035532,-0.137933,0) - pt1(-0.041186,-0.142173,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.029728,-0.133581,0) - pt1(-0.035532,-0.137933,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.024762,-0.129857,0) - pt1(-0.029728,-0.133581,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.019675,-0.126044,0) - pt1(-0.024762,-0.129857,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.014469,-0.12214,0) - pt1(-0.019675,-0.126044,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.009114,-0.118125,0) - pt1(-0.014469,-0.12214,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.003789,-0.114132,0) - pt1(-0.009114,-0.118125,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001447,-0.110206,0) - pt1(-0.003789,-0.114132,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.004678,-0.107783,0) - pt1(0.001447,-0.110206,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008089,-0.105227,0) - pt1(0.004678,-0.107783,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.011409,-0.102736,0) - pt1(0.008089,-0.105227,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.01488,-0.100134,0) - pt1(0.011409,-0.102736,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.01482,-0.100179,0) - pt1(0.01488,-0.100134,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.011319,-0.102803,0) - pt1(0.01488,-0.100134,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008089,-0.105227,0) - pt1(0.011319,-0.102803,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.004709,-0.107761,0) - pt1(0.008089,-0.105227,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001447,-0.110206,0) - pt1(0.004709,-0.107761,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.003819,-0.114154,0) - pt1(0.001447,-0.110206,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.009114,-0.118125,0) - pt1(-0.003819,-0.114154,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.014499,-0.122163,0) - pt1(-0.009114,-0.118125,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.019675,-0.126044,0) - pt1(-0.014499,-0.122163,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.024762,-0.129857,0) - pt1(-0.019675,-0.126044,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.029728,-0.133581,0) - pt1(-0.024762,-0.129857,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.035561,-0.137956,0) - pt1(-0.029728,-0.133581,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.041186,-0.142173,0) - pt1(-0.035561,-0.137956,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.046602,-0.146234,0) - pt1(-0.041186,-0.142173,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.051747,-0.150092,0) - pt1(-0.046602,-0.146234,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.057552,-0.154445,0) - pt1(-0.051747,-0.150092,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.063236,-0.158706,0) - pt1(-0.057552,-0.154445,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.069069,-0.16308,0) - pt1(-0.063236,-0.158706,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.074186,-0.166916,0) - pt1(-0.069069,-0.16308,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081875,-0.172682,0) - pt1(-0.074186,-0.166916,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.085644,-0.175509,0) - pt1(-0.081875,-0.172682,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089563,-0.178447,0) - pt1(-0.085644,-0.175509,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.089503,-0.178402,0) - pt1(-0.089563,-0.178447,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.081875,-0.172682,0) - pt1(-0.089503,-0.178402,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.074186,-0.166916,0) - pt1(-0.081875,-0.172682,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.063205,-0.158683,0) - pt1(-0.074186,-0.166916,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.051688,-0.150048,0) - pt1(-0.063205,-0.158683,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.041186,-0.142173,0) - pt1(-0.051688,-0.150048,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.029668,-0.133536,0) - pt1(-0.041186,-0.142173,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.019645,-0.126021,0) - pt1(-0.029668,-0.133536,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(-0.009085,-0.118102,0) - pt1(-0.019645,-0.126021,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.001416,-0.110228,0) - pt1(-0.009085,-0.118102,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.008149,-0.105182,0) - pt1(0.001416,-0.110228,0)
-Type:LINE - Color(00,00,00), lineType:ByLayer, lineWeight:0
+Type:LINE - Color(ff,ff,ff), lineType:ByLayer, lineWeight:0
 	pt0(0.01482,-0.100179,0) - pt1(0.008149,-0.105182,0)

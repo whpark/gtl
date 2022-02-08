@@ -139,7 +139,7 @@ export namespace gtl {
 	template < class CLogWriter >
 	class ILog {
 	protected:
-		mutable CLogWriter* m_pLog = nullptr;
+		mutable CLogWriter* m_pLog {};
 	public:
 		ILog(CLogWriter* pLog = nullptr) : m_pLog(pLog) {}
 
