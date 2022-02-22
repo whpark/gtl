@@ -242,12 +242,22 @@ namespace gtl {
 		/// @brief *this including B
 		/// @return 
 		bool RectInRect(this_t const& B) const {
-			return (pt0() <= B.pt0()) and (B.pt1() <= pt1());
+			for (size_t i{}; i < dim; i++) {
+				if (B.pt0().member(i) < this->pt0().member(i))
+					return false;
+				if (B.pt1().member(i) > this->pt1().member(i))
+					return false;
+			}
 		}
 		/// @brief *this including B (No boundary)
 		/// @return 
 		bool RectInRectNE(this_t const& B) const {
-			return (pt0() < B.pt0()) and (B.pt1() < pt1());
+			for (size_t i{}; i < dim; i++) {
+				if (B.pt0().member(i) <= this->pt0().member(i))
+					return false;
+				if (B.pt1().member(i) >= this->pt1().member(i))
+					return false;
+			}
 		}
 
 		// Operations
