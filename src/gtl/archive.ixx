@@ -322,7 +322,7 @@ export namespace gtl {
 			} else if constexpr (bLOAD) {
 				return *this >> v;
 			} else {
-				static_assert(gtlc::dependenct_false_v, "no way");
+				static_assert(gtlc::dependent_false_v, "no way");
 				return *this;
 			}
 		};

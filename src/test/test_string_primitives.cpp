@@ -92,7 +92,7 @@ using namespace gtl;
 //			static_assert(true);
 //		}
 //		else {
-//			static_assert(gtlc::dependent_false_v);
+//			static_assert(false);
 //		}
 //	}
 //

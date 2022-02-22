@@ -24,6 +24,7 @@ module;
 
 export module gtl:string_to_arithmetic;
 import :concepts;
+import :string_misc;
 
 export namespace gtl {
 

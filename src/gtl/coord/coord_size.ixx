@@ -112,7 +112,7 @@ export namespace gtl {
 			} else if constexpr (gtlc::wnd_rect<T_COORD>) {
 				this->cx = B.right - B.left;
 				this->cy = B.bottom - B.top;
-			} else static_assert(gtlc::dependenct_false_v);
+			} else static_assert(gtlc::dependent_false_v);
 			return *this;
 		};
 

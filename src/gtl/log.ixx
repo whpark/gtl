@@ -231,7 +231,7 @@ export namespace gtl {
 				m_file.seekp(0, m_file.end);
 
 			} else {
-				throw std::runtime_error(fmt::format(GTL__FUNCSIG "Cannot make LOG File {}", path.string()));
+				throw std::runtime_error(fmt::format("{}Cannot make LOG File {}", GTL__FUNCSIG, path.string()));
 			}
 
 		}
