@@ -208,7 +208,7 @@ namespace gtl {
 					break;
 				}
 			} else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 
 			time_t t = std::chrono::system_clock::to_time_t(now);
@@ -233,7 +233,7 @@ namespace gtl {
 			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
 				m_ar->WriteString(TEXT_U(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
 			} else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 #undef GTL__FMT_EXPAND
 			const tchar_t* posHead = svText.data();

@@ -24,6 +24,8 @@ namespace gtl {
 
 namespace gtl::concepts {
 
+	template<typename> inline constexpr bool dependent_false_v = false;
+
 	/// @brief arithmetic type
 	template < typename T >
 	concept arithmetic = std::is_arithmetic_v<T>;

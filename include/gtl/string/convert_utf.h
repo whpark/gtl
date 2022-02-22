@@ -138,7 +138,7 @@ namespace gtl {
 					}
 				}
 				else {
-					static_assert(false);
+					static_assert(gtlc::dependent_false_v);
 				}
 				pos += 4;
 			}
@@ -218,7 +218,7 @@ namespace gtl {
 					}
 				}
 				else {
-					static_assert(false);
+					static_assert(gtlc::dependent_false_v);
 				}
 				pos += 1;
 				return true;
@@ -256,7 +256,7 @@ namespace gtl {
 					}
 				}
 				else {
-					static_assert(false);
+					static_assert(gtlc::dependent_false_v);
 				}
 				pos += 2;
 			}
@@ -417,7 +417,7 @@ namespace gtl {
 				return UTFCharConverter_FromUTF32<tchar_to, tchar_from, bAddChar, bCheckError, bThrow, treturn>(pos, end, r);
 			}
 			else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 
 			return true;
