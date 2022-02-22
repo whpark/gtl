@@ -321,7 +321,7 @@ export namespace gtl {
 				return (std::wstring&)ToStringU32<bCOUNT_FIRST>(s, codepage);
 			}
 			else {
-				static_assert(false, "no way!");
+				static_assert(gtlc::dependent_false_v, "no way!");
 			}
 		};
 	}
@@ -593,7 +593,7 @@ export namespace gtl {
 			return ToUTFString<tchar_to, tchar_from, bCOUNT_FIRST>(svFrom, codepage);
 		}
 		else {
-			static_assert(false);
+			static_assert(gtlc::dependent_false_v);
 		}
 	}
 

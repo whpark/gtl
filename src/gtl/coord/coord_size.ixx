@@ -112,7 +112,7 @@ export namespace gtl {
 			} else if constexpr (gtlc::wnd_rect<T_COORD>) {
 				this->cx = B.right - B.left;
 				this->cy = B.bottom - B.top;
-			} else static_assert(false);
+			} else static_assert(gtlc::dependenct_false_v);
 			return *this;
 		};
 
@@ -155,7 +155,7 @@ export namespace gtl {
 				return GTL__TYPE_CAST_COORD_VAL2(x, y);
 			}
 			else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 
 		#undef GTL__TYPE_CAST_COORD_VAL2
@@ -193,7 +193,7 @@ export namespace gtl {
 				this->cy += RoundOrForward<T>(B.cy);
 				if constexpr ((dim >= 3) and gtlc::has__cz<T_COORD>)
 					this->cz += RoundOrForward<T>(B.cz);
-			} else static_assert(false);
+			} else static_assert(gtlc::dependent_false_v);
 			return *this;
 		};
 		template < gtlc::generic_coord T_COORD > this_t& operator -= (T_COORD const& B) {
@@ -214,7 +214,7 @@ export namespace gtl {
 				this->cy -= RoundOrForward<T>(B.cy);
 				if constexpr ((dim >= 3) and gtlc::has__cz<T_COORD>)
 					this->cz -= RoundOrForward<T>(B.cz);
-			} else static_assert(false);
+			} else static_assert(gtlc::dependent_false_v);
 			return *this;
 		};
 
@@ -249,7 +249,7 @@ export namespace gtl {
 			} else if constexpr (std::is_same_v<T, double>) {
 				SetAll(std::nan(""));
 			} else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 		}
 

@@ -136,7 +136,7 @@ export namespace gtl {
 					//z = {};
 				} else if constexpr (gtlc::has__xy<T_COORD>) { // 삭제금지!. static_assert 걸러내기 위해서 첫 번째 if 절 다시 추가.
 				} else {
-					static_assert(false);
+					static_assert(gtlc::dependent_false_v);
 				}
 			}
 			return *this;

@@ -140,7 +140,7 @@ export namespace gtl {
 					}
 				}
 				else {
-					static_assert(false);
+					static_assert(gtlc::dependent_false_v);
 				}
 				pos += 4;
 			}
@@ -220,7 +220,7 @@ export namespace gtl {
 					}
 				}
 				else {
-					static_assert(false);
+					static_assert(gtlc::dependent_false_v);
 				}
 				pos += 1;
 				return true;
@@ -258,7 +258,7 @@ export namespace gtl {
 					}
 				}
 				else {
-					static_assert(false);
+					static_assert(gtlc::dependent_false_v);
 				}
 				pos += 2;
 			}
@@ -419,7 +419,7 @@ export namespace gtl {
 				return UTFCharConverter_FromUTF32<tchar_to, tchar_from, bAddChar, bCheckError, bThrow, treturn>(pos, end, r);
 			}
 			else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 
 			return true;

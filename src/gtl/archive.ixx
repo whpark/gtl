@@ -137,7 +137,7 @@ export namespace gtl {
 						this->Write(std::data(v), sizeof(v));
 					}
 					else {
-						static_assert(false, "Object Type cannot be Serialized directly.");
+						static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
 					}
 				}
 				else if constexpr (std::is_integral_v<TYPE>) {
@@ -147,7 +147,7 @@ export namespace gtl {
 					this->Write(&v, sizeof(v));
 				}
 				else {
-					static_assert(false, "Object Type cannot be Serialized directly.");
+					static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
 				}
 			} else {
 				Write(&v, sizeof(v));
@@ -187,7 +187,7 @@ export namespace gtl {
 						return this->Read(std::data(v), sizeof(v));
 					}
 					else {
-						static_assert(false, "Object Type cannot be Serialized directly.");
+						static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
 					}
 				}
 				else if constexpr (std::is_integral_v<TYPE>) {
@@ -197,7 +197,7 @@ export namespace gtl {
 					return this->Read(&v, sizeof(v));
 				}
 				else {
-					static_assert(false, "Object Type cannot be Serialized directly.");
+					static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
 				}
 			} else {
 				return Read(&v, sizeof(v));
@@ -322,7 +322,7 @@ export namespace gtl {
 			} else if constexpr (bLOAD) {
 				return *this >> v;
 			} else {
-				static_assert(false, "no way");
+				static_assert(gtlc::dependenct_false_v, "no way");
 				return *this;
 			}
 		};
@@ -752,7 +752,7 @@ export namespace gtl {
 		//					*this >> a;
 		//					container.insert(std::move(a));
 		//				} else {
-		//					static_assert(false, "CONTAINER must have push_back or insert ...");
+		//					static_assert(gtlc::dependent_false_v, "CONTAINER must have push_back or insert ...");
 		//				}
 		//			}
 		//		}
@@ -780,7 +780,7 @@ export namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return LoadContainer(data);
 		//	} else {
-		//		//static_assert(false, "what???");
+		//		//static_assert(gtlc::dependent_false_v, "what???");
 		//		return *this;
 		//	}
 		//};
@@ -836,7 +836,7 @@ export namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return *this >> ptr;
 		//	} else {
-		//		//static_assert(false, "what???");
+		//		//static_assert(gtlc::dependent_false_v, "what???");
 		//		return *this;
 		//	}
 		//}
@@ -915,7 +915,7 @@ export namespace gtl {
 		//		ar & (std::uint8_t)0xff;
 		//		ar & (std::uint16_t)0xfffd;
 		//	} else {
-		//		static_assert(false, "only MBCS, UNICODE(little endian), UTF-8 types are supported.");
+		//		static_assert(gtlc::dependent_false_v, "only MBCS, UNICODE(little endian), UTF-8 types are supported.");
 		//		return ar;
 		//	}
 
@@ -1044,7 +1044,7 @@ export namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return *this >> str;
 		//	} else {
-		//		//static_assert(false, "what???");
+		//		//static_assert(gtlc::dependent_false_v, "what???");
 		//		return *this;
 		//	}
 		//}

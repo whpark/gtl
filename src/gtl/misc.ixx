@@ -260,7 +260,7 @@ export namespace gtl {
 		} else if constexpr (sizeof(v) == sizeof(std::uint64_t)) {
 			return _byteswap_uint64(v);
 		} else {
-			static_assert(false, "not supported data type.");
+			static_assert(gtlc::dependent_false_v, "not supported data type.");
 		}
 	}
 	template < std::integral type >
@@ -470,7 +470,7 @@ export namespace gtl {
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
 				Lap(L"end");
 			} else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 			os.flush();
 			depth--;
@@ -500,7 +500,7 @@ export namespace gtl {
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
 				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
 			} else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 		#undef GTL__PRINT_FMT_STOPWATCH
 
@@ -518,7 +518,7 @@ export namespace gtl {
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
 				os << std::format(L"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
 			} else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 		#undef GTL__PRINT_FMT_STOPWATCH
 			//os << (tchar)'\n';

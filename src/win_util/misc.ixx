@@ -59,7 +59,7 @@ export namespace gtl::win_util {
 			} else if constexpr (gtlc::is_one_of<tchar, char, char8_t>) {
 				OutputDebugStringA((char const*)str.c_str());
 			} else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 		}
 		virtual base_t::int_type overflow(base_t::int_type c) override {

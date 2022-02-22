@@ -156,7 +156,7 @@ export namespace gtl {
 		else if constexpr (std::is_same_v<tchar, char32_t>) { return TEXT_U(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, wchar_t>) { return TEXT_W(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, charKSSM_t>) { return (charKSSM_t*)TEXT_u(SPACE_STRING); }
-		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
+		else { static_assert(gtlc::dependent_false_v, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
 
 
@@ -662,7 +662,7 @@ export namespace gtl {
 			}
 #endif
 			else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 
 			pos = pHexEnd-1;
