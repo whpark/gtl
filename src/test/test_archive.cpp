@@ -120,7 +120,8 @@ TEST(gtl_archive, ReadLine) {
 		};
 
 		for (auto const& [eCodepage, na] : tbl) {
-			std::ofstream stream(fmt::format(uR"x(.\stream_test\cp{}.txt)x", eCodepage));
+			std::filesystem::path path = fmt::format(uR"x(.\stream_test\cp{}.txt)x", eCodepage);
+			std::ofstream stream(path);
 			for (unsigned char c = 0x80; c >= 0x80; c++) {
 				if (c > 0x80 and !(c & 0x0f))
 					stream.write("\n", 1);
