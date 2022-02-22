@@ -46,6 +46,17 @@ namespace gtl {
 #pragma pack(push, 8)
 
 
+	/// @brief ToLower, ToUpper (locale irrelavant)
+	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeLower(tchar& c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeUpper(tchar& c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] std::basic_string<tchar> ToLower(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] std::basic_string<tchar> ToUpper(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeLower(std::basic_string<tchar>& str);
+	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeUpper(std::basic_string<tchar>& str);
+
+
 	/// @brief  tszlen (string length). you cannot input string literal. you don't need tszlen("testlen");. ==> just call "testlen"sv.size();
 	/// @param psz : null terminating char_t* var. (no string literals)
 	/// @return string length

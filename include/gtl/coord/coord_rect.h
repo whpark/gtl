@@ -248,6 +248,7 @@ namespace gtl {
 				if (B.pt1().member(i) > this->pt1().member(i))
 					return false;
 			}
+			return true;
 		}
 		/// @brief *this including B (No boundary)
 		/// @return 
@@ -258,6 +259,7 @@ namespace gtl {
 				if (B.pt1().member(i) >= this->pt1().member(i))
 					return false;
 			}
+			return true;
 		}
 
 		// Operations
