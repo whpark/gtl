@@ -587,16 +587,16 @@ export namespace gtl {
 										inline void WriteLine(std::u16string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(sv); }
 										inline void WriteLine(std::u32string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(sv); }
 										inline void WriteLine(std::wstring_view sv)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t> (sv); }
-		template < typename ... Args >  inline void WriteString(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteLine(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteString(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteLine(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(std::format(sv, std::forward<Args>(args) ...)); }
 
 
 		//---------------------------------------------------------------------
