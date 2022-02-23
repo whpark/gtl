@@ -283,7 +283,6 @@ namespace gtl {
 		return false;
 	}
 
-
 	namespace internal {
 
 		template < bool bNoPaletteLookup, bool bBytePacking, typename telement = uint8, bool bLoopUnrolling = true, bool bMultiThreaded = true >

@@ -70,7 +70,7 @@ namespace gtl::old_format {
 		} else if constexpr (std::is_same_v<tchar, wchar_t>) {
 			return GetDefaultFormatSpecifierW<T_NUMBER>();
 		} else {
-			static_assert(false, "char or wchar_t only.");
+			static_assert(gtlc::dependent_false_v, "char or wchar_t only.");
 		}
 	}
 

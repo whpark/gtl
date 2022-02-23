@@ -34,15 +34,7 @@ namespace gtl {
 	constexpr inline [[nodiscard]] std::basic_string_view<wchar_t>  GetSpaceStringW()	{ return GetSpaceString<wchar_t>(); }
 
 
-	/// @brief ToLower, ToUpper, ToDigit, IsSpace ... (locale irrelavant)
-	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeLower(tchar& c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeUpper(tchar& c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] std::basic_string<tchar> ToLower(std::basic_string_view<tchar> sv);
-	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] std::basic_string<tchar> ToUpper(std::basic_string_view<tchar> sv);
-	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeLower(std::basic_string<tchar>& str);
-	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeUpper(std::basic_string<tchar>& str);
+	/// @brief ToDigit, IsSpace ... (locale irrelavant)
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c/* Locale Irrelavant */);
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c/* Locale Irrelavant */);

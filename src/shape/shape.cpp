@@ -589,7 +589,7 @@ namespace gtl::shape {
 
 				try {
 					rBlock->LoadFromCADJson(item);
-				} catch (std::exception& e) {
+				} catch ([[maybe_unused]] std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {
@@ -615,8 +615,7 @@ namespace gtl::shape {
 
 					try {
 						rShape->LoadFromCADJson(jEntity);
-					} catch (std::exception& e) {
-						e;
+					} catch ([[maybe_unused]] std::exception& e) {
 						DEBUG_PRINT("{}\n", e.what());
 						continue;
 					} catch (...) {
@@ -654,8 +653,7 @@ namespace gtl::shape {
 				try {
 					rShape->LoadFromCADJson(jEntity);
 					//rShape->UpdateBoundary(rectBoundary);
-				} catch (std::exception& e) {
-					e;
+				} catch ([[maybe_unused]] std::exception& e) {
 					DEBUG_PRINT("{}\n", e.what());
 					continue;
 				} catch (...) {

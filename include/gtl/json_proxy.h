@@ -188,7 +188,7 @@ namespace gtl {
 				return j_.is_double() ? j_.as_double() : j_.is_int64() ? (double)j_.as_int64() : default_value;
 			}
 			else {
-				static_assert(false);
+				static_assert(gtlc::dependent_false_v);
 			}
 		}
 
