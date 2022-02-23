@@ -60,7 +60,7 @@
     <ClInclude Include="pch.h">
       <Filter>[ MFC Framework ]</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="resource.h">
       <Filter>[ MFC Framework ]</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\win_util\win_util.h">
