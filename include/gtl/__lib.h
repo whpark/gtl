@@ -48,6 +48,7 @@
 #define _MSC_VER_VS2015		1900
 #define _MSC_VER_VS2017		1910
 #define _MSC_VER_VS2019		1920
+#define _MSC_VER_VS2022		1930
 
 
 //-----------------------------------------------------------------------------
@@ -87,7 +88,9 @@
 
 //-----------------------------------------------------------------------------
 // library name
-#if (_MSC_VER >= _MSC_VER_VS2019)
+#if (_MSC_VER >= _MSC_VER_VS2022)
+#	define GTL__PLATFORM_TOOLSET_VER_ "v143"
+#elif (_MSC_VER >= _MSC_VER_VS2019)
 #	define GTL__PLATFORM_TOOLSET_VER_ "v142"
 #elif (_MSC_VER >= _MSC_VER_VS2017)
 #	define GTL__PLATFORM_TOOLSET_VER_ "v141"
