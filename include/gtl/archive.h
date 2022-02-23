@@ -126,7 +126,7 @@ namespace gtl {
 						this->Write(std::data(v), sizeof(v));
 					}
 					else {
-						static_assert(false, "Object Type cannot be Serialized directly.");
+						static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
 					}
 				}
 				else if constexpr (std::is_integral_v<TYPE>) {
@@ -136,7 +136,7 @@ namespace gtl {
 					this->Write(&v, sizeof(v));
 				}
 				else {
-					static_assert(false, "Object Type cannot be Serialized directly.");
+					static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
 				}
 			} else {
 				Write(&v, sizeof(v));
@@ -176,7 +176,7 @@ namespace gtl {
 						return this->Read(std::data(v), sizeof(v));
 					}
 					else {
-						static_assert(false, "Object Type cannot be Serialized directly.");
+						static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
 					}
 				}
 				else if constexpr (std::is_integral_v<TYPE>) {
@@ -186,7 +186,7 @@ namespace gtl {
 					return this->Read(&v, sizeof(v));
 				}
 				else {
-					static_assert(false, "Object Type cannot be Serialized directly.");
+					static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
 				}
 			} else {
 				return Read(&v, sizeof(v));
@@ -311,7 +311,7 @@ namespace gtl {
 			} else if constexpr (bLOAD) {
 				return *this >> v;
 			} else {
-				static_assert(false, "no way");
+				static_assert(gtlc::dependent_false_v, "no way");
 				return *this;
 			}
 		};
@@ -576,16 +576,16 @@ namespace gtl {
 										inline void WriteLine(std::u16string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(sv); }
 										inline void WriteLine(std::u32string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(sv); }
 										inline void WriteLine(std::wstring_view sv)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t> (sv); }
-		template < typename ... Args >  inline void WriteString(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(fmt::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteLine(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(fmt::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteString(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteString(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
+		template < typename ... Args >  inline void WriteLine(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(std::format(sv, std::forward<Args>(args) ...)); }
+		template < typename ... Args >  inline void WriteLine(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(std::format(sv, std::forward<Args>(args) ...)); }
 
 
 		//---------------------------------------------------------------------
@@ -741,7 +741,7 @@ namespace gtl {
 		//					*this >> a;
 		//					container.insert(std::move(a));
 		//				} else {
-		//					static_assert(false, "CONTAINER must have push_back or insert ...");
+		//					static_assert(gtlc::dependent_false_v, "CONTAINER must have push_back or insert ...");
 		//				}
 		//			}
 		//		}
@@ -769,7 +769,7 @@ namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return LoadContainer(data);
 		//	} else {
-		//		//static_assert(false, "what???");
+		//		//static_assert(gtlc::dependent_false_v, "what???");
 		//		return *this;
 		//	}
 		//};
@@ -825,7 +825,7 @@ namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return *this >> ptr;
 		//	} else {
-		//		//static_assert(false, "what???");
+		//		//static_assert(gtlc::dependent_false_v, "what???");
 		//		return *this;
 		//	}
 		//}
@@ -904,7 +904,7 @@ namespace gtl {
 		//		ar & (std::uint8_t)0xff;
 		//		ar & (std::uint16_t)0xfffd;
 		//	} else {
-		//		static_assert(false, "only MBCS, UNICODE(little endian), UTF-8 types are supported.");
+		//		static_assert(gtlc::dependent_false_v, "only MBCS, UNICODE(little endian), UTF-8 types are supported.");
 		//		return ar;
 		//	}
 
@@ -1033,7 +1033,7 @@ namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return *this >> str;
 		//	} else {
-		//		//static_assert(false, "what???");
+		//		//static_assert(gtlc::dependent_false_v, "what???");
 		//		return *this;
 		//	}
 		//}

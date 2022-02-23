@@ -114,7 +114,7 @@ namespace gtl {
 			return U"{}";
 		}
 		else {
-			static_assert(false);
+			static_assert(gtlc::dependent_false_v);
 		}
 	}
 
@@ -208,7 +208,7 @@ namespace gtl {
 			if constexpr (iMember == 0) return B.x;
 			else if constexpr (iMember == 1) return B.y;
 			else if constexpr ((iMember == 2) && has__z<T_COORD>) return B.z;
-			else static_assert(false);
+			else static_assert(gtlc::dependent_false_v);
 		} else if constexpr (gtl::has__cxy<T_COORD>) {
 			if constexpr (iMember == 0) return B.cx;
 			else if constexpr (iMember == 1) return B.cy;
@@ -217,7 +217,7 @@ namespace gtl {
 			if constexpr (iMember == 0) return B.width;
 			else if constexpr (iMember == 1) return B.height;
 			else if constexpr ((iMember == 2) && has__depth<T_COORD>) return B.depth;
-		} else static_assert(false);
+		} else static_assert(gtlc::dependent_false_v);
 	};
 	template < int iMember, gtl::is__coord T_COORD >
 	constexpr const auto& GetCoordMember(const T_COORD& B) {
@@ -225,18 +225,18 @@ namespace gtl {
 			if constexpr (iMember == 0) return B.x;
 			else if constexpr (iMember == 1) return B.y;
 			else if constexpr ((iMember == 2) && has__z<T_COORD>) return B.z;
-			else static_assert(false);
+			else static_assert(gtlc::dependent_false_v);
 		} else if constexpr (gtl::has__cxy<T_COORD>) {
 			if constexpr (iMember == 0) return B.cx;
 			else if constexpr (iMember == 1) return B.cy;
 			else if constexpr ((iMember == 2) && has__cz<T_COORD>) return B.cz;
-			else static_assert(false);
+			else static_assert(gtlc::dependent_false_v);
 		} else if constexpr (gtl::has__size2<T_COORD>) {
 			if constexpr (iMember == 0) return B.width;
 			else if constexpr (iMember == 1) return B.height;
 			else if constexpr ((iMember == 2) && has__depth<T_COORD>) return B.depth;
-			else static_assert(false);
-		} else static_assert(false);
+			else static_assert(gtlc::dependent_false_v);
+		} else static_assert(gtlc::dependent_false_v);
 	};
 	template < int iMember, gtl::is__coord T_COORD >
 	constexpr bool HasCoordMember(const T_COORD& B) {
