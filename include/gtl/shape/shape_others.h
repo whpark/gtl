@@ -516,9 +516,34 @@ namespace gtl::shape {
 			if (!bRightHanded)
 				m_angle_start = -m_angle_start;
 		}
+		auto At(auto t) const { return m_ptCenter + m_radius * point_t{cos(t), sin(t)}; };
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
+			bool bResult{};
 			// todo : ... upgrade?
-			return xCircle::UpdateBoundary(rectBoundary);
+			rect_t rectMax(m_ptCenter, m_ptCenter);
+			rectMax.pt0() -= point_t{m_radius, m_radius};
+			rectMax.pt1() += point_t{m_radius, m_radius};
+			if (rectBoundary.RectInRect(rectMax))
+				return bResult;
+			auto start = m_angle_start;
+			auto end = start + m_angle_length;
+			bResult |= rectBoundary.UpdateBoundary(At(start));
+			bResult |= rectBoundary.UpdateBoundary(At(end));
+			if (start > end)
+				std::swap(start, end);
+			int count{};
+			int iend = end;
+			for (int t = (int)std::round(deg_t(start.dValue/90_deg))*90; t <= iend; t += 90) {
+				switch (t%360) {
+				case 0 :		bResult |= rectBoundary.UpdateBoundary(m_ptCenter + point_t{m_radius, 0.}); break;
+				case 90 :		bResult |= rectBoundary.UpdateBoundary(m_ptCenter + point_t{0., m_radius}); break;
+				case 180 :		bResult |= rectBoundary.UpdateBoundary(m_ptCenter + point_t{-m_radius, 0.}); break;
+				case 270 :		bResult |= rectBoundary.UpdateBoundary(m_ptCenter + point_t{0., -m_radius}); break;
+				}
+				if (count++ >=4)
+					break;
+			}
+			return bResult;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
 			xShape::Draw(canvas);
@@ -564,7 +589,7 @@ namespace gtl::shape {
 			return true;
 		}
 
-		deg_t AdjustAngle(deg_t angle) {
+		deg_t AdjustAngle(deg_t angle) const {
 			//if ( (angle < 0) || (angle > 360.) ) {
 			//	int r = angle / 360.;
 			//	angle = angle - 360. * r;
@@ -867,7 +892,6 @@ namespace gtl::shape {
 			}
 			return rPolyline;
 		}
-
 	};
 
 	class GTL__SHAPE_CLASS xPolylineLW : public xPolyline {

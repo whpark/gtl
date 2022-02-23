@@ -38,7 +38,6 @@ namespace gtl::shape {
 	#endif
 	}
 
-
 	//// from openCV
 	//bool clipLine(gtl::xSize2i size, gtl::xPoint2d& pt1, gtl::xPoint2d& pt2) {
 	//	if( size.cx <= 0 || size.cy <= 0 )
