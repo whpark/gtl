@@ -33,7 +33,6 @@ namespace gtl::win_util {
 		m_hComm = CreateFile(pszPortName, GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 
 		if (m_hComm == INVALID_HANDLE_VALUE) {
-			auto s = fmt::format(L"sdfsd, {}", pszPortName);
 			m_log.LogTag(L"E", L"CANNOT Open - {}", pszPortName);
 			return false;
 		}
