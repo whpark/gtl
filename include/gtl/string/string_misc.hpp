@@ -267,19 +267,19 @@ namespace gtl {
 	}	// namespace internal
 	/// @brief Split String into ...
 	template < gtlc::string_elem tchar >
-	inline [[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svDelimiters) {
+	[[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svDelimiters) {
 		return internal::TSplit<tchar, std::basic_string<tchar>>(sv, [svDelimiters](tchar c) { return svDelimiters.find(c) != svDelimiters.npos; });
 	}
 	template < gtlc::string_elem tchar >
-	inline [[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> sv, tchar cDelimiter) {
+	[[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> sv, tchar cDelimiter) {
 		return internal::TSplit<tchar, std::basic_string<tchar>>(sv, [cDelimiter](tchar c) { return cDelimiter == c; });
 	}
 	template < gtlc::string_elem tchar >
-	inline [[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svDelimiters) {
+	[[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svDelimiters) {
 		return gtl::internal::TSplit<tchar, std::basic_string_view<tchar>>(sv, [svDelimiters](tchar c) { return svDelimiters.find(c) != svDelimiters.npos; });
 	}
 	template < gtlc::string_elem tchar >
-	inline [[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> sv, tchar cDelimiter) {
+	[[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> sv, tchar cDelimiter) {
 		return gtl::internal::TSplit<tchar, std::basic_string_view<tchar>>(sv, [cDelimiter](tchar c) { return cDelimiter == c; });
 	}
 

@@ -46,15 +46,15 @@ namespace gtl {
 #pragma pack(push, 8)
 
 
-	/// @brief ToLower, ToUpper (locale irrelavant)
-	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToLower(tchar c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] tchar ToUpper(tchar c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeLower(tchar& c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeUpper(tchar& c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] std::basic_string<tchar> ToLower(std::basic_string_view<tchar> sv);
-	template < gtlc::string_elem tchar > /*constexpr */inline [[nodiscard]] std::basic_string<tchar> ToUpper(std::basic_string_view<tchar> sv);
-	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeLower(std::basic_string<tchar>& str);
-	template < gtlc::string_elem tchar > /*constexpr */inline               void MakeUpper(std::basic_string<tchar>& str);
+	/// @brief ToLower, ToUpper
+	template < gtlc::string_elem tchar > [[nodiscard]] tchar ToLower(tchar c);
+	template < gtlc::string_elem tchar > [[nodiscard]] tchar ToUpper(tchar c);
+	template < gtlc::string_elem tchar >               void MakeLower(tchar& c);
+	template < gtlc::string_elem tchar >               void MakeUpper(tchar& c);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string<tchar> ToLower(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string<tchar> ToUpper(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar >               void MakeLower(std::basic_string<tchar>& str);
+	template < gtlc::string_elem tchar >               void MakeUpper(std::basic_string<tchar>& str);
 
 
 	/// @brief  tszlen (string length). you cannot input string literal. you don't need tszlen("testlen");. ==> just call "testlen"sv.size();
@@ -62,10 +62,10 @@ namespace gtl {
 	/// @return string length
 	/// @param pszMax : (end+1) of the allocated buffer.
 	/// @return string length. if not reached, SIZE_MAX.
-	template < gtlc::string_elem tchar >				constexpr		 [[nodiscard]] GTL__DEPR_SEC size_t tszlen(tchar const*const& psz);
-	template < gtlc::string_elem tchar >				constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax);
-	template < gtlc::string_elem tchar >				constexpr inline [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf);
-	template < gtlc::contiguous_string_container tstring_buf >	constexpr inline [[nodiscard]] size_t tszlen(tstring_buf const& v);
+	template < gtlc::string_elem tchar >						constexpr [[nodiscard]] GTL__DEPR_SEC size_t tszlen(tchar const*const& psz);
+	template < gtlc::string_elem tchar >						constexpr [[nodiscard]] size_t tszlen(tchar const* psz, tchar const* const pszMax);
+	template < gtlc::string_elem tchar >						constexpr [[nodiscard]] size_t tszlen(tchar const* psz, size_t sizeOfBuf);
+	template < gtlc::contiguous_string_container tstring_buf >	constexpr [[nodiscard]] size_t tszlen(tstring_buf const& v);
 
 	// todo : documents...
 
@@ -77,9 +77,9 @@ namespace gtl {
 	///  EINVAL : if !pszDest || !pszSrc
 	///  ERANGE : if sizeDest is smaller
 	template < gtlc::string_elem tchar >
-	constexpr		 GTL__DEPR_SEC errno_t tszcpy(tchar* const& pszDest, size_t sizeDest, tchar const*const& pszSrc);
+	constexpr GTL__DEPR_SEC errno_t tszcpy(tchar* const& pszDest, size_t sizeDest, tchar const*const& pszSrc);
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline GTL__DEPR_SEC errno_t tszcpy(tstring_buf& szDest, tchar const* const& pszSrc);
+	constexpr GTL__DEPR_SEC errno_t tszcpy(tstring_buf& szDest, tchar const* const& pszSrc);
 
 
 	/// @brief tszcpy utf8/16/32/wchar_t ver. of strcpy_s
@@ -99,37 +99,37 @@ namespace gtl {
 	constexpr errno_t tszcpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
 
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string_view<tchar> svSrc);
+	constexpr errno_t tszcpy(tstring_buf& szDest, std::basic_string_view<tchar> svSrc);
 
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline errno_t tszcpy(tstring_buf& szDest, std::basic_string<tchar> const& strSrc);
+	constexpr errno_t tszcpy(tstring_buf& szDest, std::basic_string<tchar> const& strSrc);
 
 	// tszncpy
 	template < gtlc::string_elem tchar >
-	constexpr		 errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
+	constexpr errno_t tszncpy(tchar*const& pszDest, size_t sizeDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline errno_t tszncpy(tstring_buf& szDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
+	constexpr errno_t tszncpy(tstring_buf& szDest, tchar const* pszSrc, size_t nCount = _TRUNCATE);
 
 	// tszncpy (sv)
 	template < gtlc::string_elem tchar >
-	constexpr		 errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
+	constexpr errno_t tszncpy(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
+	constexpr errno_t tszncpy(tstring_buf &szDest, std::basic_string_view<tchar> svSrc, size_t nCount = _TRUNCATE);
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline errno_t tszncpy(tstring_buf &szDest, std::basic_string<tchar> const& svSrc, size_t nCount = _TRUNCATE);
+	constexpr errno_t tszncpy(tstring_buf &szDest, std::basic_string<tchar> const& svSrc, size_t nCount = _TRUNCATE);
 
 	// tszcat
 	template < gtlc::string_elem tchar >
-	constexpr		 GTL__DEPR_SEC errno_t tszcat(tchar* pszDest, size_t sizeDest, tchar const* pszSrc);
+	constexpr GTL__DEPR_SEC errno_t tszcat(tchar* pszDest, size_t sizeDest, tchar const* pszSrc);
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline GTL__DEPR_SEC errno_t tszcat(tstring_buf& szDest, tchar const* pszSrc);
+	constexpr GTL__DEPR_SEC errno_t tszcat(tstring_buf& szDest, tchar const* pszSrc);
 
 	template < gtlc::string_elem tchar >
-	constexpr		 errno_t tszcat(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
+	constexpr errno_t tszcat(tchar* pszDest, size_t sizeDest, std::basic_string_view<tchar> svSrc);
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string_view<tchar> svSrc);
+	constexpr errno_t tszcat(tstring_buf &szDest, std::basic_string_view<tchar> svSrc);
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline errno_t tszcat(tstring_buf &szDest, std::basic_string<tchar> const& strSrc);
+	constexpr errno_t tszcat(tstring_buf &szDest, std::basic_string<tchar> const& strSrc);
 
 
 	/// @brief Remove Charactors from str.
@@ -141,18 +141,18 @@ namespace gtl {
 	template < gtlc::string_elem tchar >
 	constexpr size_t tszrmchar(tchar* const psz, tchar const* const pszMax, tchar chRemove);
 	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-	constexpr inline size_t tszrmchar(tstring_buf &sz, tchar chRemove);
+	constexpr size_t tszrmchar(tstring_buf &sz, tchar chRemove);
 
 
-	template < gtlc::string_elem tchar > constexpr inline GTL__DEPR_SEC [[nodiscard]] int tszcmp(tchar const* pszA, tchar const* pszB);
-	template < gtlc::string_elem tchar > constexpr inline GTL__DEPR_SEC [[nodiscard]] int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount);
-	template < gtlc::string_elem tchar > constexpr inline GTL__DEPR_SEC [[nodiscard]] int tszicmp(tchar const* pszA, tchar const* pszB);
-	template < gtlc::string_elem tchar > constexpr inline GTL__DEPR_SEC [[nodiscard]] int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount);
+	template < gtlc::string_elem tchar > constexpr GTL__DEPR_SEC [[nodiscard]] int tszcmp(tchar const* pszA, tchar const* pszB);
+	template < gtlc::string_elem tchar > constexpr GTL__DEPR_SEC [[nodiscard]] int tszncmp(tchar const* pszA, tchar const* pszB, size_t nCount);
+	template < gtlc::string_elem tchar > constexpr GTL__DEPR_SEC [[nodiscard]] int tszicmp(tchar const* pszA, tchar const* pszB);
+	template < gtlc::string_elem tchar > constexpr GTL__DEPR_SEC [[nodiscard]] int tsznicmp(tchar const* pszA, tchar const* pszB, size_t nCount);
 
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tszcmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tszncmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tszicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] int tsznicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount);
+	template < gtlc::string_elem tchar > constexpr [[nodiscard]] int tszcmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
+	template < gtlc::string_elem tchar > constexpr [[nodiscard]] int tszncmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount);
+	template < gtlc::string_elem tchar > constexpr [[nodiscard]] int tszicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
+	template < gtlc::string_elem tchar > constexpr [[nodiscard]] int tsznicmp(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB, size_t nCount);
 
 	template < gtlc::contiguous_string_container tstring_buf >	errno_t tszupr(tstring_buf& buf);
 	template < gtlc::string_elem tchar >			 	errno_t tszupr(tchar* const psz, size_t size);
