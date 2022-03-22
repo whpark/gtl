@@ -213,7 +213,6 @@ namespace gtl {
 	}
 	template < gtlc::string_elem tchar > void MakeUpper(tchar& c) {
 		c = ToUpper(c);
-		std::tolower()
 	}
 
 

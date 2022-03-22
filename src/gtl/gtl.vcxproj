@@ -259,6 +259,12 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\string\string_to_arithmetic.h" />
     <ClInclude Include="..\..\include\gtl\string\utf_char_view.h" />
     <ClInclude Include="..\..\include\gtl\time.h" />
+    <ClInclude Include="..\..\include\gtl\ui\ui_predefine.h" />
+    <ClInclude Include="..\..\include\gtl\ui\ui_prop.h" />
+    <ClInclude Include="..\..\include\gtl\ui\ui_prop_value_color.h" />
+    <ClInclude Include="..\..\include\gtl\ui\ui_prop_value_etc.h" />
+    <ClInclude Include="..\..\include\gtl\ui\ui_unit.h" />
+    <ClInclude Include="..\..\include\gtl\ui\ui_widget.h" />
     <ClInclude Include="..\..\include\gtl\unit.h" />
     <ClInclude Include="..\..\include\gtl\_config.h" />
     <ClInclude Include="..\..\include\gtl\_default.h" />
