@@ -33,7 +33,7 @@ namespace gtl::win_util {
 		m_hComm = CreateFile(pszPortName, GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 
 		if (m_hComm == INVALID_HANDLE_VALUE) {
-			m_log.LogTag(L"E", L"CANNOT Open - {}", pszPortName);
+			m_log.LogTag("E", L"CANNOT Open - {}", pszPortName);
 			return false;
 		}
 		m_log.Log(L"Port {} Open. baud {}, ByteSize {}, Parity {}, StopBits {}, RTS({}), DTR({}), XOnOff({})",
@@ -311,7 +311,7 @@ namespace gtl::win_util {
 		//CancelIoEx(m_hComm, NULL);
 		// Write
 		if (!WriteFile(m_hComm, buf, nSize, &dwSize, &m_overlappedW) && (GetLastError() != ERROR_IO_PENDING)) {
-			m_log.LogTag(L"E", L"Error : {}, {}\n", GetLastError(), GetErrorMessage(GetLastError()));
+			m_log.LogTag("E", L"Error : {}, {}\n", GetLastError(), GetErrorMessage(GetLastError()));
 			return 0;
 		}
 
@@ -322,7 +322,7 @@ namespace gtl::win_util {
 			CancelIo(m_hComm);
 		#endif
 
-			m_log.LogTag(L"E", L"!!!! Serial FAILED !!!! ");
+			m_log.LogTag("E", L"!!!! Serial FAILED !!!! ");
 			return 0;
 		}
 		GetOverlappedResult(m_hComm, &m_overlappedW, &dwSize, FALSE);

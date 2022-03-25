@@ -23,6 +23,48 @@ namespace gtl {
 	}
 }
 
+namespace test_std_string {
+
+	template < typename tchar_t >
+	void Writer(std::basic_string<tchar_t> str) {
+	}
+
+	template < typename tchar_t >
+	void WriterX(gtl::TString<tchar_t> str) {
+	}
+
+	void UseWriter() {
+		{
+			std::string stra;
+			std::wstring strw;
+			std::u8string stru8;
+			Writer(stra);
+			Writer(strw);
+			Writer(stru8);
+		}
+		{
+			std::string_view stra;
+			std::wstring_view strw;
+			std::u8string_view stru8;
+			std::string sa(stra);
+			sa = stra;
+		#if 0	// NOT COMPILES
+			Writer<char>(stra);
+			Writer<wchar_t>(strw);
+			Writer<char8_t>(stru8);
+		#endif
+			WriterX<char>(stra);
+			WriterX<wchar_t>(strw);
+			WriterX<char8_t>(stru8);
+		}
+	}
+
+
+	TEST(std_string, std_string_conversion) {
+		using namespace gtl;
+	}
+}
+
 
 TEST(gtl_string, TString_CodepageConversion) {
 	using namespace gtl;
