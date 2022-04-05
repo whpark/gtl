@@ -232,6 +232,7 @@ xcopy /y "$(IntermediateOutputPath)*.ifc" "$(SolutionDir)lib\$(PlatformTarget)\$
     <ClCompile Include="mat_helper.ixx" />
     <ClCompile Include="misc.ixx" />
     <ClCompile Include="mutex.ixx" />
+    <ClCompile Include="ptr_container.ixx" />
     <ClCompile Include="rand.ixx" />
     <ClCompile Include="reflection.ixx" />
     <ClCompile Include="string.ixx" />
