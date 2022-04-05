@@ -2,8 +2,6 @@
 
 #include "gtl/gtl.h"
 
-#include "gtl/ptr_container.h"
-
 #pragma warning(disable:4566)	// character encoding
 
 using namespace std::literals;

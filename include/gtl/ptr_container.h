@@ -72,11 +72,10 @@ namespace gtl {
 		using reference       = TData&;
 		using const_reference = const TData&;
 
-		using iterator                  = TPtrIterator<typename base_t::iterator>;
-		using const_iterator            = TPtrIterator<typename base_t::const_iterator>;
-
-		using reverse_iterator       = TPtrIterator<typename base_t::reverse_iterator>;
-		using const_reverse_iterator = TPtrIterator<typename base_t::const_reverse_iterator>;
+		using iterator					= TPtrIterator<typename base_t::iterator>;
+		using const_iterator			= TPtrIterator<typename base_t::const_iterator>;
+		using reverse_iterator			= TPtrIterator<typename base_t::reverse_iterator>;
+		using const_reverse_iterator	= TPtrIterator<typename base_t::const_reverse_iterator>;
 
 		// constructor
 		using base_t::base_t;
