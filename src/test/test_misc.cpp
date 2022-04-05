@@ -2,13 +2,14 @@
 
 #include "gtl/gtl.h"
 
+#include "gtl/ptr_container.h"
+
 #pragma warning(disable:4566)	// character encoding
 
 using namespace std::literals;
 using namespace gtl::literals;
 
 namespace gtl::test::misc {
-	using namespace gtl;
 
 	class xTestVirtualBase {
 	public:
@@ -62,6 +63,43 @@ namespace gtl::test::misc {
 		TMatrix<double, 3, 3> m1 { 1., 0., 0., 0., 2., 0., 0., 0., 3.}, m2{ 3., 0., 0., 0., 3., 0., 0., 0., 3.}, m4 { 3., 0., 0., 0., 6., 0., 0., 0., 9.};
 		auto m3 = m1 * m2;
 		EXPECT_EQ(m3, m4);
+	}
+
+	TEST(misc, ptr_container) {
+
+		gtl::uptr_deque<int> lst;
+
+		lst.push_back(std::make_unique<int>(3));
+		auto b = lst.begin();
+		auto e = lst.end();
+		auto rb = lst.rbegin();
+		auto re = lst.rend();
+		for (auto const& i : lst) {
+			EXPECT_EQ(i, 3);
+		}
+		auto const& const_lst = lst;
+		for (auto const& i : const_lst) {
+			EXPECT_EQ(i, 3);
+		}
+
+		lst.clear();
+		lst.push_back(std::make_unique<int>(10));
+		lst.push_back(std::make_unique<int>(9));
+		lst.push_back(std::make_unique<int>(8));
+		lst.push_back(std::make_unique<int>(7));
+		lst.push_back(std::make_unique<int>(6));
+		lst.push_back(std::make_unique<int>(5));
+		lst.push_back(std::make_unique<int>(4));
+		lst.push_back(std::make_unique<int>(3));
+		lst.push_back(std::make_unique<int>(2));
+		lst.push_back(std::make_unique<int>(1));
+		lst.push_back(std::make_unique<int>(0));
+
+		std::sort(lst.base_t::begin(), lst.base_t::end(), [](auto const& a, auto const& b) { return *a<*b;});
+
+		EXPECT_EQ(lst[0], 0);
+		EXPECT_EQ(lst[10], 10);
+
 	}
 }
 
