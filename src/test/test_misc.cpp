@@ -75,6 +75,43 @@ namespace gtl::test::misc {
 	}
 
 
+	TEST(misc, ptr_container) {
+
+		gtl::uptr_deque<int> lst;
+
+		lst.push_back(std::make_unique<int>(3));
+		auto b = lst.begin();
+		auto e = lst.end();
+		auto rb = lst.rbegin();
+		auto re = lst.rend();
+		for (auto const& i : lst) {
+			EXPECT_EQ(i, 3);
+		}
+		auto const& const_lst = lst;
+		for (auto const& i : const_lst) {
+			EXPECT_EQ(i, 3);
+		}
+
+		lst.clear();
+		lst.push_back(std::make_unique<int>(10));
+		lst.push_back(std::make_unique<int>(9));
+		lst.push_back(std::make_unique<int>(8));
+		lst.push_back(std::make_unique<int>(7));
+		lst.push_back(std::make_unique<int>(6));
+		lst.push_back(std::make_unique<int>(5));
+		lst.push_back(std::make_unique<int>(4));
+		lst.push_back(std::make_unique<int>(3));
+		lst.push_back(std::make_unique<int>(2));
+		lst.push_back(std::make_unique<int>(1));
+		lst.push_back(std::make_unique<int>(0));
+
+		std::sort(lst.base_t::begin(), lst.base_t::end(), [](auto const& a, auto const& b) { return *a<*b;});
+
+		EXPECT_EQ(lst[0], 0);
+		EXPECT_EQ(lst[10], 10);
+
+	}
+
 //	template < typename TData > requires (sizeof(TData) == 1)
 //	std::string EncodeBase64(std::span<TData> data) {
 //		using namespace boost::archive::iterators;
