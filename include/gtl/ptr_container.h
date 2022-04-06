@@ -22,7 +22,7 @@
 #include <memory>
 #include <vector>
 #include <deque>
-
+#include "gtl/mutex.h"
 
 namespace gtl {
 
@@ -61,8 +61,8 @@ namespace gtl {
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// TPtrContainer
-	template < typename TData, template < typename TData > typename TPtr, template < typename TPtr > typename base_container >
-	class TPtrContainer : public base_container<TPtr<TData>> {
+	template < typename TData, template < typename TData > typename TPtr, template < typename TPtr > typename base_container, typename TMutex = gtl::null_mutex >
+	class TPtrContainer : public base_container<TPtr<TData>>, public TMutex {
 	public:
 		// alias
 		using this_t = TPtrContainer;
@@ -76,6 +76,8 @@ namespace gtl {
 		using const_iterator			= TPtrIterator<typename base_t::const_iterator>;
 		using reverse_iterator			= TPtrIterator<typename base_t::reverse_iterator>;
 		using const_reverse_iterator	= TPtrIterator<typename base_t::const_reverse_iterator>;
+
+		constexpr static bool has_push_pop_front_ = requires(base_t base) {base.push_back; base.pop_back};
 
 		// constructor
 		using base_t::base_t;
@@ -109,33 +111,57 @@ namespace gtl {
 		auto&		operator [](base_t::size_type offset)		{ return *(base_t::operator [](offset)); }
 		auto const& operator [](base_t::size_type offset) const { return *(base_t::operator [](offset)); }
 
-		// Push/Pop
-		TPtr<TData> PopFront() requires requires (base_t container) { container.pop_front(); } {
+		// operator <=>
+		auto operator <=> (this_t const&) const = default;
+
+		// Concurrent Operation (Thread Safe operation)
+		constexpr void push_front(TPtr<TData>&& r) requires has_push_pop_front_ {
+			std::unique_lock lock(*this);
+			base_t::push_front(std::move(r));
+		}
+		constexpr void push_back(TPtr<TData>&& r) {
+			std::unique_lock lock(*this);
+			base_t::push_back(std::move(r));
+		}
+		constexpr [[nodiscard]] TPtr<TData> pop_front() requires has_push_pop_front_ {
+			std::unique_lock lock(*this);
 			auto r = std::move(base_t::front());
 			base_t::pop_front();
 			return r;
 		}
-		TPtr<TData> PopBack() {
+		constexpr [[nodiscard]] TPtr<TData> pop_back() {
+			std::unique_lock lock(*this);
 			auto r = std::move(base_t::back());
 			base_t::pop_back();
 			return r;
 		}
-
-		// operator <=>
-		auto operator <=> (this_t const&) const = default;
+		constexpr void Insert(auto&& where, TPtr<TData>&& r) {
+			std::unique_lock lock(*this);
+			base_t::insert(where, std::move(r));
+		}
 	};
 
 
 	// alias
 
 	template < typename TData >
-	using uptr_vector = TPtrContainer<TData, std::unique_ptr, std::vector>;
+	using xUPtrVector = TPtrContainer<TData, std::unique_ptr, std::vector>;
 	template < typename TData >
-	using sptr_vector = TPtrContainer<TData, std::shared_ptr, std::vector>;
+	using xSPtrVector = TPtrContainer<TData, std::shared_ptr, std::vector>;
 
 	template < typename TData >
-	using uptr_deque = TPtrContainer<TData, std::unique_ptr, std::deque>;
+	using xUPtrDeque = TPtrContainer<TData, std::unique_ptr, std::deque>;
 	template < typename TData >
-	using sptr_deque = TPtrContainer<TData, std::shared_ptr, std::deque>;
+	using xSPtrDeque = TPtrContainer<TData, std::shared_ptr, std::deque>;
+
+	template < typename TData >
+	using xConcurrentUPtrVector = TPtrContainer<TData, std::unique_ptr, std::vector, gtl::recursive_shared_mutex>;
+	template < typename TData >
+	using xConcurrentSPtrVector = TPtrContainer<TData, std::shared_ptr, std::vector, gtl::recursive_shared_mutex>;
+
+	template < typename TData >
+	using xConcurrentUPtrDeque = TPtrContainer<TData, std::unique_ptr, std::deque, gtl::recursive_shared_mutex>;
+	template < typename TData >
+	using xConcurrentSPtrDeque = TPtrContainer<TData, std::shared_ptr, std::deque, gtl::recursive_shared_mutex>;
 
 }	// namespace gtl
