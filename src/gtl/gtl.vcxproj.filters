@@ -128,7 +128,7 @@
     <ClCompile Include="coord\coord_srect.ixx">
       <Filter>Source Files\coord</Filter>
     </ClCompile>
-    <ClCompile Include="ptr_container.ixx">
+    <ClCompile Include="smart_ptr_container.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

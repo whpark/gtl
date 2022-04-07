@@ -105,7 +105,7 @@
 export module gtl;
 
 export import :concepts;
-export import :ptr_container;
+export import :smart_ptr_container;
 export import :misc;
 export import :unit;
 export import :coord;

@@ -1,0 +1,235 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// ptr_container.h
+//
+//			GTL : (G)reen (T)ea (L)atte
+//
+// 2017.07.20.
+// 2017.04.23. container : vector<unique_ptr> 추가
+// 2017.07.24. container : Sort 제외 IList 기능들 추가.
+// 2017.07.28. container : 1 차 완료 예정.
+// 2018.03.10. Move Constructor 추가
+//             TSmartPtr... --> TUniquePtr... / TSharedPtr... 로 세분화
+// 2018.04.01. operator == 추가.
+// 2022.04.05. 전체 재작업.
+//
+// PWH
+//
+///////////////////////////////////////////////////////////////////////////////
+
+module;
+
+#include <memory>
+#include <vector>
+#include <deque>
+#include <mutex>
+#include <shared_mutex>
+
+#include "gtl/_config.h"
+#include "gtl/_macro.h"
+
+export module gtl:smart_ptr_container;
+import :concepts;
+import :mutex;
+
+export namespace gtl {
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	// Iterator ( iterator, const_iterator )
+	template < typename base_iterator >
+	class TSmartPtrIterator : public base_iterator {
+	public:
+		using this_t = TSmartPtrIterator;
+		using base_t = base_iterator;
+		using value_type = typename base_t::value_type::element_type;
+
+	public:
+		// constructor
+		using base_t::base_t;
+		constexpr TSmartPtrIterator(base_t const& base) : base_t(base) { }
+
+		// operators
+		using base_t::operator =;
+		using base_t::operator +;
+		using base_t::operator ++;
+		using base_t::operator +=;
+		using base_t::operator -;
+		using base_t::operator --;
+		using base_t::operator -=;
+		auto operator <=> (TSmartPtrIterator const&) const = default;
+
+		value_type&			operator * ()			{ return *(base_t::operator *()); }
+		value_type const&	operator * () const		{ return *(base_t::operator *()); }
+		value_type*			operator -> ()			{ return base_t::operator *(); }
+		value_type const*	operator -> () const	{ return base_t::operator *(); }
+
+		auto&		GetSmartPtr()		{ return base_t::operator*(); }
+		auto const&	GetSmartPtr() const	{ return base_t::operator*(); }
+	};
+
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------
+	// TSmartPtrContainer
+	template < typename T, template < typename T > typename TSmartPtr, template < typename TSmartPtr > typename base_container, typename TMutex = gtl::null_mutex >
+	class TSmartPtrContainer : public base_container<TSmartPtr<T>>, public TMutex {
+	public:
+		// alias
+		using this_t = TSmartPtrContainer;
+		using base_t = base_container<TSmartPtr<T>>;
+
+		using value_type      = T;
+		using reference       = T&;
+		using const_reference = const T&;
+
+		using iterator					= TSmartPtrIterator<typename base_t::iterator>;
+		using const_iterator			= TSmartPtrIterator<typename base_t::const_iterator>;
+		using reverse_iterator			= TSmartPtrIterator<typename base_t::reverse_iterator>;
+		using const_reverse_iterator	= TSmartPtrIterator<typename base_t::const_reverse_iterator>;
+
+		constexpr static auto base_has_push_pop_front_ = requires(base_t base) {base.push_front; base.pop_front;};
+		constexpr static auto value_has_clone_ = requires (T object) { object.Clone(); };
+
+		// constructor
+		using base_t::base_t;
+
+		// begin/end
+		constexpr iterator					begin()			{ return base_t::begin(); }
+		constexpr iterator					end()			{ return base_t::end(); }
+		constexpr const_iterator			begin()	const	{ return base_t::cbegin(); }
+		constexpr const_iterator			end() const		{ return base_t::cend(); }
+		constexpr const_iterator			cbegin() const	{ return base_t::cbegin(); }
+		constexpr const_iterator			cend() const	{ return base_t::cend(); }
+
+		constexpr reverse_iterator			rbegin()		{ return base_t::rbegin(); }
+		constexpr reverse_iterator			rend()			{ return base_t::rend(); }
+		constexpr const_reverse_iterator	rbegin() const	{ return base_t::crbegin(); }
+		constexpr const_reverse_iterator	rend() const	{ return base_t::crend(); }
+		constexpr const_reverse_iterator	crbegin() const	{ return base_t::crbegin(); }
+		constexpr const_reverse_iterator	crend() const	{ return base_t::crend(); }
+
+		// front/back
+		constexpr auto&						front()			{ return *base_t::front(); }
+		constexpr auto const&				front() const	{ return *base_t::front(); }
+		constexpr auto&						back()			{ return *base_t::back(); }
+		constexpr auto const&				back() const	{ return *base_t::back(); }
+
+		// at
+		constexpr auto&						at(base_t::size_type offset)		{ return *(base_t::operator [](offset)); }
+		constexpr auto const&				at(base_t::size_type offset) const	{ return *(base_t::operator [](offset)); }
+
+		// operator []
+		constexpr auto&						operator [](base_t::size_type offset)		{ return *(base_t::operator [](offset)); }
+		constexpr auto const&				operator [](base_t::size_type offset) const { return *(base_t::operator [](offset)); }
+
+		// operator <=>
+		auto operator <=> (this_t const&) const = default;
+
+		// Concurrent Operation (Thread Safe operation)
+		constexpr auto& push_front(TSmartPtr<T>&& r) requires base_has_push_pop_front_ {
+			std::unique_lock lock(*this);
+		base_t::push_front(std::move(r));
+		return front();
+		}
+			constexpr auto& push_back(TSmartPtr<T>&& r) {
+			std::unique_lock lock(*this);
+			base_t::push_back(std::move(r));
+			return back();
+		}
+		constexpr [[nodiscard]] TSmartPtr<T> pop_front() requires base_has_push_pop_front_ {
+			std::unique_lock lock(*this);
+		auto r = std::move(base_t::front());
+		base_t::pop_front();
+		return r;
+		}
+			constexpr [[nodiscard]] TSmartPtr<T> pop_back() {
+			std::unique_lock lock(*this);
+			auto r = std::move(base_t::back());
+			base_t::pop_back();
+			return r;
+		}
+		constexpr auto& insert(auto&& where, TSmartPtr<T>&& r) {
+			std::unique_lock lock(*this);
+			return base_t::emplace(where, std::move(r));
+		}
+		template <class... TValue>
+		inline auto& emplace_front(TValue&&... values) requires base_has_push_pop_front_ {
+			return push_front(new T{std::forward<TValue>(values)...});
+		}
+			template <class... TValue>
+		inline auto& emplace_back(TValue&&... values) {
+			return push_back(new T{std::forward<TValue>(values)...});
+		}
+		template <class... TValue>
+		inline auto& emplace(auto&& where, TValue&&... values) {
+			return *base_t::emplace(where, new T{std::forward<TValue>(values)...});
+		}
+
+		//void assign(std::initializer_list<T>) = delete;
+		//iterator insert(const_iterator, std::initializer_list<T>) = delete;
+
+		// helper
+		constexpr base_t&		Base()			{ return *this; }
+		constexpr base_t const&	Base() const	{ return *this; }
+
+		template < typename ... Arg >
+		constexpr void AddCloneTo(TSmartPtrContainer<Arg...>& container) const requires (value_has_clone_ || std::is_copy_constructible_v<T>) {
+			std::shared_lock lock(*this);
+			if constexpr (value_has_clone_) {
+				for (auto const& obj : *this)
+					container.push_back(obj.Clone());
+			}
+			else if constexpr (std::is_copy_constructible_v<T>) {
+				for (auto const& obj : *this)
+					container.push_back(new T{obj});
+			}
+		}
+		template < typename ... Arg >
+		constexpr void AddCloneFrom(TSmartPtrContainer const& container) requires (value_has_clone_ || std::is_copy_constructible_v<T>) {
+			std::shared_lock lock(container);
+			if constexpr (value_has_clone_) {
+				for (auto const& obj : container)
+					push_back(obj.Clone());
+			}
+			else if constexpr (std::is_copy_constructible_v<T>) {
+				for (auto const& obj : container)
+					push_back(new T{obj});
+			}
+		}
+		template < typename ... Arg >
+		constexpr void AddRefTo(TSmartPtrContainer<Arg...>& container) const requires std::is_convertible_v<TSmartPtr<T>, std::shared_ptr<T>> {
+			std::shared_lock lock(*this);
+			//std::unique_lock lock2(container);
+			for (auto sharedptr : Base())
+				container.push_back(std::move(sharedptr));
+		}
+		template < typename ... Arg >
+		constexpr void AddRefFrom(TSmartPtrContainer<Arg...> const& container) requires std::is_convertible_v<TSmartPtr<T>, std::shared_ptr<T>> {
+			std::shared_lock lock(container);
+			for (auto sharedptr : container.Base())
+				push_back(std::move(sharedptr));
+		}
+
+	};
+
+
+	// alias
+	template < typename T >
+	using xUPtrVector = TSmartPtrContainer<T, std::unique_ptr, std::vector>;
+	template < typename T >
+	using xSPtrVector = TSmartPtrContainer<T, std::shared_ptr, std::vector>;
+
+	template < typename T >
+	using xUPtrDeque = TSmartPtrContainer<T, std::unique_ptr, std::deque>;
+	template < typename T >
+	using xSPtrDeque = TSmartPtrContainer<T, std::shared_ptr, std::deque>;
+
+	template < typename T >
+	using xConcurrentUPtrVector = TSmartPtrContainer<T, std::unique_ptr, std::vector, gtl::recursive_shared_mutex>;
+	template < typename T >
+	using xConcurrentSPtrVector = TSmartPtrContainer<T, std::shared_ptr, std::vector, gtl::recursive_shared_mutex>;
+
+	template < typename T >
+	using xConcurrentUPtrDeque = TSmartPtrContainer<T, std::unique_ptr, std::deque, gtl::recursive_shared_mutex>;
+	template < typename T >
+	using xConcurrentSPtrDeque = TSmartPtrContainer<T, std::shared_ptr, std::deque, gtl::recursive_shared_mutex>;
+
+}	// namespace gtl
