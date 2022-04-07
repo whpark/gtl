@@ -6,6 +6,7 @@
 //
 // 2018.01.15. recursive_shared_mutex (extension of std::recursive_mutex)
 // 2019.07.24. QL -> GTL
+// 2022.04.07. recursive_shared_mutex - refactoring
 //
 // PWH
 //
