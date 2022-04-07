@@ -12,7 +12,7 @@
 #include "gtl/_default.h"
 #include "gtl/_lib_gtl.h"
 #include "gtl/concepts.h"
-#include "gtl/ptr_container.h"
+#include "gtl/smart_ptr_container.h"
 #include "gtl/misc.h"
 #include "gtl/string.h"
 #include "gtl/archive.h"

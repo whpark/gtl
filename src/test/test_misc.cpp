@@ -7,6 +7,10 @@
 using namespace std::literals;
 using namespace gtl::literals;
 
+static_assert(std::is_convertible_v<std::unique_ptr<int>, std::shared_ptr<int>>);
+static_assert(!std::is_convertible_v<std::shared_ptr<int>, std::unique_ptr<int>>);
+static_assert(!std::is_same_v<std::unique_ptr<int>, std::shared_ptr<int>>);
+
 namespace gtl::test::misc {
 
 	class xTestVirtualBase {
@@ -65,7 +69,7 @@ namespace gtl::test::misc {
 
 	TEST(misc, ptr_container) {
 
-		gtl::uptr_deque<int> lst;
+		gtl::xConcurrentUPtrDeque<int> lst;
 
 		lst.push_back(std::make_unique<int>(3));
 		auto b = lst.begin();
@@ -94,10 +98,96 @@ namespace gtl::test::misc {
 		lst.push_back(std::make_unique<int>(0));
 
 		std::sort(lst.base_t::begin(), lst.base_t::end(), [](auto const& a, auto const& b) { return *a<*b;});
-
 		EXPECT_EQ(lst[0], 0);
 		EXPECT_EQ(lst[10], 10);
+		lst.clear();
 
+		// test thread
+		{
+			constexpr size_t N = 100;
+			gtl::xConcurrentUPtrDeque<int> lst;
+			std::latch latchQueue(N);
+			auto Queue = [&](size_t index) {
+				latchQueue.count_down();
+				latchQueue.wait();
+				std::unique_lock lock(lst);
+				for (int i = 0; i < N; i++) {
+					lst.push_back(std::make_unique<int>(index*N + i));
+				}
+			};
+			std::vector<std::thread> threadsQueue;
+			threadsQueue.reserve(N);
+			for (size_t i{}; i < N; i++) {
+				threadsQueue.emplace_back(Queue, i);
+			}
+			for (auto& t : threadsQueue)
+				t.join();
+
+			std::latch latch(N);
+			std::vector<std::thread> threads;
+			threads.reserve(N);
+			size_t sum{};
+			for (size_t i{}; i < N; i++) {
+				threads.emplace_back([&]{
+					latch.count_down();
+					latch.wait();
+					std::unique_lock lock(lst);
+					for (auto i : lst) {
+						sum += i;
+					}
+				});
+			}
+
+			for (auto& t : threads)
+				t.join();
+
+			auto n = N*N-1;
+			EXPECT_EQ(sum, ((1+n)*n/2)*N);
+		}
+
+		{
+			constexpr size_t N = 100;
+			gtl::xConcurrentUPtrDeque<int> lst;
+			std::latch latchQueue(N);
+			auto Queue = [&](size_t index) {
+				latchQueue.count_down();
+				latchQueue.wait();
+				//std::unique_lock lock(lst);
+				for (int i = 0; i < N; i++) {
+					lst.push_back(std::make_unique<int>(index*N + i));
+				}
+			};
+
+			std::vector<std::thread> threadsQueue;
+			threadsQueue.reserve(N);
+			for (size_t i{}; i < N; i++) {
+				threadsQueue.emplace_back(Queue, i);
+			}
+			for (auto& t : threadsQueue)
+				t.join();
+			EXPECT_EQ(lst.size(), N*N);
+
+			std::latch latch(N);
+			std::vector<std::thread> threads;
+			threads.reserve(N);
+			size_t sum{};
+			for (size_t i{}; i < N; i++) {
+				threads.emplace_back([&]{
+					latch.count_down();
+					latch.wait();
+					std::unique_lock lock(lst);
+					for (auto i : lst) {
+						sum += i;
+					}
+					});
+			}
+
+			for (auto& t : threads)
+				t.join();
+
+			auto n = N*N-1;
+			EXPECT_EQ(sum, ((1+n)*n/2)*N);
+		}
 	}
 }
 

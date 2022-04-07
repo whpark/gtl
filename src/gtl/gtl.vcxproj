@@ -245,9 +245,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\mat_helper.h" />
     <ClInclude Include="..\..\include\gtl\misc.h" />
     <ClInclude Include="..\..\include\gtl\mutex.h" />
-    <ClInclude Include="..\..\include\gtl\ptr_container.h" />
     <ClInclude Include="..\..\include\gtl\rand.h" />
     <ClInclude Include="..\..\include\gtl\reflection.h" />
+    <ClInclude Include="..\..\include\gtl\smart_ptr_container.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_utf.h" />
     <ClInclude Include="..\..\include\gtl\string\HangeulCodeMap.h" />
     <ClInclude Include="..\..\include\gtl\string\string_misc.h" />

@@ -161,7 +161,7 @@
     <ClInclude Include="..\..\include\gtl\ui\ui_widget.h">
       <Filter>gtl\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\ptr_container.h">
+    <ClInclude Include="..\..\include\gtl\smart_ptr_container.h">
       <Filter>gtl</Filter>
     </ClInclude>
   </ItemGroup>

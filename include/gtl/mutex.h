@@ -4,7 +4,7 @@
 //
 //			GTL : (G)reen (T)ea (L)atte
 //
-// 2018.01.15. recursive_shared_mutex (extension of std::recursive_mutex)
+// 2018.01.15. recursive_recursive_shared_mutex (extension of std::recursive_mutex)
 // 2019.07.24. QL -> GTL
 //
 // PWH
@@ -34,8 +34,8 @@ namespace gtl {
 	/// @brief null mutex
 	class null_mutex {
 	public:
-		null_mutex() noexcept { }
-		~null_mutex() noexcept { }
+		//null_mutex() noexcept {}
+		//~null_mutex() noexcept {}
 
 		void lock() { // lock the mutex
 		}
@@ -55,6 +55,39 @@ namespace gtl {
 
 	//------------------------------------------------------------------------
 	/// @brief recursive shared mutex
+	class recursive_shared_mutex : public std::shared_mutex {
+	public:
+		using this_t = recursive_shared_mutex;
+		using base_t = std::shared_mutex;
+	private:
+		std::atomic<std::thread::id> m_owner;
+		size_t m_counter{};
+	public:
+		using base_t::base_t;
+		//recursive_shared_mutex(recursive_shared_mutex const&) = delete;
+		//recursive_shared_mutex& operator=(recursive_shared_mutex const&) = delete;
+
+		void lock() noexcept {
+			//_Smtx_lock_exclusive(&_Myhandle);
+			if (auto idCurrent = std::this_thread::get_id(); idCurrent == m_owner) {
+				m_counter++;
+			}
+			else {
+				base_t::lock();
+				m_owner = idCurrent;
+				m_counter = 1;
+			}
+		}
+		void unlock() noexcept {
+			if (--m_counter == 0) {
+				m_owner.store({});
+				base_t::unlock();
+			}
+		}
+
+	};
+
+#if 0
 	class recursive_shared_mutex {
 	private:
 		std::shared_mutex m_mtx;
@@ -176,7 +209,7 @@ namespace gtl {
 		}
 
 	};
-
+#endif
 
 #pragma pack(pop)
 }	// namespace gtl
