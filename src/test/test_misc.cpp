@@ -97,6 +97,8 @@ namespace gtl::test::misc {
 		lst.push_back(std::make_unique<int>(1));
 		lst.push_back(std::make_unique<int>(0));
 
+		//lst.push_front(std::make_unique<int>(0));
+
 		std::sort(lst.base_t::begin(), lst.base_t::end(), [](auto const& a, auto const& b) { return *a<*b;});
 		EXPECT_EQ(lst[0], 0);
 		EXPECT_EQ(lst[10], 10);

@@ -152,8 +152,25 @@ namespace gtl {
 		}
 		template <class... TValue>
 		inline auto& emplace(auto&& where, TValue&&... values) {
+			std::unique_lock lock(*this);
 			return *base_t::emplace(where, new T{std::forward<TValue>(values)...});
 		}
+
+		iterator erase(const_iterator where) {
+			std::unique_lock lock(*this);
+			return base_t::erase(where);
+		}
+		iterator erase(const_iterator iter0, const_iterator iter1) {
+			std::unique_lock lock(*this);
+			return base_t::erase(iter0, iter1);
+		}
+
+		void clear() { // erase all
+			std::unique_lock lock(*this);
+			base_t::clear();
+		}
+
+		void swap(this_t&) = delete;
 
 		//void assign(std::initializer_list<T>) = delete;
 		//iterator insert(const_iterator, std::initializer_list<T>) = delete;
@@ -198,6 +215,63 @@ namespace gtl {
 			std::shared_lock lock(container);
 			for (auto sharedptr : container.Base())
 				push_back(std::move(sharedptr));
+		}
+
+		bool Contains(T const& obj) {
+			std::shared_lock lock(*this);
+			for (auto const& v : *this) {
+				if (obj == v)
+					return true;
+			}
+			return false;
+		}
+		size_t Find(T const& obj) const {
+			std::shared_lock lock(*this);
+			for (size_t i{}; i < base_t::size(); i++) {
+				if (at(i) == obj)
+					return i;
+			}
+			return (size_t)-1;
+		}
+		size_t Find(T const* ptr) const {
+			std::shared_lock lock(*this);
+			for (size_t i{}; i < base_t::size(); i++) {
+				if (at(i).ptr() == ptr)
+					return i;
+			}
+			return (size_t)-1;
+		}
+		auto FindIter(T const& obj) {
+			std::shared_lock lock(*this);
+			for (auto iter = begin(); iter != end(); iter++) {
+				if (*iter == obj)
+					return iter;
+			}
+			return end();
+		}
+		auto FindIter(T const& obj) const {
+			std::shared_lock lock(*this);
+			for (auto iter = begin(); iter != end(); iter++) {
+				if (*iter == obj)
+					return iter;
+			}
+			return end();
+		}
+		auto FindIter(T const* ptr) {
+			std::shared_lock lock(*this);
+			for (auto iter = begin(); iter != end(); iter++) {
+				if (iter.GetSmartPtr().get() == ptr)
+					return iter;
+			}
+			return end();
+		}
+		auto FindIter(T const* ptr) const {
+			std::shared_lock lock(*this);
+			for (auto iter = begin(); iter != end(); iter++) {
+				if (iter.GetSmartPtr().get() == ptr)
+					return iter;
+			}
+			return end();
 		}
 
 	};
