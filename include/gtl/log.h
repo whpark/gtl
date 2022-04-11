@@ -207,7 +207,14 @@ namespace gtl {
 
 		if (!OpenFile(now) || !m_ar)
 			return;
-		if (!m_strTagFilter.empty() && !svTag.empty() && !m_strTagFilter.contains(svTag)) {
+		if (!m_strTagFilter.empty() && !svTag.empty() &&
+		#if 0	// TEMP
+			!m_strTagFilter.contains(svTag)
+		#else
+			(m_strTagFilter.find(svTag) != m_strTagFilter.npos)
+		#endif
+			)
+		{
 			return;
 		}
 
