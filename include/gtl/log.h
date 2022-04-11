@@ -40,7 +40,7 @@ namespace gtl {
 		std::filesystem::path m_path;								// Current File Path
 		std::ofstream m_file;										// Current File
 		std::unique_ptr<archive_out_t> m_ar;						// Archive
-		xString m_strTagFilter;										// Tag Filter. 'How to use' is up to user.
+		std::string m_strTagFilter;									// Tag Filter. 'How to use' is up to user.
 																	// (if and only if m_strTagFilter and strTag is not empty), if strTag is not found on strTagFilter, no Log will be written.
 
 	public:
@@ -59,10 +59,10 @@ namespace gtl {
 		//std::function<int(int, int, int)> m_fun;
 
 		std::function<xStringA  (xSimpleLog&, archive_out_t&, xSysTime, const std::string_view svTag, const std::string_view svContent)> m_funcFormatterA;			// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<xStringW  (xSimpleLog&, archive_out_t&, xSysTime, const std::wstring_view svTag, const std::wstring_view svContent)> m_funcFormatterW;		// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<xStringU8 (xSimpleLog&, archive_out_t&, xSysTime, const std::u8string_view svTag, const std::u8string_view svContent)> m_funcFormatterU8;		// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<xStringU16 (xSimpleLog&, archive_out_t&, xSysTime, const std::u16string_view svTag, const std::u16string_view svContent)> m_funcFormatterU16;	// 로그 파일 포맷을 바꾸고 싶을 때...
-		std::function<xStringU32 (xSimpleLog&, archive_out_t&, xSysTime, const std::u32string_view svTag, const std::u32string_view svContent)> m_funcFormatterU32;	// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringW  (xSimpleLog&, archive_out_t&, xSysTime, const std::string_view svTag, const std::wstring_view svContent)> m_funcFormatterW;		// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringU8 (xSimpleLog&, archive_out_t&, xSysTime, const std::string_view svTag, const std::u8string_view svContent)> m_funcFormatterU8;		// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringU16 (xSimpleLog&, archive_out_t&, xSysTime, const std::string_view svTag, const std::u16string_view svContent)> m_funcFormatterU16;	// 로그 파일 포맷을 바꾸고 싶을 때...
+		std::function<xStringU32 (xSimpleLog&, archive_out_t&, xSysTime, const std::string_view svTag, const std::u32string_view svContent)> m_funcFormatterU32;	// 로그 파일 포맷을 바꾸고 싶을 때...
 
 	public:
 		xSimpleLog() = default;
@@ -99,27 +99,39 @@ namespace gtl {
 			std::scoped_lock lock(m_mutex);
 			m_strTagFilter = sv;
 		}
-		std::wstring_view GetTagFilter() const {
+		std::string_view GetTagFilter() const {
 			return m_strTagFilter;
 		}
 
 
 	public:
 		template < typename tchar_t >
-		void _Log(const std::basic_string_view<tchar_t> svTag, const std::basic_string_view<tchar_t> sv);
+		void _Log(std::string_view svTag, std::basic_string<tchar_t>&& str);
 
 	public:
 		// Write Log
+	#if 0
+		template < typename SFMT, typename ... Args > void Log(SFMT const& fmt, Args&& ... args) {
+			_Log({}, std::format(fmt, std::forward<Args>(args)...));
+		}
+		template < typename ... Args > void LogTag(const std::string_view svTag, fmt::basic_format_string<char, Args...> fmt, Args&& ... args) {
+			_Log(svTag, fmt::vformat<char>(fmt, fmt::make_format_args<fmt::format_context>(args...)));
+		}
+		template < typename ... Args > void LogTag(const std::string_view svTag, fmt::basic_format_string<wchar_t, Args...> fmt, Args&& ... args) {
+			_Log(svTag, fmt::vformat<wchar_t>(fmt, fmt::make_format_args<fmt::wformat_context>(args...)));
+		}
+	#else
 		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { _Log<char>({}, std::format(svText, std::forward<Args>(args)...)); }
 		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args) { _Log<wchar_t>({}, std::format(svText, std::forward<Args>(args)...)); }
 		template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args) { _Log<char8_t>({}, std::format(svText, std::forward<Args>(args)...)); }
 		template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args) { _Log<char16_t>({}, std::format(svText, std::forward<Args>(args)...)); }
 		template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args) { _Log<char32_t>({}, std::format(svText, std::forward<Args>(args)...)); }
 		template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args) { _Log<char>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::wstring_view svTag, const std::wstring_view svText, Args&& ... args) { _Log<wchar_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::u8string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char8_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::u16string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char16_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::u32string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char32_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::wstring_view svText, Args&& ... args) { _Log<wchar_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char8_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u16string_view svText, Args&& ... args) { _Log<char16_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u32string_view svText, Args&& ... args) { _Log<char32_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+	#endif
 
 	};
 
@@ -138,33 +150,56 @@ namespace gtl {
 		CLogWriter* GetLog() const { return m_pLog; }
 
 	public:
-		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<wchar_t>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char8_t>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char16_t>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char32_t>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::wstring_view svTag, const std::wstring_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<wchar_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::u8string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char8_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::u16string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char16_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::u32string_view svTag, const std::u8string_view svText, Args&& ... args) { if (m_pLog) m_pLog->_Log<char32_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-
+	#if 0
+		template < typename SFMT, typename ... Args > void Log(SFMT const& fmt, Args&& ... args) {
+			if (m_pLog) m_pLog->_Log({}, std::format(fmt, std::forward<Args>(args)...));
+		}
+		template < typename SFMT, typename ... Args > void LogTag(const std::string_view svTag, SFMT const& fmt, Args&& ... args) {
+			if (m_pLog) m_pLog->_Log(svTag, std::format(fmt, std::forward<Args>(args)...));
+		}
+	#else
+		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) 
+			{ if (m_pLog) m_pLog->_Log<char>({}, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<wchar_t>({}, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<char8_t>({}, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<char16_t>({}, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<char32_t>({}, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<char>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::wstring_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<wchar_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u8string_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<char8_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u16string_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<char16_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u32string_view svText, Args&& ... args)
+			{ if (m_pLog) m_pLog->_Log<char32_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+	#endif
 	};
 
 
 
 	// Write Log
 	template < typename tchar_t >
-	void xSimpleLog::_Log(const std::basic_string_view<tchar_t> svMask, const std::basic_string_view<tchar_t> svText) {
+	void xSimpleLog::_Log(std::string_view svTag, std::basic_string<tchar_t>&& str) {
 		auto now = std::chrono::system_clock::now();
 
 	#if defined(_DEBUG) and defined(_WINDOWS)
 		if (m_bTraceOut) {
-			if constexpr(sizeof(tchar_t) == sizeof(char)) {
-				OutputDebugStringA((const char*)svText.data());
+			if constexpr (std::is_same_v<tchar_t, char>) {
+				OutputDebugStringA(str.c_str());
 				OutputDebugStringA("\r\n");
-			} else if (sizeof(tchar_t) == sizeof(wchar_t)) {
-				OutputDebugStringW((wchar_t const*)svText.data());
+			}
+			else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
+				OutputDebugStringW(str.c_str());
+				OutputDebugStringW(L"\r\n");
+			}
+			else {
+				OutputDebugStringW(xStringW(str));
 				OutputDebugStringW(L"\r\n");
 			}
 		}
@@ -172,40 +207,34 @@ namespace gtl {
 
 		if (!OpenFile(now) || !m_ar)
 			return;
-		if (!m_strTagFilter.empty() && !svMask.empty()) {
-			if constexpr (std::is_same_v<tchar_t, xString::value_type>) {
-				if (!m_strTagFilter.find(svMask))
-					return;
-			} else {
-				if (!m_strTagFilter.find(xString(svMask)))
-					return;
-			}
+		if (!m_strTagFilter.empty() && !svTag.empty() && !m_strTagFilter.contains(svTag)) {
+			return;
 		}
 
 		do {
 			if constexpr (std::is_same_v<tchar_t, char>) {
 				if (m_funcFormatterA) {
-					m_funcFormatterA(*this, *m_ar, now, svMask, svText);
+					m_funcFormatterA(*this, *m_ar, now, svTag, str);
 					break;
 				}
 			} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
 				if (m_funcFormatterW) {
-					m_funcFormatterW(*this, *m_ar, now, svMask, svText);
+					m_funcFormatterW(*this, *m_ar, now, svTag, str);
 					break;
 				}
 			} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
 				if (m_funcFormatterU8) {
-					m_funcFormatterU8(*this, *m_ar, now, svMask, svText);
+					m_funcFormatterU8(*this, *m_ar, now, svTag, str);
 					break;
 				}
 			} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
 				if (m_funcFormatterU16) {
-					m_funcFormatterU16(*this, *m_ar, now, svMask, svText);
+					m_funcFormatterU16(*this, *m_ar, now, svTag, str);
 					break;
 				}
 			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
 				if (m_funcFormatterU32) {
-					m_funcFormatterU32(*this, *m_ar, now, svMask, svText);
+					m_funcFormatterU32(*this, *m_ar, now, svTag, str);
 					break;
 				}
 			} else {
@@ -224,21 +253,21 @@ namespace gtl {
 			
 #define GTL__FMT_EXPAND "{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {} : "
 			if constexpr (std::is_same_v<tchar_t, char>) {
-				m_ar->WriteString(GTL__FMT_EXPAND, st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
+				m_ar->WriteString(GTL__FMT_EXPAND, st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svTag);
 			} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
-				m_ar->WriteString(TEXT_W(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
+				m_ar->WriteString(TEXT_W(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), xStringW(svTag));
 			} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
-				m_ar->WriteString(TEXT_u8(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
+				m_ar->WriteString(TEXT_u8(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), (std::u8string_view&)svTag);
 			} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
-				m_ar->WriteString(TEXT_u(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
+				m_ar->WriteString(TEXT_u(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), xStringU16(svTag));
 			} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
-				m_ar->WriteString(TEXT_U(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svMask);
+				m_ar->WriteString(TEXT_U(GTL__FMT_EXPAND), st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), xStringU32(svTag));
 			} else {
 				static_assert(gtlc::dependent_false_v);
 			}
 #undef GTL__FMT_EXPAND
-			const tchar_t* posHead = svText.data();
-			const tchar_t* posEnd = svText.data() + svText.size();
+			const tchar_t* posHead = str.data();
+			const tchar_t* posEnd = str.data() + str.size();
 			const tchar_t* posNext {};
 			for (const tchar_t* pos = posHead; pos && (pos < posEnd); pos = posNext+1) {
 				if (pos != posHead) {
@@ -274,11 +303,11 @@ namespace gtl {
 			CloseFile();
 	}
 
-	//template void xSimpleLog::_Log<char>(const std::basic_string_view<char> svMask, const std::basic_string_view<char> svText);
-	//template void xSimpleLog::_Log<wchar_t>(const std::basic_string_view<wchar_t> svMask, const std::basic_string_view<wchar_t> svText);
-	//template void xSimpleLog::_Log<char8_t>(const std::basic_string_view<char8_t> svMask, const std::basic_string_view<char8_t> svText);
-	//template void xSimpleLog::_Log<char16_t>(const std::basic_string_view<char16_t> svMask, const std::basic_string_view<char16_t> svText);
-	//template void xSimpleLog::_Log<char32_t>(const std::basic_string_view<char32_t> svMask, const std::basic_string_view<char32_t> svText);
+	//template void xSimpleLog::_Log<char>(const std::basic_string_view<char> svTag, const std::basic_string_view<char> svText);
+	//template void xSimpleLog::_Log<wchar_t>(const std::basic_string_view<wchar_t> svTag, const std::basic_string_view<wchar_t> svText);
+	//template void xSimpleLog::_Log<char8_t>(const std::basic_string_view<char8_t> svTag, const std::basic_string_view<char8_t> svText);
+	//template void xSimpleLog::_Log<char16_t>(const std::basic_string_view<char16_t> svTag, const std::basic_string_view<char16_t> svText);
+	//template void xSimpleLog::_Log<char32_t>(const std::basic_string_view<char32_t> svTag, const std::basic_string_view<char32_t> svText);
 
 #pragma pack(pop)
 }	// namespace gtl

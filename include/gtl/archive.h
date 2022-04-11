@@ -421,7 +421,7 @@ namespace gtl {
 			{
 				constexpr bool bSwapStreamByteOrder = (sizeof(tchar) >= 2) and (eCodepage == eCODEPAGE_OTHER_ENDIAN<tchar>);
 				constexpr bool bSwapByteOrder = bSwapStreamByteOrder xor bSWAP_BYTE_ORDER;
-				if constexpr (bSwapByteOrder) [[unlikely]] {
+				if constexpr (bSwapByteOrder) {
 					if (auto r = GetLine<tchar>(GetByteSwap<tchar>(cDelimiter), bTrimCR ? GetByteSwap<tchar>('\r') : tchar{}); r) {
 						for (auto& c : r.value())
 							ByteSwap(c);
@@ -431,7 +431,7 @@ namespace gtl {
 						return {};
 					}
 				}
-				else [[likely]] {
+				else {
 					return GetLine<tchar>(cDelimiter, bTrimCR ? (tchar)'\r' : tchar{});
 				}
 			}

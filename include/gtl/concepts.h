@@ -222,7 +222,7 @@ namespace gtl::concepts {
 	template < typename T_COORD > concept has__size2 = requires (T_COORD a) { a.width; a.height; };
 	template < typename T_COORD > concept has__size3 = requires (T_COORD a) { a.width; a.height; a.depth; };
 
-	template < typename T_COORD > concept generic_point = has__x<T_COORD>;
+	template < typename T_COORD > concept generic_point = has__xy<T_COORD>;
 	template < typename T_COORD > concept generic_coord = coord<T_COORD> or wnd_point<T_COORD> or wnd_size<T_COORD> or wnd_rect<T_COORD> or generic_point<T_COORD> or cv_size<T_COORD> or cv_rect<T_COORD>;
 
 

@@ -74,12 +74,12 @@ namespace gtl {
 	/// @tparam tchar 
 	/// @param str : string
 	/// @param pszTrim : chars to trim
-	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str,			std::basic_string_view<tchar> svTrim);
-	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str,			std::basic_string_view<tchar> svTrim);
-	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str,				std::basic_string_view<tchar> svTrim);
-	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str,			tchar const cTrim);
-	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str,			tchar const cTrim);
-	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str,				tchar const cTrim);
+	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str,	std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str,	std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str,		std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str,	tchar const cTrim);
+	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str,	tchar const cTrim);
+	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str,		tchar const cTrim);
 	template < gtlc::string_elem tchar > void TrimLeft(std::basic_string<tchar>& str);
 	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str);
 	template < gtlc::string_elem tchar > void Trim(std::basic_string<tchar>& str);
@@ -91,26 +91,22 @@ namespace gtl {
 	/// @param str : string
 	/// @param pszTrim : chars to trim
 	/// @return Trimmed string_view
-	template < gtlc::string_elem tchar > [[nodiscard]]        std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv,	std::basic_string_view<tchar> svTrim);
-	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv,	std::basic_string_view<tchar> svTrim);
-	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv,		std::basic_string_view<tchar> svTrim);
-	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv,	tchar const cTrim);
-	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv,	tchar const cTrim);
-	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv,		tchar const cTrim);
-	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv);
-	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv);
-	template < gtlc::string_elem tchar > [[nodiscard]] inline std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv,	std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv,	std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv,		std::basic_string_view<tchar> svTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv,	tchar const cTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv,	tchar const cTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv,		tchar const cTrim);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimLeftView(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimRightView(std::basic_string_view<tchar> sv);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::basic_string_view<tchar> TrimView(std::basic_string_view<tchar> sv);
 
 
 	/// @brief Split Strings into ...
-	template < gtlc::string_elem tchar >
-	inline [[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svDelimiters);
-	template < gtlc::string_elem tchar >
-	inline [[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> sv, tchar cDelimiter);
-	template < gtlc::string_elem tchar >
-	inline [[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svDelimiters);
-	template < gtlc::string_elem tchar >
-	inline [[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> sv, tchar cDelimiter);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svDelimiters);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::vector<std::basic_string<tchar>> Split(std::basic_string_view<tchar> sv, tchar cDelimiter);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> sv, std::basic_string_view<tchar> svDelimiters);
+	template < gtlc::string_elem tchar > [[nodiscard]] std::vector<std::basic_string_view<tchar>> SplitView(std::basic_string_view<tchar> sv, tchar cDelimiter);
 
 
 	/// @brief Translate Escape Sequence Characters

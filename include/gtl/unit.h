@@ -41,7 +41,7 @@ namespace gtl {
 	};
 	using mm_t = tlength_mm_t<double>;
 
-	namespace literals {
+	inline namespace literals {
 		inline mm_t operator "" _nm (long double v)					{ return mm_t(v * 1.e-6); }
 		inline mm_t operator "" _um (long double v)					{ return mm_t(v * 1.e-3); }
 		inline mm_t operator "" _mm (long double v)					{ return mm_t(v); }
@@ -292,7 +292,7 @@ namespace gtl {
 
 	using rad_t = tangle_rad_t<double>;
 	using deg_t = tangle_deg_t<double>;
-	namespace literals {
+	inline namespace literals {
 		inline rad_t operator "" _rad (long double v)				{ return rad_t(v); }
 		inline rad_t operator "" _rad (unsigned long long v)		{ return rad_t((double) v); }
 		inline deg_t operator "" _deg (long double v)				{ return deg_t(v); }

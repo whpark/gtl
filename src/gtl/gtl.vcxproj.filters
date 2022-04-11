@@ -18,6 +18,9 @@
     <Filter Include="gtl\coord">
       <UniqueIdentifier>{26a74bbd-47dc-497c-8c54-3e39e5bd918b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="gtl\ui">
+      <UniqueIdentifier>{cc155a50-7a80-4047-be94-0b8b3f23f116}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\string.h">
@@ -138,6 +141,27 @@
       <Filter>gtl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\matrix.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\ui\ui_predefine.h">
+      <Filter>gtl\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\ui\ui_prop.h">
+      <Filter>gtl\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\ui\ui_prop_value_color.h">
+      <Filter>gtl\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\ui\ui_prop_value_etc.h">
+      <Filter>gtl\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\ui\ui_unit.h">
+      <Filter>gtl\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\ui\ui_widget.h">
+      <Filter>gtl\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\smart_ptr_container.h">
       <Filter>gtl</Filter>
     </ClInclude>
   </ItemGroup>

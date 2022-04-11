@@ -224,7 +224,7 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 
 namespace gtl {
 
-	namespace literals {
+	inline namespace literals {
 	};
 
 	// aliases
