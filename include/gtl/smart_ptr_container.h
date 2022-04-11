@@ -59,6 +59,11 @@ namespace gtl {
 		auto const&	GetSmartPtr() const	{ return base_t::operator*(); }
 	};
 
+	template < typename TCONTAINER >
+	concept has_push_pop_front = requires(TCONTAINER container) {container.push_front; container.pop_front;};
+	template < typename T >
+	concept value_has_clone = requires (T object) { object.NewClone(); };
+
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// TSmartPtrContainer
 	template < typename T, template < typename T > typename TSmartPtr, template < typename TSmartPtr > typename base_container, typename TMutex = gtl::null_mutex >
@@ -77,8 +82,8 @@ namespace gtl {
 		using reverse_iterator			= TSmartPtrIterator<typename base_t::reverse_iterator>;
 		using const_reverse_iterator	= TSmartPtrIterator<typename base_t::const_reverse_iterator>;
 
-		constexpr static auto base_has_push_pop_front_ = requires(base_t base) {base.push_front; base.pop_front;};
-		constexpr static auto value_has_clone_ = requires (T object) { object.Clone(); };
+		//constexpr static auto base_has_push_pop_front_ = requires(base_t base) {base.push_front; base.pop_front;};
+		//constexpr static auto value_has_clone_ = requires (T object) { object.Clone(); };
 
 		// constructor
 		using base_t::base_t;
@@ -116,9 +121,14 @@ namespace gtl {
 		auto operator <=> (this_t const&) const = default;
 
 		// Concurrent Operation (Thread Safe operation)
-		constexpr auto& push_front(TSmartPtr<T>&& r) requires base_has_push_pop_front_ {
+		constexpr auto& push_front(TSmartPtr<T>&& r) requires has_push_pop_front<base_t> {
 			std::unique_lock lock(*this);
 			base_t::push_front(std::move(r));
+			return front();
+		}
+		constexpr auto& push_front(T* ptr) requires has_push_pop_front<base_t> {
+			std::unique_lock lock(*this);
+			base_t::emplace_front(ptr);
 			return front();
 		}
 		constexpr auto& push_back(TSmartPtr<T>&& r) {
@@ -126,14 +136,23 @@ namespace gtl {
 			base_t::push_back(std::move(r));
 			return back();
 		}
-		constexpr [[nodiscard]] TSmartPtr<T> pop_front() requires base_has_push_pop_front_ {
+		constexpr auto& push_back(T* ptr) {
 			std::unique_lock lock(*this);
+			base_t::emplace_back(ptr);
+			return back();
+		}
+		constexpr [[nodiscard]] TSmartPtr<T> pop_front() requires has_push_pop_front<base_t> {
+			std::unique_lock lock(*this);
+			if (base_t::empty())
+				return {};
 			auto r = std::move(base_t::front());
 			base_t::pop_front();
 			return r;
 		}
 		constexpr [[nodiscard]] TSmartPtr<T> pop_back() {
 			std::unique_lock lock(*this);
+			if (base_t::empty())
+				return {};
 			auto r = std::move(base_t::back());
 			base_t::pop_back();
 			return r;
@@ -142,13 +161,19 @@ namespace gtl {
 			std::unique_lock lock(*this);
 			return base_t::emplace(where, std::move(r));
 		}
+		constexpr auto& insert(size_t index, TSmartPtr<T>&& r) {
+			std::unique_lock lock(*this);
+			return base_t::emplace(base_t::begin()+index, std::move(r));
+		}
 		template <class... TValue>
-		inline auto& emplace_front(TValue&&... values) requires base_has_push_pop_front_ {
-			return push_front(new T{std::forward<TValue>(values)...});
+		inline auto& emplace_front(TValue&&... values) requires has_push_pop_front<base_t> {
+			std::unique_lock lock(*this);
+			return base_t::emplace_front(new T{std::forward<TValue>(values)...});
 		}
 		template <class... TValue>
 		inline auto& emplace_back(TValue&&... values) {
-			return push_back(new T{std::forward<TValue>(values)...});
+			std::unique_lock lock(*this);
+			return emplace_back(new T{std::forward<TValue>(values)...});
 		}
 		template <class... TValue>
 		inline auto& emplace(auto&& where, TValue&&... values) {
@@ -180,11 +205,11 @@ namespace gtl {
 		constexpr base_t const&	Base() const	{ return *this; }
 
 		template < typename ... Arg >
-		constexpr void AddCloneTo(TSmartPtrContainer<Arg...>& container) const requires (value_has_clone_ || std::is_copy_constructible_v<T>) {
+		constexpr void AddCloneTo(TSmartPtrContainer<Arg...>& container) const requires (value_has_clone<T> || std::is_copy_constructible_v<T>) {
 			std::shared_lock lock(*this);
-			if constexpr (value_has_clone_) {
+			if constexpr (value_has_clone<T>) {
 				for (auto const& obj : *this)
-					container.push_back(obj.Clone());
+					container.push_back(obj.NewClone());
 			}
 			else if constexpr (std::is_copy_constructible_v<T>) {
 				for (auto const& obj : *this)
@@ -192,11 +217,11 @@ namespace gtl {
 			}
 		}
 		template < typename ... Arg >
-		constexpr void AddCloneFrom(TSmartPtrContainer const& container) requires (value_has_clone_ || std::is_copy_constructible_v<T>) {
+		constexpr void AddCloneFrom(TSmartPtrContainer const& container) requires (value_has_clone<T> || std::is_copy_constructible_v<T>) {
 			std::shared_lock lock(container);
-			if constexpr (value_has_clone_) {
+			if constexpr (value_has_clone<T>) {
 				for (auto const& obj : container)
-					push_back(obj.Clone());
+					push_back(obj.NewClone());
 			}
 			else if constexpr (std::is_copy_constructible_v<T>) {
 				for (auto const& obj : container)
@@ -272,6 +297,30 @@ namespace gtl {
 					return iter;
 			}
 			return end();
+		}
+
+		template < typename ... TArgs >
+		decltype(auto) Push(TArgs&& ...args) {
+			return push_back(std::forward<TArgs>(args)...);
+		}
+		decltype(auto) Pop() {
+			return pop_back();
+		}
+
+		bool Delete(size_t index) {
+			if (index > base_t::size())
+				return false;
+			std::unique_lock lock(*this);
+			base_t::erase(begin()+index);
+			return true;
+		}
+		bool Delete(T const* ptr) {
+			std::unique_lock lock(*this);
+			if (auto iter = FindIter(ptr); iter != end()) {
+				base_t::erase(iter);
+				return true;
+			}
+			return false;
 		}
 
 	};
