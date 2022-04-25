@@ -17,7 +17,9 @@ namespace gtl::test::reflection::MACRO {
 		std::string str2{"str2"};
 
 	private:
-		GTL__REFLECTION_BASE(CTestStruct)
+		using this_t = CTestStruct;
+		using base_t = this_t;
+		GTL__REFLECTION_BASE()
 
 	#if 1
 		GTL__REFLECTION_MEMBERS(str1,str2)
@@ -43,7 +45,9 @@ namespace gtl::test::reflection::MACRO {
 		CTestStruct test;
 
 	private:
-		GTL__REFLECTION_BASE(CTestClass)
+		using this_t = CTestClass;
+		using base_t = this_t;
+		GTL__REFLECTION_BASE()
 		
 		GTL__REFLECTION_MEMBERS(b1, b2,
 								i, j,
@@ -57,14 +61,16 @@ namespace gtl::test::reflection::MACRO {
 
 	class CTestClassDerived : public CTestClass {
 
-	public:
+	public: 
 		int k{};
 		double a{}, b{}, c{};
 		std::string str {"str"};
 		std::u8string strU8 { u8"strU8" };
 
 	private:
-		GTL__REFLECTION_DERIVED(CTestClassDerived, CTestStruct)
+		using this_t = CTestClassDerived;
+		using base_t = CTestClass;
+		GTL__REFLECTION_DERIVED()
 
 		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8);
 	};
@@ -74,7 +80,7 @@ namespace gtl::test::reflection::MACRO {
 
 namespace gtl::test::reflection::CRTP {
 
-	struct CTestStruct : public IMemberWise<CTestStruct> {
+	struct CTestStruct : public IReflection<CTestStruct> {
 	public:
 		std::string str1{"str1"};
 		std::string str2{"str2"};
@@ -87,7 +93,7 @@ namespace gtl::test::reflection::CRTP {
 	};
 
 
-	class CTestClass : public IMemberWise<CTestClass> {
+	class CTestClass : public IReflection<CTestClass> {
 	public:
 		bool b1{}, b2{};
 		int i{}, j{};
@@ -107,14 +113,14 @@ namespace gtl::test::reflection::CRTP {
 	};
 
 
-	class CTestClassDerived : public IMemberWiseDerived<CTestClassDerived, CTestClass> {
+	class CTestClassDerived : public IReflectionDerived<CTestClassDerived, CTestClass> {
 	public:
 		int k{};
 		double a{}, b{}, c{};
 		std::string str {"str"};
 		std::u8string strU8 { u8"strU8" };
 
-	private:
+	public:
 		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8);
 	};
 

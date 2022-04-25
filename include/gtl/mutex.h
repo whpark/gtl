@@ -7,6 +7,7 @@
 // 2018.01.15. recursive_recursive_shared_mutex (extension of std::recursive_mutex)
 // 2019.07.24. QL -> GTL
 // 2022.04.07. recursive_shared_mutex - refactoring
+//
 // PWH
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -15,6 +16,7 @@
 #pragma once
 
 #include <mutex>
+#include <thread>
 #include <atomic>
 #include <shared_mutex>
 #include <system_error>
@@ -37,19 +39,19 @@ namespace gtl {
 		//null_mutex() noexcept {}
 		//~null_mutex() noexcept {}
 
-		void lock() { // lock the mutex
+		void lock() const { // lock the mutex
 		}
-		[[nodiscard]] bool try_lock() { // try to lock the mutex
+		[[nodiscard]] bool try_lock() const { // try to lock the mutex
 			return true;
 		}
-		void unlock() { // unlock the mutex
+		void unlock() const { // unlock the mutex
 		}
 
-		void lock_shared() noexcept {}
-		bool try_lock_shared() noexcept {
+		void lock_shared() const noexcept {}
+		bool try_lock_shared() const noexcept {
 			return true;
 		}
-		void unlock_shared() noexcept {}
+		void unlock_shared() const noexcept {}
 	};
 
 

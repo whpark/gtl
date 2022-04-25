@@ -1850,11 +1850,9 @@ namespace gtl::win_util {
 		//	CRefCounter rcUpdateScroll(m_rcUpdateScroll);
 
 		{
-			SCROLLINFO siH, siV;
-			ZeroVar(siH);
-			siH.cbSize = sizeof(siH);
-			ZeroVar(siV);
-			siV.cbSize = sizeof(siV);
+			SCROLLINFO siH{.cbSize = sizeof(siH)}, siV{.cbSize = sizeof(siV)};
+			//siH.cbSize = sizeof(siH);
+			//siV.cbSize = sizeof(siV);
 			//GetScrollInfo(SB_HORZ, &siH);
 			//GetScrollInfo(SB_VERT, &siV);
 

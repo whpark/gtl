@@ -48,10 +48,7 @@ namespace gtl::win_util {
 					CHeaderCtrl* pHeaderCtrl = GetHeaderCtrl();
 					if (!pHeaderCtrl)
 						return FALSE;
-					SCROLLINFO si;
-					memset(&si, 0, sizeof(si));
-					si.cbSize = sizeof(si);
-					si.fMask = SIF_ALL;
+					SCROLLINFO si{.cbSize = sizeof(si), .fMask = SIF_ALL};
 					GetScrollInfo(SB_HORZ, &si);
 					for (int iSubItem = 0; iSubItem < pHeaderCtrl->GetItemCount(); iSubItem++) {
 						CRect rectSubItem;
@@ -91,8 +88,7 @@ namespace gtl::win_util {
 
 		// Notify
 		{
-			NMLVDISPINFO ldi;
-			memset(&ldi, 0, sizeof(ldi));
+			NMLVDISPINFO ldi{};
 			ldi.hdr.code = LVN_BEGINLABELEDIT;
 			ldi.hdr.hwndFrom = m_hWnd;
 			ldi.hdr.idFrom = GetDlgCtrlID();
@@ -130,16 +126,11 @@ namespace gtl::win_util {
 			pHeaderCtrl->GetItemRect(iSubItem, rectSubItem);
 			rectSubItem.top = rect.top;
 			rectSubItem.bottom = rect.bottom;
-			SCROLLINFO si;
-			memset(&si, 0, sizeof(si));
-			si.cbSize = sizeof(si);
-			si.fMask = SIF_POS;
+			SCROLLINFO si{.cbSize = sizeof(si), .fMask = SIF_POS};
 			GetScrollInfo(SB_HORZ, &si);
 			rectSubItem.left -= si.nPos;
 			rectSubItem.right -= si.nPos;
-			HDITEM hi;
-			memset(&hi, 0, sizeof(hi));
-			hi.mask = HDI_FORMAT;
+			HDITEM hi{.mask = HDI_FORMAT};
 			pHeaderCtrl->GetItem(iSubItem, &hi);
 			switch (hi.fmt & LVCFMT_JUSTIFYMASK) {
 			case LVCFMT_LEFT : dwStyle = ES_LEFT; break;
@@ -183,8 +174,7 @@ namespace gtl::win_util {
 				&& (m_iSubItem >= 0) && (m_iSubItem < GetHeaderCtrl()->GetItemCount())
 				)
 			{
-				NMLVDISPINFO ldi;
-				memset(&ldi, 0, sizeof(ldi));
+				NMLVDISPINFO ldi{};
 				ldi.hdr.code = LVN_ENDLABELEDIT;
 				ldi.hdr.hwndFrom = m_hWnd;
 				ldi.hdr.idFrom = GetDlgCtrlID();
@@ -373,10 +363,7 @@ namespace gtl::win_util {
 					auto& aHeaderCtrl = GetHeaderCtrl();
 					if (!aHeaderCtrl)
 						return FALSE;
-					SCROLLINFO si;
-					memset(&si, 0, sizeof(si));
-					si.cbSize = sizeof(si);
-					si.fMask = SIF_ALL;
+					SCROLLINFO si{.cbSize = sizeof(si), .fMask = SIF_ALL};
 					GetScrollInfo(SB_HORZ, &si);
 					for (int iSubItem = 0; iSubItem < aHeaderCtrl.GetItemCount(); iSubItem++) {
 						CRect rectSubItem;
@@ -416,8 +403,7 @@ namespace gtl::win_util {
 
 		// Notify
 		{
-			NMLVDISPINFO ldi;
-			memset(&ldi, 0, sizeof(ldi));
+			NMLVDISPINFO ldi{};
 			ldi.hdr.code = LVN_BEGINLABELEDIT;
 			ldi.hdr.hwndFrom = m_hWnd;
 			ldi.hdr.idFrom = GetDlgCtrlID();
@@ -455,16 +441,11 @@ namespace gtl::win_util {
 			aHeaderCtrl.GetItemRect(iSubItem, rectSubItem);
 			rectSubItem.top = rect.top;
 			rectSubItem.bottom = rect.bottom;
-			SCROLLINFO si;
-			memset(&si, 0, sizeof(si));
-			si.cbSize = sizeof(si);
-			si.fMask = SIF_POS;
+			SCROLLINFO si{.cbSize = sizeof(si), .fMask = SIF_POS};
 			GetScrollInfo(SB_HORZ, &si);
 			rectSubItem.left -= si.nPos;
 			rectSubItem.right -= si.nPos;
-			HDITEM hi;
-			memset(&hi, 0, sizeof(hi));
-			hi.mask = HDI_FORMAT;
+			HDITEM hi{.mask = HDI_FORMAT};
 			aHeaderCtrl.GetItem(iSubItem, &hi);
 			switch (hi.fmt & LVCFMT_JUSTIFYMASK) {
 			case LVCFMT_LEFT : dwStyle = ES_LEFT; break;
@@ -508,8 +489,7 @@ namespace gtl::win_util {
 				&& (m_iSubItem >= 0) && (m_iSubItem < GetHeaderCtrl().GetItemCount())
 				)
 			{
-				NMLVDISPINFO ldi;
-				memset(&ldi, 0, sizeof(ldi));
+				NMLVDISPINFO ldi{};
 				ldi.hdr.code = LVN_ENDLABELEDIT;
 				ldi.hdr.hwndFrom = m_hWnd;
 				ldi.hdr.idFrom = GetDlgCtrlID();

@@ -12,7 +12,7 @@
 #pragma once
 
 #include "gtl/_config.h"
-
+#include "gtl/concepts.h"
 
 #if (GTL__BOOST_JSON__AS_STANDALONE)
 #	define BOOST_JSON_STANDALONE
@@ -368,6 +368,7 @@ namespace gtl {
 		operator int() const { return (int)j_; }
 		operator int64_t() const { return (int64_t)j_; }
 		operator double() const { return (double)j_; }
+		operator float() const { return (float)(double)j_; }
 		template < gtlc::string_elem tchar_t >
 		operator std::basic_string<tchar_t> () const {
 			auto jstrU8 = (std::string)j_;
