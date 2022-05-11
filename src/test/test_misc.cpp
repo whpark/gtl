@@ -74,10 +74,9 @@ namespace gtl::test::misc {
 		EXPECT_EQ(m3, m4);
 	}
 
-
 	TEST(misc, ptr_container) {
 
-		gtl::xConcurrentUPtrDeque<int> lst;
+		gtl::TConcurrentUPtrDeque<int> lst;
 
 		lst.push_back(std::make_unique<int>(3));
 		auto b = lst.begin();
@@ -105,6 +104,8 @@ namespace gtl::test::misc {
 		lst.push_back(std::make_unique<int>(1));
 		lst.push_back(std::make_unique<int>(0));
 
+		//lst.push_front(std::make_unique<int>(0));
+
 		std::sort(lst.base_t::begin(), lst.base_t::end(), [](auto const& a, auto const& b) { return *a<*b;});
 		EXPECT_EQ(lst[0], 0);
 		EXPECT_EQ(lst[10], 10);
@@ -113,7 +114,7 @@ namespace gtl::test::misc {
 		// test thread
 		{
 			constexpr size_t N = 100;
-			gtl::xConcurrentUPtrDeque<int> lst;
+			gtl::TConcurrentUPtrDeque<int> lst;
 			std::latch latchQueue(N);
 			auto Queue = [&](size_t index) {
 				latchQueue.count_down();
@@ -155,7 +156,7 @@ namespace gtl::test::misc {
 
 		{
 			constexpr size_t N = 100;
-			gtl::xConcurrentUPtrDeque<int> lst;
+			gtl::TConcurrentUPtrDeque<int> lst;
 			std::latch latchQueue(N);
 			auto Queue = [&](size_t index) {
 				latchQueue.count_down();

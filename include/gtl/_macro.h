@@ -189,7 +189,7 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 #define GTL__DYNAMIC_CLASS(ID)\
 	static inline TDynamicCreateHelper<this_t, ID, std::make_unique<this_t>> dynamicCreateDerived_s;
 #define GTL__DYNAMIC_CLASS_EMPLACE(ID, ...)\
-	static inline TDynamicCreateHelper<this_t, ID, []()->std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(__VA_ARGS__); }> dynamicCreateDerived_s;
+	static inline TDynamicCreateHelper<this_t, ID, []()->std::unique_ptr<base_t>{ return std::make_unique<this_t>(__VA_ARGS__); }> dynamicCreateDerived_s;
 
 
 //================================================================================================================================
@@ -198,7 +198,7 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 #define I_GTL__REFLECTION_MEMBER(var)	gtl::internal::pair{ std::string_view{#var}, &this_t::var }
 
 #define GTL__REFLECTION_MEMBERS(...) \
-	constexpr static inline const std::tuple member_tuple_s {\
+	constexpr static inline const std::tuple s_member_tuple {\
 		GTL__RECURSIVE_MACRO_COMMA(I_GTL__REFLECTION_MEMBER, __VA_ARGS__)\
 	};
 
@@ -207,53 +207,52 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 //
 
 
-#define GTL__REFLECTION_BASE(THIS_CLASS)\
-	using mw_base_t = THIS_CLASS;\
-	using this_t = THIS_CLASS;\
+#define GTL__REFLECTION_BASE(TJSON)\
+	using reflection_base_t = this_t;\
+	using json_t = TJSON;\
 	template < typename tjson >\
 	friend void from_json(tjson const& j, this_t& var) {\
-		std::apply([&j, &var](auto& ... args) { (from_json(j[args.first], var.*(args.second)), ...); }, this_t::member_tuple_s);\
+		std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::s_member_tuple);\
 	}\
 	template < typename tjson >\
 	friend void to_json(tjson&& j, this_t const& var) {\
-		std::apply([&j, &var](auto const& ... args) { (to_json(j[args.first], var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+		std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, this_t::s_member_tuple);\
 	}\
 	template < typename tarchive >\
 	friend tarchive& operator >> (tarchive& ar, this_t& var) {\
-		std::apply([&ar, &var](auto& ... args) { ((ar >> var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+		std::apply([&ar, &var](auto& ... args) { ((ar >> var.*(args.second)), ...); }, this_t::s_member_tuple);\
 		return ar;\
 	}\
 	template < typename tarchive >\
 	friend tarchive& operator << (tarchive& ar, this_t const& var) {\
-		std::apply([&ar, &var](auto const& ... args) { ((ar << var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+		std::apply([&ar, &var](auto const& ... args) { ((ar << var.*(args.second)), ...); }, this_t::s_member_tuple);\
 		return ar;\
 	}\
 	//auto operator <=> (this_t const&) const = default;
 
 
-#define GTL__REFLECTION_DERIVED(THIS_CLASS, PARENT_CLASS)\
-	using this_t = THIS_CLASS;\
-	using parent_t = PARENT_CLASS;\
+#define GTL__REFLECTION_DERIVED()\
+	using reflection_base_t = base_t::reflection_base_t;\
 	template < typename tjson >\
 	friend void from_json(tjson const& j, this_t& var) {\
-		from_json(j, (parent_t&)var);\
-		std::apply([&j, &var](auto& ... args) { (from_json(j[args.first], var.*(args.second)), ...); }, this_t::member_tuple_s);\
+		from_json(j, (base_t&)var);\
+		std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::s_member_tuple);\
 	}\
 	template < typename tjson >\
 	friend void to_json(tjson&& j, this_t const& var) {\
-		to_json(j, (parent_t const&)var);\
-		std::apply([&j, &var](auto const& ... args) { (to_json(j[args.first], var.*(args.second)), ...); }, this_t::member_tuple_s);\
+		to_json(j, (base_t const&)var);\
+		std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, this_t::s_member_tuple);\
 	}\
 	template < typename tarchive >\
 	friend tarchive& operator >> (tarchive& ar, this_t& var) {\
-		ar >> (parent_t&)var;\
-		std::apply([&ar, &var](auto& ... args) { ((ar & var.*(args.second)), ...); }, this_t::member_tuple_s);\
+		ar >> (base_t&)var;\
+		std::apply([&ar, &var](auto& ... args) { ((ar >> var.*(args.second)), ...); }, this_t::s_member_tuple);\
 		return ar;\
 	}\
 	template < typename tarchive >\
 	friend tarchive& operator << (tarchive& ar, this_t const& var) {\
-		ar << (parent_t const&)var;\
-		std::apply([&ar, &var](auto const& ... args) { ((ar << var.*(args.second)), ...); }, THIS_CLASS::member_tuple_s);\
+		ar << (base_t const&)var;\
+		std::apply([&ar, &var](auto const& ... args) { ((ar << var.*(args.second)), ...); }, this_t::s_member_tuple);\
 		return ar;\
 	}\
 	//auto operator <=> (this_t const&) const = default;
@@ -261,12 +260,10 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 
 	//-----------------------------------------------------------------------------
 	// Reflection (member wise...) : with virtual function
-#define GTL__REFLECTION_VIRTUAL_BASE(THIS_CLASS)\
-	GTL__REFLECTION_BASE(THIS_CLASS)\
-	virtual void FromJson(bjson<> const& j) { from_json(j, *(this_t*)this); }\
-	virtual void ToJson(bjson<>& j) const { to_json(j, *(this_t*)this); }\
-	virtual void FromJson(njson<> const& j) { from_json(j, *(this_t*)this); }\
-	virtual void ToJson(njson<>& j) const { to_json(j, *(this_t*)this); }\
+#define GTL__REFLECTION_VIRTUAL_BASE(TJSON)\
+	GTL__REFLECTION_BASE(TJSON)\
+	virtual void FromJson(typename reflection_base_t::json_t const& j) { from_json(j, *(this_t*)this); }\
+	virtual void ToJson(typename reflection_base_t::json_t& j) const { to_json(j, *(this_t const*)this); }\
 	virtual bool Compare(this_t const& B) const {\
 		if (!dynamic_cast<this_t const*>(&B))\
 			return false;\
@@ -274,13 +271,11 @@ static_assert(NUM_ARGS(1, 2, 3) == 3, "for MSVC, add compiler option /Zc:preproc
 	}\
 
 
-#define GTL__REFLECTION_VIRTUAL_DERIVED(THIS_CLASS, PARENT_CLASS)\
-	GTL__REFLECTION_DERIVED(THIS_CLASS, PARENT_CLASS)\
-	void FromJson(bjson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }\
-	void ToJson(bjson<>& j) const override { to_json(j, *(THIS_CLASS*)this); }\
-	void FromJson(njson<> const& j) override { from_json(j, *(THIS_CLASS*)this); }\
-	void ToJson(njson<>& j) const override { to_json(j, *(THIS_CLASS*)this); }\
-	bool Compare(typename THIS_CLASS::mw_base_t const& B) const override {\
+#define GTL__REFLECTION_VIRTUAL_DERIVED()\
+	GTL__REFLECTION_DERIVED()\
+	void FromJson(typename reflection_base_t::json_t const& j) override { from_json(j, *(this_t*)this); }\
+	void ToJson(typename reflection_base_t::json_t& j) const override { to_json(j, *(this_t const*)this); }\
+	bool Compare(typename this_t::reflection_base_t const& B) const override {\
 		if (!dynamic_cast<this_t const*>(&B))\
 			return false;\
 		return (*this) == (this_t const&)B;\

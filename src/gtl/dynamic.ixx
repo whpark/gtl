@@ -88,7 +88,7 @@ export namespace gtl {
 
 
 
-	template < typename tobject, auto id, std::unique_ptr<typename tobject::mw_base_t> (*Creator)() >
+	template < typename tobject, auto id, std::unique_ptr<typename tobject::base_t> (*Creator)() >
 	class TDynamicCreateHelper {
 	public:
 		using object_t = tobject;

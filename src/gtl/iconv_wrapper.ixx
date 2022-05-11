@@ -23,6 +23,7 @@ module;
 
 export module gtl:iconv_wrapper;
 import :concepts;
+import :misc;
 
 /*******************************************
 
@@ -93,9 +94,9 @@ export namespace gtl {
 
 	public:
 		Ticonv(char const* to = nullptr, char const* from = nullptr) {
-			if (!to)
+			if (!to or !*to)
 				to = GuessCodeFromType<tchar_to>();
-			if (!from)
+			if (!from or !*from)
 				from = GuessCodeFromType<tchar_from>();
 			cd_ = iconv_open(to, from);
 		}
@@ -237,14 +238,26 @@ export namespace gtl {
 	};
 
 	// helper
-	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from, size_t initial_dst_buf_size = 1024 >
-	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string_view<tchar_from> svFrom, char const* szCodeTo = nullptr, char const* szCodeFrom = nullptr) {
-		return Ticonv<tchar_to, tchar_from, initial_dst_buf_size>{szCodeTo, szCodeFrom}.Convert(svFrom);
+	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from,
+		gtl::xStringLiteral szCodeTo = "", gtl::xStringLiteral szCodeFrom = "", size_t initial_dst_buf_size = 1024 >
+	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string_view<tchar_from> strFrom) {
+		static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
+		return iconv.Convert(strFrom);
+	}
+	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from,
+		gtl::xStringLiteral szCodeTo = "", gtl::xStringLiteral szCodeFrom = "", size_t initial_dst_buf_size = 1024 >
+	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string<tchar_from> const& strFrom) {
+		static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
+		return iconv.Convert(strFrom);
 	}
 
-	// helper
+	// obsolete
 	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from, size_t initial_dst_buf_size = 1024 >
-	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string<tchar_from> const& strFrom, char const* szCodeTo = nullptr, char const* szCodeFrom = nullptr) {
+	[[deprecated]] std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string_view<tchar_from> svFrom, char const* szCodeTo, char const* szCodeFrom = nullptr) {
+		return Ticonv<tchar_to, tchar_from, initial_dst_buf_size>{szCodeTo, szCodeFrom}.Convert(svFrom);
+	}
+	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from, size_t initial_dst_buf_size = 1024 >
+	[[deprecated]] std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string<tchar_from> const& strFrom, char const* szCodeTo, char const* szCodeFrom = nullptr) {
 		return Ticonv<tchar_to, tchar_from, initial_dst_buf_size>{szCodeTo, szCodeFrom}.Convert(strFrom);
 	}
 
