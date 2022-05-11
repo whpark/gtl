@@ -43,16 +43,6 @@ namespace gtl::ui {
 		return fmt::format(GetDefaultFormatString(sizeof...(args)), std::forward<Args>(args)...);
 	}
 
-	template < gtlc::string_elem tchar_t, size_t N >
-	struct StringLiteral {
-		tchar_t str[N];
-
-		constexpr StringLiteral(tchar_t const (&sz)[N]) {
-			std::copy_n(sz, N, str);
-		}
-	};
-
-
 	//! @brief translate string to html safe string ( '<' ==> "&lt;" )
 	//! @param str 
 	//! @return 

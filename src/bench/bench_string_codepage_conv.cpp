@@ -1,6 +1,9 @@
 ﻿#include "benchmark/benchmark.h"
 
 #include "gtl/gtl.h"
+#include "gtl/iconv_wrapper.h"
+#include "gtl/string.h"
+#include "gtl/string/convert_codepage.h"
 #include "gtl/string/utf_char_view.h"
 
 using namespace std::literals;
@@ -204,13 +207,91 @@ static void StringCodepageConv_U8toU32_coroutine(benchmark::State& state) {
 
 }
 
-BENCHMARK(StringCodepageConv_U8toU32_CountAndConvert)->Arg(0)->Arg(1)->Arg(2);
-BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvert)->Arg(0)->Arg(1)->Arg(2);
-BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvertNoShrink)->Arg(0)->Arg(1)->Arg(2);
-BENCHMARK(StringCodepageConv_U8toU32_coroutine)->Arg(0)->Arg(1)->Arg(2);
+//BENCHMARK(StringCodepageConv_U8toU32_CountAndConvert)->Arg(0)->Arg(1)->Arg(2);
+//BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvert)->Arg(0)->Arg(1)->Arg(2);
+//BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvertNoShrink)->Arg(0)->Arg(1)->Arg(2);
+//BENCHMARK(StringCodepageConv_U8toU32_coroutine)->Arg(0)->Arg(1)->Arg(2);
 
+#pragma optimize ("", off)
+void StringCodepageConv_ICONV_MBCS_WIDE(benchmark::State& state) {
 
+	for (auto _ : state) {
+		std::string str{"가나다라마바사"};
+		auto strT = gtl::ToString_iconv<wchar_t, char, "", "CP949">(str);
+	}
+}
+void StringCodepageConv_ICONV_MBCS_WIDE_EACH(benchmark::State& state) {
 
+	for (auto _ : state) {
+		std::string str{"가나다라마바사"};
+		auto strT = gtl::ToString_iconv<wchar_t, char>(str, nullptr, "CP949");
+	}
+}
+#pragma optimize ("", on)
+
+#pragma optimize ("", off)
+void StringCodepageConv_WindowsAPI_MBCS_WIDE(benchmark::State& state) {
+
+	for (auto _ : state) {
+		std::string str{"가나다라마바사"};
+		auto n = MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, str.c_str(), (int)str.size(), nullptr, 0);
+		if (n <= 0)
+			continue;
+		std::wstring strW;
+		strW.resize(n);
+		MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, str.c_str(), (int)str.size(), strW.data(), (int)strW.size());
+	}
+
+}
+#pragma optimize ("", on)
+
+BENCHMARK(StringCodepageConv_ICONV_MBCS_WIDE);
+BENCHMARK(StringCodepageConv_ICONV_MBCS_WIDE_EACH);
+BENCHMARK(StringCodepageConv_WindowsAPI_MBCS_WIDE);
+
+#pragma optimize ("", off)
+void StringCodepageConv_ICONV_UTF8_WIDE(benchmark::State& state) {
+
+	for (auto _ : state) {
+		auto str{u8"가나다라마바사"s};
+		auto strT = gtl::ToString_iconv<wchar_t>(str);
+	}
+
+}
+#pragma optimize ("", on)
+
+#pragma optimize ("", off)
+void StringCodepageConv_WindowsAPI_UTF8_WIDE(benchmark::State& state) {
+
+	for (auto _ : state) {
+		auto str{u8"가나다라마바사"s};
+		auto n = MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, (char const*)str.c_str(), (int)str.size(), nullptr, 0);
+		if (n <= 0)
+			continue;
+		std::wstring strW;
+		strW.resize(n);
+		MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, (char const*)str.c_str(), (int)str.size(), strW.data(), (int)strW.size());
+	}
+
+}
+#pragma optimize ("", on)
+
+BENCHMARK(StringCodepageConv_ICONV_UTF8_WIDE);
+BENCHMARK(StringCodepageConv_WindowsAPI_UTF8_WIDE);
+
+//#pragma optimize ("", off)
+//void StringCodepageConv_ICONV_R_MBCS_WIDE(benchmark::State& state) {
+//
+//	gtl::Ticonv<wchar_t, char> conv(nullptr, "CP949");
+//	for (auto _ : state) {
+//		auto str{"가나다라마바사"s};
+//		auto strT = conv.Convert(str);
+//	}
+//
+//}
+//#pragma optimize ("", on)
+//
+//BENCHMARK(StringCodepageConv_ICONV_R_MBCS_WIDE);
 
 //=====================================================================================================
 

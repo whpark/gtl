@@ -45,6 +45,15 @@ namespace gtl::internal {
 namespace gtl {
 #pragma pack(push, 8)
 
+	template < gtlc::string_elem tchar_t, size_t N >
+	struct xStringLiteral {
+		tchar_t str[N];
+
+		constexpr xStringLiteral(tchar_t const (&sz)[N]) {
+			std::copy_n(sz, N, str);
+		}
+	};
+
 	//! @brief call back function for progress dialog or something like...
 	using callback_progress_t = std::function<bool (int iPercent, bool bDone, bool bError)>;
 
