@@ -224,7 +224,7 @@ void StringCodepageConv_ICONV_MBCS_WIDE_EACH(benchmark::State& state) {
 
 	for (auto _ : state) {
 		std::string str{"가나다라마바사"};
-		auto strT = gtl::ToString_iconv<wchar_t, char>(str, nullptr, "CP949");
+		auto strT = gtl::ToString_iconv<wchar_t, char, "", "CP949">(str);
 	}
 }
 #pragma optimize ("", on)

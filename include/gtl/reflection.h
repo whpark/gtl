@@ -38,8 +38,9 @@ namespace gtl {
 	//
 
 
-#define GTL__REFLECTION_BASE()\
+#define GTL__REFLECTION_BASE(TJSON)\
 	using reflection_base_t = this_t;\
+	using json_t = TJSON;\
 	template < typename tjson >\
 	friend void from_json(tjson const& j, this_t& var) {\
 		std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::s_member_tuple);\
@@ -62,7 +63,7 @@ namespace gtl {
 
 
 #define GTL__REFLECTION_DERIVED()\
-	using reflection_base_t = typename base_t::reflection_base_t;\
+	using reflection_base_t = base_t::reflection_base_t;\
 	template < typename tjson >\
 	friend void from_json(tjson const& j, this_t& var) {\
 		from_json(j, (base_t&)var);\
@@ -91,8 +92,7 @@ namespace gtl {
 	//-----------------------------------------------------------------------------
 	// Reflection (member wise...) : with virtual function
 #define GTL__REFLECTION_VIRTUAL_BASE(TJSON)\
-	GTL__REFLECTION_BASE()\
-	using json_t = TJSON;\
+	GTL__REFLECTION_BASE(TJSON)\
 	virtual void FromJson(json_t const& j) { from_json(j, *(this_t*)this); }\
 	virtual void ToJson(json_t& j) const { to_json(j, *(this_t const*)this); }\
 	virtual bool Compare(this_t const& B) const {\
@@ -104,9 +104,9 @@ namespace gtl {
 
 #define GTL__REFLECTION_VIRTUAL_DERIVED()\
 	GTL__REFLECTION_DERIVED()\
-	void FromJson(typename reflection_base_t::json_t const& j) override { from_json(j, *(this_t*)this); }\
-	void ToJson(typename reflection_base_t::json_t& j) const override { to_json(j, *(this_t const*)this); }\
-	bool Compare(typename reflection_base_t const& B) const override {\
+	void FromJson(typename base_t::json_t const& j) override { from_json(j, *(this_t*)this); }\
+	void ToJson(typename base_t::json_t& j) const override { to_json(j, *(this_t const*)this); }\
+	bool Compare(typename base_t::reflection_base_t const& B) const override {\
 		if (!dynamic_cast<this_t const*>(&B))\
 			return false;\
 		return (*this) == (this_t const&)B;\
@@ -114,40 +114,39 @@ namespace gtl {
 
 
 
-	//================================================================================================================================
-	// reflection CRTP version.
-	//
+	////================================================================================================================================
+	//// reflection CRTP version.
+	////
 
-	/// @brief CRTP reflection class. (not good. better to use MACROS)
-	/// @tparam 
-	template < typename THIS_CLASS, typename tjson = gtl::njson<nlohmann::json> >
-	class IReflection {
-	public:
-		using reflection_base_t = THIS_CLASS;
-		using this_t = THIS_CLASS;
-		using base_t = this_t;
+	///// @brief CRTP reflection class. (not good. better to use MACROS)
+	///// @tparam 
+	//template < typename THIS_CLASS, typename tjson = gtl::njson<nlohmann::json> >
+	//class IReflection {
+	//public:
+	//	using reflection_base_t = THIS_CLASS;
+	//	using this_t = THIS_CLASS;
 
-		GTL__REFLECTION_VIRTUAL_BASE(tjson)
+	//	GTL__REFLECTION_VIRTUAL_BASE(tjson)
 
-	public:
-		auto operator <=>(IReflection const&) const = default;
-	};
-
+	////public:
+	////	auto operator <=>(IReflection const&) const = default;
+	//};
 
 
-	/// @brief CRTP reflection class (derived). (not good. better to use MACROS)
-	/// @tparam 
-	template < typename THIS_CLASS, typename BASE_CLASS >
-	class IReflectionDerived : public BASE_CLASS {
-	public:
-		using this_t = THIS_CLASS;
-		using base_t = BASE_CLASS;
 
-		GTL__REFLECTION_VIRTUAL_DERIVED()
+	///// @brief CRTP reflection class (derived). (not good. better to use MACROS)
+	///// @tparam 
+	//template < typename THIS_CLASS, typename BASE_CLASS >
+	//class IReflectionDerived : public BASE_CLASS {
+	//public:
+	//	using this_t = THIS_CLASS;
+	//	using base_t = BASE_CLASS;
 
-	public:
-		auto operator <=>(IReflectionDerived const&) const = default;
-	};
+	//	GTL__REFLECTION_VIRTUAL_DERIVED()
+
+	//public:
+	//	auto operator <=>(IReflectionDerived const&) const = default;
+	//};
 
 
 #pragma pack(pop)
