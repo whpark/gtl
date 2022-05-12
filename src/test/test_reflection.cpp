@@ -61,7 +61,7 @@ namespace gtl::test::reflection::MACRO {
 
 	class CTestClassDerived : public CTestClass {
 
-	public: 
+	public:
 		int k{};
 		double a{}, b{}, c{};
 		std::string str {"str"};

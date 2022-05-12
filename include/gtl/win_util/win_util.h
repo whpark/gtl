@@ -125,7 +125,7 @@ namespace gtl::win_util {
 		void Lap(std::string_view sv, Args&& ... args) {
 			auto t = tclock::now();
 			osA << std::format(GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
-			osA << std::format(sv, std::forward<Args>(args)...);
+			osA << std::vformat(sv, std::make_format_args(args...));
 			osA << std::format(GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
 			base_t::t0 = tclock::now();
 		}
@@ -133,7 +133,7 @@ namespace gtl::win_util {
 		void Lap(std::wstring_view sv, Args&& ... args) {
 			auto t = tclock::now();
 			osW << std::format(L"" GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
-			osW << std::format(sv, std::forward<Args>(args)...);
+			osW << std::vformat(sv, std::make_format_args(args...));
 			osW << std::format(L"" GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
 			base_t::t0 = tclock::now();
 		}

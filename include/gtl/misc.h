@@ -487,8 +487,8 @@ namespace gtl {
 		void Stop() {}
 
 	public:
-		template < typename ... Args >
-		void Lap(Args&& ... args) {
+		template < typename SFMT, typename ... Args >
+		void Lap(SFMT const& fmt, Args&& ... args) {
 			auto t = tclock::now();
 		#define GTL__PRINT_FMT_STOPWATCH "STOP_WATCH {:{}}[ "
 			if constexpr (gtlc::is_one_of<tchar, char>) {
@@ -506,7 +506,7 @@ namespace gtl {
 			}
 		#undef GTL__PRINT_FMT_STOPWATCH
 
-			os << std::format(std::forward<Args>(args)...);
+			os << std::vformat(fmt, std::make_format_args(args...));
 
 		#define GTL__PRINT_FMT_STOPWATCH " ] {}\n"
 			if constexpr (gtlc::is_one_of<tchar, char>) {
