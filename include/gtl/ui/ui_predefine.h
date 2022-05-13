@@ -15,8 +15,8 @@
 
 #pragma once
 
-#include "../_default.h"
-#include "../string.h"
+#include "gtl/_default.h"
+#include "gtl/string.h"
 
 #define GText TEXT_u8
 

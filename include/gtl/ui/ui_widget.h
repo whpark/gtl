@@ -317,7 +317,7 @@ namespace gtl::ui {
 			if (size)
 				option.m_attributes.emplace_back(fmt::format(GText(R"xx(size={})xx"), size));
 			option.m_template = Option();
-			option.m_items = values;
+			option.m_items = std::move(values);
 
 			if (width.index())
 				option.m_properties.push_back({ GText("Width"), ToString(width) });

@@ -16,6 +16,7 @@
 #pragma once
 
 #include "ui_predefine.h"
+#include "gtl/misc.h"
 
 //#define BOOST_JSON_STANDALONE
 //#include "boost/json.hpp"
@@ -23,7 +24,7 @@
 
 /*export*/ namespace gtl::ui::unit {
 
-	template < typename T, typename CLASS, StringLiteral TUNIT_NAME >
+	template < typename T, typename CLASS, xStringLiteral TUNIT_NAME >
 	struct TPosLength {
 		using value_type = T;
 		using this_t = TPosLength;
@@ -90,7 +91,7 @@
 };
 
 
-/*export*/ namespace gtl::ui::literals {
+/*export*/ namespace gtl::ui::inline literals {
 	constexpr unit::px_t		operator "" _px (long double v)		{ return unit::px_t{(float)v}; }
 	constexpr unit::px_t		operator "" _px (uint64_t v)		{ return unit::px_t{(float)v}; }
 
