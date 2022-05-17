@@ -326,6 +326,8 @@ namespace gtl::ui {
 			return std::make_shared<xWidget>(option);
 		}
 
+		[[nodiscard]] static rWidget Table(string_t name, gtl::ui::unit::position_t width={}, gtl::ui::unit::position_t height = {}) {
+		}
 		[[nodiscard]] static rWidget ListColumn(string_t name, rWidget itemTempl, gtl::ui::unit::position_t width={}, gtl::ui::unit::position_t height = {}) {
 		}
 		[[nodiscard]] static rWidget List(std::vector<xWidget> set, bool bColumnItems = true) {
