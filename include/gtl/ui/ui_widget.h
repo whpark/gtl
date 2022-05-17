@@ -298,7 +298,7 @@ namespace gtl::ui {
 			option.m_attributes.emplace_back(GText(R"xx(onclick="OnButton({id})" )xx"));
 
 			if (width.index())
-				option.m_properties.push_back({GText("Width"), ToString(width)});
+				option.m_properties.push_back(gtl::ui::prop::MakeProperty(GText("Width"), width));
 			if (height.index())
 				option.m_properties.push_back({GText("Height"), ToString(height)});
 			return std::make_shared<xWidget>(option);

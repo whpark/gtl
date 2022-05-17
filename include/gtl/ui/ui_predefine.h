@@ -29,7 +29,7 @@ namespace gtl::ui {
 	using xstring_t = gtl::TString<char_type>;
 	using item_t = std::variant<int, string_t, std::vector<uint8_t>>;
 
-	constexpr string_t GetDefaultFormatString(size_t nArg) {
+	inline constexpr string_t GetDefaultFormatString(size_t nArg) {
 		using namespace std::literals;
 		string_t str;
 		str.reserve(nArg*3);

@@ -19,12 +19,12 @@
 /*export*/ namespace gtl::ui::prop::value {
 
 	namespace text_align {
-		static inline string_t const center			{ GText("center"s) };
-		static inline string_t const left			{ GText("left"s) };
-		static inline string_t const right			{ GText("right"s) };
-		static inline string_t const justify		{ GText("justify"s) };
-		static inline string_t const init			{ GText("init"s) };
-		static inline string_t const inherit		{ GText("inherit"s) };
+		static inline constexpr string_t const center		{ GText("center"s) };
+		static inline constexpr string_t const left			{ GText("left"s) };
+		static inline constexpr string_t const right		{ GText("right"s) };
+		static inline constexpr string_t const justify		{ GText("justify"s) };
+		static inline constexpr string_t const init			{ GText("init"s) };
+		static inline constexpr string_t const inherit		{ GText("inherit"s) };
 	}
 
 
