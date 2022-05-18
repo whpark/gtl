@@ -38,7 +38,7 @@ namespace gtl::ui {
 		//=====================================================================
 		// attributes
 		//! @brief unique id
-		string_t m_id;
+		string_t m_id{MakeUniqueID()};
 		//! @brief name
 		string_t m_name;
 		//! @brief widget type (label, button, panel...)
