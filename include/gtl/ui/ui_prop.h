@@ -23,22 +23,24 @@
 /*export*/ namespace gtl::ui::inline prop {
 
 	inline namespace name {
-		static inline constexpr string_t const text_align		{ GText("text-align"s) };
-		static inline constexpr string_t const background		{ GText("background"s) };
-		static inline constexpr string_t const width			{ GText("width"s) };
-		static inline constexpr string_t const height			{ GText("height"s) };
-		static inline constexpr string_t const max_width		{ GText("max-width"s) };
-		static inline constexpr string_t const min_width		{ GText("min-width"s) };
-		static inline constexpr string_t const max_height		{ GText("max-height"s) };
-		static inline constexpr string_t const min_height		{ GText("min-height"s) };
-		static inline constexpr string_t const border			{ GText("border"s) };
-		static inline constexpr string_t const margin			{ GText("margin"s) };
-		static inline constexpr string_t const padding			{ GText("padding"s) };
+		using namespace std::literals;
+
+		static inline string_t const text_align		{ GText("text-align"s) };
+		static inline string_t const background		{ GText("background"s) };
+		static inline string_t const width			{ GText("width"s) };
+		static inline string_t const height			{ GText("height"s) };
+		static inline string_t const max_width		{ GText("max-width"s) };
+		static inline string_t const min_width		{ GText("min-width"s) };
+		static inline string_t const max_height		{ GText("max-height"s) };
+		static inline string_t const min_height		{ GText("min-height"s) };
+		static inline string_t const border			{ GText("border"s) };
+		static inline string_t const margin			{ GText("margin"s) };
+		static inline string_t const padding		{ GText("padding"s) };
 	}
 
 	//==============================================================================================================================
 	//! @brief widget appearance
-	struct GTL__CLASS xWidgetProperty {
+	struct xWidgetProperty {
 	public:
 		using this_t = xWidgetProperty;
 
@@ -52,21 +54,25 @@
 		}
 
 		auto operator <=> (xWidgetProperty const&) const = default;
-		bool operator == (string_t const& name) const {
-			return m_name == name;
-		}
-
+		//bool operator == (string_t const& name) const {
+		//	return m_name == name;
+		//}
 	};
 
 	template < typename ... Args >
 	xWidgetProperty MakeProperty(string_t name, Args&& ... value) {
 		xWidgetProperty prop;
 		prop.m_name = std::move(name);
-		if constexpr ((sizeof ... (Args) == 1) and std::is_convertible_v<Args, string_t>) {
-			prop.m_value = std::move(value);
+		if constexpr (sizeof ... (Args) == 1) {
+			if constexpr (std::is_convertible_v<Args..., string_t>) {
+				prop.m_value = std::move(value...);
+			}
+			else {
+				prop.m_value = ToString(std::forward<Args>(value)...);
+			}
 		}
 		else {
-			prop.m_value = ToString(std::forward<Args>(args)...);
+			prop.m_value = ToString(std::forward<Args>(value)...);
 		}
 		return prop;
 	}

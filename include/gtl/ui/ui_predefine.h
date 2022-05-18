@@ -48,6 +48,7 @@ namespace gtl::ui {
 	//! @return 
 	template <bool bToHTMLSafeEntities>
 	string_t TranslateHTMLChar(string_t str) {
+		using namespace std::literals;
 		static std::vector<std::pair<string_t, string_t>> const tbl{
 			{ GText(" "s),	GText("&nbsp;"s) },
 			{ GText("<"s),	GText("&lt;"s) },

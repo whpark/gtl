@@ -209,10 +209,12 @@ namespace gtl::ui {
 		}
 
 		string_t GetStyleString() {
+			using namespace std::literals;
+
 			string_t strStyles;
 			size_t len{};
 			for (auto const& prop : m_properties) {
-				len += prop.m_property.size() + prop.m_value.size() + 3;
+				len += prop.m_name.size() + prop.m_value.size() + 3;
 			}
 
 			if (len) {
@@ -231,9 +233,9 @@ namespace gtl::ui {
 
 		[[nodiscard]] static rWidget GroupBoxVertical(string_t title, xWidgetData option = {}, std::initializer_list<rWidgetData> lst = {}) {
 			if (option.m_tag.empty())
-				option.m_tag = GText("fieldset"s);
-			option.m_properties.push_back({ GText("display"s), GText("flex"s) });
-			option.m_properties.push_back({ GText("flex-direction"s), GText("column"s) });
+				option.m_tag = GText("fieldset");
+			option.m_properties.push_back({ GText("display"), GText("flex") });
+			option.m_properties.push_back({ GText("flex-direction"), GText("column") });
 			//option.m_properties.push_back({ GText("align-items"s), GText("center"s) });
 			auto r = std::make_shared<xWidget>(option);
 			r->m_components = lst;
@@ -242,10 +244,12 @@ namespace gtl::ui {
 		}
 
 		[[nodiscard]] static rWidget PanelVertical(xWidgetData option={}, std::initializer_list<rWidgetData> lst = {}) {
+			using namespace std::literals;
+
 			if (option.m_tag.empty())
 				option.m_tag = GText("div"s);
-			option.m_properties.push_back({ GText("display"s), GText("flex"s) });
-			option.m_properties.push_back({GText("flex-direction"s), GText("column"s)});
+			option.m_properties.push_back({ GText("display"), GText("flex") });
+			option.m_properties.push_back({GText("flex-direction"), GText("column")});
 			//option.m_properties.push_back({ GText("align-items"s), GText("center"s) });
 			auto r = std::make_shared<xWidget>(option);
 			r->m_components = lst;
@@ -254,9 +258,9 @@ namespace gtl::ui {
 		[[nodiscard]] static rWidget PanelHorizontal(xWidgetData option={}, std::initializer_list<rWidgetData> lst = {}) {
 			if (option.m_tag.empty())
 				option.m_tag = GText("div"s);
-			option.m_properties.push_back({GText("display"s), GText("flex"s)});
-			option.m_properties.push_back({GText("flex-direction"s), GText("row"s)});
-			option.m_properties.push_back({ GText("align-items"s), GText("center"s) });
+			option.m_properties.push_back({GText("display"), GText("flex")});
+			option.m_properties.push_back({GText("flex-direction"), GText("row")});
+			option.m_properties.push_back({ GText("align-items"), GText("center") });
 			auto r = std::make_shared<xWidget>(option);
 			r->m_components = lst;
 			return r;

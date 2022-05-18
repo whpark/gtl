@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        div {
+            user-select: none;
+            padding: 2px;
+            margin: 2px;
+        }
+
+        table {
+            padding: 1px;
+            margin: 1px;
+
+        }
+	    .listctrl {
+            padding: 2px;
+            margin: 2px;
+
+	    }
+        .listctrl.head.item {
+
+        }
+
+    </style>
+
+    <script>
+        "use strict";
+        //! [chromeWebView]
+        window.chrome.webview.addEventListener('message', arg => {
+            console.log('OnMessage\n');
+            CreateObject(arg);
+        });
+        //! [chromeWebView]
+        console.log('AddEventListener\n');
+
+        function OnButton(btn) {
+            console.log('Button_Click:' + btn.id + '\n');
+            window.chrome.webview.postMessage('Button_Click:' + btn.id + '');
+        }
+        function OnEditChange(id, value) {
+            console.log('Edit_Change:' + id.id + ':' + value);
+            window.chrome.webview.postMessage('Edit_Change:' + id.id + ':' + value);
+        }
+
+        function GetWindowBounds() {
+            window.chrome.webview.postMessage("GetWindowBounds");
+        }
+
+        function CreateObject(arg) {
+            // 1. Create the button
+            var button = document.createElement("button");
+            button.innerHTML = "ButtonCreated";
+            button.id = "btnCreated";
+
+            // 2. Append somewhere
+            var body = document.getElementsByTagName("body")[0];
+            body.appendChild(button);
+
+            // 3. Add event handler
+            button.addEventListener("click", function () { OnButton(button.id); });
+        }
+
+        function GetText_test(id) {
+            var edit = document.getElementById(id);
+            alert(edit.value);
+        }
+
+    </script>
+</head>
+<body>
+
+    <!-- gtl.ui - here -->
+
+    <fieldset>
+        <legend>Personalia:</legend>
+        <label style="Width: 200px;">First name:</label>
+        <input type="text" id="fname" name="fname">
+        <input type="number" min="10.5" max="20" step="2" value="16">
+        <br /><br />
+        <label for="lname">Last name:</label>
+        <input type="text" id="lname" name="lname" value="asguhagsdjfa;iojfwioe"><br><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email"><br><br>
+        <label for="birthday">Birthday:</label>
+        <input type="date" id="birthday" name="birthday" onchange="OnEditChange({id}, this.value)">
+        <button onclick="GetText_test('lname')">test button</button>
+    </fieldset>
+
+    <div>
+        <table border="1">
+            <tr>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+            </tr>
+            <tr> <td>first</td><td>second</td><td>third</td> </tr>
+            <tr> <td>first</td><td>second</td><td>third</td> </tr>
+            <tr> <td>first</td><td>second</td><td>third</td> </tr>
+            <tr> <td>first</td><td>second</td><td>third</td> </tr>
+            <tr> <td>first</td><td>second</td><td>third</td> </tr>
+            <tr> <td>first</td><td>second</td><td>third</td> </tr>
+            <tr> <td>first</td><td>second</td><td>third</td> </tr>
+        </table>
+    </div>
+
+    <div class="listctrl">
+        <div class="listctrl.head">
+            <div class="listctrl.head.item">Col1</div>
+            <div class="listctrl.head.item">Col2</div>
+            <div class="listctrl.head.item">Col3</div>
+            <div class="listctrl.head.item">Col4</div>
+        </div>
+    </div>
+
+    <div>
+        <label for="standard-select">Standard Select</label>
+    </div>
+    <select id="standard-select" size="3">
+        <option value="Option 1">Option 1</option>
+        <option value="Option 2">Option 2</option>
+        <option value="Option 3">Option 3</option>
+        <option value="Option 4">Option 4</option>
+        <option value="Option 5">Option 5</option>
+        <option value="Option length">Option that has too long of a value to fit</option>
+    </select>
+
+    <div>
+        <label for="multi-select">Multiple Select</label>
+    </div>
+    <select id="multi-select" multiple>
+        <option value="Option 1">Option 1</option>
+        <option value="Option 2">Option 2</option>
+        <option value="Option 3">Option 3</option>
+        <option value="Option 4">Option 4</option>
+        <option value="Option 5">Option 5</option>
+        <option value="Option length">Option that has too long of a value to fit</option>
+    </select>
+
+
+    <div>
+        <label for="multi-select--disabled">Multiple Select</label>
+    </div>
+    <select id="multi-select--disabled" multiple disabled>
+        <option value="Option 1">Option 1</option>
+        <option value="Option 2">Option 2</option>
+        <option value="Option 3">Option 3</option>
+        <option value="Option 4">Option 4</option>
+        <option value="Option 5">Option 5</option>
+        <option value="Option length">Option that has too long of a value to fit</option>
+    </select>
+
+</body>
+</html>

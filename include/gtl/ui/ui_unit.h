@@ -51,7 +51,7 @@
 	using position_t = std::variant<dummy_t, px_t, em_t, rem_t, vw_t, vh_t, vmin_t, vmax_t, percent_t>;
 
 	template < typename TUNIT >
-	struct TFormatter : public fmt::formatter<typename std::remove_cvref_t<TUNIT>::value_type, gtl::ui::char_type> {
+	struct TFMTUnitFormatter : public fmt::formatter<typename std::remove_cvref_t<TUNIT>::value_type, gtl::ui::char_type> {
 		using base_t = fmt::formatter<typename std::remove_cvref_t<TUNIT>::value_type, gtl::ui::char_type>;
 		template < typename context >
 		auto format(TUNIT const& v, context& ctx) {
@@ -66,7 +66,7 @@
 	};
 
 	template < typename TUNIT >
-	struct TFormatter : public std::formatter<typename std::remove_cvref_t<TUNIT>::value_type, gtl::ui::char_type> {
+	struct TSTDUnitFormatter : public std::formatter<typename std::remove_cvref_t<TUNIT>::value_type, gtl::ui::char_type> {
 		using base_t = std::formatter<typename std::remove_cvref_t<TUNIT>::value_type, gtl::ui::char_type>;
 		template < typename context >
 		auto format(TUNIT const& v, context& ctx) {
@@ -82,52 +82,50 @@
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 
-	/*export*/ template <> struct fmt::formatter<dummy_t,	 char_type> : TFormatter<dummy_t> {};
-	/*export*/ template <> struct fmt::formatter<px_t,		 char_type> : TFormatter<px_t> {};
-	/*export*/ template <> struct fmt::formatter<em_t,		 char_type> : TFormatter<em_t> {};
-	/*export*/ template <> struct fmt::formatter<rem_t,		 char_type> : TFormatter<rem_t> {};
-	/*export*/ template <> struct fmt::formatter<vw_t,		 char_type> : TFormatter<vw_t> {};
-	/*export*/ template <> struct fmt::formatter<vh_t,		 char_type> : TFormatter<vh_t> {};
-	/*export*/ template <> struct fmt::formatter<vmin_t,	 char_type> : TFormatter<vmin_t> {};
-	/*export*/ template <> struct fmt::formatter<vmax_t,	 char_type> : TFormatter<vmax_t> {};
-	/*export*/ template <> struct fmt::formatter<percent_t,	 char_type> : TFormatter<percent_t> {};
-
-	/*export*/ template <> struct fmt::formatter<position_t, char_type> : fmt::formatter<float, char_type> {
-		using base_t = fmt::formatter<float, gtl::ui::char_type>;
-		template < typename context > auto format(position_t const& v, context& ctx) {
-			//gtl::ui::string_t str;
-			std::visit([&]<typename T>(T&& arg) {
-				base_t::format((float)arg.value, ctx);
-				fmt::format_to(ctx.out(), std::remove_cvref_t<T>::unit_name);
-			}, v);
-			return ctx.out();
-		}
-	};
-
-
-	/*export*/ template <> struct std::formatter<dummy_t,	char_type> : TFormatter<dummy_t> {};
-	/*export*/ template <> struct std::formatter<px_t,		char_type> : TFormatter<px_t> {};
-	/*export*/ template <> struct std::formatter<em_t,		char_type> : TFormatter<em_t> {};
-	/*export*/ template <> struct std::formatter<rem_t,		char_type> : TFormatter<rem_t> {};
-	/*export*/ template <> struct std::formatter<vw_t,		char_type> : TFormatter<vw_t> {};
-	/*export*/ template <> struct std::formatter<vh_t,		char_type> : TFormatter<vh_t> {};
-	/*export*/ template <> struct std::formatter<vmin_t,	char_type> : TFormatter<vmin_t> {};
-	/*export*/ template <> struct std::formatter<vmax_t,	char_type> : TFormatter<vmax_t> {};
-	/*export*/ template <> struct std::formatter<percent_t,	char_type> : TFormatter<percent_t> {};
-
-	/*export*/ template <> struct std::formatter<position_t, char_type> : std::formatter<float, char_type> {
-		using base_t = std::formatter<float, char_type>;
-		template < typename context > auto format(position_t const& v, context& ctx) {
-			//gtl::ui::string_t str;
-			std::visit([&]<typename T>(T&& arg) {
-				base_t::format((float)arg.value, ctx);
-				std::format_to(ctx.out(), std::remove_cvref_t<T>::unit_name);
-			}, v);
-			return ctx.out();
-		}
-	}
-
 };	// namespace gtl::ui::unit
+
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::dummy_t,	gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::dummy_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::px_t,		gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::px_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::em_t,		gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::em_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::rem_t,		gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::rem_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::vw_t,		gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::vw_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::vh_t,		gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::vh_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::vmin_t,		gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::vmin_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::vmax_t,		gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::vmax_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::percent_t,	gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::percent_t> {};
+/*export*/ template <> struct fmt::formatter<gtl::ui::unit::position_t, gtl::ui::char_type> : fmt::formatter<float, gtl::ui::char_type> {
+	using base_t = fmt::formatter<float, gtl::ui::char_type>;
+	template < typename context > auto format(gtl::ui::unit::position_t const& v, context& ctx) {
+		//gtl::ui::string_t str;
+		std::visit([&]<typename T>(T&& arg) {
+			base_t::format((float)arg.value, ctx);
+			fmt::format_to(ctx.out(), std::remove_cvref_t<T>::unit_name);
+		}, v);
+		return ctx.out();
+	}
+};
+
+
+/*export*/ template <> struct std::formatter<gtl::ui::unit::dummy_t,	gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::dummy_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::px_t,		gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::px_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::em_t,		gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::em_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::rem_t,		gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::rem_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::vw_t,		gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::vw_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::vh_t,		gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::vh_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::vmin_t,		gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::vmin_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::vmax_t,		gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::vmax_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::percent_t,	gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::percent_t> {};
+/*export*/ template <> struct std::formatter<gtl::ui::unit::position_t, gtl::ui::char_type> : std::formatter<float, gtl::ui::char_type> {
+	using base_t = std::formatter<float, gtl::ui::char_type>;
+	template < typename context > auto format(gtl::ui::unit::position_t const& v, context& ctx) {
+		//gtl::ui::string_t str;
+		std::visit([&]<typename T>(T&& arg) {
+			base_t::format((float)arg.value, ctx);
+			std::format_to(ctx.out(), std::remove_cvref_t<T>::unit_name);
+		}, v);
+		return ctx.out();
+	}
+};
 
 
 /*export*/ namespace gtl::ui::inline literals {
