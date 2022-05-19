@@ -24,6 +24,7 @@
 namespace gtl::ui {
 
 	using char_type = char8_t;
+	using id_t = uint32_t;
 	using string_t = std::basic_string<char_type>;
 	using string_view_t = std::basic_string_view<char_type>;
 	using xstring_t = gtl::TString<char_type>;

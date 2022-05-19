@@ -92,7 +92,8 @@ namespace gtl::ui::renderer {
 			if (auto index = strContent.find(strInsertionText, 0); index != strContent.npos) {
 				string_t strTail{strContent.data() + index + strInsertionText.size(), strContent.size() - index - strInsertionText.size()};
 
-				auto strBody = m_widget.MakeHTML();
+				id_t id{};
+				auto strBody = m_widget.MakeHTML(id);
 
 				strContent.resize(index);
 				strContent.reserve(index+strBody.size()+strTail.size());
@@ -175,9 +176,10 @@ namespace gtl::ui::renderer {
 		void OnHTMLMessage(ICoreWebView2* sender, std::wstring message) {
 			static auto const strButtonClick = L"Button_Click:"s;
 			static auto const strEditChange = L"Edit_Change:"s;
+			static auto const strSelectChange = L"Select_Change:"s;
 			if (message.starts_with(strButtonClick)) {
-				string_t id = gtl::ToString<char_type, wchar_t>(message.substr(strButtonClick.size()));
-				if (auto rWidget = m_widget.FindComponent(id); rWidget and rWidget->fn_OnClick) {
+				string_t strID = gtl::ToString<char_type, wchar_t>(message.substr(strButtonClick.size()));
+				if (auto rWidget = m_widget.FindComponent(gtl::tsztoi(strID)); rWidget and rWidget->fn_OnClick) {
 					rWidget->fn_OnClick(rWidget, {}, {});
 				}
 				//std::wstring reply = L"message";
@@ -186,14 +188,28 @@ namespace gtl::ui::renderer {
 			else if (message.starts_with(strEditChange)) {
 				string_t m = gtl::ToString<char_type, wchar_t>(message.substr(strEditChange.size()));
 				if (auto i = m.find(':'); i != m.npos) {
-					string_t id = m.substr(0, i);
+					string_t strID = m.substr(0, i);
 					string_t str = m.substr(i+1);
-					if (auto rWidget = m_widget.FindComponent(id); rWidget and rWidget->fn_OnTextChanged) {
+					if (auto rWidget = m_widget.FindComponent(gtl::tsztoi(strID)); rWidget and rWidget->fn_OnTextChanged) {
 						if (rWidget->fn_OnTextChanged(rWidget, {}, str)) {
 						} else {
 						}
 					} else {
-						::MessageBox(nullptr, gtl::xStringW(m), nullptr, MB_OK);
+						//::MessageBox(nullptr, gtl::xStringW(m), nullptr, MB_OK);
+					}
+				}
+			}
+			else if (message.starts_with(strSelectChange)) {
+				string_t m = gtl::ToString<char_type, wchar_t>(message.substr(strSelectChange.size()));
+				if (auto i = m.find(':'); i != m.npos) {
+					string_t strID = m.substr(0, i);
+					string_t str = m.substr(i+1);
+					if (auto rWidget = m_widget.FindComponent(gtl::tsztoi(strID)); rWidget and rWidget->fn_OnTextChanged) {
+						if (rWidget->fn_OnItemSelect(rWidget, {}, str)) {
+						} else {
+						}
+					} else {
+						//::MessageBox(nullptr, gtl::xStringW(m), nullptr, MB_OK);
 					}
 				}
 			}

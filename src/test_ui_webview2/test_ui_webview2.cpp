@@ -53,7 +53,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	using namespace gtl::ui;
 	using namespace gtl::ui::unit;
 
-	xWidgetData::InitUniqueID();
+	//xWidgetData::InitUniqueID();
 	position_t widthCol1 {120_px};
 
 	xWidget& w = s_webview2->m_widget;
@@ -66,28 +66,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					xWidget::Label(GText("Title"s), widthCol1, {}, {}),
 					xWidget::Button(GText("Button1"s), {}, {}, {.fn_OnClick = [&](rWidgetData rself, string_view_t evt, string_view_t text) ->bool{
 						//if (auto r = w.FindComponent(GText("EDIT"))) { MessageBox(gtl::xStringW(m_webview->GetText_TEST(r->m_id))); }
-						OnButtonEvent(rself->m_id); return true; }}),
+						OnButtonEvent(ToString(rself->m_id)); return true; }}),
 				}),
 			xWidget::PanelHorizontal({}, {
 				xWidget::Label(GText("Label2"s), widthCol1),
-				xWidget::Button(GText("Button2"s), {}, {}, {.fn_OnClick = [](rWidgetData rself, string_view_t evt, string_view_t text) { OnButtonEvent(rself->m_id); return true; }}),
+				xWidget::Button(GText("Button2"s), {}, {}, {.fn_OnClick = [](rWidgetData rself, string_view_t evt, string_view_t text) { OnButtonEvent(ToString(rself->m_id)); return true; }}),
 				xWidget::Input(GText("text <value>"s), {}, {}, {}),
 				}),
 				xWidget::PanelHorizontal({}, {
 					xWidget::Label(GText("Label3"s), widthCol1),
-					xWidget::Select(GText("Select..."), {GText("text 1"), GText("string option2"), GText("mmm3"), GText("mmm4"), GText("mmm5"), GText("mmmmmmm6"), GText("fasdfasdf")}, 4),
+					xWidget::Select(GText("Select..."), {GText("string option 1"), GText("string option2"), GText("mmm3"), GText("mmm4"), GText("mmm5"), GText("mmmmmmm6"), GText("mmm")}, 4),
 					}),
 					xWidget::PanelHorizontal({}, {
 						xWidget::Label(GText("Label4"s), widthCol1),
 						xWidget::Select(GText("Select..."), {GText("text 1"), GText("string option2"), GText("mmm3"), GText("mmm4"), GText("mmm5"), GText("mmmmmmm6"), GText("fasdfasdf")}),
 						}),
 			})
-			);
+	);
 	//w.m_components.push_back(
 	//	xWidget::List ()
 	//);
 
-	xWidgetData t{.m_id=u8"id_eeee"s, .m_tag=u8"fsdfsd"s};
+	xWidgetData t{.m_tag=u8"fsdfsd"s};
 
 	xWidget vertical_panel;
 	vertical_panel.m_properties.push_back(prop::Width(200_px));
@@ -97,6 +97,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	label->m_properties.push_back(prop::Width(300_px));
 	label->m_properties.push_back(prop::Height(30_px));
 	vertical_panel.AddComponent(label);
+    w.AddComponent(std::move(vertical_panel));
 	hpanel.AddComponent(xWidget::Label(GText("Title"s)));
 	w.AddComponent(std::move(hpanel));
 
@@ -189,32 +190,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
+		// Parse the menu selections:
+		switch (int wmId = LOWORD(wParam); wmId)
+		{
+		case IDM_ABOUT:
+            if (s_webview2 and s_webview2->m_webView) {
+                auto& widget = s_webview2->m_widget;
+                std::erase_if(s_webview2->m_widget.m_components, [](auto const& i) { return i->m_id == 5; });
+                s_webview2->SetContext();
             }
-        }
+			//DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			break;
+		case IDM_EXIT:
+			DestroyWindow(hWnd);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
         break;
     case WM_SIZE :
-        {
-            auto nType = wParam;
-			if ((nType != SIZE_MINIMIZED) and s_webview2 and s_webview2->m_controller) {
-				auto cx = LOWORD(lParam);
-                auto cy = HIWORD(lParam);
-				RECT rect{0, 0, cx, cy};
-				s_webview2->m_controller->put_Bounds(rect);
-			}
-        }
+		if (auto nType = wParam; (nType != SIZE_MINIMIZED) and s_webview2 and s_webview2->m_controller) {
+			auto cx = LOWORD(lParam);
+			auto cy = HIWORD(lParam);
+			RECT rect{0, 0, cx, cy};
+			s_webview2->m_controller->put_Bounds(rect);
+		}
+        break;
+    case WM_MOVE :
+		if (s_webview2 and s_webview2->m_controller) {
+			s_webview2->m_controller->NotifyParentWindowPositionChanged();  // bug-bypassing
+		}
         break;
     case WM_PAINT:
         {

@@ -42,6 +42,11 @@
             console.log('Edit_Change:' + id.id + ':' + value);
             window.chrome.webview.postMessage('Edit_Change:' + id.id + ':' + value);
         }
+        function OnSelectChange(id) {
+            var box = document.getElementById(id.id);
+            console.log('Select_Change:' + id.id + ':' + box.value);
+            window.chrome.webview.postMessage('Select_Change:' + id.id + ':' + box.value);
+        }
 
         function GetWindowBounds() {
             window.chrome.webview.postMessage("GetWindowBounds");

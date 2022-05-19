@@ -38,7 +38,8 @@ namespace gtl::ui {
 		//=====================================================================
 		// attributes
 		//! @brief unique id
-		string_t m_id{MakeUniqueID()};
+		//string_t m_id{MakeUniqueID()};
+		id_t m_id{};	// Unique ID by framework.
 		//! @brief name
 		string_t m_name;
 		//! @brief widget type (label, button, panel...)
@@ -78,6 +79,7 @@ namespace gtl::ui {
 		event_handler_t fn_OnTextChanged;
 		event_handler_t fn_OnItemSelect;
 
+	#if 0
 	protected:
 		static inline std::atomic<int64_t> id{};
 		static string_t MakeUniqueID() {
@@ -85,6 +87,7 @@ namespace gtl::ui {
 		}
 	public:
 		static void InitUniqueID() { id = 0; }
+	#endif
 	};
 	static_assert(std::is_aggregate_v<xWidgetData>);
 	using rWidgetData = std::shared_ptr<xWidgetData>;
@@ -123,23 +126,23 @@ namespace gtl::ui {
 			return *this;
 		}
 
-		rWidgetData FindComponent(string_view_t id/* 'parent:1st:2nd:*/) {
+		rWidgetData FindComponent(id_t id/* 'parent:1st:2nd:*/) {
 			return FindComponent(id, m_components);
 		}
 
-		static rWidgetData FindComponent(string_view_t id, std::deque<std::shared_ptr<xWidgetData>>& components) {
-			auto pos = id.find(':');
-			string_view_t idChild;
-			if (pos != id.npos) {
-				idChild = id.substr(pos);
-				id = id.substr(0, pos);
-			}
+		static rWidgetData FindComponent(id_t id, std::deque<std::shared_ptr<xWidgetData>>& components) {
+			//auto pos = strID.find(':');
+			//string_view_t idChild;
+			//id_t id{gtl::tsztoi<id_t>(strID)};
+			//if (pos != strID.npos) {
+			//	idChild = strID.substr(pos);
+			//}
 
 			for (auto& r : components) {
-				if (auto p = FindComponent(id, r->m_components); p)
-					return idChild.empty() ? p : FindComponent(idChild, p->m_components);
 				if (r->m_id == id)
-					return idChild.empty() ? r : FindComponent(idChild, r->m_components);
+					return r;
+				if (auto c = FindComponent(id, r->m_components); c)
+					return c;
 			}
 			return {};
 		}
@@ -153,7 +156,7 @@ namespace gtl::ui {
 		xWidget& SetCallback_OnItemSelected(event_handler_t func)		{ fn_OnItemSelect = func;	return *this; }
 		xWidget& SetCallback_OnEvent(event_handler_t func)				{ fn_OnEvent = func;		return *this; }
 
-		string_t MakeHTML() {
+		string_t MakeHTML(id_t& id) {
 			using namespace std::literals;
 
 			string_t str;
@@ -163,8 +166,9 @@ namespace gtl::ui {
 			auto strOpen = fmt::format(GText("<{}{}{}>"s), strTagName, GetAttributeString(), GetStyleString());
 
 			string_t strComponents;
-			for (auto const& rChild : m_components) {
-				strComponents += ((xWidget*)rChild.get())->MakeHTML();
+			for (auto& rChild : m_components) {
+				rChild->m_id = ++id;
+				strComponents += ((xWidget*)rChild.get())->MakeHTML(id);
 			}
 
 			string_t text{m_text};
@@ -176,7 +180,7 @@ namespace gtl::ui {
 						text += ' ';
 					templ.m_value = item;
 					templ.m_text = item;
-					text += templ.MakeHTML();
+					text += templ.MakeHTML(id);
 				}
 			}
 
