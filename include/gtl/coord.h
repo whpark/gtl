@@ -131,7 +131,13 @@ namespace gtl {
 				str += ',';
 				str += ' ';
 			}
-			str += std::format(svFMT, coord.data()[i]);
+			if constexpr (sizeof(tchar_t) == 1)
+				str += std::vformat(svFMT, std::make_format_args(coord.data()[i]));
+			else if constexpr (sizeof(tchar_t) == 2)
+				str += std::vformat(svFMT, std::make_wformat_args(coord.data()[i]));
+			else {
+				static_assert(gtlc::dependent_false_v, "tchar_t must be char or wchar_t");
+			}
 		}
 		return str;
 	}
