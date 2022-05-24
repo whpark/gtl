@@ -37,6 +37,12 @@ TEST(gtl_shape, basic) {
 	std::unique_ptr<gtl::shape::xShape> r2 = std::move(rLine2);
 	EXPECT_NE(*r1, *r2);
 
+	gtl::color_rgba_t a;
+	gtl::color_rgba_t b;
+	a.r = 1; a.g = 2; a.b = 3; a.a = 4;
+	b = a;
+	EXPECT_EQ(a, b);
+
 	for (auto path : paths) {
 
 		DEBUG_PRINT("\t\tpath : {}\n", path.string());

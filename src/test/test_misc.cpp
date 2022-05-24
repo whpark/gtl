@@ -69,7 +69,7 @@ namespace gtl::test::misc {
 
 	TEST(misc, ptr_container) {
 
-		gtl::xConcurrentUPtrDeque<int> lst;
+		gtl::TConcurrentUPtrDeque<int> lst;
 
 		lst.push_back(std::make_unique<int>(3));
 		auto b = lst.begin();
@@ -107,7 +107,7 @@ namespace gtl::test::misc {
 		// test thread
 		{
 			constexpr size_t N = 100;
-			gtl::xConcurrentUPtrDeque<int> lst;
+			gtl::TConcurrentUPtrDeque<int> lst;
 			std::latch latchQueue(N);
 			auto Queue = [&](size_t index) {
 				latchQueue.count_down();
@@ -149,7 +149,7 @@ namespace gtl::test::misc {
 
 		{
 			constexpr size_t N = 100;
-			gtl::xConcurrentUPtrDeque<int> lst;
+			gtl::TConcurrentUPtrDeque<int> lst;
 			std::latch latchQueue(N);
 			auto Queue = [&](size_t index) {
 				latchQueue.count_down();

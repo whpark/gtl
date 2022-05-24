@@ -113,6 +113,11 @@
 #	include <source_location>
 #endif
 
+#define SPDLOG_USE_STD_FORMAT
+#define SPDLOG_WCHAR_TO_UTF8_SUPPORT
+#define SPDLOG_WCHAR_FILENAMES
+#include "spdlog/spdlog.h"
+
 #define GTL__DEPR_SEC [[deprecated("NOT Secure. use 'sv' instead.")]]
 
 #include "gtl/_config.h"

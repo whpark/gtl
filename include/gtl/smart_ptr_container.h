@@ -52,8 +52,8 @@ namespace gtl {
 
 		value_type&			operator * ()			{ return *(base_t::operator *()); }
 		value_type const&	operator * () const		{ return *(base_t::operator *()); }
-		value_type*			operator -> ()			{ return base_t::operator *(); }
-		value_type const*	operator -> () const	{ return base_t::operator *(); }
+		value_type*			operator -> ()			{ return (base_t::operator *()).get(); }
+		value_type const*	operator -> () const	{ return (base_t::operator *()).get(); }
 
 		auto&		GetSmartPtr()		{ return base_t::operator*(); }
 		auto const&	GetSmartPtr() const	{ return base_t::operator*(); }
@@ -218,7 +218,7 @@ namespace gtl {
 		}
 		template < typename ... Arg >
 		constexpr void AddCloneFrom(TSmartPtrContainer const& container) requires (value_has_clone<T> || std::is_copy_constructible_v<T>) {
-			std::shared_lock lock(container);
+			std::shared_lock lock(*this);
 			if constexpr (value_has_clone<T>) {
 				for (auto const& obj : container)
 					push_back(obj.NewClone());
@@ -237,7 +237,7 @@ namespace gtl {
 		}
 		template < typename ... Arg >
 		constexpr void AddRefFrom(TSmartPtrContainer<Arg...> const& container) requires std::is_convertible_v<TSmartPtr<T>, std::shared_ptr<T>> {
-			std::shared_lock lock(container);
+			std::shared_lock lock(*this);
 			for (auto sharedptr : container.Base())
 				push_back(std::move(sharedptr));
 		}
@@ -328,23 +328,23 @@ namespace gtl {
 
 	// alias
 	template < typename T >
-	using xUPtrVector = TSmartPtrContainer<T, std::unique_ptr, std::vector>;
+	using TUPtrVector = TSmartPtrContainer<T, std::unique_ptr, std::vector>;
 	template < typename T >
-	using xSPtrVector = TSmartPtrContainer<T, std::shared_ptr, std::vector>;
+	using TSPtrVector = TSmartPtrContainer<T, std::shared_ptr, std::vector>;
 
 	template < typename T >
-	using xUPtrDeque = TSmartPtrContainer<T, std::unique_ptr, std::deque>;
+	using TUPtrDeque = TSmartPtrContainer<T, std::unique_ptr, std::deque>;
 	template < typename T >
-	using xSPtrDeque = TSmartPtrContainer<T, std::shared_ptr, std::deque>;
+	using TSPtrDeque = TSmartPtrContainer<T, std::shared_ptr, std::deque>;
 
 	template < typename T >
-	using xConcurrentUPtrVector = TSmartPtrContainer<T, std::unique_ptr, std::vector, gtl::recursive_shared_mutex>;
+	using TConcurrentUPtrVector = TSmartPtrContainer<T, std::unique_ptr, std::vector, gtl::recursive_shared_mutex>;
 	template < typename T >
-	using xConcurrentSPtrVector = TSmartPtrContainer<T, std::shared_ptr, std::vector, gtl::recursive_shared_mutex>;
+	using TConcurrentSPtrVector = TSmartPtrContainer<T, std::shared_ptr, std::vector, gtl::recursive_shared_mutex>;
 
 	template < typename T >
-	using xConcurrentUPtrDeque = TSmartPtrContainer<T, std::unique_ptr, std::deque, gtl::recursive_shared_mutex>;
+	using TConcurrentUPtrDeque = TSmartPtrContainer<T, std::unique_ptr, std::deque, gtl::recursive_shared_mutex>;
 	template < typename T >
-	using xConcurrentSPtrDeque = TSmartPtrContainer<T, std::shared_ptr, std::deque, gtl::recursive_shared_mutex>;
+	using TConcurrentSPtrDeque = TSmartPtrContainer<T, std::shared_ptr, std::deque, gtl::recursive_shared_mutex>;
 
 }	// namespace gtl

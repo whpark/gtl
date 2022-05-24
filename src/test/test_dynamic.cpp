@@ -11,12 +11,15 @@ using namespace gtl::literals;
 namespace gtl::test::reflection::MACRO {
 
 	struct CTestStruct {
+	public:
+		using this_t = CTestStruct;
+		using base_t = this_t;
+		GTL__REFLECTION_BASE(gtl::njson<>)
 
 	public:
 		std::string str1{"str1"};
 		std::string str2{"str2"};
 
-		GTL__REFLECTION_BASE(CTestStruct)
 	private:
 
 	#if 1
@@ -36,6 +39,10 @@ namespace gtl::test::reflection::MACRO {
 
 
 	class CTestClass {
+	public:
+		using this_t = CTestClass;
+		using base_t = this_t;
+		GTL__REFLECTION_BASE(gtl::njson<>)
 
 	public:
 		bool b1{}, b2{};
@@ -48,7 +55,6 @@ namespace gtl::test::reflection::MACRO {
 
 		virtual ~CTestClass() {}
 
-		GTL__REFLECTION_BASE(CTestClass)
 	private:
 		
 		GTL__REFLECTION_MEMBERS(b1, b2,
@@ -74,14 +80,16 @@ namespace gtl::test::reflection::MACRO {
 
 		virtual ~CTestClassDerived() {}
 
-		GTL__REFLECTION_DERIVED(CTestClassDerived, CTestStruct)
+		using this_t = CTestClassDerived;
+		using base_t = CTestClass;
+		GTL__REFLECTION_DERIVED()
 	private:
 
 		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8)
 
 	public:
 		//GTL__DYNAMIC_CLASS(1);
-		constexpr static inline auto Creator = []() -> std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(); };
+		constexpr static inline auto Creator = []() -> std::unique_ptr<base_t>{ return std::make_unique<this_t>(); };
 		static inline TDynamicCreateHelper<this_t, 1, Creator> dynamicCreateDerived_s;
 	};
 
@@ -93,7 +101,9 @@ namespace gtl::test::reflection::MACRO {
 	public:
 		CTestClassDerived2(double d) : dummy(d) {}
 
-		GTL__REFLECTION_DERIVED(CTestClassDerived2, CTestStruct)
+		using this_t = CTestClassDerived2;
+		using base_t = CTestClass;
+		GTL__REFLECTION_DERIVED()
 
 	private:
 		GTL__REFLECTION_MEMBERS(dummy)
@@ -117,53 +127,58 @@ namespace gtl::test::reflection::MACRO {
 }
 
 
-namespace gtl::test::reflection::CRTP {
-
-	struct CTestStruct : public IMemberWise<CTestStruct> {
-	public:
-		std::string str1{"str1"};
-		std::string str2{"str2"};
-
-	public:
-		//using this_t = std::remove_cvref_t<decltype(*this)>;
-
-		GTL__REFLECTION_MEMBERS(str1, str2)
-
-	};
-
-
-	class CTestClass : public IMemberWise<CTestClass> {
-	public:
-		bool b1{}, b2{};
-		int i{}, j{};
-		int64_t k{}, l{};
-		double a{}, b{}, c{};
-		std::string str {"str"};
-		std::u8string strU8 { u8"strU8" };
-		CTestStruct test;
-
-		GTL__REFLECTION_MEMBERS(b1,
-								b2,
-								i, j,
-								k, l,
-								a, b, c,
-								str, strU8,
-								test);
-	};
-
-
-	class CTestClassDerived : public IMemberWiseDerived<CTestClassDerived, CTestClass> {
-	public:
-		int k{};
-		double a{}, b{}, c{};
-		std::string str {"str"};
-		std::u8string strU8 { u8"strU8" };
-
-	private:
-		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8)
-	};
-
-}
+//namespace gtl::test::reflection::CRTP {
+//
+//	struct CTestStruct : public IReflection<CTestStruct> {
+//	public:
+//		std::string str1{"str1"};
+//		std::string str2{"str2"};
+//
+//	public:
+//		using this_t = CTestStruct;
+//		using base_t = this_t;
+//
+//		GTL__REFLECTION_MEMBERS(str1, str2)
+//
+//	};
+//
+//
+//	class CTestClass : public IReflection<CTestClass> {
+//	public:
+//		bool b1{}, b2{};
+//		int i{}, j{};
+//		int64_t k{}, l{};
+//		double a{}, b{}, c{};
+//		std::string str {"str"};
+//		std::u8string strU8 { u8"strU8" };
+//		CTestStruct test;
+//
+//		GTL__REFLECTION_MEMBERS(b1,
+//								b2,
+//								i, j,
+//								k, l,
+//								a, b, c,
+//								str, strU8,
+//								test);
+//
+//		auto operator <=>(CTestClass const&) const = default;
+//	};
+//
+//
+//	class CTestClassDerived : public IReflectionDerived<CTestClassDerived, CTestClass> {
+//	public:
+//		int k{};
+//		double a{}, b{}, c{};
+//		std::string str {"str"};
+//		std::u8string strU8 { u8"strU8" };
+//
+//		auto operator <=>(CTestClassDerived const&) const = default;
+//
+//	public:
+//		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8)
+//	};
+//
+//}
 
 //namespace boost {
 //	// When exceptions are disabled

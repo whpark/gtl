@@ -38,7 +38,8 @@ namespace gtl::ui {
 		//=====================================================================
 		// attributes
 		//! @brief unique id
-		string_t m_id;
+		//string_t m_id{MakeUniqueID()};
+		id_t m_id{};	// Unique ID by framework.
 		//! @brief name
 		string_t m_name;
 		//! @brief widget type (label, button, panel...)
@@ -78,6 +79,7 @@ namespace gtl::ui {
 		event_handler_t fn_OnTextChanged;
 		event_handler_t fn_OnItemSelect;
 
+	#if 0
 	protected:
 		static inline std::atomic<int64_t> id{};
 		static string_t MakeUniqueID() {
@@ -85,6 +87,7 @@ namespace gtl::ui {
 		}
 	public:
 		static void InitUniqueID() { id = 0; }
+	#endif
 	};
 	static_assert(std::is_aggregate_v<xWidgetData>);
 	using rWidgetData = std::shared_ptr<xWidgetData>;
@@ -123,23 +126,23 @@ namespace gtl::ui {
 			return *this;
 		}
 
-		rWidgetData FindComponent(string_view_t id/* 'parent:1st:2nd:*/) {
+		rWidgetData FindComponent(id_t id/* 'parent:1st:2nd:*/) {
 			return FindComponent(id, m_components);
 		}
 
-		static rWidgetData FindComponent(string_view_t id, std::deque<std::shared_ptr<xWidgetData>>& components) {
-			auto pos = id.find(':');
-			string_view_t idChild;
-			if (pos != id.npos) {
-				idChild = id.substr(pos);
-				id = id.substr(0, pos);
-			}
+		static rWidgetData FindComponent(id_t id, std::deque<std::shared_ptr<xWidgetData>>& components) {
+			//auto pos = strID.find(':');
+			//string_view_t idChild;
+			//id_t id{gtl::tsztoi<id_t>(strID)};
+			//if (pos != strID.npos) {
+			//	idChild = strID.substr(pos);
+			//}
 
 			for (auto& r : components) {
-				if (auto p = FindComponent(id, r->m_components); p)
-					return idChild.empty() ? p : FindComponent(idChild, p->m_components);
 				if (r->m_id == id)
-					return idChild.empty() ? r : FindComponent(idChild, r->m_components);
+					return r;
+				if (auto c = FindComponent(id, r->m_components); c)
+					return c;
 			}
 			return {};
 		}
@@ -153,7 +156,7 @@ namespace gtl::ui {
 		xWidget& SetCallback_OnItemSelected(event_handler_t func)		{ fn_OnItemSelect = func;	return *this; }
 		xWidget& SetCallback_OnEvent(event_handler_t func)				{ fn_OnEvent = func;		return *this; }
 
-		string_t MakeHTML() {
+		string_t MakeHTML(id_t& id) {
 			using namespace std::literals;
 
 			string_t str;
@@ -163,8 +166,9 @@ namespace gtl::ui {
 			auto strOpen = fmt::format(GText("<{}{}{}>"s), strTagName, GetAttributeString(), GetStyleString());
 
 			string_t strComponents;
-			for (auto const& rChild : m_components) {
-				strComponents += ((xWidget*)rChild.get())->MakeHTML();
+			for (auto& rChild : m_components) {
+				rChild->m_id = ++id;
+				strComponents += ((xWidget*)rChild.get())->MakeHTML(id);
 			}
 
 			string_t text{m_text};
@@ -176,7 +180,7 @@ namespace gtl::ui {
 						text += ' ';
 					templ.m_value = item;
 					templ.m_text = item;
-					text += templ.MakeHTML();
+					text += templ.MakeHTML(id);
 				}
 			}
 
@@ -209,10 +213,12 @@ namespace gtl::ui {
 		}
 
 		string_t GetStyleString() {
+			using namespace std::literals;
+
 			string_t strStyles;
 			size_t len{};
 			for (auto const& prop : m_properties) {
-				len += prop.m_property.size() + prop.m_value.size() + 3;
+				len += prop.m_name.size() + prop.m_value.size() + 3;
 			}
 
 			if (len) {
@@ -231,9 +237,9 @@ namespace gtl::ui {
 
 		[[nodiscard]] static rWidget GroupBoxVertical(string_t title, xWidgetData option = {}, std::initializer_list<rWidgetData> lst = {}) {
 			if (option.m_tag.empty())
-				option.m_tag = GText("fieldset"s);
-			option.m_properties.push_back({ GText("display"s), GText("flex"s) });
-			option.m_properties.push_back({ GText("flex-direction"s), GText("column"s) });
+				option.m_tag = GText("fieldset");
+			option.m_properties.push_back({ GText("display"), GText("flex") });
+			option.m_properties.push_back({ GText("flex-direction"), GText("column") });
 			//option.m_properties.push_back({ GText("align-items"s), GText("center"s) });
 			auto r = std::make_shared<xWidget>(option);
 			r->m_components = lst;
@@ -242,10 +248,12 @@ namespace gtl::ui {
 		}
 
 		[[nodiscard]] static rWidget PanelVertical(xWidgetData option={}, std::initializer_list<rWidgetData> lst = {}) {
+			using namespace std::literals;
+
 			if (option.m_tag.empty())
 				option.m_tag = GText("div"s);
-			option.m_properties.push_back({ GText("display"s), GText("flex"s) });
-			option.m_properties.push_back({GText("flex-direction"s), GText("column"s)});
+			option.m_properties.push_back({ GText("display"), GText("flex") });
+			option.m_properties.push_back({GText("flex-direction"), GText("column")});
 			//option.m_properties.push_back({ GText("align-items"s), GText("center"s) });
 			auto r = std::make_shared<xWidget>(option);
 			r->m_components = lst;
@@ -254,9 +262,9 @@ namespace gtl::ui {
 		[[nodiscard]] static rWidget PanelHorizontal(xWidgetData option={}, std::initializer_list<rWidgetData> lst = {}) {
 			if (option.m_tag.empty())
 				option.m_tag = GText("div"s);
-			option.m_properties.push_back({GText("display"s), GText("flex"s)});
-			option.m_properties.push_back({GText("flex-direction"s), GText("row"s)});
-			option.m_properties.push_back({ GText("align-items"s), GText("center"s) });
+			option.m_properties.push_back({GText("display"), GText("flex")});
+			option.m_properties.push_back({GText("flex-direction"), GText("row")});
+			option.m_properties.push_back({ GText("align-items"), GText("center") });
 			auto r = std::make_shared<xWidget>(option);
 			r->m_components = lst;
 			return r;
@@ -298,7 +306,7 @@ namespace gtl::ui {
 			option.m_attributes.emplace_back(GText(R"xx(onclick="OnButton({id})" )xx"));
 
 			if (width.index())
-				option.m_properties.push_back({GText("Width"), ToString(width)});
+				option.m_properties.push_back(gtl::ui::prop::MakeProperty(GText("Width"), width));
 			if (height.index())
 				option.m_properties.push_back({GText("Height"), ToString(height)});
 			return std::make_shared<xWidget>(option);
@@ -317,7 +325,7 @@ namespace gtl::ui {
 			if (size)
 				option.m_attributes.emplace_back(fmt::format(GText(R"xx(size={})xx"), size));
 			option.m_template = Option();
-			option.m_items = values;
+			option.m_items = std::move(values);
 
 			if (width.index())
 				option.m_properties.push_back({ GText("Width"), ToString(width) });
@@ -326,6 +334,8 @@ namespace gtl::ui {
 			return std::make_shared<xWidget>(option);
 		}
 
+		[[nodiscard]] static rWidget Table(string_t name, gtl::ui::unit::position_t width={}, gtl::ui::unit::position_t height = {}) {
+		}
 		[[nodiscard]] static rWidget ListColumn(string_t name, rWidget itemTempl, gtl::ui::unit::position_t width={}, gtl::ui::unit::position_t height = {}) {
 		}
 		[[nodiscard]] static rWidget List(std::vector<xWidget> set, bool bColumnItems = true) {

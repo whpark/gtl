@@ -7,6 +7,7 @@
 // 2018.01.15. recursive_recursive_shared_mutex (extension of std::recursive_mutex)
 // 2019.07.24. QL -> GTL
 // 2022.04.07. recursive_shared_mutex - refactoring
+//
 // PWH
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -15,6 +16,7 @@
 #pragma once
 
 #include <mutex>
+#include <thread>
 #include <atomic>
 #include <shared_mutex>
 #include <system_error>
@@ -37,35 +39,38 @@ namespace gtl {
 		//null_mutex() noexcept {}
 		//~null_mutex() noexcept {}
 
-		void lock() { // lock the mutex
+		void lock() const { // lock the mutex
 		}
-		[[nodiscard]] bool try_lock() { // try to lock the mutex
+		[[nodiscard]] bool try_lock() const { // try to lock the mutex
 			return true;
 		}
-		void unlock() { // unlock the mutex
+		void unlock() const { // unlock the mutex
 		}
 
-		void lock_shared() noexcept {}
-		bool try_lock_shared() noexcept {
+		void lock_shared() const noexcept {}
+		bool try_lock_shared() const noexcept {
 			return true;
 		}
-		void unlock_shared() noexcept {}
+		void unlock_shared() const noexcept {}
 	};
 
-
+#if 1
 	//------------------------------------------------------------------------
 	/// @brief recursive shared mutex
-	class recursive_shared_mutex : public std::shared_mutex {
+	class recursive_shared_mutex {
 	public:
 		using this_t = recursive_shared_mutex;
-		using base_t = std::shared_mutex;
+		//using base_t = std::shared_mutex;
 	private:
+		std::shared_mutex m_mutex;
 		std::atomic<std::thread::id> m_owner;
 		size_t m_counter{};
+
 	public:
-		using base_t::base_t;
-		//recursive_shared_mutex(recursive_shared_mutex const&) = delete;
-		//recursive_shared_mutex& operator=(recursive_shared_mutex const&) = delete;
+		//using base_t::base_t;
+		recursive_shared_mutex() = default;
+		recursive_shared_mutex(recursive_shared_mutex const&) = delete;
+		recursive_shared_mutex& operator=(recursive_shared_mutex const&) = delete;
 
 		void lock() noexcept {
 			//_Smtx_lock_exclusive(&_Myhandle);
@@ -73,21 +78,52 @@ namespace gtl {
 				m_counter++;
 			}
 			else {
-				base_t::lock();
+				m_mutex.lock();
 				m_owner = idCurrent;
 				m_counter = 1;
 			}
 		}
+		void lock_shared() noexcept {
+			if (auto idCurrent = std::this_thread::get_id(); idCurrent == m_owner) {
+			}
+			else {
+				m_mutex.lock_shared();
+			}
+		}
+		bool try_lock() noexcept {
+			auto idCurrent = std::this_thread::get_id();
+			if (idCurrent == m_owner) {
+				m_counter++;
+				return true;
+			}
+			if (m_mutex.try_lock()) {
+				m_owner = idCurrent;
+				m_counter = 1;
+			}
+		}
+		bool try_lock_shared() noexcept {
+			if (auto idCurrent = std::this_thread::get_id(); idCurrent == m_owner) {
+				m_counter++;
+				return true;
+			}
+			return m_mutex.try_lock_shared();
+		}
 		void unlock() noexcept {
 			if (--m_counter == 0) {
 				m_owner.store({});
-				base_t::unlock();
+				m_mutex.unlock();
+			}
+		}
+		void unlock_shared() noexcept {
+			if (auto idCurrent = std::this_thread::get_id(); idCurrent == m_owner) {
+			} else {
+				m_mutex.unlock_shared();
 			}
 		}
 
 	};
 
-#if 0
+#else
 	class recursive_shared_mutex {
 	private:
 		std::shared_mutex m_mtx;

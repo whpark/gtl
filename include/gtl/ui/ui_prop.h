@@ -20,52 +20,99 @@
 #include "ui_prop_value_color.h"
 #include "ui_unit.h"
 
-/*export*/ namespace gtl::ui::prop {
+/*export*/ namespace gtl::ui::inline prop {
 
-	//=============================================================================================================================
+	inline namespace name {
+		using namespace std::literals;
+
+		static inline string_t const text_align		{ GText("text-align"s) };
+		static inline string_t const background		{ GText("background"s) };
+		static inline string_t const width			{ GText("width"s) };
+		static inline string_t const height			{ GText("height"s) };
+		static inline string_t const max_width		{ GText("max-width"s) };
+		static inline string_t const min_width		{ GText("min-width"s) };
+		static inline string_t const max_height		{ GText("max-height"s) };
+		static inline string_t const min_height		{ GText("min-height"s) };
+		static inline string_t const border			{ GText("border"s) };
+		static inline string_t const margin			{ GText("margin"s) };
+		static inline string_t const padding		{ GText("padding"s) };
+	}
+
+	//==============================================================================================================================
 	//! @brief widget appearance
 	struct xWidgetProperty {
 	public:
 		using this_t = xWidgetProperty;
 
-		string_t m_property, m_value;
+		string_t m_name, m_value;
 
 		//constexpr xWidgetProperty(string_view_t prop, string_view_t value) : m_property(prop), m_value(value) {}
 		//virtual ~xWidgetProperty() {}
 
 		string_t GetStyle() const {
-			return fmt::format(GText("{}:{};"), m_property, m_value);
+			return fmt::format(GText("{}:{};"), m_name, m_value);
 		}
 
+		auto operator <=> (xWidgetProperty const&) const = default;
+		//bool operator == (string_t const& name) const {
+		//	return m_name == name;
+		//}
 	};
 
+	template < typename ... Args >
+	xWidgetProperty MakeProperty(string_t name, Args&& ... value) {
+		xWidgetProperty prop;
+		prop.m_name = std::move(name);
+		if constexpr (sizeof ... (Args) == 1) {
+			if constexpr (std::is_convertible_v<Args..., string_t>) {
+				prop.m_value = std::move(value...);
+			}
+			else {
+				prop.m_value = ToString(std::forward<Args>(value)...);
+			}
+		}
+		else {
+			prop.m_value = ToString(std::forward<Args>(value)...);
+		}
+		return prop;
+	}
 
-	using position_t = gtl::ui::unit::position_t;
+	//==============================================================================================================================
 
 	/// @brief TextAlign
 	/// @ex TextAlign(gtl::ui::prop::value::text_align::center);
-	constexpr static xWidgetProperty TextAlign(string_t const& prop)	{ return xWidgetProperty{GText("text-align"s), prop}; }
+	constexpr inline xWidgetProperty TextAlign(string_t const& prop) {
+		return xWidgetProperty{gtl::ui::prop::name::text_align, prop};
+	}
 
 	template < typename ... Args >
 	constexpr static xWidgetProperty Background(Args&& ... args) {
-		return xWidgetProperty{GText(""), ToString(std::forward<Args>(args)...)};
+		return MakeProperty(gtl::ui::prop::name::background, std::forward<Args>(args)...);
 	}
 
 	/// @brief Width
-	static xWidgetProperty Width(position_t const& length) {
-		return xWidgetProperty(GText("width"s), ToString(length));
+	inline xWidgetProperty Width(position_t const& length) {
+		return MakeProperty(gtl::ui::prop::name::width, length);
 	}
-	/// @brief Width
-	static xWidgetProperty Height(position_t const& length) {
-		return xWidgetProperty(GText("height"s), ToString(length));
+	/// @brief height
+	inline xWidgetProperty Height(position_t const& length) {
+		return MakeProperty(gtl::ui::prop::name::height, length);
 	}
-	/// @brief Width
-	static xWidgetProperty MaxWidth(position_t const& length) {
-		return xWidgetProperty(GText("max-width"s), ToString(length));
+	/// @brief max-width
+	inline xWidgetProperty MaxWidth(position_t const& length) {
+		return MakeProperty(gtl::ui::prop::name::max_width, length);
 	}
-	/// @brief Width
-	static xWidgetProperty MaxHeight(position_t const& length) {
-		return xWidgetProperty(GText("max-height"s), ToString(length));
+	/// @brief max-height
+	inline xWidgetProperty MaxHeight(position_t const& length) {
+		return MakeProperty(gtl::ui::prop::name::max_height, length);
+	}
+	/// @brief min-width
+	inline xWidgetProperty MinWidth(position_t const& length) {
+		return MakeProperty(gtl::ui::prop::name::min_width, length);
+	}
+	/// @brief min-height
+	inline xWidgetProperty MinHeight(position_t const& length) {
+		return MakeProperty(gtl::ui::prop::name::min_height, length);
 	}
 
 
@@ -76,9 +123,9 @@
 	/// @ex Border(3_px, 3_px, u8"solid", u8"green");
 	/// @ex Border(3_px, 3_px, u8"solid", color::AliceBlue);
 	template < typename ... ANY_OF_PX_EM_REM_PERCENT_STRING >
-	static xWidgetProperty Border(ANY_OF_PX_EM_REM_PERCENT_STRING&& ... args) {
+	xWidgetProperty Border(ANY_OF_PX_EM_REM_PERCENT_STRING&& ... args) {
 		static_assert(sizeof... (args) > 0 and sizeof... (args) <= 4);
-		return xWidgetProperty{ GText("border"s), ToString(args...) };
+		return MakeProperty(gtl::ui::prop::name::border, args...);
 	}
 
 	/// @brief 
@@ -88,9 +135,11 @@
 	/// @ex Margin(10_px);
 	/// @ex Margin(0.1_em, 0.1_em);
 	/// @ex Margin(0.1_rem, 0.1_rem);
-	static xWidgetProperty Margin(position_t const& p1) { return xWidgetProperty{ GText("margin"s), ToString(p1) }; }
-	static xWidgetProperty Margin(position_t const& p1, position_t const& p2) { return xWidgetProperty{ GText("margin"s), ToString(p1, p2) }; }
-	static xWidgetProperty Margin(position_t const& p1, position_t const& p2, position_t const& p3, position_t const& p4) { return xWidgetProperty{ GText("margin"s), ToString(p1, p2, p3, p4) }; }
+	inline xWidgetProperty Margin(position_t const& p1) { return MakeProperty(gtl::ui::prop::name::margin, p1); }
+	inline xWidgetProperty Margin(position_t const& p1, position_t const& p2) { return MakeProperty(gtl::ui::prop::name::margin, p1, p2); }
+	inline xWidgetProperty Margin(position_t const& p1, position_t const& p2, position_t const& p3, position_t const& p4) {
+		return MakeProperty(gtl::ui::prop::name::margin, p1, p2, p3, p4);
+	}
 
 	/// @brief 
 	/// @tparam ...ANY_OF_PX_EM_REM_PERCENT 
@@ -99,9 +148,11 @@
 	/// @ex Padding(10_px);
 	/// @ex Padding(0.1_em, 0.1_em);
 	/// @ex Padding(0.1_rem, 0.1_rem);
-	static xWidgetProperty Padding(position_t const& p1) { return xWidgetProperty{ GText("padding"s), ToString(p1) }; }
-	static xWidgetProperty Padding(position_t const& p1, position_t const& p2) { return xWidgetProperty{ GText("padding"s), ToString(p1, p2) }; }
-	static xWidgetProperty Padding(position_t const& p1, position_t const& p2, position_t const& p3, position_t const& p4) { return xWidgetProperty{ GText("padding"s), ToString(p1, p2, p3, p4) }; }
+	inline xWidgetProperty Padding(position_t const& p1) { return MakeProperty(gtl::ui::prop::name::padding, p1); }
+	inline xWidgetProperty Padding(position_t const& p1, position_t const& p2) { return MakeProperty(gtl::ui::prop::name::padding, p1, p2); }
+	inline xWidgetProperty Padding(position_t const& p1, position_t const& p2, position_t const& p3, position_t const& p4) {
+		return MakeProperty(gtl::ui::prop::name::padding, p1, p2, p3, p4);
+	}
 
 };
 

@@ -12,7 +12,7 @@
 #pragma once
 
 #include "gtl/_config.h"
-
+#include "gtl/concepts.h"
 
 #if (GTL__BOOST_JSON__AS_STANDALONE)
 #	define BOOST_JSON_STANDALONE
@@ -364,10 +364,11 @@ namespace gtl {
 			return j_[index];
 		}
 
-		operator bool() const { return (bool)j_; }
-		operator int() const { return (int)j_; }
-		operator int64_t() const { return (int64_t)j_; }
-		operator double() const { return (double)j_; }
+		operator bool() const { return j_.is_boolean() ? (bool)j_ : false; }
+		operator int() const { return j_.is_number_integer() ? (int)j_ : 0; }
+		operator int64_t() const { return j_.is_number_integer() ? (int64_t)j_ : 0ll; }
+		operator double() const { return j_.is_number_float() ? (double)j_ : 0.0; }
+		operator float() const { return j_.is_number_float() ? (float)(double)j_ : 0.0f; }
 		template < gtlc::string_elem tchar_t >
 		operator std::basic_string<tchar_t> () const {
 			auto jstrU8 = (std::string)j_;
@@ -380,15 +381,16 @@ namespace gtl {
 		}
 		template < typename T >
 			requires (
-				std::is_class_v<T>
+				(std::is_class_v<T> || std::is_enum_v<T> )
 				&& !std::is_convertible_v<T, std::string> && !std::is_convertible_v<T, std::wstring>
 				&& !std::is_convertible_v<T, std::u8string> && !std::is_convertible_v<T, std::u16string> && !std::is_convertible_v<T, std::u32string>
 				&& !std::is_convertible_v<T, std::string_view> && !std::is_convertible_v<T, std::wstring_view>
 				&& !std::is_convertible_v<T, std::u8string_view> && !std::is_convertible_v<T, std::u16string_view> && !std::is_convertible_v<T, std::u32string_view>
 				)
 		operator T() const {
-			T a;
-			from_json(*this, a);
+			T a{};
+			if (j_.is_object())
+				from_json(*this, a);
 			return a;
 		}
 

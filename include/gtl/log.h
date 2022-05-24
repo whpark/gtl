@@ -110,15 +110,19 @@ namespace gtl {
 
 	public:
 		// Write Log
-	#if 0
-		template < typename SFMT, typename ... Args > void Log(SFMT const& fmt, Args&& ... args) {
-			_Log({}, std::format(fmt, std::forward<Args>(args)...));
+	#if 1
+		template < typename ... Args > void Log(std::string_view fmt, Args&& ... args) {
+			_Log({}, std::vformat(fmt, std::make_format_args(args...)));
 		}
-		template < typename ... Args > void LogTag(const std::string_view svTag, fmt::basic_format_string<char, Args...> fmt, Args&& ... args) {
-			_Log(svTag, fmt::vformat<char>(fmt, fmt::make_format_args<fmt::format_context>(args...)));
+		template < typename ... Args > void Log(std::wstring_view fmt, Args&& ... args) {
+			_Log({}, std::vformat(fmt, std::make_wformat_args(args...)));
 		}
-		template < typename ... Args > void LogTag(const std::string_view svTag, fmt::basic_format_string<wchar_t, Args...> fmt, Args&& ... args) {
-			_Log(svTag, fmt::vformat<wchar_t>(fmt, fmt::make_format_args<fmt::wformat_context>(args...)));
+
+		template < typename ... Args > void LogTag(std::string_view svTag, std::string_view fmt, Args&& ... args) {
+			_Log(svTag, std::vformat(fmt, std::make_format_args(args...)));
+		}
+		template < typename ... Args > void LogTag(std::string_view svTag, std::wstring_view fmt, Args&& ... args) {
+			_Log(svTag, std::vformat(fmt, std::make_wformat_args(args...)));
 		}
 	#else
 		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { _Log<char>({}, std::format(svText, std::forward<Args>(args)...)); }

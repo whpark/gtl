@@ -45,6 +45,15 @@ namespace gtl::internal {
 namespace gtl {
 #pragma pack(push, 8)
 
+	template < gtlc::string_elem tchar_t, size_t N >
+	struct xStringLiteral {
+		tchar_t str[N];
+
+		constexpr xStringLiteral(tchar_t const (&sz)[N]) {
+			std::copy_n(sz, N, str);
+		}
+	};
+
 	//! @brief call back function for progress dialog or something like...
 	using callback_progress_t = std::function<bool (int iPercent, bool bDone, bool bError)>;
 
@@ -123,7 +132,7 @@ namespace gtl {
 	//-------------------------------------------------------------------------
 	// Variable Init
 	template < gtlc::trivially_copyable T >
-	constexpr inline void ZeroVar(T& var) { var = T{}; }
+	constexpr inline void MakeZeroVar(T& var) { var = T{}; }
 
 
 	//-------------------------------------------------------------------------
@@ -226,11 +235,11 @@ namespace gtl {
 		template < typename T >						constexpr T bit_single(int b)					{ return ((T)1 << b); }
 		template < typename T, typename ... Bits >	constexpr T bit_multi(Bits ... bits)			{ return (bit_single<T>(bits) | ...); }
 	}
-	template < typename ... Bits >				constexpr std::uint32_t BIT32(Bits ... bits)		{ return internal::bit_multi<std::uint32_t>(bits...); }
-	template < typename ... Bits >				constexpr std::uint64_t BIT64(Bits ... bits)		{ return internal::bit_multi<std::uint64_t>(bits...); }
+	template < typename ... Bits >				constexpr std::uint32_t Bit32(Bits ... bits)		{ return internal::bit_multi<std::uint32_t>(bits...); }
+	template < typename ... Bits >				constexpr std::uint64_t Bit64(Bits ... bits)		{ return internal::bit_multi<std::uint64_t>(bits...); }
 
-	template < typename ... Bits >				constexpr std::bitset<32> BITSET32(Bits ... bits)	{ return std::bitset<32>(bit32(bits...)); }
-	template < typename ... Bits >				constexpr std::bitset<64> BITSET64(Bits ... bits)	{ return std::bitset<64>(bit64(bits...)); }
+	template < typename ... Bits >				constexpr std::bitset<32> BitSet32(Bits ... bits)	{ return std::bitset<32>(bit32(bits...)); }
+	template < typename ... Bits >				constexpr std::bitset<64> BitSet64(Bits ... bits)	{ return std::bitset<64>(bit64(bits...)); }
 
 
 	// Word Align Position
@@ -478,8 +487,8 @@ namespace gtl {
 		void Stop() {}
 
 	public:
-		template < typename ... Args >
-		void Lap(Args&& ... args) {
+		template < typename SFMT, typename ... Args >
+		void Lap(SFMT const& fmt, Args&& ... args) {
 			auto t = tclock::now();
 		#define GTL__PRINT_FMT_STOPWATCH "STOP_WATCH {:{}}[ "
 			if constexpr (gtlc::is_one_of<tchar, char>) {
@@ -497,7 +506,7 @@ namespace gtl {
 			}
 		#undef GTL__PRINT_FMT_STOPWATCH
 
-			os << std::format(std::forward<Args>(args)...);
+			os << std::vformat(fmt, std::make_format_args(args...));
 
 		#define GTL__PRINT_FMT_STOPWATCH " ] {}\n"
 			if constexpr (gtlc::is_one_of<tchar, char>) {

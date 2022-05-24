@@ -104,7 +104,7 @@ namespace gtl {
 	static inline TDynamicCreateBase<this_t, T_IDENTIFIER> dynamicCreateBase_s;
 
 
-	template < typename tobject, auto id, std::unique_ptr<typename tobject::mw_base_t> (*Creator)() >
+	template < typename tobject, auto id, std::unique_ptr<typename tobject::base_t> (*Creator)() >
 	class TDynamicCreateHelper {
 	public:
 		using object_t = tobject;
@@ -123,7 +123,7 @@ namespace gtl {
 #define GTL__DYNAMIC_CLASS(ID)\
 	static inline TDynamicCreateHelper<this_t, ID, std::make_unique<this_t>> dynamicCreateDerived_s;
 #define GTL__DYNAMIC_CLASS_EMPLACE(ID, ...)\
-	static inline TDynamicCreateHelper<this_t, ID, []()->std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(__VA_ARGS__); }> dynamicCreateDerived_s;
+	static inline TDynamicCreateHelper<this_t, ID, []()->std::unique_ptr<base_t>{ return std::make_unique<this_t>(__VA_ARGS__); }> dynamicCreateDerived_s;
 
 
 //	//-----------------------------------------------------------------------------
