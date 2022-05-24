@@ -18,7 +18,7 @@ if %ERRORLEVEL% neq 0  goto :error_end
 echo ------------------
 echo +  win32 - Release
 echo ------------------
-msbuild glt.sln /p:Platform=win32 /p:Configuration=Release -m
+msbuild gtl.sln /p:Platform=win32 /p:Configuration=Release -m
 if %ERRORLEVEL% neq 0  goto :error_end
 
 goto :end
