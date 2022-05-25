@@ -318,6 +318,7 @@ SUPPRESS_DEPRECATED_WARNING
 		auto strA1 = L"가" + str + u"도레미";
 		auto strA2 = L"가"s + str + U"마바사";
 		auto strA3 = L"가"sv + str + L"솔라시";
+		auto strA6 = strA + str;
 		gtl::xStringW strA4 {strA + str};
 SUPPRESS_DEPRECATED_WARNING
 		auto strA5 = L"가"s.c_str() + str;	// NOT Secure

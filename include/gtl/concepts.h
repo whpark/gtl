@@ -10,6 +10,7 @@
 #pragma once
 
 #include <concepts>
+#include <ciso646>
 #include "_config.h"
 
 #if !defined(__cpp_lib_concepts)

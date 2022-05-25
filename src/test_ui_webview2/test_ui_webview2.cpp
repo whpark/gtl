@@ -68,19 +68,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						//if (auto r = w.FindComponent(GText("EDIT"))) { MessageBox(gtl::xStringW(m_webview->GetText_TEST(r->m_id))); }
 						OnButtonEvent(ToString(rself->m_id)); return true; }}),
 				}),
-			xWidget::PanelHorizontal({}, {
-				xWidget::Label(GText("Label2"s), widthCol1),
-				xWidget::Button(GText("Button2"s), {}, {}, {.fn_OnClick = [](rWidgetData rself, string_view_t evt, string_view_t text) { OnButtonEvent(ToString(rself->m_id)); return true; }}),
-				xWidget::Input(GText("text <value>"s), {}, {}, {}),
+				xWidget::PanelHorizontal({}, {
+					xWidget::Label(GText("Label2"s), widthCol1),
+					xWidget::Button(GText("Button2"s), {}, {}, {.fn_OnClick = [](rWidgetData rself, string_view_t evt, string_view_t text) { OnButtonEvent(ToString(rself->m_id)); return true; }}),
+					xWidget::Input(GText("text <value>"s), {}, {}, {}),
 				}),
 				xWidget::PanelHorizontal({}, {
 					xWidget::Label(GText("Label3"s), widthCol1),
 					xWidget::Select(GText("Select..."), {GText("string option 1"), GText("string option2"), GText("mmm3"), GText("mmm4"), GText("mmm5"), GText("mmmmmmm6"), GText("mmm")}, 4),
-					}),
-					xWidget::PanelHorizontal({}, {
-						xWidget::Label(GText("Label4"s), widthCol1),
-						xWidget::Select(GText("Select..."), {GText("text 1"), GText("string option2"), GText("mmm3"), GText("mmm4"), GText("mmm5"), GText("mmmmmmm6"), GText("fasdfasdf")}),
-						}),
+				}),
+				xWidget::PanelHorizontal({}, {
+					xWidget::Label(GText("Label4"s), widthCol1),
+					xWidget::Select(GText("Select..."), {GText("text 1"), GText("string option2"), GText("mmm3"), GText("mmm4"), GText("mmm5"), GText("mmmmmmm6"), GText("fasdfasdf")}),
+				}),
 			})
 	);
 	//w.m_components.push_back(
