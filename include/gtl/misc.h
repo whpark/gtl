@@ -65,16 +65,16 @@ namespace gtl {
 	//-----------------------------------------------------------------------------
 	// defaulted Copy Constructor/Assignment 에서 제외할 멤버 변수용
 	template < typename T >
-	class non_copyable_member : public T {
+	class TCopyTransparent : public T {
 	public:
 		using base_t = T;
 
 		using T::T;
-		//non_copyable_member() : T() {}
-		non_copyable_member(const non_copyable_member& B) { }
-		non_copyable_member(non_copyable_member&& B) = default;
-		non_copyable_member& operator = (const non_copyable_member& B) { return *this; }
-		non_copyable_member& operator = (non_copyable_member&& B) = default;
+		//TCopyTransparent() : T() {}
+		TCopyTransparent(const TCopyTransparent& B) { }
+		TCopyTransparent(TCopyTransparent&& B) = default;
+		TCopyTransparent& operator = (const TCopyTransparent& B) { return *this; }
+		TCopyTransparent& operator = (TCopyTransparent&& B) = default;
 	};
 
 
