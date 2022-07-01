@@ -275,10 +275,10 @@ export namespace gtl {
 		friend inline [[nodiscard]] TString<tchar_other> operator + (tstring_buf const& a, TString const& b) {
 			return TString::Add<tchar_other, tchar>(a, b);
 		}
-		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
-		GTL__DEPR_SEC friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const* const& a, TString const& b) {
-			return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>(a), b);
-		}
+		//template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
+		//GTL__DEPR_SEC friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const* const& a, TString const& b) {
+		//	return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>(a), b);
+		//}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
 		friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const a, TString const& b) {
 			return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>{&a, &a+1}, b);

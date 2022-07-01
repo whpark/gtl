@@ -53,9 +53,9 @@ export namespace gtl::concepts {
 	concept contiguous_container =
 		requires (tcontainer v) {
 			v[0];
-			std::data(v);
-			std::size(v);
-		};
+			{ v.data() } -> std::convertible_to<std::remove_cvref_t<decltype(v[0])> const*>;
+			{ v.size() } -> std::convertible_to<size_t>;
+	};
 
 
 	/// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...

@@ -47,7 +47,7 @@ export namespace gtl {
 		using archive_out_t = gtl::TArchive<std::ofstream>;
 
 	protected:
-		mutable non_copyable_member<std::recursive_mutex> m_mutex;	// for multi-thread
+		mutable TCopyTransparent<std::recursive_mutex> m_mutex;	// for multi-thread
 		std::filesystem::path m_path;								// Current File Path
 		std::ofstream m_file;										// Current File
 		std::unique_ptr<archive_out_t> m_ar;						// Archive

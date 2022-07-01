@@ -131,5 +131,8 @@
     <ClCompile Include="smart_ptr_container.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="2dMatArray.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
