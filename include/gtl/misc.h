@@ -81,12 +81,12 @@ namespace gtl {
 	////-----------------------------------------------------------------------------
 	//// Auto Copy Constructor 에서 제외, Movable 포함 멤버 변수용
 	//template < typename T >
-	//class non_copyable_movable_member : public T {
+	//class TCopyTransparent : public T {
 	//public:
 	//	using T::T;
-	//	non_copyable_movable_member(const non_copyable_movable_member& B) {};
-	//	//non_copyable_movable_member(non_copyable_movable_member&& B) = default;
-	//	//non_copyable_movable_member& operator = (non_copyable_movable_member&& B) = default;
+	//	TCopyTransparent(const TCopyTransparent& B) {};
+	//	//TCopyTransparent(TCopyTransparent&& B) = default;
+	//	//TCopyTransparent& operator = (TCopyTransparent&& B) = default;
 	//};
 
 

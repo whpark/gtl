@@ -141,8 +141,8 @@ namespace gtl::concepts {
 		(
 			requires (tcontainer v) {
 				v[0];
-				{ std::data(v) } -> std::convertible_to<std::remove_cvref_t<decltype(v[0])> const*>;
-				{ std::size(v) } -> std::convertible_to<size_t>;
+				{ v.data() } -> std::convertible_to<std::remove_cvref_t<decltype(v[0])> const*>;
+				{ v.size() } -> std::convertible_to<size_t>;
 			}
 			or
 			std::is_array_v<tcontainer>
