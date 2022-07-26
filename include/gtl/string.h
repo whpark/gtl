@@ -183,6 +183,11 @@ namespace gtl {
 
 		//---------------------------------------------------------------------
 		/// @brief operator += ...
+		using base_t::operator +=;
+		TString& operator += (TString const& b) {
+			((std::basic_string<tchar>&)*this) += b;
+			return *this;
+		}
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		inline TString& operator += (tstring_buf const& b) {
 			if constexpr (std::is_same_v<tchar, tchar_other>) {
@@ -206,6 +211,10 @@ namespace gtl {
 
 		//---------------------------------------------------------------------
 		/// @brief operator + ... (which needs codepage conversion)
+		template < gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
+		friend inline [[nodiscard]] TString operator + (TString const& a, TString<tchar_other> const& b) {
+			return (std::basic_string<tchar> const&)a + gtl::ToString<tchar, tchar_other>(b);
+		}
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_same_v<tchar, tchar_other>)
 		friend inline [[nodiscard]] TString operator + (TString const& a, tstring_buf const& b) {
