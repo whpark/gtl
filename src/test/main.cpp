@@ -2,8 +2,8 @@
 
 
 #ifdef _DEBUG
-#pragma comment(lib, "gtestd.lib")
-#pragma comment(lib, "gmockd.lib")
+#pragma comment(lib, "gtest.lib")
+#pragma comment(lib, "gmock.lib")
 #else
 #pragma comment(lib, "gtest.lib")
 #pragma comment(lib, "gmock.lib")
