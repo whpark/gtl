@@ -184,13 +184,14 @@ namespace gtl {
 		//---------------------------------------------------------------------
 		/// @brief operator += ...
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
-		inline TString operator += (tstring_buf const& b) {
+		inline TString& operator += (tstring_buf const& b) {
 			if constexpr (std::is_same_v<tchar, tchar_other>) {
-				return ((std::basic_string<tchar>&)*this) += b;
+				((std::basic_string<tchar>&)*this) += b;
 			}
 			else {
-				return ((std::basic_string<tchar>&)*this) += gtl::ToString<tchar, tchar_other>(/*std::basic_string_view<tchar_other>(*/b);
+ 				((std::basic_string<tchar>&)*this) += gtl::ToString<tchar, tchar_other>(/*std::basic_string_view<tchar_other>(*/b);
 			}
+			return *this;
 		}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
 		GTL__DEPR_SEC inline TString& operator += (tchar_other const* const& psz) {
@@ -286,8 +287,13 @@ namespace gtl {
 		friend inline [[nodiscard]] TString<tchar_other> operator + (tstring_buf const& a, TString const& b) {
 			return TString::Add<tchar_other, tchar>(a, b);
 		}
+		//template < typename tchar_other >
+		//requires (!std::is_same_v<tchar, tchar_other>)
+		//friend inline [[nodiscard]] TString<tchar> operator + (TString<tchar_other> const& a, TString const& b) {
+		//	return TString::Add<tchar_other, tchar>(a, b);
+		//}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
-		GTL__DEPR_SEC friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const* const& a, TString const& b) {
+		GTL__DEPR_SEC friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const* const& a, TString<tchar> const& b) {
 			return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>(a), b);
 		}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)

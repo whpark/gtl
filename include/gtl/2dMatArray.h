@@ -60,7 +60,7 @@ namespace gtl {
 	public:
 		struct T_ITEM {
 			cv::Mat img;
-			mutable non_copyable_member<std::recursive_mutex> mtxThumbnail;
+			mutable TCopyTransparent<std::recursive_mutex> mtxThumbnail;
 			//mutable bool bTumbnail = false;
 			std::vector<cv::Mat> thumbnails;
 		};
