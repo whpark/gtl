@@ -9,8 +9,9 @@
 
 #pragma once
 
+#include <version>
 #include <concepts>
-#include <ciso646>
+//#include <ciso646>	// -> c++20 <version>
 #include "_config.h"
 
 #if !defined(__cpp_lib_concepts)
