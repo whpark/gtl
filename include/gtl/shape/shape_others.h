@@ -1020,7 +1020,7 @@ namespace gtl::shape {
 		}
 		virtual void PrintOut(std::wostream& os) const override {
 			xShape::PrintOut(os);
-			fmt::print(os, L"\tflags:{}, degree:{}\n");
+			fmt::print(os, L"\tflags:{}, degree:{}\n", m_flags, m_degree);
 			fmt::print(os, L"\tknot ");
 			for (auto knot : m_knots)
 				fmt::print(os, L"{}, ", knot);

@@ -32,7 +32,7 @@
 #include <cstring>
 #include <cwchar>
 #include <cwctype>
-#include <ciso646>
+//#include <ciso646>	// -> c++20 <version>
 //#include <tchar.h>
 //#include <cstdbool>
 
