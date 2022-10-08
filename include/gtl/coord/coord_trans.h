@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 //////////////////////////////////////////////////////////////////////
 //
 // coord_trans.h: coord trans
 //
 // PWH
-// 2019.11.02. ÀüÃ¼ ¼öÁ¤
+// 2019.11.02. ì „ì²´ ìˆ˜ì •
 // 2021.05.21. renewal
 // 2021.07.05. new - naming convention
 //
@@ -206,7 +206,7 @@ namespace gtl {
 		using base_t = ICoordTrans;
 
 	protected:
-		boost::ptr_deque<ICoordTrans> chain_;	// ¸¶Áö¸· Back() CTºÎÅÍ Front() ±îÁö Transform() Àû¿ë.
+		boost::ptr_deque<ICoordTrans> chain_;	// ë§ˆì§€ë§‰ Back() CTë¶€í„° Front() ê¹Œì§€ Transform() ì ìš©.
 
 	public:
 		//friend class boost::serialization::access;
@@ -467,7 +467,7 @@ namespace gtl {
 				return false;
 
 			std::array<point_t, 3> ptsS{ptsSource[0], ptsSource[1]}, ptsT{ptsTarget[0], ptsTarget[1]};
-			// ¼¼¹øÂ° Á¡Àº °¢°¢, 0¹ø ±âÁØÀ¸·Î 1¹øÀ» 90µµ È¸Àü½ÃÅ´
+			// ì„¸ë²ˆì§¸ ì ì€ ê°ê°, 0ë²ˆ ê¸°ì¤€ìœ¼ë¡œ 1ë²ˆì„ 90ë„ íšŒì „ì‹œí‚´
 			ptsS[2].x = -(ptsS[1].y-ptsS[0].y) + ptsS[0].x;
 			ptsS[2].y =  (ptsS[1].x-ptsS[0].x) + ptsS[0].y;
 			if (bRightHanded) {
@@ -668,7 +668,7 @@ namespace gtl {
 		}
 
 		TCoordTransDim& operator *= (TCoordTransDim const& B) {
-			// ¼ø¼­ ¹Ù²Ù¸é ¾ÈµÊ.
+			// ìˆœì„œ ë°”ê¾¸ë©´ ì•ˆë¨.
 			m_offset		= m_scale * m_mat * (B.m_offset - m_origin) + m_offset;
 
 			m_origin		= B.m_origin;
