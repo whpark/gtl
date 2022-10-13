@@ -11,15 +11,15 @@ echo ------------------
 msbuild gtl.sln /p:Platform=x64 /p:Configuration=Release -m
 if %ERRORLEVEL% neq 0  goto :error_end
 echo ------------------
-echo +  win32 - Debug (X)
+echo +  win32 - Debug
 echo ------------------
-rem msbuild gtl.sln /p:Platform=win32 /p:Configuration=Debug -m
-rem if %ERRORLEVEL% neq 0  goto :error_end
+msbuild gtl.sln /p:Platform=x86 /p:Configuration=Debug -m
+if %ERRORLEVEL% neq 0  goto :error_end
 echo ------------------
-echo +  win32 - Release (X)
+echo +  win32 - Release
 echo ------------------
-rem msbuild gtl.sln /p:Platform=win32 /p:Configuration=Release -m
-rem if %ERRORLEVEL% neq 0  goto :error_end
+msbuild gtl.sln /p:Platform=x86 /p:Configuration=Release -m
+if %ERRORLEVEL% neq 0  goto :error_end
 
 goto :end
 
