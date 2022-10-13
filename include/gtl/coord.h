@@ -14,7 +14,7 @@
 #include "gtl/misc.h"
 #include "gtl/concepts.h"
 
-#include "boost/serialization/serialization.hpp"
+//#include "boost/serialization/serialization.hpp"
 
 #include "gtl/coord/coord_size.h"
 #include "gtl/coord/coord_point.h"

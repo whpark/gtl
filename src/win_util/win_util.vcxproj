@@ -188,7 +188,7 @@
       <PreprocessorDefinitions>GTL__WINUTIL_EXPORTS;_AFXEXT;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -196,7 +196,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\win_util.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -226,7 +226,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PreprocessorDefinitions>GTL__WINUTIL_EXPORTS;_AFXEXT;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -234,7 +234,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\win_util.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -264,7 +264,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PreprocessorDefinitions>GTL__WINUTIL_EXPORTS;_AFXEXT;_WINDOWS;_DEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -272,7 +272,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\win_util.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -302,7 +302,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PreprocessorDefinitions>GTL__WINUTIL_EXPORTS;_AFXEXT;_WINDOWS;_DEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -310,7 +310,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <Link>
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\win_util.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -342,7 +342,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PreprocessorDefinitions>GTL__WINUTIL_EXPORTS;_AFXEXT;_WINDOWS;NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -352,7 +352,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>.\win_util.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -382,7 +382,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PreprocessorDefinitions>GTL__WINUTIL_EXPORTS;_AFXEXT;_WINDOWS;NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -392,7 +392,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>.\win_util.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -422,7 +422,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PreprocessorDefinitions>GTL__WINUTIL_EXPORTS;_AFXEXT;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -432,7 +432,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>.\win_util.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -464,7 +464,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PreprocessorDefinitions>GTL__WINUTIL_EXPORTS;_AFXEXT;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;C:\local\boost\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UseStandardPreprocessor>true</UseStandardPreprocessor>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -474,7 +474,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>.\win_util.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib;C:\local\boost\lib$(PlatformArchitecture)-msvc-$(PlatformToolsetVersion[0])$(PlatformToolsetVersion[1]).$(PlatformToolsetVersion[2]);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
