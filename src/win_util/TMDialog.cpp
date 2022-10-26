@@ -75,7 +75,7 @@ namespace gtl::win_util {
 
 		if (fmt.empty())
 			fmt = L"{}";
-		auto str = fmt::format(fmt, iValue);
+		auto str = fmt::format(fmt::runtime(fmt), iValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 
@@ -94,7 +94,7 @@ namespace gtl::win_util {
 
 		if (fmt.empty())
 			fmt = L"{}";
-		auto str = fmt::format(fmt, iValue);
+		auto str = fmt::format(fmt::runtime(fmt), iValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 
@@ -113,7 +113,7 @@ namespace gtl::win_util {
 
 		if (fmt.empty())
 			fmt = L"{:.5f}";
-		auto str = fmt::format(fmt, dValue);
+		auto str = fmt::format(fmt::runtime(fmt), dValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 

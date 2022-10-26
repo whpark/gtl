@@ -6,9 +6,8 @@
 //#define FMT_HEADER_ONLY
 //#include "fmt/color.h"
 //#include "fmt/ostream.h"
-
 #include "benchmark/benchmark.h"
-#pragma comment(lib, "benchmark.lib")
+//#pragma comment(lib, "benchmark.lib")
 #pragma comment(lib, "shlwapi.lib")
 
 int main(int argc, char** argv) {
