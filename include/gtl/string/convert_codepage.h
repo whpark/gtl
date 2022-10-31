@@ -710,8 +710,8 @@ namespace gtl {
 		auto result = facet.out(state, pszSourceBegin, pszSourceEnd, pszSourceNext,
 					   str.data(), str.data()+len, pszDestNext);
 
-		if (result == std::codecvt_base::error)
-			throw std::invalid_argument{ GTL__FUNCSIG "String Cannot be transformed!" };
+		//if (result == std::codecvt_base::error)
+		//	throw std::invalid_argument{ GTL__FUNCSIG "String Cannot be transformed!" };
 
 		// todo : test len.
 		//len = tszlen(str.data(), str.data()+len+1);

@@ -68,9 +68,10 @@ namespace test_std_string {
 
 TEST(gtl_string, TString_CodepageConversion) {
 	using namespace gtl;
-
 	std::string_view sv{"ACBDEF"};
 
+	gtl::eMBCS_Codepage_g = gtl::eCODEPAGE::UTF8;
+	
 	auto len0 = gtl::tszlen(u"ABCDEF");
 	static_assert(gtl::tszlen(u"ABCDEF") == 6);
 	auto len1 = gtl::tszlen(u"ABCDEF"sv);
@@ -130,7 +131,7 @@ TEST(gtl_string, TString_Upper_Lower) {
 
 	constexpr char16_t const szCH_Exception[] = {
 		//0x69, 0x131, 0x142, 0xF8, 0x167,
-		0x3f, 0x49, 0x141, 0xd8, 0x166,
+		0x3f, 0x49, 0x141, 0xd8, 0x166, 0x130
 	};
 
 	EXPECT_TRUE(std::setlocale(LC_CTYPE, ".1250"));
