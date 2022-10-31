@@ -1,4 +1,4 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 // MatView.cpp : implementation file
 //
 
@@ -251,7 +251,7 @@ namespace gtl::win_util {
 		// Info
 		//rect.left = rect.right + s_nSpace;
 		//rect.right = m_rectTool.right;
-		m_staticInfo.Create(WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_BORDER|ES_AUTOHSCROLL|ES_NOHIDESEL|ES_READONLY, CRect(), this, eIDInfo);	// Rect ¥¬ ShowTool(), OnSize() «‘ºˆø°º≠ º≥¡§
+		m_staticInfo.Create(WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_BORDER|ES_AUTOHSCROLL|ES_NOHIDESEL|ES_READONLY, CRect(), this, eIDInfo);	// Rect Îäî ShowTool(), OnSize() Ìï®ÏàòÏóêÏÑú ÏÑ§Ï†ï
 																																		//m_ttInfo.Create(this, WS_VISIBLE|TTS_ALWAYSTIP|TTS_NOPREFIX/*|TTS_NOANIMATE*/|TTS_BALLOON);
 																																		//m_ttInfo.AddTool(this, _T(""), rect, eIDInfo);
 																																		//EnableToolTips(true);
@@ -345,7 +345,7 @@ namespace gtl::win_util {
 				auto interval = std::chrono::milliseconds(15);
 				ss.t0 = std::chrono::steady_clock::now() - interval;
 
-				// Ω√∞£
+				// ÏãúÍ∞Ñ
 				double len = m_ctI2S.Trans(deltaImage.GetLength());
 				CRect rect;
 				GetClientRect(rect);
@@ -815,7 +815,7 @@ namespace gtl::win_util {
 			ptImgBottomRight.x = std::clamp<int>(ptImgBottomRight.x, 0, cx);
 			ptImgBottomRight.y = std::clamp<int>(ptImgBottomRight.y, 0, cy);
 
-			// ∏È¿˚¿Ã 1/10 ¿Ã µ«µµ∑œ....
+			// Î©¥Ï†ÅÏù¥ 1/10 Ïù¥ ÎêòÎèÑÎ°ù....
 			double dArea = rectClient.Width() * rectClient.Height() / 100;
 			double dRate = sqrt(dArea / (cx * cy));
 			double dRateMaxX = rectClient.Width() * 0.80 / cx;
@@ -862,7 +862,7 @@ namespace gtl::win_util {
 			}
 		}
 
-		// Focus «•Ω√
+		// Focus ÌëúÏãú
 		CWnd* pWndFocus = GetFocus();
 		bool bFocused = pWndFocus && ( (pWndFocus == this) || IsChild(pWndFocus) );
 		if (bFocused) {
@@ -1681,7 +1681,7 @@ namespace gtl::win_util {
 			return false;
 		}
 
-		// dZoom ∞™ π´Ω√. m_ctI2S ªÁøÎ«œ∏È µ«¥¬µ•....
+		// dZoom Í∞í Î¨¥Ïãú. m_ctI2S ÏÇ¨Ïö©ÌïòÎ©¥ ÎêòÎäîÎç∞....
 		dZoom = m_ctI2S.m_scale;
 		if (m_ctI2S.m_scale == 1.0) {
 			imgView = imgOrg;
@@ -1737,7 +1737,7 @@ namespace gtl::win_util {
 		//		img.copyTo(imgView);
 		//	else {
 		//		ResizeImage(img, imgView, dZoom, dZoom >= 1.0 ? m_imgOrg.GetScaleUpMethod() : m_imgOrg.GetScaleDownMethod());
-		//		// »Æ¥Î«“ ∞ÊøÏ, ¿ÃπÃ¡ˆ ¿ßƒ° ∫∏¡§
+		//		// ÌôïÎåÄÌï† Í≤ΩÏö∞, Ïù¥ÎØ∏ÏßÄ ÏúÑÏπò Î≥¥Ï†ï
 		//		if ( (imgView.cols > rectClient.Width()) || (imgView.rows > rectClient.Height()) ) {
 		//			xPoint2d pt0(rectClient.TopLeft());// = m_ctI2S.Trans(rectdOrg.TopLeft());
 		//			xPoint2d pt1 = m_ctI2S.Trans(xPoint2d(rectOrg.x, rectOrg.y));
@@ -1781,7 +1781,7 @@ namespace gtl::win_util {
 			imgView = imgSet.GetResizedImage(r, dZoom);
 
 			if (dZoom >= 1.0) {
-				// »Æ¥Î«“ ∞ÊøÏ, ¿ÃπÃ¡ˆ ¿ßƒ° ∫∏¡§
+				// ÌôïÎåÄÌï† Í≤ΩÏö∞, Ïù¥ÎØ∏ÏßÄ ÏúÑÏπò Î≥¥Ï†ï
 				if ( (imgView.cols > rectClient.Width()) || (imgView.rows > rectClient.Height()) ) {
 					xPoint2d pt0(rectClient.TopLeft());// = m_ctI2S.Trans(rectdOrg.TopLeft());
 					xPoint2d pt1 = m_ctI2S.Trans(xPoint2d(rectOrg.x, rectOrg.y));
@@ -2038,7 +2038,7 @@ namespace gtl::win_util {
 					if (m_setting.bShowTool) {
 						CRect rect;
 						if (m_setting.bStatusOnBottom) {
-							{	// »Á¿˚¿Ã ¿⁄≤Ÿ ≥≤æ∆º≠..... ¿Ã∞≈ ø©±‚º≠ «œ∏È æ»µ«¥¬µ•...
+							{	// ÌùîÏ†ÅÏù¥ ÏûêÍæ∏ ÎÇ®ÏïÑÏÑú..... Ïù¥Í±∞ Ïó¨Í∏∞ÏÑú ÌïòÎ©¥ ÏïàÎêòÎäîÎç∞...
 								CRect rect;
 								pWnd->GetWindowRect(rect);
 								ScreenToClient(rect);

@@ -566,28 +566,16 @@ namespace gtl {
 		};
 
 	public:
-										inline void WriteString(std::string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>    (sv, {}, false); }
-										inline void WriteString(std::u8string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t> (sv, {}, false); }
-										inline void WriteString(std::u16string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(sv, {}, false); }
-										inline void WriteString(std::u32string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(sv, {}, false); }
-										inline void WriteString(std::wstring_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t> (sv, {}, false); }
-										inline void WriteLine(std::string_view sv)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>    (sv); }
-										inline void WriteLine(std::u8string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t> (sv); }
-										inline void WriteLine(std::u16string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(sv); }
-										inline void WriteLine(std::u32string_view sv)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(sv); }
-										inline void WriteLine(std::wstring_view sv)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t> (sv); }
-		template < typename ... Args >  inline void WriteString(std::string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(std::vformat(sv, std::make_format_args(args...) ), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(std::format(sv, std::forward<Args>(args) ...), {}, false); }
-		template < typename ... Args >  inline void WriteString(std::wstring_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(std::vformat(sv, std::make_wformat_args(args...) ), {}, false); }
-
-		template < typename ... Args >  inline void WriteLine(std::string_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(std::vformat(sv, std::make_format_args(args...) )); }
-		template < typename ... Args >  inline void WriteLine(std::u8string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::u16string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::u32string_view sv, Args&& ... args)	requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(std::format(sv, std::forward<Args>(args) ...)); }
-		template < typename ... Args >  inline void WriteLine(std::wstring_view sv, Args&& ... args)		requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(std::vformat(sv, std::make_wformat_args(args...) )); }
-
+		template < typename ... targs > inline void WriteString(gtl::internal::tformat_string<char, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(Format(sv, std::forward<targs>(args)... ), {}, false); }
+		template < typename ... targs > inline void WriteString(gtl::internal::tformat_string<char8_t, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(Format(sv, std::forward<targs>(args)...), {}, false); }
+		template < typename ... targs > inline void WriteString(gtl::internal::tformat_string<char16_t, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(Format(sv, std::forward<targs>(args) ...), {}, false); }
+		template < typename ... targs > inline void WriteString(gtl::internal::tformat_string<char32_t, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(Format(sv, std::forward<targs>(args) ...), {}, false); }
+		template < typename ... targs > inline void WriteString(gtl::internal::tformat_string<wchar_t, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(Format(sv, std::forward<targs>(args)... ), {}, false); }
+		template < typename ... targs > inline void WriteLine(gtl::internal::tformat_string<char, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char>(Format(sv, std::forward<targs>(args)... )); }
+		template < typename ... targs > inline void WriteLine(gtl::internal::tformat_string<char8_t, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char8_t>(Format(sv, std::forward<targs>(args)...)); }
+		template < typename ... targs > inline void WriteLine(gtl::internal::tformat_string<char16_t, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char16_t>(Format(sv, std::forward<targs>(args) ...)); }
+		template < typename ... targs > inline void WriteLine(gtl::internal::tformat_string<char32_t, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<char32_t>(Format(sv, std::forward<targs>(args) ...)); }
+		template < typename ... targs > inline void WriteLine(gtl::internal::tformat_string<wchar_t, targs...> const& sv, targs&& ... args) requires (bSTORE) { CHECK_ARCHIVE_STORABLE; TWriteLine<wchar_t>(Format(sv, std::forward<targs>(args)... )); }
 
 		//---------------------------------------------------------------------
 		// Read / Write Size

@@ -154,7 +154,7 @@ namespace gtl {
 
 
 		[[nodiscard]]
-		std::wstring Format(std::wstring const& sv) const {
+		std::wstring OldFormat(std::wstring const& sv) const {
 			std::wstring str;
 
 			std::time_t t = *this;

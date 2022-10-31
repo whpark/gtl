@@ -121,20 +121,20 @@ namespace gtl::win_util {
 	#define GTL__PRINT_FMT_STOPWATCH_PRE "STOP_WATCH {:{}}[ "
 	#define GTL__PRINT_FMT_STOPWATCH_POST " ] {}\n"
 
-		template < typename ... Args >
-		void Lap(std::string_view sv, Args&& ... args) {
+		template < typename ... targs >
+		void Lap(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args) {
 			auto t = tclock::now();
-			osA << std::format(GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
-			osA << std::vformat(sv, std::make_format_args(args...));
-			osA << std::format(GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
+			osA << fmt::format(GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
+			osA << Format(fmt, std::forward<targs>(args)...);
+			osA << fmt::format(GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
 			base_t::t0 = tclock::now();
 		}
-		template < typename ... Args >
-		void Lap(std::wstring_view sv, Args&& ... args) {
+		template < typename ... targs >
+		void Lap(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args) {
 			auto t = tclock::now();
-			osW << std::format(L"" GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
-			osW << std::vformat(sv, std::make_format_args(args...));
-			osW << std::format(L"" GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
+			osW << fmt::format(L"" GTL__PRINT_FMT_STOPWATCH_PRE, ' ', base_t::depth * 4);
+			osW << Format(fmt, std::forward<targs>(args)...);
+			osW << fmt::format(L"" GTL__PRINT_FMT_STOPWATCH_POST, std::chrono::duration_cast<tresolution>(t - base_t::t0));
 			base_t::t0 = tclock::now();
 		}
 	#undef GTL__PRINT_FMT_STOPWATCH_POST

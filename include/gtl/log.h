@@ -110,32 +110,43 @@ namespace gtl {
 
 	public:
 		// Write Log
-	#if 1
-		template < typename ... Args > void Log(std::string_view fmt, Args&& ... args) {
-			_Log({}, std::vformat(fmt, std::make_format_args(args...)));
-		}
-		template < typename ... Args > void Log(std::wstring_view fmt, Args&& ... args) {
-			_Log({}, std::vformat(fmt, std::make_wformat_args(args...)));
-		}
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>("", Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>("", Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>("", Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char16_t>("", Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char32_t>("", Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>(svTag, Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>(svTag, Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>(svTag, Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char16_t>(svTag, Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char32_t>(svTag, Format(fmt, std::forward<targs>(args)...)); }
 
-		template < typename ... Args > void LogTag(std::string_view svTag, std::string_view fmt, Args&& ... args) {
-			_Log(svTag, std::vformat(fmt, std::make_format_args(args...)));
-		}
-		template < typename ... Args > void LogTag(std::string_view svTag, std::wstring_view fmt, Args&& ... args) {
-			_Log(svTag, std::vformat(fmt, std::make_wformat_args(args...)));
-		}
-	#else
-		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { _Log<char>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args) { _Log<wchar_t>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args) { _Log<char8_t>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args) { _Log<char16_t>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args) { _Log<char32_t>({}, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args) { _Log<char>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::string_view svTag, const std::wstring_view svText, Args&& ... args) { _Log<wchar_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char8_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u16string_view svText, Args&& ... args) { _Log<char16_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-		template < typename ... Args > void LogTag(const std::string_view svTag, const std::u32string_view svText, Args&& ... args) { _Log<char32_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
-	#endif
+	//#if 1
+	//	template < typename ... Args > void Log(std::string_view fmt, Args&& ... args) {
+	//		_Log({}, std::vformat(fmt, std::make_format_args(args...)));
+	//	}
+	//	template < typename ... Args > void Log(std::wstring_view fmt, Args&& ... args) {
+	//		_Log({}, std::vformat(fmt, std::make_wformat_args(args...)));
+	//	}
+
+	//	template < typename ... Args > void LogTag(std::string_view svTag, std::string_view fmt, Args&& ... args) {
+	//		_Log(svTag, std::vformat(fmt, std::make_format_args(args...)));
+	//	}
+	//	template < typename ... Args > void LogTag(std::string_view svTag, std::wstring_view fmt, Args&& ... args) {
+	//		_Log(svTag, std::vformat(fmt, std::make_wformat_args(args...)));
+	//	}
+	//#else
+	//	template < typename ... Args > void Log(std::string_view svText, Args&& ... args) { _Log<char>({}, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args) { _Log<wchar_t>({}, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void Log(std::u8string_view svText, Args&& ... args) { _Log<char8_t>({}, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void Log(std::u16string_view svText, Args&& ... args) { _Log<char16_t>({}, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void Log(std::u32string_view svText, Args&& ... args) { _Log<char32_t>({}, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void LogTag(const std::string_view svTag, const std::string_view svText, Args&& ... args) { _Log<char>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void LogTag(const std::string_view svTag, const std::wstring_view svText, Args&& ... args) { _Log<wchar_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void LogTag(const std::string_view svTag, const std::u8string_view svText, Args&& ... args) { _Log<char8_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void LogTag(const std::string_view svTag, const std::u16string_view svText, Args&& ... args) { _Log<char16_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+	//	template < typename ... Args > void LogTag(const std::string_view svTag, const std::u32string_view svText, Args&& ... args) { _Log<char32_t>(svTag, std::format(svText, std::forward<Args>(args)...)); }
+	//#endif
 
 	};
 
@@ -296,13 +307,13 @@ namespace gtl {
 				if constexpr (std::is_same_v<tchar_t, char>) {
 					m_ar->WriteString("{1:{0}}\r\n", len, pos);
 				} else if constexpr (std::is_same_v<tchar_t, wchar_t>) {
-					m_ar->WriteString(L"{1:{0}\r\n", len, pos);
+					m_ar->WriteString(L"{1:{0}}\r\n", len, pos);
 				} else if constexpr (std::is_same_v<tchar_t, char8_t>) {
-					m_ar->WriteString(u8"{1:{0}\r\n", len, pos);
+					m_ar->WriteString(u8"{1:{0}}\r\n", len, pos);
 				} else if constexpr (std::is_same_v<tchar_t, char16_t>) {
-					m_ar->WriteString(u"{1:{0}\r\n", len, pos);
+					m_ar->WriteString(u"{1:{0}}\r\n", len, pos);
 				} else if constexpr (std::is_same_v<tchar_t, char32_t>) {
-					m_ar->WriteString(U"{1:{0}\r\n", len, pos);
+					m_ar->WriteString(U"{1:{0}}\r\n", len, pos);
 				}
 			}
 

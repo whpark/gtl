@@ -574,8 +574,7 @@ namespace gtl {
 		/// @brief fmt::format
 		template < typename S, typename ... Args >
 		TString& Format(S const& format_str, Args&& ... args) {
-			*this = std::move(fmt::format<S, Args...>(format_str, std::forward<Args>(args)...));
-			return *this;
+			return *this = fmt::format<S, Args...>(format_str, std::forward<Args>(args)...);
 		}
 
 
@@ -623,6 +622,49 @@ namespace gtl {
 	using xStringKSSM = TString<charKSSM_t>;		// KSSM (codepage 1361)
 #endif
 
+	namespace internal {
+		// fmt::format adapter
+		template <typename tchar, typename... targs>
+		using tformat_string = fmt::basic_format_string<tchar, std::type_identity_t<targs>...>;
+	};
+		
+	template < typename tchar, typename ... targs>
+	constexpr auto TFormat(fmt::basic_string_view<tchar> fmt, targs&& ... args) {
+		return fmt::vformat(fmt, fmt::make_format_args<fmt::buffer_context<tchar>>(std::forward<targs>(args)...));
+	}
+	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char> Format(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)			{ return TFormat<char>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<wchar_t> Format(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)		{ return TFormat<wchar_t>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char8_t> Format(gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)		{ return TFormat<char8_t>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char16_t> Format(gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return TFormat<char16_t>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char32_t> Format(gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return TFormat<char32_t>(fmt, std::forward<targs>(args)...); }
+
+	template < typename tchar, typename toutput, typename ... targs>
+	constexpr auto TFormatTo(toutput& out, fmt::basic_string_view<tchar> fmt, targs&& ... args) {
+		return fmt::vformat_to(out, fmt, fmt::make_format_args<fmt::buffer_context<tchar>>(std::forward<targs>(args)...));
+	}
+	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return TFormatTo<char>(out, fmt, std::forward<targs>(args)...); }
+	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)		{ return TFormatTo<wchar_t>(out, fmt, std::forward<targs>(args)...); }
+	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)		{ return TFormatTo<char8_t>(out, fmt, std::forward<targs>(args)...); }
+	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return TFormatTo<char16_t>(out, fmt, std::forward<targs>(args)...); }
+	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return TFormatTo<char32_t>(out, fmt, std::forward<targs>(args)...); }
+
+	inline fmt::basic_runtime<char> RuntimeFormatString(std::string_view s) { return {{s}}; }
+	inline fmt::basic_runtime<wchar_t> RuntimeFormatString(std::wstring_view s) { return {{s}}; }
+	inline fmt::basic_runtime<char8_t> RuntimeFormatString(std::u8string_view s) { return {{s}}; }
+	inline fmt::basic_runtime<char16_t> RuntimeFormatString(std::u16string_view s) { return {{s}}; }
+	inline fmt::basic_runtime<char32_t> RuntimeFormatString(std::u32string_view s) { return {{s}}; }
+
+	template < gtlc::string_elem tchar >
+	constexpr std::basic_string<tchar> ToExoticString(std::string const& sv) {
+		std::basic_string<tchar> result;
+		result.reserve(sv.size());
+		for (auto c : sv) {
+			//if (c == '\r')
+			//	continue;
+			result.push_back(c);
+		}
+		return result;
+	}
 
 #pragma pack(pop)
 };	// namespace gtl;

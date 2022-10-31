@@ -2,6 +2,7 @@
 
 #include "gtl/gtl.h"
 #include "gtl/archive.h"
+#include "gtl/string.h"
 
 #pragma warning(disable:4566)	// character encoding
 
@@ -366,10 +367,10 @@ TEST(gtl_archive, WriteLine) {
 		xOFArchive ar(uR"x(.\stream_test\write_line_u16.txt)x");
 		ar.WriteCodepageBOM(eCODEPAGE::UTF16);
 		for (auto const& vstr : strs1) {
-			std::visit([&ar](auto const& str) { ar.WriteLine(str); }, vstr);
+			std::visit([&ar](auto const& str) { ar.WriteLine(RuntimeFormatString(str)); }, vstr);
 		}
 		for (auto const& vstr : strs2) {
-			std::visit([&ar](auto const& str) { ar.WriteLine(str); }, vstr);
+			std::visit([&ar](auto const& str) { ar.WriteLine(RuntimeFormatString(str)); }, vstr);
 		}
 	}
 
