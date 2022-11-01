@@ -439,7 +439,7 @@ namespace gtl {
 				if (auto r = TReadLine<eCodepage, tchar_codepage>((tchar_codepage)cDelimiter, bTrimCR); r) {
 					S_CODEPAGE_OPTION option{
 						.from = std::is_same_v<tchar_codepage, char> ? eCodepage_ : eCODEPAGE::DEFAULT,
-						.to = std::is_same_v<tchar, char> ? eMBCS_Codepage_g : eCODEPAGE::DEFAULT
+						.to = std::is_same_v<tchar, char> ? g_eCodepageMBCS : eCODEPAGE::DEFAULT
 					};
 					return ((TString<tchar_codepage>&)*r).ToString<tchar>(option);
 				}
@@ -496,7 +496,7 @@ namespace gtl {
 			if constexpr (!gtlc::is_same_utf<tchar, tchar_codepage>) {
 				constexpr auto eCodepageNative = eCODEPAGE_DEFAULT<tchar_codepage>;
 				S_CODEPAGE_OPTION codepage{
-					.from = std::is_same_v<tchar, char> ? eMBCS_Codepage_g : eCODEPAGE::DEFAULT,
+					.from = std::is_same_v<tchar, char> ? g_eCodepageMBCS : eCODEPAGE::DEFAULT,
 					.to = std::is_same_v<tchar_codepage, char> ? eCodepage_ : eCodepageNative
 				};
 				auto str = ToString<tchar_codepage, tchar, false>(sv, codepage);

@@ -19,6 +19,8 @@ std::vector<gtl::TString<tchar>> ReadFile(tarchive& ar) {
 };
 
 TEST(gtl_archive, ReadLine) {
+	gtl::g_eCodepageMBCS = gtl::GetHostCodepage();
+	
 	using namespace gtl;
 
 	std::vector<std::u8string> const strs {
@@ -63,7 +65,7 @@ TEST(gtl_archive, ReadLine) {
 		//	while (stream.good()) {
 		//		if (auto r = ar.ReadLineU16(); r) {
 		//			gtl::TrimRight(*r);
-		//			std::string str = gtl::ToStringA(*r, {.from = eMBCS_Codepage_g});
+		//			std::string str = gtl::ToStringA(*r, {.from = g_eCodepageMBCS});
 		//			fmt::print("{}\n", str.c_str());
 		//		}
 		//	}

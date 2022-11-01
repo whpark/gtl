@@ -13,6 +13,8 @@ TEST(gtl_string, codepage) {
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
+	gtl::g_eCodepageMBCS = gtl::GetHostCodepage();
+
 	// unicode <=> mbcs
 	auto rstrA = gtl::ToString_iconv<char, wchar_t, "CP949">(L"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv);
 	std::u16string str1 = gtl::ToStringU16(*rstrA, {.from = gtl::eCODEPAGE::KO_KR_949});
@@ -63,6 +65,8 @@ TEST(gtl_string, codepage) {
 
 
 TEST(gtl_string_codepage_Test, iconv_wrapper) {
+
+	gtl::g_eCodepageMBCS = gtl::GetHostCodepage();
 
 	// unicode <=> mbcs
 	auto r1 = gtl::ToString_iconv<char16_t>(gtl::ToStringA(U"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv, {.to = gtl::eCODEPAGE::KO_KR_949}), nullptr, "CP949");

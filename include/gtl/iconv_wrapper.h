@@ -26,6 +26,7 @@
 #pragma warning(pop)
 
 #include "gtl/_config.h"
+#include "gtl/__lib.h"
 #include "gtl/concepts.h"
 
 /*******************************************
@@ -204,26 +205,27 @@ namespace gtl {
 			if constexpr (std::is_same_v<tchar, char8_t>) {
 				return "UTF-8";
 			}
-			else if (std::is_same_v<tchar, char16_t>) {
+			else if constexpr (std::is_same_v<tchar, char16_t>) {
 				if constexpr (std::endian::native == std::endian::little) {
 					return "UTF-16LE";
 				} else {
 					return "UTF-16BE";
 				}
-			} else if (std::is_same_v<tchar, char32_t>) {
+			}
+			else if constexpr (std::is_same_v<tchar, char32_t>) {
 				if constexpr (std::endian::native == std::endian::little) {
 					return "UTF-32LE";
 				} else {
 					return "UTF-32BE";
 				}
 			}
-			else if (std::is_same_v<tchar, wchar_t>) {
+			else if constexpr (std::is_same_v<tchar, wchar_t>) {
 				return "wchar_t";
 			} else if (std::is_same_v<tchar, char>) {
 				return "char";
 			}
 		#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-			else if (std::is_same_v<tchar, charKSSM_t>) {
+			else if constexpr (std::is_same_v<tchar, charKSSM_t>) {
 				return "JOHAB";
 			}
 		#endif

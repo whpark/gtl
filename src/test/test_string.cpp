@@ -67,11 +67,11 @@ namespace test_std_string {
 
 
 TEST(gtl_string, TString_CodepageConversion) {
+	gtl::g_eCodepageMBCS = gtl::eCODEPAGE::UTF8;
+
 	using namespace gtl;
 	std::string_view sv{"ACBDEF"};
 
-	gtl::eMBCS_Codepage_g = gtl::eCODEPAGE::UTF8;
-	
 	auto len0 = gtl::tszlen(u"ABCDEF");
 	static_assert(gtl::tszlen(u"ABCDEF") == 6);
 	auto len1 = gtl::tszlen(u"ABCDEF"sv);
@@ -96,6 +96,8 @@ TEST(gtl_string, TString_CodepageConversion) {
 }
 
 TEST(gtl_string, TString_Trim) {
+	gtl::g_eCodepageMBCS = gtl::eCODEPAGE::UTF8;
+
 	using namespace gtl;
 	
 	gtl::xStringU16 str;
@@ -113,6 +115,8 @@ TEST(gtl_string, TString_Trim) {
 }
 
 TEST(gtl_string, TString_Upper_Lower) {
+	gtl::g_eCodepageMBCS = gtl::eCODEPAGE::UTF8;
+
 	using namespace gtl;
 
 	constexpr char16_t const szCH[] =
@@ -172,6 +176,8 @@ TEST(gtl_string, TString_Upper_Lower) {
 
 
 TEST(gtl_string, TString_etc) {
+	gtl::g_eCodepageMBCS = gtl::eCODEPAGE::UTF8;
+
 	//using namespace gtl;
 
 	EXPECT_TRUE(std::setlocale(LC_ALL, ".949"));
