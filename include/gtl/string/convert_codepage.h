@@ -31,6 +31,8 @@ namespace gtl {
 		DEFAULT__OR_USE_MBCS_CODEPAGE = 0,	// Default or use MBCS Codepage (eCODEPAGE g_eCodepageMBCS;)
 		DEFAULT = 0,
 
+		ANSI_WINDOWS = 1252,
+
 		UTF7 = 65000,
 		UTF8 = 65001,
 
@@ -63,51 +65,6 @@ namespace gtl {
 
 	};
 
-#if 0
-	struct eCODEPAGE_ {
-		enum : int {
-			DEFAULT = -1,
-			//MBCS = 0,
-
-			UCS2LE = 1200,
-			UCS2BE = 1201,
-			UCS2 = (std::endian::native == std::endian::little) ? UCS2LE : UCS2BE,
-			_UCS2_other = (UCS2 == UCS2BE) ? UCS2LE : UCS2BE,
-
-			UTF7 = 65000,
-			UTF8 = 65001,
-
-			UTF16LE = UCS2LE,
-			UTF16BE = UCS2BE,
-			UTF16 = (std::endian::native == std::endian::little) ? UTF16LE : UTF16BE,
-			_UTF16_other = (UTF16 == UTF16BE) ? UTF16LE : UTF16BE,
-
-			UTF32LE = 12000,
-			UTF32BE = 12001,
-			UTF32 = (std::endian::native == std::endian::little) ? UTF32LE : UTF32BE,
-			_UTF32_other = (UTF32 == UTF32BE) ? UTF32LE : UTF32BE,
-
-
-		//------------------------
-
-			ACP = 0,
-
-			KO_KR_949 = 949,
-	#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-			KO_KR_JOHAB_KSSM_1361 = 1361,	// 조합형 KSSM
-	#endif
-
-
-			//... your codepages, here.
-
-
-		};
-
-	private :
-		int value_{DEFAULT};
-	};
-#endif
-
 	template <typename tchar>	constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT = eCODEPAGE::DEFAULT;
 	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<char> = eCODEPAGE::DEFAULT;
 	template <>					constexpr inline eCODEPAGE const eCODEPAGE_DEFAULT<char8_t> = eCODEPAGE::UTF8;
@@ -120,26 +77,19 @@ namespace gtl {
 	template <>					constexpr inline eCODEPAGE const eCODEPAGE_OTHER_ENDIAN<char32_t> = eCODEPAGE::_UTF32_other;
 	template <>					constexpr inline eCODEPAGE const eCODEPAGE_OTHER_ENDIAN<wchar_t> = eCODEPAGE::_UCS2_other;
 
-
 	template < eCODEPAGE eCodepage > struct char_type_from {
-		using char_type = char;
+		using char_type = void;
 	};
-
-	template <> struct char_type_from<eCODEPAGE::UTF8> {
-		using char_type = char8_t;
-	};
-	template <> struct char_type_from<eCODEPAGE::UTF16LE> {
-		using char_type = char16_t;
-	};
-	template <> struct char_type_from<eCODEPAGE::UTF16BE> {
-		using char_type = char16_t;
-	};
-	template <> struct char_type_from<eCODEPAGE::UTF32LE> {
-		using char_type = char32_t;
-	};
-	template <> struct char_type_from<eCODEPAGE::UTF32BE> {
-		using char_type = char32_t;
-	};
+	template <> struct char_type_from<eCODEPAGE::DEFAULT>	{ using char_type = char; };
+	template <> struct char_type_from<eCODEPAGE::UTF8>		{ using char_type = char8_t; };
+	template <> struct char_type_from<eCODEPAGE::UTF16LE>	{ using char_type = char16_t; };
+	template <> struct char_type_from<eCODEPAGE::UTF16BE>	{ using char_type = char16_t; };
+	template <> struct char_type_from<eCODEPAGE::UTF32LE>	{ using char_type = char32_t; };
+	template <> struct char_type_from<eCODEPAGE::UTF32BE>	{ using char_type = char32_t; };
+	template <> struct char_type_from<eCODEPAGE::KO_KR_949>	{ using char_type = char; };
+	#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
+	template <> struct char_type_from<eCODEPAGE::KO_KR_JOHAB_KSSM_1361>	{ using char_type = charKSSM_t; };
+	#endif
 
 
 
@@ -164,7 +114,7 @@ namespace gtl {
 	}
 
 
-	constexpr eCODEPAGE GetHostCodepage() {
+	constexpr eCODEPAGE GetHostCodepage() {	// Source File Encoding
 		constexpr std::array strGA = {"가"};
 		constexpr std::array strGA_UTF8 = {u8"가"};
 		constexpr std::array strGA_KSC5601 = {0xa1, 0xb0, 0x00};	// '가' == 0xb0a1 in KSC5601
@@ -209,7 +159,7 @@ namespace gtl {
 		template < typename tchar > eCODEPAGE To() const   { return GetCodepage<tchar>(to); }
 
 		auto operator <=> (S_CODEPAGE_OPTION const& rhs) const = default;
-		
+
 	private:
 		template < typename tchar >
 		constexpr static inline eCODEPAGE GetCodepage(eCODEPAGE eCodepage) {
@@ -727,7 +677,7 @@ namespace gtl {
 			return (std::string&)ToUTFString<char8_t, wchar_t, bCOUNT_FIRST>(svFrom, codepage);
 		} else if (codepage == S_CODEPAGE_OPTION{.from = eCODEPAGE_DEFAULT<wchar_t>, .to = eCODEPAGE::KO_KR_949}) {
 			// cache
-			thread_local static gtl::Ticonv<char, wchar_t> iconv{ "CP949", "UTF-16" };
+			thread_local static gtl::Ticonv<char, wchar_t> iconv{ "CP949", GetCodepageName<wchar_t>() };
 			if (auto r = iconv.Convert(svFrom))
 				return *r;
 			return {};
@@ -741,8 +691,7 @@ namespace gtl {
 	template < bool bCOUNT_FIRST >
 	std::wstring ConvMBCS2Wide(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		codepage.from = codepage.From<char>();
-		codepage.to == codepage.To<wchar_t>();
-		auto e = eCODEPAGE_DEFAULT<wchar_t>;
+		codepage.to = codepage.To<wchar_t>();		// ..if codepage.to == 0 then codepage.to = DEFAULT Codepage
 		if (codepage.from == eCODEPAGE::UTF8) {
 			return ToUTFString<wchar_t, char8_t, bCOUNT_FIRST>((std::u8string_view&)svFrom, codepage);
 		} else if (codepage == S_CODEPAGE_OPTION{.from = eCODEPAGE::KO_KR_949, .to = eCODEPAGE_DEFAULT<wchar_t>}) {

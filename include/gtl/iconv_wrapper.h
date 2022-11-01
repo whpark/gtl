@@ -248,13 +248,13 @@ namespace gtl {
 	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from,
 		gtl::xStringLiteral szCodeTo = "", gtl::xStringLiteral szCodeFrom = "", size_t initial_dst_buf_size = 1024 >
 	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string_view<tchar_from> strFrom) {
-		static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
+		thread_local static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
 		return iconv.Convert(strFrom);
 	}
 	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from,
 		gtl::xStringLiteral szCodeTo = "", gtl::xStringLiteral szCodeFrom = "", size_t initial_dst_buf_size = 1024 >
 	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string<tchar_from> const& strFrom) {
-		static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
+		thread_local static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
 		return iconv.Convert(strFrom);
 	}
 
