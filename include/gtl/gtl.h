@@ -23,6 +23,7 @@
 #include "gtl/rand.h"
 #include "gtl/mat_helper.h"
 #include "gtl/matrix.h"
+#include "gtl/stop_watch.h"
 
 // todo : streamable_unique_ptr / streamable_shared_ptr - derived from std::unique_ptr / std::shared_ptr  respectively. for dynamic creatable object
 

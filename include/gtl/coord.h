@@ -95,8 +95,8 @@ namespace gtl {
 	//-------------------------------------------------------------------------
 	// to Text, From Text
 
-	template < gtlc::string_elem tchar, gtlc::arithmetic T_NUMBER >
-	constexpr std::basic_string_view<tchar> GetDefaultFormatSpecifier(T_NUMBER) {
+	template < gtlc::string_elem tchar, gtlc::arithmetic tvalue >
+	constexpr fmt::basic_format_string<tchar, tvalue> GetDefaultFormatSpecifier() {
 		using namespace std::literals;
 		if constexpr (std::is_same_v<tchar, char>) {
 			return "{}";
@@ -120,32 +120,24 @@ namespace gtl {
 
 	//-------------------------------------------------------------------------
 	// to Text, From Text
-	template < typename tchar_t, gtlc::coord T_COORD >
-	std::basic_string<tchar_t> ToString(T_COORD const& coord, std::basic_string_view<tchar_t> svFMT = {}) {
-		std::basic_string<tchar_t> str;
-		if ( svFMT.empty() )
-			svFMT = GetDefaultFormatSpecifier<tchar_t, typename T_COORD::value_type>(0);
+	template < typename tchar, gtlc::coord T_COORD >
+	std::basic_string<tchar> ToString(T_COORD const& coord, fmt::basic_format_string<tchar, typename T_COORD::value_type> const& svFMT = GetDefaultFormatSpecifier<tchar, typename T_COORD::value_type>()) {
+		std::basic_string<tchar> str;
+		//if ( !(fmt::basic_string_view<tchar>(svFMT)).data() )
+		//	svFMT = GetDefaultFormatSpecifier<tchar, typename T_COORD::value_type>();
 
 		for (size_t i = 0; i < coord.size(); i++) {
-			if (i) {
+			if (i)
 				str += ',';
-				str += ' ';
-			}
-			if constexpr (sizeof(tchar_t) == 1)
-				str += std::vformat(svFMT, std::make_format_args(coord.data()[i]));
-			else if constexpr (sizeof(tchar_t) == 2)
-				str += std::vformat(svFMT, std::make_wformat_args(coord.data()[i]));
-			else {
-				static_assert(gtlc::dependent_false_v, "tchar_t must be char or wchar_t");
-			}
+			str += fmt::vformat((fmt::basic_string_view<tchar>)svFMT, fmt::make_format_args<fmt::buffer_context<tchar>>(coord.data()[i]));
 		}
 		return str;
 	}
-	template < gtlc::coord T_COORD, typename tchar_t >
-	T_COORD FromString(std::basic_string_view<tchar_t> sv) {
+	template < gtlc::coord T_COORD, typename tchar >
+	T_COORD FromString(std::basic_string_view<tchar> sv) {
 		T_COORD coord;
-		tchar_t const* pos = sv.data();
-		tchar_t const* const end = sv.data() + sv.size();
+		tchar const* pos = sv.data();
+		tchar const* const end = sv.data() + sv.size();
 		for (auto& v : coord.arr()) {
 			if (pos >= end)
 				break;
