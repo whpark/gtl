@@ -7,6 +7,7 @@
 //#include "fmt/color.h"
 //#include "fmt/ostream.h"
 #include "benchmark/benchmark.h"
+#include "gtl/misc.h"
 //#pragma comment(lib, "benchmark.lib")
 #pragma comment(lib, "shlwapi.lib")
 
@@ -15,6 +16,8 @@ int main(int argc, char** argv) {
     //fmt::print(fmt::emphasis::bold|fmt::fg(fmt::v7::rgb{0,255,0}), "Hello world {{0x{:06x}}}\n", 0x00'ff'00);
     //fmt::print(fmt::emphasis::bold|fmt::fg(fmt::terminal_color::green), "Hello world {{{}}}\n", "TerminalGreen");
     //fmt::print(fmt::emphasis::bold|fmt::fg(fmt::color::green), "Hello world {{{}}}\n", "Color::Green");
+
+	gtl::SetCurrentPath_GTLProjectPath();
 
 	benchmark::Initialize(&argc, argv);
 	benchmark::RunSpecifiedBenchmarks();

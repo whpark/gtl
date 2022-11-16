@@ -1,4 +1,9 @@
 ﻿#include "pch.h"
+#include "gtl/misc.h"
+
+#define FMT_HEADER_ONLY
+#include "fmt/format.h"
+#include "fmt/xchar.h"
 
 // vcpkg does this.
 //#ifdef _DEBUG
@@ -23,10 +28,12 @@ namespace testing::internal {
 }
 
 
-
 int main(int argc, wchar_t** argv) {
 	testing::InitGoogleTest(&argc, argv);
 	EXPECT_TRUE(std::setlocale(LC_ALL, "Korean.949"));
+
+	gtl::SetCurrentPath_GTLSolutionBin();
+	//fmt::print("Current Folder : {}\n", std::filesystem::current_path().string().c_str());
 	auto r = RUN_ALL_TESTS();
 	return r;
 }

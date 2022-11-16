@@ -20,6 +20,8 @@
 #include <format>
 #include <chrono>
 #include <functional>
+#include <filesystem>
+#include <source_location>
 #include "gtl/concepts.h"
 
 namespace gtl::internal {
@@ -481,7 +483,55 @@ namespace gtl {
 		return ""sv;
 	}
 
+	inline std::filesystem::path Trim_TempFolderName(std::filesystem::path path = std::filesystem::current_path()) {
+		std::vector<std::wstring> strsTempFolder {
+		#ifdef _DEBUG
+			L"Debug",
+		#else
+			L"Release",
+		#endif
+		#ifdef _M_64_
+			L"x64",
+		#else
+			L"Win32", L"x86",
+		#endif
+			L"Temp",
+		};
+		for (auto const& strTempFolder : strsTempFolder) {
+			if (path.filename() == strTempFolder) {
+				path = path.parent_path();
+			}
+		}
+		return path;
+	}
 
+	inline /*constexpr*/ std::wstring GetGTLProjectName(std::source_location const& l = std::source_location::current()) {
+		for (std::filesystem::path path = l.file_name(); !path.empty() and path.has_parent_path(); path = path.parent_path()) {
+			auto parent = path.parent_path();
+			if (parent.filename() == L"src") {
+				return path.filename();
+			}
+		}
+		return {};
+	}
+
+	inline bool SetCurrentPath_GTLProjectPath(std::source_location const& l = std::source_location::current()) {
+		auto projectName = gtl::GetGTLProjectName(l);
+		if (auto path = gtl::Trim_TempFolderName() / L"src" / projectName; std::filesystem::exists(path)) {
+			std::error_code ec{};
+			std::filesystem::current_path(path, ec);
+			return !!ec;
+		}
+		return false;
+	}
+	inline bool SetCurrentPath_GTLSolutionBin(std::source_location const& l = std::source_location::current()) {
+		if (auto path = gtl::Trim_TempFolderName() / L"bin"; std::filesystem::exists(path)) {
+			std::error_code ec{};
+			std::filesystem::current_path(path, ec);
+			return !!ec;
+		}
+		return false;
+	}
 
 #pragma pack(pop)
 }	// namespac gtl

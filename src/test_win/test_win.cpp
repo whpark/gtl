@@ -67,6 +67,7 @@ BOOL CtestwinApp::InitInstance()
 
 	CWinAppEx::InitInstance();
 
+	gtl::SetCurrentPath_GTLProjectPath();
 
 	// Initialize OLE libraries
 	if (!AfxOleInit())
