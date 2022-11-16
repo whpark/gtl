@@ -14,6 +14,9 @@
 #include "gtest/gtest.h"
 #include "benchmark/benchmark.h"
 
+#include "opencv2/opencv.hpp"
+#include "nlohmann/json.hpp"
+
 #include "boost/json.hpp"
 #include "boost/variant.hpp"
 #include "boost/ptr_container/ptr_deque.hpp"

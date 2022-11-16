@@ -39,7 +39,7 @@ namespace gtl {
 		// 분 단위 1의 자리에서 버림 -> 10분 단위로 파일 이름 생성
 		//strFilePath.Replace(L"%10M", fmt::format(L"{:02d}", tm.tm_min/10*10));
 		//strFilePath.Replace(L"%10m", fmt::format(L"{:02d}", tm.tm_min/10*10));
-		std::wregex reMin(LR"xxx(%([0-9]{1,2})[mM])xxx");
+		static std::wregex reMin(LR"xxx(%([0-9]{1,2})[mM])xxx");
 		for (std::wsmatch result; std::regex_search(strFilePath, result, reMin); ) {
 			auto const& r = result[1];
 			int minute = std::stoi(r.str());
@@ -52,7 +52,7 @@ namespace gtl {
 		//	path.assign(buf.data(), buf.data()+l);
 		//else
 		//	path = (std::wstring&)strFilePath;	// 일단 그냥 설정....
-		path = tNow.Format(strFilePath);
+		path = tNow.OldFormat(strFilePath);
 
 		// Opens a file
 		if ( !m_ar || !m_file.is_open() || (strFilePath.CompareNoCase(path) != 0) ) {

@@ -460,8 +460,8 @@ namespace gtl {
 
 	void C2dMatArray::ThumbnailMaker(std::stop_token token) {
 		using namespace std::literals;
-		static volatile long iThreadNumber = 0;
-		long iCurrentThread = InterlockedAdd(&iThreadNumber, 1);
+		//static volatile long iThreadNumber = 0;
+		//long iCurrentThread = InterlockedAdd(&iThreadNumber, 1);
 		//TRACE("ThumbnailMaker Start(%d)\n", iCurrentThread);
 
 		std::unique_lock lock(m_mtxThumbnail);

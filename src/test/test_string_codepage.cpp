@@ -13,14 +13,18 @@ TEST(gtl_string, codepage) {
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
+	gtl::g_eCodepageMBCS = gtl::GetHostCodepage();
+
 	// unicode <=> mbcs
-	auto rstrA = gtl::ToString_iconv<char, wchar_t, "", "CP949">(L"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv);
+	auto rstrA = gtl::ToString_iconv<char, wchar_t, "CP949">(L"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv);
 	std::u16string str1 = gtl::ToStringU16(*rstrA, {.from = gtl::eCODEPAGE::KO_KR_949});
 	EXPECT_TRUE(str1 == u"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"s);
 
+	auto rstrB = gtl::ToString_iconv<char, wchar_t, "CP949">(L"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv);
+	std::string str_Part = gtl::ToStringA(L"가나다라마바사아자차카타파하", {.to = gtl::eCODEPAGE::KO_KR_949});
 	std::string str2 = gtl::ToStringA(u"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍", {.to = gtl::eCODEPAGE::KO_KR_949});
 
-	EXPECT_TRUE(str2 == (*gtl::ToString_iconv<char, wchar_t, "", "CP949">(L"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv)));
+	EXPECT_TRUE(str2 == (*gtl::ToString_iconv<char, wchar_t, "CP949">(L"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv)));
 
 	std::string str3 = gtl::ToStringA(u"adfasdf가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍", {.to = gtl::eCODEPAGE::KO_KR_949});
 	EXPECT_TRUE(str3 == *gtl::ToString_iconv<char>(u"adfasdf가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv, "CP949"));
@@ -63,6 +67,8 @@ TEST(gtl_string, codepage) {
 
 
 TEST(gtl_string_codepage_Test, iconv_wrapper) {
+
+	gtl::g_eCodepageMBCS = gtl::GetHostCodepage();
 
 	// unicode <=> mbcs
 	auto r1 = gtl::ToString_iconv<char16_t>(gtl::ToStringA(U"가나다라마바사아자차카타파하긎긣꿳뎓뫓멙뻍"sv, {.to = gtl::eCODEPAGE::KO_KR_949}), nullptr, "CP949");

@@ -26,6 +26,7 @@
 #pragma warning(pop)
 
 #include "gtl/_config.h"
+#include "gtl/__lib.h"
 #include "gtl/concepts.h"
 
 /*******************************************
@@ -204,26 +205,27 @@ namespace gtl {
 			if constexpr (std::is_same_v<tchar, char8_t>) {
 				return "UTF-8";
 			}
-			else if (std::is_same_v<tchar, char16_t>) {
+			else if constexpr (std::is_same_v<tchar, char16_t>) {
 				if constexpr (std::endian::native == std::endian::little) {
 					return "UTF-16LE";
 				} else {
 					return "UTF-16BE";
 				}
-			} else if (std::is_same_v<tchar, char32_t>) {
+			}
+			else if constexpr (std::is_same_v<tchar, char32_t>) {
 				if constexpr (std::endian::native == std::endian::little) {
 					return "UTF-32LE";
 				} else {
 					return "UTF-32BE";
 				}
 			}
-			else if (std::is_same_v<tchar, wchar_t>) {
+			else if constexpr (std::is_same_v<tchar, wchar_t>) {
 				return "wchar_t";
 			} else if (std::is_same_v<tchar, char>) {
 				return "char";
 			}
 		#if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
-			else if (std::is_same_v<tchar, charKSSM_t>) {
+			else if constexpr (std::is_same_v<tchar, charKSSM_t>) {
 				return "JOHAB";
 			}
 		#endif
@@ -246,13 +248,13 @@ namespace gtl {
 	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from,
 		gtl::xStringLiteral szCodeTo = "", gtl::xStringLiteral szCodeFrom = "", size_t initial_dst_buf_size = 1024 >
 	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string_view<tchar_from> strFrom) {
-		static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
+		thread_local static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
 		return iconv.Convert(strFrom);
 	}
 	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from,
 		gtl::xStringLiteral szCodeTo = "", gtl::xStringLiteral szCodeFrom = "", size_t initial_dst_buf_size = 1024 >
 	std::optional<std::basic_string<tchar_to>> ToString_iconv(std::basic_string<tchar_from> const& strFrom) {
-		static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
+		thread_local static gtl::Ticonv<tchar_to, tchar_from, initial_dst_buf_size> iconv{szCodeTo.str, szCodeFrom.str};
 		return iconv.Convert(strFrom);
 	}
 

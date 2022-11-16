@@ -114,7 +114,7 @@ namespace gtl::test::misc {
 				latchQueue.wait();
 				std::unique_lock lock(lst);
 				for (int i = 0; i < N; i++) {
-					lst.push_back(std::make_unique<int>(index*N + i));
+					lst.push_back(std::make_unique<int>((int)(index*N + i)));
 				}
 			};
 			std::vector<std::thread> threadsQueue;
@@ -189,6 +189,22 @@ namespace gtl::test::misc {
 
 			auto n = N*N-1;
 			EXPECT_EQ(sum, ((1+n)*n/2)*N);
+		}
+	}
+
+	TEST(misc, StopWatch) {
+		{
+			gtl::TStopWatch<wchar_t> sw(std::wcout);
+			sw.Lap(L"asdfasdf{}, {}", 1, L"asdf");
+			sw.Lap(L"asdfasdf{}, {}", 2, L"asdf");
+			sw.Lap(L"asdfasdf{}, {}", 3, L"가나다");
+		}
+
+		{
+			gtl::TStopWatch sw(std::cout);
+			sw.Lap("asdfasdf{}, {}", 1, "asdf");
+			sw.Lap("asdfasdf{}, {}", 2, "asdf");
+			sw.Lap("asdfasdf{}, {}", 3, "가나다");
 		}
 	}
 }
