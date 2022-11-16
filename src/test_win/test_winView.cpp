@@ -76,6 +76,10 @@ void CtestwinView::OnInitialUpdate() {
 
 	auto strMatSize = theApp.GetProfileString(_T("misc"), _T("MatSize"), _T("20000,20000"));
 	SetDlgItemText(IDC_MAT_SIZE, strMatSize);
+	// test
+	auto size = gtl::win_util::GetDlgItemCoord<gtl::xSize2i>(this, IDC_MAT_SIZE);
+	gtl::win_util::SetDlgItemCoord(this, IDC_MAT_SIZE, size, L"{}");
+
 	{
 		auto size = gtl::FromString<gtl::xSize2i, wchar_t>((LPCTSTR)strMatSize);
 		auto str = gtl::ToString<wchar_t>(size);
@@ -88,7 +92,7 @@ void CtestwinView::OnInitialUpdate() {
 
 	}
 
-	gtl::win_util::GetDlgItemString(this, IDC_MAT_SIZE);
+	//gtl::win_util::GetDlgItemString(this, IDC_MAT_SIZE);
 }
 
 

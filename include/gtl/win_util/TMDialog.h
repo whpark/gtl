@@ -33,7 +33,7 @@ namespace gtl::win_util {
 	GTL__WINUTIL_API CString	GetDlgItemString(CWnd* pWnd, int idc);
 
 	template < typename T_COORD > requires gtlc::coord<T_COORD>
-	void DDX_Coord(CDataExchange* pDX, int idc, T_COORD& coord, std::basic_string_view<xString::value_type> fmt = {}) {
+	void DDX_Coord(CDataExchange* pDX, int idc, T_COORD& coord, fmt::basic_format_string<xString::value_type, typename T_COORD::value_type> fmt = {}) {
 		if (!pDX)
 			return;
 		CString str;
@@ -54,7 +54,7 @@ namespace gtl::win_util {
 		return coord;
 	}
 	template < typename T_COORD > requires gtlc::coord<T_COORD>
-	void SetDlgItemCoord(CWnd* pWnd, int idc, T_COORD& coord, std::basic_string_view<CString::XCHAR> fmt = {}) {
+	void SetDlgItemCoord(CWnd* pWnd, int idc, T_COORD& coord, fmt::basic_format_string<CString::XCHAR, typename T_COORD::value_type> fmt = {}) {
 		std::wstring str = ToString<wchar_t>(coord, fmt).c_str();
 		SetDlgItemText(pWnd->GetSafeHwnd(), idc, str.c_str());
 	}
@@ -265,7 +265,7 @@ namespace gtl::win_util {
 			return coord;
 		}
 		template < typename T_COORD, class = T_COORD::coord_t >
-		void SetDlgItemCoord(int idc, T_COORD& coord, std::wstring_view fmt = {}) {
+		void SetDlgItemCoord(int idc, T_COORD& coord, fmt::basic_format_string<CString::XCHAR, typename T_COORD::value_type> fmt = {}) {
 			CString str;
 			str = ToString(coord, fmt).c_str();
 			CheckAndSetDlgItemText(idc, str);
