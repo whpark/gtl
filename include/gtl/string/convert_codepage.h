@@ -115,9 +115,9 @@ namespace gtl {
 
 
 	constexpr eCODEPAGE GetHostCodepage() {	// Source File Encoding
-		constexpr std::array strGA = {"가"};
+		constexpr std::array strGA = {"\xa1\xb0"};	// 가 in CP949
 		constexpr std::array strGA_UTF8 = {u8"가"};
-		constexpr std::array strGA_KSC5601 = {0xa1, 0xb0, 0x00};	// '가' == 0xb0a1 in KSC5601
+		constexpr std::array strGA_KSC5601 = {0xa1, 0xb0, 0x00};	// '가' == 0xb0a1 in KSC5601 // CP949
 		if (strGA.size() == strGA_UTF8.size() and (memcmp(strGA.data(), strGA_UTF8.data(), strGA.size()) == 0))
 			return eCODEPAGE::UTF8;
 
