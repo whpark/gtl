@@ -139,7 +139,7 @@ namespace gtl {
 		default :
 			{
 				thread_local static char szCodepage[32]{0};
-				std::format_to(szCodepage, "CP{}", std::to_underlying(eCodepage));
+				std::format_to(szCodepage, "CP{}", /*std::to_underlying(eCodepage)*/(int)eCodepage);
 				return szCodepage;
 			}
 		}
