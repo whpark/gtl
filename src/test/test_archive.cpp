@@ -35,7 +35,8 @@ TEST(gtl_archive, ReadLine) {
 		u8R"xx(})xx",
 	};
 
-	for (auto const& dir : std::filesystem::directory_iterator(uR"x(.\stream_test\)x")) {
+	std::error_code ec{};
+	for (auto const& dir : std::filesystem::directory_iterator(uR"x(.\stream_test\)x", ec)) {
 		if (dir.is_directory() or dir.is_other())
 			continue;
 		gtl::xStringU16 strFilename(dir.path().filename().string<wchar_t>());
@@ -72,6 +73,7 @@ TEST(gtl_archive, ReadLine) {
 		//}
 
 	}
+	EXPECT_TRUE(!ec);
 
 
 	{
