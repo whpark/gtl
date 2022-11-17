@@ -32,8 +32,8 @@ int main(int argc, wchar_t** argv) {
 	testing::InitGoogleTest(&argc, argv);
 	EXPECT_TRUE(std::setlocale(LC_ALL, "Korean.949"));
 
-	gtl::SetCurrentPath_GTLSolutionBin();
-	//fmt::print("Current Folder : {}\n", std::filesystem::current_path().string().c_str());
+	gtl::SetCurrentPath_GTLProjectFolder();
+	fmt::print("Current Folder : {}\n\n", std::filesystem::current_path().string().c_str());
 	auto r = RUN_ALL_TESTS();
 	return r;
 }

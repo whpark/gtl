@@ -17,7 +17,7 @@
 
 
 //-----------------------------------------------------------------------------
-// 32 / 64 bit.
+// 32 / 64 bit. DON't USE _X64 flag.  use  :  if constexpr (sizeof(size_t) == sizeof(uint64_t))
 #if defined(_M_X64) || defined(_M_IA64) || defined(_M_AMD64) || defined(_WIN64)
 #	define _X64 1
 #else

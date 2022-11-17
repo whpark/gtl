@@ -484,19 +484,22 @@ namespace gtl {
 	}
 
 	inline std::filesystem::path Trim_TempFolderName(std::filesystem::path path = std::filesystem::current_path()) {
-		std::vector<std::wstring> strsTempFolder {
-		#ifdef _DEBUG
-			L"Debug",
-		#else
-			L"Release",
-		#endif
-		#ifdef _M_64_
-			L"x64",
-		#else
-			L"Win32", L"x86",
-		#endif
-			L"Temp",
-		};
+		static auto const strsTempFolder = []{
+			std::vector<std::wstring> folders;
+			#ifdef _DEBUG
+				folders.push_back(L"Debug");
+			#else
+				folders.push_back(L"Release");
+			#endif
+				if constexpr (sizeof(size_t) == sizeof(uint64_t)) {
+					folders.push_back(L"x64");
+				} else if constexpr (sizeof(size_t) == sizeof(uint32_t)) {
+					folders.push_back(L"x86");
+					folders.push_back(L"Win32");
+				}
+				folders.push_back(L"Temp");
+			return folders;
+		}();
 		for (auto const& strTempFolder : strsTempFolder) {
 			if (path.filename() == strTempFolder) {
 				path = path.parent_path();
@@ -518,20 +521,20 @@ namespace gtl {
 		return {};
 	}
 
-	inline bool SetCurrentPath_GTLProjectPath(std::source_location const& l = std::source_location::current()) {
+	inline bool SetCurrentPath_GTLProjectFolder(std::source_location const& l = std::source_location::current()) {
 		auto projectName = gtl::GetGTLProjectName(l);
 		if (auto path = gtl::Trim_TempFolderName() / L"src" / projectName; std::filesystem::exists(path)) {
 			std::error_code ec{};
 			std::filesystem::current_path(path, ec);
-			return !!ec;
+			return !ec;
 		}
 		return false;
 	}
-	inline bool SetCurrentPath_GTLSolutionBin(std::source_location const& l = std::source_location::current()) {
+	inline bool SetCurrentPath_GTLBinFolder(std::source_location const& l = std::source_location::current()) {
 		if (auto path = gtl::Trim_TempFolderName() / L"bin"; std::filesystem::exists(path)) {
 			std::error_code ec{};
 			std::filesystem::current_path(path, ec);
-			return !!ec;
+			return !ec;
 		}
 		return false;
 	}
