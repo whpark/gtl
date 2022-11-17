@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     //fmt::print(fmt::emphasis::bold|fmt::fg(fmt::terminal_color::green), "Hello world {{{}}}\n", "TerminalGreen");
     //fmt::print(fmt::emphasis::bold|fmt::fg(fmt::color::green), "Hello world {{{}}}\n", "Color::Green");
 
-	gtl::SetCurrentPath_GTLProjectFolder();
+	gtl::SetCurrentPath_ProjectFolder();
 
 	benchmark::Initialize(&argc, argv);
 	benchmark::RunSpecifiedBenchmarks();

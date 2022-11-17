@@ -483,7 +483,24 @@ namespace gtl {
 		return ""sv;
 	}
 
-	inline std::filesystem::path Trim_TempFolderName(std::filesystem::path path = std::filesystem::current_path()) {
+	/// @brief Get Project Name from source file path
+	/// @param l : don't touch.
+	/// @return 
+	inline /*constexpr*/ std::wstring GetGTLProjectName(std::source_location const& l = std::source_location::current()) {
+		std::filesystem::path path = l.file_name();
+		if (path.extension() == ".h")	// CANNOT get project name from header file
+			return {};
+		while (path.has_parent_path()) {
+			auto filename = path.filename();
+			path = path.parent_path();
+			if (path.filename() == L"src")
+				return filename;
+		}
+		return {};
+	}
+
+	inline std::filesystem::path GetProjectRootFolder(std::wstring const& strProjectNameToBeRemoved, std::filesystem::path path = std::filesystem::current_path()) {
+		// Init Temp Folder Names (ex, "Debug", "Release", ...)
 		static auto const strsTempFolder = []{
 			std::vector<std::wstring> folders;
 			#ifdef _DEBUG
@@ -500,7 +517,19 @@ namespace gtl {
 				folders.push_back(L"Temp");
 			return folders;
 		}();
+
+		// Remove Project Folder ( ex, [src]/[ProjectName] )
+		if ( path.has_parent_path() and (path.filename() == strProjectNameToBeRemoved) ) {
+			path = path.parent_path();
+			if (path.has_parent_path() and path.filename() == L"src") {
+				path = path.parent_path();
+			}
+		}
+
+		// Remove Output Dir Folder Name ( ex, Temp/x64/Debug/ )
 		for (auto const& strTempFolder : strsTempFolder) {
+			if (!path.has_parent_path())
+				break;
 			if (path.filename() == strTempFolder) {
 				path = path.parent_path();
 			}
@@ -508,35 +537,24 @@ namespace gtl {
 		return path;
 	}
 
-	/// @brief Get Project Name from source file path
-	/// @param l : don't touch.
-	/// @return 
-	inline /*constexpr*/ std::wstring GetGTLProjectName(std::source_location const& l = std::source_location::current()) {
-		for (std::filesystem::path path = l.file_name(); !path.empty() and path.has_parent_path(); path = path.parent_path()) {
-			auto parent = path.parent_path();
-			if (parent.filename() == L"src") {
-				return path.filename();
-			}
-		}
-		return {};
-	}
-
-	inline bool SetCurrentPath_GTLProjectFolder(std::source_location const& l = std::source_location::current()) {
+	inline std::optional<std::filesystem::path> SetCurrentPath_ProjectFolder(std::filesystem::path const& pathRelToProjectRoot, std::source_location const& l = std::source_location::current()) {
+		// first, Get Root Folder, and then attach [pathRel]
 		auto projectName = gtl::GetGTLProjectName(l);
-		if (auto path = gtl::Trim_TempFolderName() / L"src" / projectName; std::filesystem::exists(path)) {
-			std::error_code ec{};
-			std::filesystem::current_path(path, ec);
-			return !ec;
-		}
-		return false;
+		auto path = gtl::GetProjectRootFolder(projectName);
+		if (!pathRelToProjectRoot.empty())
+			path /= pathRelToProjectRoot;
+		std::error_code ec{};
+		std::filesystem::current_path(path, ec);
+		if (ec)
+			return {};
+		return path;
 	}
-	inline bool SetCurrentPath_GTLBinFolder(std::source_location const& l = std::source_location::current()) {
-		if (auto path = gtl::Trim_TempFolderName() / L"bin"; std::filesystem::exists(path)) {
-			std::error_code ec{};
-			std::filesystem::current_path(path, ec);
-			return !ec;
-		}
-		return false;
+	inline auto SetCurrentPath_ProjectFolder(std::source_location const& l = std::source_location::current()) {
+		auto projectName = gtl::GetGTLProjectName(l);
+		return SetCurrentPath_ProjectFolder(std::filesystem::path(L"src") / projectName, l);
+	}
+	inline auto SetCurrentPath_BinFolder(std::source_location const& l = std::source_location::current()) {
+		return SetCurrentPath_ProjectFolder(L"bin", l);
 	}
 
 #pragma pack(pop)

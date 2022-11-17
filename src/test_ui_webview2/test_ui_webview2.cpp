@@ -35,7 +35,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     using namespace Microsoft::WRL;
 
-    gtl::SetCurrentPath_GTLBinFolder();
+    gtl::SetCurrentPath_BinFolder();
 	
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
