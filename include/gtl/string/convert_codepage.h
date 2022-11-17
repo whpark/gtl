@@ -137,7 +137,7 @@ namespace gtl {
 		case UTF32LE :	return "UTF-32LE";
 		case UTF32BE :	return "UTF-32BE";
 		default :
-			{
+			if (/*std::to_underlying*/(int)eCodepage) {
 				thread_local static char szCodepage[32]{0};
 				std::format_to(szCodepage, "CP{}", /*std::to_underlying(eCodepage)*/(int)eCodepage);
 				return szCodepage;

@@ -505,6 +505,9 @@ namespace gtl {
 		return path;
 	}
 
+	/// @brief Get Project Name from source file path
+	/// @param l : don't touch.
+	/// @return 
 	inline /*constexpr*/ std::wstring GetGTLProjectName(std::source_location const& l = std::source_location::current()) {
 		for (std::filesystem::path path = l.file_name(); !path.empty() and path.has_parent_path(); path = path.parent_path()) {
 			auto parent = path.parent_path();
