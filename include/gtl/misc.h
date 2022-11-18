@@ -20,6 +20,8 @@
 #include <format>
 #include <chrono>
 #include <functional>
+#include <filesystem>
+#include <source_location>
 #include "gtl/concepts.h"
 
 namespace gtl::internal {
@@ -481,7 +483,79 @@ namespace gtl {
 		return ""sv;
 	}
 
+	/// @brief Get Project Name from source file path
+	/// @param l : don't touch.
+	/// @return 
+	inline /*constexpr*/ std::wstring GetGTLProjectName(std::source_location const& l = std::source_location::current()) {
+		std::filesystem::path path = l.file_name();
+		if (path.extension() == ".h")	// CANNOT get project name from header file
+			return {};
+		while (path.has_parent_path()) {
+			auto filename = path.filename();
+			path = path.parent_path();
+			if (path.filename() == L"src")
+				return filename;
+		}
+		return {};
+	}
 
+	inline std::filesystem::path GetProjectRootFolder(std::wstring const& strProjectNameToBeRemoved, std::filesystem::path path = std::filesystem::current_path()) {
+		// Init Temp Folder Names (ex, "Debug", "Release", ...)
+		static auto const strsTempFolder = []{
+			std::vector<std::wstring> folders;
+			#ifdef _DEBUG
+				folders.push_back(L"Debug");
+			#else
+				folders.push_back(L"Release");
+			#endif
+				if constexpr (sizeof(size_t) == sizeof(uint64_t)) {
+					folders.push_back(L"x64");
+				} else if constexpr (sizeof(size_t) == sizeof(uint32_t)) {
+					folders.push_back(L"x86");
+					folders.push_back(L"Win32");
+				}
+				folders.push_back(L"Temp");
+			return folders;
+		}();
+
+		// Remove Project Folder ( ex, [src]/[ProjectName] )
+		if ( path.has_parent_path() and (path.filename() == strProjectNameToBeRemoved) ) {
+			path = path.parent_path();
+			if (path.has_parent_path() and path.filename() == L"src") {
+				path = path.parent_path();
+			}
+		}
+
+		// Remove Output Dir Folder Name ( ex, Temp/x64/Debug/ )
+		for (auto const& strTempFolder : strsTempFolder) {
+			if (!path.has_parent_path())
+				break;
+			if (path.filename() == strTempFolder) {
+				path = path.parent_path();
+			}
+		}
+		return path;
+	}
+
+	inline std::optional<std::filesystem::path> SetCurrentPath_ProjectFolder(std::filesystem::path const& pathRelToProjectRoot, std::source_location const& l = std::source_location::current()) {
+		// first, Get Root Folder, and then attach [pathRel]
+		auto projectName = gtl::GetGTLProjectName(l);
+		auto path = gtl::GetProjectRootFolder(projectName);
+		if (!pathRelToProjectRoot.empty())
+			path /= pathRelToProjectRoot;
+		std::error_code ec{};
+		std::filesystem::current_path(path, ec);
+		if (ec)
+			return {};
+		return path;
+	}
+	inline auto SetCurrentPath_ProjectFolder(std::source_location const& l = std::source_location::current()) {
+		auto projectName = gtl::GetGTLProjectName(l);
+		return SetCurrentPath_ProjectFolder(std::filesystem::path(L"src") / projectName, l);
+	}
+	inline auto SetCurrentPath_BinFolder(std::source_location const& l = std::source_location::current()) {
+		return SetCurrentPath_ProjectFolder(L"bin", l);
+	}
 
 #pragma pack(pop)
 }	// namespac gtl

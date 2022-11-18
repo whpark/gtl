@@ -67,6 +67,9 @@ BOOL CtestwinApp::InitInstance()
 
 	CWinAppEx::InitInstance();
 
+	if (auto r = gtl::SetCurrentPath_BinFolder()) {
+		//AfxMessageBox(r->c_str());
+	}
 
 	// Initialize OLE libraries
 	if (!AfxOleInit())
