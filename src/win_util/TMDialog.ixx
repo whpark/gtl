@@ -170,7 +170,7 @@ export namespace gtl::win_util {
 
 		if (fmt.empty())
 			fmt = L"{}";
-		auto str = fmt::format(fmt, iValue);
+		auto str = fmt::format(fmt::runtime(fmt), iValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 
@@ -189,7 +189,7 @@ export namespace gtl::win_util {
 
 		if (fmt.empty())
 			fmt = L"{}";
-		auto str = fmt::format(fmt, iValue);
+		auto str = fmt::format(fmt::runtime(fmt), iValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 
@@ -208,7 +208,7 @@ export namespace gtl::win_util {
 
 		if (fmt.empty())
 			fmt = L"{:.5f}";
-		auto str = fmt::format(fmt, dValue);
+		auto str = fmt::format(fmt::runtime(fmt), dValue);
 		CheckAndSetDlgItemText(pWnd, idc, str);
 	}
 
@@ -226,7 +226,7 @@ export namespace gtl::win_util {
 		if (!pDX || !pDX->m_pDlgWnd)
 			return;
 		double dScaledValue = value * scaleToView;
-		DDX_Double(pDX, idc, dScaledValue, fmt);
+		gtlw::DDX_Double(pDX, idc, dScaledValue, fmt);
 		if (pDX->m_bSaveAndValidate) {
 			value = dScaledValue / scaleToView;
 		}

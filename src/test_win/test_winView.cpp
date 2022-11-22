@@ -76,6 +76,19 @@ void CtestwinView::OnInitialUpdate() {
 
 	auto strMatSize = theApp.GetProfileString(_T("misc"), _T("MatSize"), _T("20000,20000"));
 	SetDlgItemText(IDC_MAT_SIZE, strMatSize);
+	{
+		auto size = gtl::FromString<gtl::xSize2i, wchar_t>((LPCTSTR)strMatSize);
+		auto str = gtl::ToString<wchar_t>(size);
+		constexpr COLORREF cr = RGB(255, 128, 32);
+		constexpr gtl::color_bgra_t crBGRA{.cr = cr};
+		constexpr gtl::color_rgba_t crRGBA{.cr = cr};
+
+		std::vector<gtl::color_bgra_t> pal;
+		pal.push_back(gtl::ColorBGRA(GetBValue(cr), GetGValue(cr), GetRValue(cr), 0));
+
+	}
+
+	gtl::win_util::GetDlgItemString(this, IDC_MAT_SIZE);
 }
 
 
@@ -318,7 +331,7 @@ cv::Mat CtestwinView::CreateSampleImage(cv::Size size, int type, cv::Scalar cr1,
 bool CtestwinView::WriteSampleImage(std::filesystem::path const& folder, cv::Mat const& mat, int nBPP) {
 	gtlw::xStopWatch sw;
 
-	std::vector<gtl::color_bgra_t> palette{ (nBPP <= 8) ? (size_t)(0x01 << nBPP) : (size_t)0, gtl::color_bgra_t{} };
+	std::vector<gtl::color_bgra_t> palette{ (nBPP <= 8) ? ((size_t)0x01 << nBPP) : (size_t)0, gtl::color_bgra_t{} };
 	if (!palette.empty())
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
 

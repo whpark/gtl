@@ -153,8 +153,7 @@ export namespace gtl::win_util {
 
 		// Error setting time-outs.
 
-		DCB dcb;
-		memset(&dcb, 0, sizeof(dcb));
+		DCB dcb{};
 		dcb.DCBlength = sizeof(dcb);
 		dcb.BaudRate = setting.baud;
 		dcb.fBinary = 1;
@@ -179,8 +178,7 @@ export namespace gtl::win_util {
 		SetCommState(m_hComm, &dcb);
 		//::SetCommMask(m_hComm, EV_RXCHAR|EV_ERR|EV_TXEMPTY);
 
-		COMMTIMEOUTS to;
-		ZeroVar(to);
+		COMMTIMEOUTS to{};
 		//to.ReadIntervalTimeout = (DWORD)std::chrono::milliseconds(m_durTimeoutRX).count();
 		to.ReadIntervalTimeout = m_dwTimeoutRX;//INFINITE;
 		to.ReadTotalTimeoutMultiplier = 1;

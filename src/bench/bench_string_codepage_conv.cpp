@@ -10,12 +10,13 @@ import gtl;
 using namespace std::literals;
 using namespace gtl::literals;
 
+#define TEST_SZ 	"가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하"\
+					"asdfasdf가나다라마adrg바sfdgdh사아자차카타dd파하긎긣꿳fghs뎓뫓멙뻍😊❤✔"\
+					"asdfasdfaskdfjaklsjgflak;sdfjaskl;dfjnvakls;dfnvja;slfvnlikasjf"
 
 
 constexpr std::array<std::u8string_view, 3> TEST_STRING = { {
-		u8"가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하"sv,
-		u8"asdfasdf가나다라마adrg바sfdgdh사아자차카타dd파하긎긣꿳fghs뎓뫓멙뻍😊❤✔"sv,
-		u8"asdfasdfaskdfjaklsjgflak;sdfjaskl;dfjnvakls;dfnvja;slfvnlikasjf"sv
+		TEXT_u8(TEST_SZ)
 	} };
 
 namespace gtl {
@@ -215,16 +216,8 @@ static void StringCodepageConv_U8toU32_coroutine(benchmark::State& state) {
 
 #pragma optimize ("", off)
 void StringCodepageConv_ICONV_MBCS_WIDE(benchmark::State& state) {
-
 	for (auto _ : state) {
-		std::string str{"가나다라마바사"};
-		auto strT = gtl::ToString_iconv<wchar_t, char, "", "CP949">(str);
-	}
-}
-void StringCodepageConv_ICONV_MBCS_WIDE_EACH(benchmark::State& state) {
-
-	for (auto _ : state) {
-		std::string str{"가나다라마바사"};
+		std::string str{TEST_SZ};
 		auto strT = gtl::ToString_iconv<wchar_t, char, "", "CP949">(str);
 	}
 }
@@ -232,9 +225,8 @@ void StringCodepageConv_ICONV_MBCS_WIDE_EACH(benchmark::State& state) {
 
 #pragma optimize ("", off)
 void StringCodepageConv_WindowsAPI_MBCS_WIDE(benchmark::State& state) {
-
 	for (auto _ : state) {
-		std::string str{"가나다라마바사"};
+		std::string str{TEST_SZ};
 		auto n = MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, str.c_str(), (int)str.size(), nullptr, 0);
 		if (n <= 0)
 			continue;
@@ -242,19 +234,17 @@ void StringCodepageConv_WindowsAPI_MBCS_WIDE(benchmark::State& state) {
 		strW.resize(n);
 		MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, str.c_str(), (int)str.size(), strW.data(), (int)strW.size());
 	}
-
 }
 #pragma optimize ("", on)
 
 BENCHMARK(StringCodepageConv_ICONV_MBCS_WIDE);
-BENCHMARK(StringCodepageConv_ICONV_MBCS_WIDE_EACH);
 BENCHMARK(StringCodepageConv_WindowsAPI_MBCS_WIDE);
 
 #pragma optimize ("", off)
 void StringCodepageConv_ICONV_UTF8_WIDE(benchmark::State& state) {
 
 	for (auto _ : state) {
-		auto str{u8"가나다라마바사"s};
+		std::u8string str{TEXT_u8(TEST_SZ)};
 		auto strT = gtl::ToString_iconv<wchar_t>(str);
 	}
 
@@ -265,7 +255,7 @@ void StringCodepageConv_ICONV_UTF8_WIDE(benchmark::State& state) {
 void StringCodepageConv_WindowsAPI_UTF8_WIDE(benchmark::State& state) {
 
 	for (auto _ : state) {
-		auto str{u8"가나다라마바사"s};
+		std::u8string str{TEXT_u8(TEST_SZ)};
 		auto n = MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, (char const*)str.c_str(), (int)str.size(), nullptr, 0);
 		if (n <= 0)
 			continue;
@@ -285,7 +275,7 @@ BENCHMARK(StringCodepageConv_WindowsAPI_UTF8_WIDE);
 //
 //	gtl::Ticonv<wchar_t, char> conv(nullptr, "CP949");
 //	for (auto _ : state) {
-//		auto str{"가나다라마바사"s};
+//		std::u8string str{TEXT_u8(TEST_SZ)};
 //		auto strT = conv.Convert(str);
 //	}
 //

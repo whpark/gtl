@@ -231,11 +231,11 @@ export namespace gtl {
 		template < typename T >						constexpr T bit_single(int b)					{ return ((T)1 << b); }
 		template < typename T, typename ... Bits >	constexpr T bit_multi(Bits ... bits)			{ return (bit_single<T>(bits) | ...); }
 	}
-	template < typename ... Bits >				constexpr std::uint32_t BIT32(Bits ... bits)		{ return internal::bit_multi<std::uint32_t>(bits...); }
-	template < typename ... Bits >				constexpr std::uint64_t BIT64(Bits ... bits)		{ return internal::bit_multi<std::uint64_t>(bits...); }
+	template < typename ... Bits >				constexpr std::uint32_t Bit32(Bits ... bits)		{ return internal::bit_multi<std::uint32_t>(bits...); }
+	template < typename ... Bits >				constexpr std::uint64_t Bit64(Bits ... bits)		{ return internal::bit_multi<std::uint64_t>(bits...); }
 
-	template < typename ... Bits >				constexpr std::bitset<32> BITSET32(Bits ... bits)	{ return std::bitset<32>(bit32(bits...)); }
-	template < typename ... Bits >				constexpr std::bitset<64> BITSET64(Bits ... bits)	{ return std::bitset<64>(bit64(bits...)); }
+	template < typename ... Bits >				constexpr std::bitset<32> BitSet32(Bits ... bits)	{ return std::bitset<32>(bit32(bits...)); }
+	template < typename ... Bits >				constexpr std::bitset<64> BitSet64(Bits ... bits)	{ return std::bitset<64>(bit64(bits...)); }
 
 
 	// Word Align Position

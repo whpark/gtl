@@ -316,7 +316,7 @@ export namespace gtl {
 			//}
 			if ((c > 127) or (c <= 0) or !std::strchr("+-.0123456789eE", c))
 				break;
-			*str++ += (char)*pos;
+			*str++ = (char)*pos;
 		}
 		*str = 0;
 		char const* pszStopped{};

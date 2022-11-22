@@ -339,8 +339,7 @@ export namespace gtl {
 		if constexpr (std::is_same_v<tchar, char>) {
 			return (tchar)std::toupper(c);
 		} else {
-			return (tchar)
-				std::towupper(c);
+			return (tchar)std::towupper(c);
 		}
 	}
 
@@ -491,7 +490,6 @@ export namespace gtl {
 		tchar* const pszDest = std::data(szDest);
 		size_t sizeDest = std::size(szDest);
 		return tszcpy(pszDest, sizeDest, std::basic_string_view{strSrc.data(), strSrc.size()});
-
 	}
 
 #if 0	// any type <- any type.... 너무 많은 옵션.

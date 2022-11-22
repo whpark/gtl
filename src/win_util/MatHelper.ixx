@@ -26,7 +26,7 @@ export namespace gtl::win_util {
 	//-----------------------------------------------------------------------------
 	// Mat to DC
 	bool MatToDC(cv::Mat const& _img, cv::Size const& sizeView, CDC& dc, CRect const& rect, CBitmap const& mask);
-	bool MatToDC(cv::Mat const& img, cv::Size const& sizeEffective, CDC& dc, CRect const& rectTarget, std::span<RGBQUAD> palette = {});
+	bool MatToDC(cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rectTarget, std::span<RGBQUAD> palette = {});
 	bool MatToDCTransparent(cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, COLORREF crTransparent);
 	bool MatToDCAlphaBlend(cv::Mat const& img, cv::Size const& sizeView, CDC& dc, CRect const& rect, BLENDFUNCTION blend);
 
@@ -223,7 +223,7 @@ export namespace gtl::win_util {
 		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &dlgProgress, &pelsPerMeter]() { img = gtl::LoadBitmapMat(path, pelsPerMeter, dlgProgress.m_calback); });
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &pelsPerMeter, &dlgProgress]() { img = gtl::LoadBitmapMat(path, pelsPerMeter, dlgProgress.m_calback); });
 		auto r = dlgProgress.DoModal();
 
 		CWaitCursor wc;

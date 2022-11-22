@@ -930,7 +930,6 @@ export namespace gtl {
 			//	f.write(redundant, sr);
 			//}
 			//bOK = true;
-
 			bOK = gtl::internal::MatToBitmapFile<true, false, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, {}, funcCallback);
 
 			return true;
@@ -1210,7 +1209,6 @@ export namespace gtl {
 			return true;
 		}
 
-		// todo : merge w/ MatFromBitmapFile...
 		template < typename telement = cv::Vec3b, bool bLoopUnrolling = true, bool bMultiThreaded = false >
 		bool MatFromBitmapFilePixelArray(std::istream& f, cv::Mat& img, int nBPP, callback_progress_t funcCallback = nullptr) {
 

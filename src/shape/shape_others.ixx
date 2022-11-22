@@ -546,7 +546,7 @@ export namespace gtl::shape {
 			if (!bRightHanded)
 				m_angle_start = -m_angle_start;
 		}
-		auto At(auto t) const { return m_ptCenter + m_radius * point_t{cos(t), sin(t)}; };
+		auto At(auto t) const { return m_ptCenter + m_radius * point_t{gtl::cos(t), gtl::sin(t)}; };
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			bool bResult{};
 			// todo : ... upgrade?
@@ -563,7 +563,7 @@ export namespace gtl::shape {
 				std::swap(start, end);
 			int count{};
 			int iend = end;
-			for (int t = (int)std::round(deg_t(start.dValue/90_deg))*90; t <= iend; t += 90) {
+			for (int t = (int)std::round(deg_t(start.dValue/90_deg))*90+90; t <= iend; t += 90) {
 				switch (t%360) {
 				case 0 :		bResult |= rectBoundary.UpdateBoundary(m_ptCenter + point_t{m_radius, 0.}); break;
 				case 90 :		bResult |= rectBoundary.UpdateBoundary(m_ptCenter + point_t{0., m_radius}); break;
@@ -696,8 +696,8 @@ export namespace gtl::shape {
 			deg_t t1 = m_angle_start + m_angle_length;
 			auto radius1 = m_radius;
 			auto radius2 = m_radiusH;
-			point_t pt0 = ct(point_t{radius1*cos(t0), radius2*sin(t0)});
-			point_t pt1 = ct(point_t{radius1*cos(t1), radius2*sin(t1)});
+			point_t pt0 = ct(point_t{radius1*gtl::cos(t0), radius2*gtl::sin(t0)});
+			point_t pt1 = ct(point_t{radius1*gtl::cos(t1), radius2*gtl::sin(t1)});
 
 			return std::pair{ pt0, pt1 };
 		}
@@ -1051,7 +1051,7 @@ export namespace gtl::shape {
 		}
 		virtual void PrintOut(std::wostream& os) const override {
 			xShape::PrintOut(os);
-			fmt::print(os, L"\tflags:{}, degree:{}\n");
+			fmt::print(os, L"\tflags:{}, degree:{}\n", m_flags, m_degree);
 			fmt::print(os, L"\tknot ");
 			for (auto knot : m_knots)
 				fmt::print(os, L"{}, ", knot);
@@ -1665,4 +1665,20 @@ export namespace gtl::shape {
 	};
 
 }
+
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xShape, "shape")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xLayer, "layer")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xDot, "dot")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xLine, "line")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xPolyline, "polyline")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xPolylineLW, "lwpolyline")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xCircle, "circleXY")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xArc, "arcXY")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xEllipse, "ellipseXY")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xSpline, "spline")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xText, "text")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xMText, "mtext")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xHatch, "hatch")
+BOOST_CLASS_EXPORT_GUID(gtl::shape::xDrawing, "drawing")
+
 

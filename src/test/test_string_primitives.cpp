@@ -92,7 +92,7 @@ using namespace gtl;
 //			static_assert(true);
 //		}
 //		else {
-//			static_assert(false);
+//			static_assert(gtlc::dependent_false_v);
 //		}
 //	}
 //
@@ -129,7 +129,7 @@ TEST(gtl_string, tszlen) {
 	EXPECT_EQ(3, gtl::tszlen(U"가나다"));
 	EXPECT_EQ(4, gtl::tszlen(u"가나다라"));
 	EXPECT_EQ(4, gtl::tszlen(L"가나다라"));
-	EXPECT_EQ(8, gtl::tszlen(*gtl::ToString_iconv<char, wchar_t, "", "CP949">(L"가나다라"sv)));
+	EXPECT_EQ(8, gtl::tszlen(*gtl::ToString_iconv<char, wchar_t, "CP949">(L"가나다라"sv)));
 	constexpr char16_t const* sz3 = u"가나다";
 	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
 	constexpr auto l0 = tszlen(sz3);

@@ -1,13 +1,13 @@
 ﻿#include "pch.h"
 
-
-#ifdef _DEBUG
-#pragma comment(lib, "gtestd.lib")
-#pragma comment(lib, "gmockd.lib")
-#else
-#pragma comment(lib, "gtest.lib")
-#pragma comment(lib, "gmock.lib")
-#endif
+// vcpkg does this.
+//#ifdef _DEBUG
+//#pragma comment(lib, "gtest.lib")
+//#pragma comment(lib, "gmock.lib")
+//#else
+//#pragma comment(lib, "gtest.lib")
+//#pragma comment(lib, "gmock.lib")
+//#endif
 #pragma comment(lib, "Shlwapi.lib")
 
 

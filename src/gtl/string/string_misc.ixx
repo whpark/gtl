@@ -150,8 +150,6 @@ export namespace gtl {
 		else if constexpr (std::is_same_v<tchar, charKSSM_t>) { return (charKSSM_t*)TEXT_u(SPACE_STRING); }
 		else { static_assert(gtlc::dependent_false_v, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
-
-
 	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c) {
 		return (c >= '0') && (c <= '9');
 	}

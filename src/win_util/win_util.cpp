@@ -10,9 +10,42 @@
 //#define new DEBUG_NEW
 //#endif
 
-//namespace gtl::win_util {
-//
-//}
+
+namespace gtl::win_util {
+
+	xString GetErrorMessage(CException& e) {
+		xString str;
+		e.GetErrorMessage(str.GetBuffer(1024), 1024);
+		str.ReleaseBuffer();
+		str.TrimRight();
+		return str;
+	}
+
+	xString GetErrorMessage(DWORD dwLastError) {
+		xString str;
+		LPVOID lpMsgBuf;
+		FormatMessage( 
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+			FORMAT_MESSAGE_FROM_SYSTEM | 
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dwLastError,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+			(LPTSTR) &lpMsgBuf,
+			0,
+			NULL 
+		);
+
+		str = (LPCTSTR)lpMsgBuf;
+		str.TrimRight();
+
+		// Free the buffer.
+		LocalFree( lpMsgBuf );
+
+		return str;
+	}
+
+}
 
 #if 0
 

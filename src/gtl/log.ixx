@@ -177,8 +177,15 @@ export namespace gtl {
 		std::time_t t = tNow;
 		std::tm tm;
 		localtime_s(&tm, &t);
-		strFilePath.Replace(L"%10M", fmt::format(L"{:02d}", tm.tm_min/10*10));	// 분 단위 1의 자리에서 버림 -> 10분 단위로 파일 이름 생성
-		strFilePath.Replace(L"%10m", fmt::format(L"{:02d}", tm.tm_min/10*10));
+		// 분 단위 1의 자리에서 버림 -> 10분 단위로 파일 이름 생성
+		//strFilePath.Replace(L"%10M", fmt::format(L"{:02d}", tm.tm_min/10*10));
+		//strFilePath.Replace(L"%10m", fmt::format(L"{:02d}", tm.tm_min/10*10));
+		static std::wregex reMin(LR"xxx(%([0-9]{1,2})[mM])xxx");
+		for (std::wsmatch result; std::regex_search(strFilePath, result, reMin); ) {
+			auto const& r = result[1];
+			int minute = std::stoi(r.str());
+			strFilePath.replace(result.position(), result.length(), std::format(L"{:02d}", tm.tm_min/minute*minute));
+		}
 		std::filesystem::path path;
 		//std::vector<wchar_t> buf(std::max((std::size_t)4096, strFilePath.size()), 0);
 		//auto l = std::wcsftime(buf.data(), buf.size(), strFilePath, &tm);

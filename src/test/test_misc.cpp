@@ -2,14 +2,6 @@
 
 #include "gtl/gtl.h"
 
-#include "boost/archive/iterators/binary_from_base64.hpp"
-#include "boost/archive/iterators/base64_from_binary.hpp"
-#include "boost/archive/iterators/transform_width.hpp"
-#include "boost/algorithm/string.hpp"
-
-#include "opencv2/opencv.hpp"
-
-
 import gtl;
 
 #pragma warning(disable:4566)	// character encoding
@@ -17,8 +9,11 @@ import gtl;
 using namespace std::literals;
 using namespace gtl::literals;
 
+static_assert(std::is_convertible_v<std::unique_ptr<int>, std::shared_ptr<int>>);
+static_assert(!std::is_convertible_v<std::shared_ptr<int>, std::unique_ptr<int>>);
+static_assert(!std::is_same_v<std::unique_ptr<int>, std::shared_ptr<int>>);
+
 namespace gtl::test::misc {
-	using namespace gtl;
 
 	class xTestVirtualBase {
 	public:
@@ -144,7 +139,7 @@ namespace gtl::test::misc {
 					for (auto i : lst) {
 						sum += i;
 					}
-					});
+				});
 			}
 
 			for (auto& t : threads)
@@ -198,70 +193,5 @@ namespace gtl::test::misc {
 			EXPECT_EQ(sum, ((1+n)*n/2)*N);
 		}
 	}
-
-//	template < typename TData > requires (sizeof(TData) == 1)
-//	std::string EncodeBase64(std::span<TData> data) {
-//		using namespace boost::archive::iterators;
-//		using It = base64_from_binary<transform_width<std::span<TData>::iterator, 6, 8>>;
-//		auto tmp = std::string(It(std::begin(data)), It(std::end(data)));
-//		return tmp.append((3 - data.size() % 3) % 3, '=');
-//	}
-//
-//	template < typename TString, typename TOutpytIterator >
-//	void DecodeBase64(TString const& str, TOutpytIterator iterOutput) {
-//		using namespace boost::archive::iterators;
-//		using str2bin = transform_width<binary_from_base64<TString::const_iterator>, 8, 6>;
-//		std::copy(str2bin(str.begin()), str2bin(str.end()), iterOutput);
-//	}
-//
-//#if 0
-//	template < typename archive >
-//	void SyncMatBase64(archive& ar, cv::Mat& mat) {
-//		if constexpr (archive::is_saving::value) {
-//			ar & mat.cols;
-//			ar & mat.rows;
-//			ar & mat.type();
-//			if (mat.cols and mat.rows) {
-//				if (mat.isContinuous()) {
-//					ar & EncodeBase64(std::span(mat.datastart, mat.dataend));
-//				} else {
-//					std::string str;
-//					str.reserve(mat.cols * mat.rows * mat.elemSize() +1 )* 8 / 6;
-//					size_t len = mat.cols*mat.elemSize();
-//					for (int y {}; y < mat.rows; y++) {
-//						auto const* p = mat.ptr(y);
-//						str += EncodeBase64(std::span(p, len));
-//					}
-//					ar & str;
-//				}
-//			}
-//		} else if constexpr (archive::is_loading::value) {
-//			int rows{};
-//			int cols{};
-//			int type{};
-//
-//			ar & cols;
-//			ar & rows;
-//			ar & type;
-//			if (!rows or !cols) {
-//				return;
-//			}
-//			std::string str;
-//			ar & str;
-//			mat = cv::Mat::zeros(rows, cols, type);
-//			DecodeBase64(str, mat.begin<uchar>());
-//		}
-//	}
-//
-//	TEST(misc, mat_json) {
-//		cv::Mat mat = cv::Mat::eye(100, 100, CV_8UC1);
-//
-//		auto str = EncodeBase64(std::span(mat.datastart, mat.dataend));
-//		cv::Mat mat2(100, 100, CV_8UC1);
-//		DecodeBase64(mat2.begin<uchar>(), str);
-//
-//		EXPECT_EQ(mat, mat2);
-//
-//	}
 }
 
