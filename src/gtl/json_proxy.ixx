@@ -346,6 +346,8 @@ export namespace gtl {
 		operator float() const { return j_.is_number_float() ? (float)(double)j_ : 0.0f; }
 		template < gtlc::string_elem tchar_t >
 		operator std::basic_string<tchar_t> () const {
+			if (!j_.is_string())
+				return {};
 			auto jstrU8 = (std::string)j_;
 			if constexpr (std::is_same_v<tchar_t, char8_t>) {
 				return std::u8string((char8_t const*)jstrU8.data(), jstrU8.size());
