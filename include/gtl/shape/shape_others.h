@@ -526,6 +526,8 @@ namespace gtl::shape {
 			if (rectBoundary.RectInRect(rectMax))
 				return bResult;
 			auto start = m_angle_start;
+			if (start < 0_deg)
+				start += 360_deg;
 			auto end = start + m_angle_length;
 			bResult |= rectBoundary.UpdateBoundary(At(start));
 			bResult |= rectBoundary.UpdateBoundary(At(end));
@@ -533,7 +535,7 @@ namespace gtl::shape {
 				std::swap(start, end);
 			int count{};
 			int iend = end;
-			for (int t = (int)std::round(deg_t(start.dValue/90_deg))*90+90; t <= iend; t += 90) {
+			for (int t = (int)std::floor(deg_t(start.dValue/90_deg))*90+90; t <= iend; t += 90) {
 				switch (t%360) {
 				case 0 :		bResult |= rectBoundary.UpdateBoundary(m_ptCenter + point_t{m_radius, 0.}); break;
 				case 90 :		bResult |= rectBoundary.UpdateBoundary(m_ptCenter + point_t{0., m_radius}); break;
@@ -800,8 +802,21 @@ namespace gtl::shape {
 		};
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			bool bModified{};
-			for (auto const& pt : m_pts)
-				bModified |= rectBoundary.UpdateBoundary(pt);
+
+			auto nPt = m_pts.size();
+			if (!m_bLoop)
+				nPt--;
+			for (int iPt = 0; iPt < nPt; iPt++) {
+				auto pt0 = m_pts[iPt];
+				bModified |= rectBoundary.UpdateBoundary(pt0);
+				if (pt0.Bulge() != 0.0) {
+					auto iPt2 = (iPt+1) % m_pts.size();
+					auto pt1 = m_pts[iPt2];
+					xArc arc = xArc::GetFromBulge(pt0.Bulge(), pt0, pt1);
+					bModified |= arc.UpdateBoundary(rectBoundary);
+				}
+			}
+
 			return bModified;
 		};
 		virtual void Draw(ICanvas& canvas) const override;
