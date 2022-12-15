@@ -525,14 +525,24 @@ namespace gtl::shape {
 			rectMax.pt1() += point_t{m_radius, m_radius};
 			if (rectBoundary.RectInRect(rectMax))
 				return bResult;
-			auto start = m_angle_start;
+			if (std::fabs(m_angle_length) >= 360._deg) {
+				bResult |= rectBoundary.UpdateBoundary(point_t(m_ptCenter.x - m_radius, m_ptCenter.y - m_radius, m_ptCenter.z));
+				bResult |= rectBoundary.UpdateBoundary(point_t(m_ptCenter.x + m_radius, m_ptCenter.y + m_radius, m_ptCenter.z));
+				return bResult;
+			}
+			auto start = deg_t(std::fmod(m_angle_start.dValue, 360_deg));
 			if (start < 0_deg)
 				start += 360_deg;
 			auto end = start + m_angle_length;
 			bResult |= rectBoundary.UpdateBoundary(At(start));
 			bResult |= rectBoundary.UpdateBoundary(At(end));
-			if (start > end)
+			if (start > end) {
 				std::swap(start, end);
+				if (start < 0_deg) {
+					start += 360_deg;
+					end += 360_deg;
+				}
+			}
 			int count{};
 			int iend = end;
 			for (int t = (int)std::floor(deg_t(start.dValue/90_deg))*90+90; t <= iend; t += 90) {
