@@ -526,6 +526,8 @@ namespace gtl::shape {
 			if (rectBoundary.RectInRect(rectMax))
 				return bResult;
 			auto start = m_angle_start;
+			if (start < 0_deg)
+				start += 360_deg;
 			auto end = start + m_angle_length;
 			bResult |= rectBoundary.UpdateBoundary(At(start));
 			bResult |= rectBoundary.UpdateBoundary(At(end));
