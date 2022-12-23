@@ -131,6 +131,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="test_task.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\gtl\gtl.vcxproj">
