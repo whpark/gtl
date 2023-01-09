@@ -105,7 +105,7 @@ export namespace gtl {
 			} else if constexpr (gtlc::has__xy<T_COORD>) {
 				this->cx = RoundOrForward<T>(B.x);
 				this->cy = RoundOrForward<T>(B.y);
-				if constexpr ((dim >= 3) and has__z<T_COORD>)
+				if constexpr ((dim >= 3) and gtlc::has__z<T_COORD>)
 					this->cz = RoundOrForward<T>(B.z);
 			} else if constexpr (gtlc::rect<T_COORD>) {
 				*this = (B.pt1 - B.pt0);
