@@ -544,6 +544,8 @@ namespace gtl {
 		if (!pathRelToProjectRoot.empty())
 			path /= pathRelToProjectRoot;
 		std::error_code ec{};
+		std::filesystem::create_directories(path, ec);
+		ec = {};
 		std::filesystem::current_path(path, ec);
 		if (ec)
 			return {};
