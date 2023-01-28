@@ -415,7 +415,7 @@ export namespace gtl {
 			return (TString&)str;
 		}
 
-		void Trim()														{ gtl::Trim(); }
+		void Trim()														{ gtl::Trim(*this); }
 		void TrimRight()												{ gtl::TrimRight(*this); }
 		void TrimRight(tchar chTarget)									{ gtl::TrimRight(*this, chTarget); }
 		void TrimRight(const tchar* pszTargets)							{ gtl::TrimRight(*this, pszTargets); }
