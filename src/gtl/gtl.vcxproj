@@ -450,6 +450,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h" />
     <ClInclude Include="..\..\include\gtl\json_proxy.h" />
+    <ClInclude Include="..\..\include\gtl\json_sync.h" />
     <ClInclude Include="..\..\include\gtl\log.h" />
     <ClInclude Include="..\..\include\gtl\matrix.h" />
     <ClInclude Include="..\..\include\gtl\mat_helper.h" />

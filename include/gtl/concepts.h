@@ -151,6 +151,31 @@ namespace gtl::concepts {
 		);
 
 
+	/// @brief string like classes
+	template < typename tstr_t, typename tchar_t = tstr_t::value_type >
+	concept tstring = 
+		std::is_convertible_v< tstr_t, std::basic_string<char> >
+		or std::is_convertible_v< tstr_t, std::basic_string<char8_t> >
+		or std::is_convertible_v< tstr_t, std::basic_string<wchar_t> >
+		or std::is_convertible_v< tstr_t, std::basic_string<char16_t> >
+		or std::is_convertible_v< tstr_t, std::basic_string<char32_t> >
+		;
+
+	/// @brief string_view like classes
+	template < typename tstr_t, typename tchar_t = tstr_t::value_type >
+	concept tstring_view = 
+		std::is_convertible_v< tstr_t, std::basic_string_view<char> >
+		or std::is_convertible_v< tstr_t, std::basic_string_view<char8_t> >
+		or std::is_convertible_v< tstr_t, std::basic_string_view<wchar_t> >
+		or std::is_convertible_v< tstr_t, std::basic_string_view<char16_t> >
+		or std::is_convertible_v< tstr_t, std::basic_string_view<char32_t> >
+		;
+
+	/// @brief string or string_view like classes
+	template < typename tstr_t, typename tchar_t = tstr_t::value_type >
+	concept tstring_like = tstring<tstr_t, tchar_t> or tstring_view<tstr_t, tchar_t>;
+
+
 	/// @brief type for string buffer with type constraints
 	template < typename tcontainer, typename tchar >
 	concept contiguous_type_string_container = 
