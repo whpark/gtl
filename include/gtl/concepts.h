@@ -11,6 +11,7 @@
 
 #include <version>
 #include <concepts>
+#include <string>
 //#include <ciso646>	// -> c++20 <version>
 #include "_config.h"
 
