@@ -54,7 +54,7 @@
 
 	<Type Name="gtl::TRECT3&lt;*&gt;">
 		<DisplayString IncludeView="noparens">{left,g},{top,g},{front,g},{right,g},{bottom,g},{back,g}</DisplayString>
-		<DisplayString ExcludeView="noparens">LT({left,g},{top,g},{front,g}), RB({right,g},{bottom,g},{back,g})</DisplayString>
+		<DisplayString ExcludeView="noparens">LT({left,g},{top,g},{front,g}), RB({right,g},{bottom,g},{back,g}), w {right-left,g}, h {bottom-top,g}, d {back-front,g}</DisplayString>
 		<Expand>
 			<Item Name="left">left</Item>
 			<Item Name="top">top</Item>
@@ -70,7 +70,7 @@
 
 	<Type Name="gtl::TRECT2&lt;*&gt;">
 		<DisplayString IncludeView="noparens">{left,g},{top,g},{right,g},{bottom,g}</DisplayString>
-		<DisplayString ExcludeView="noparens">LT({left,g},{top,g}), RB({right,g},{bottom,g})</DisplayString>
+		<DisplayString ExcludeView="noparens">LT({left,g},{top,g}), RB({right,g},{bottom,g}), w{right-left,g}, h{bottom-top,g}</DisplayString>
 		<Expand>
 			<Item Name="left">left</Item>
 			<Item Name="top">top</Item>

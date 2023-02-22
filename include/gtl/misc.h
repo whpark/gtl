@@ -483,6 +483,9 @@ namespace gtl {
 		return ""sv;
 	}
 
+	inline bool HasParentPath(std::filesystem::path const& path) {
+		return path.has_parent_path() and path != path.parent_path();
+	}
 	/// @brief Get Project Name from source file path
 	/// @param l : don't touch.
 	/// @return 
@@ -490,7 +493,7 @@ namespace gtl {
 		std::filesystem::path path = l.file_name();
 		if (path.extension() == ".h")	// CANNOT get project name from header file
 			return {};
-		while (path.has_parent_path()) {
+		while (HasParentPath(path)) {
 			auto filename = path.filename();
 			path = path.parent_path();
 			if (path.filename() == L"src")
@@ -519,16 +522,16 @@ namespace gtl {
 		}();
 
 		// Remove Project Folder ( ex, [src]/[ProjectName] )
-		if ( path.has_parent_path() and (path.filename() == strProjectNameToBeRemoved) ) {
+		if ( HasParentPath(path) and (path.filename() == strProjectNameToBeRemoved) ) {
 			path = path.parent_path();
-			if (path.has_parent_path() and path.filename() == L"src") {
+			if (HasParentPath(path) and path.filename() == L"src") {
 				path = path.parent_path();
 			}
 		}
 
 		// Remove Output Dir Folder Name ( ex, Temp/x64/Debug/ )
 		for (auto const& strTempFolder : strsTempFolder) {
-			if (!path.has_parent_path())
+			if (!HasParentPath(path))
 				break;
 			if (path.filename() == strTempFolder) {
 				path = path.parent_path();
@@ -541,8 +544,10 @@ namespace gtl {
 		// first, Get Root Folder, and then attach [pathRel]
 		auto projectName = gtl::GetGTLProjectName(l);
 		auto path = gtl::GetProjectRootFolder(projectName);
-		if (!pathRelToProjectRoot.empty())
-			path /= pathRelToProjectRoot;
+		if (!pathRelToProjectRoot.empty()) {
+			if (pathRelToProjectRoot.filename() != path.filename())
+				path /= pathRelToProjectRoot;
+		}
 		std::error_code ec{};
 		std::filesystem::create_directories(path, ec);
 		ec = {};
