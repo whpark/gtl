@@ -153,11 +153,11 @@ namespace gtl {
 	/// @param v 
 	/// @return 
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
+		requires (std::is_integral_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST Round(T_SOURCE v) {
 		//return T_DEST(std::round(v));
 		return T_DEST(v+0.5*(v<T_SOURCE{}?-1:1));
 	}
-
 	/// @brief Rounding to nearest integer.
 	/// @tparam T_DEST 
 	/// @tparam T_SOURCE 
@@ -165,9 +165,27 @@ namespace gtl {
 	/// @param place rounding place (ex, 1, 10, 100, 0.01 ...)
 	/// @return 
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
+		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST Round(T_SOURCE v, T_SOURCE place) {
 		//return T_DEST(T_DEST(std::round(v/place/10))*place*10);
 		return T_DEST(T_DEST(v/place/10+0.5*(v<T_SOURCE{}?-1:1))*place*10);
+	}
+	
+	/// @brief Round for gtlc::generic_coord
+	template < gtlc::generic_coord T_COORD >
+	constexpr [[nodiscard]] T_COORD Round(T_COORD const& coord) {
+		T_COORD v;
+		if constexpr (gtlc::has__x<T_COORD>) { v.x = std::round(coord.x); }
+		if constexpr (gtlc::has__y<T_COORD>) { v.y = std::round(coord.y); }
+		if constexpr (gtlc::has__z<T_COORD>) { v.z = std::round(coord.z); }
+		if constexpr (gtlc::has__w<T_COORD>) { v.w = std::round(coord.w); }
+		if constexpr (gtlc::has__cx<T_COORD>) { v.cx = std::round(coord.cx); }
+		if constexpr (gtlc::has__cy<T_COORD>) { v.cy = std::round(coord.cy); }
+		if constexpr (gtlc::has__cz<T_COORD>) { v.cz = std::round(coord.cz); }
+		if constexpr (gtlc::has__width<T_COORD>) { v.width = std::round(coord.width); }
+		if constexpr (gtlc::has__height<T_COORD>) { v.height = std::round(coord.height); }
+		if constexpr (gtlc::has__depth<T_COORD>) { v.depth = std::round(coord.depth); }
+		return v;
 	}
 
 	/// @brief Round or just forward values. (실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.)
@@ -176,6 +194,7 @@ namespace gtl {
 	/// @param v2 
 	/// @return 
 	template < typename T_DEST, typename T_SOURCE >
+		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST RoundOrForward(T_SOURCE v2) {
 		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {
 			return Round<T_DEST, T_SOURCE>(v2);
@@ -184,17 +203,21 @@ namespace gtl {
 		}
 	}
 
+
 	// Ceil
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
+		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST Ceil(T_SOURCE v) {
 		return T_DEST(std::ceil(v));	// std::ceil is not constexpr yet.
 	}
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
+		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST Ceil(T_SOURCE v, T_SOURCE place) {
 		return T_DEST(std::ceil(v/place/10)*place*10);
 	}
 	// 실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.
 	template < typename T_DEST, typename T_SOURCE >
+		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST CeilOrForward(T_SOURCE v2) {
 		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {
 			return Ceil<T_DEST, T_SOURCE>(v2);
@@ -203,23 +226,60 @@ namespace gtl {
 		}
 	}
 
+	/// @brief Ceil for gtlc::generic_coord
+	template < gtlc::generic_coord T_COORD >
+	constexpr [[nodiscard]] T_COORD Ceil(T_COORD const& coord) {
+		T_COORD v;
+		if constexpr (gtlc::has__x<T_COORD>) { v.x = std::ceil(coord.x); }
+		if constexpr (gtlc::has__y<T_COORD>) { v.y = std::ceil(coord.y); }
+		if constexpr (gtlc::has__z<T_COORD>) { v.z = std::ceil(coord.z); }
+		if constexpr (gtlc::has__w<T_COORD>) { v.w = std::ceil(coord.w); }
+		if constexpr (gtlc::has__cx<T_COORD>) { v.cx = std::ceil(coord.cx); }
+		if constexpr (gtlc::has__cy<T_COORD>) { v.cy = std::ceil(coord.cy); }
+		if constexpr (gtlc::has__cz<T_COORD>) { v.cz = std::ceil(coord.cz); }
+		if constexpr (gtlc::has__width<T_COORD>) { v.width = std::ceil(coord.width); }
+		if constexpr (gtlc::has__height<T_COORD>) { v.height = std::ceil(coord.height); }
+		if constexpr (gtlc::has__depth<T_COORD>) { v.depth = std::ceil(coord.depth); }
+		return v;
+	}
+
 	// Floor
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
+		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST Floor(T_SOURCE v) {
 		return T_DEST(std::floor(v));	// std::floor is not constexpr yet.
 	}
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
+		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST Floor(T_SOURCE v, T_SOURCE place) {
 		return T_DEST(std::floor(v/place/10)*place*10);
 	}
 	// 실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.
 	template < typename T_DEST, typename T_SOURCE >
+		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
 	constexpr [[nodiscard]] T_DEST FloorOrForward(T_SOURCE v2) {
 		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {
 			return Floor<T_DEST, T_SOURCE>(v2);
 		} else {
 			return (T_DEST)v2;
 		}
+	}
+
+	/// @brief Floor for gtlc::generic_coord
+	template < gtlc::generic_coord T_COORD >
+	constexpr [[nodiscard]] T_COORD Floor(T_COORD const& coord) {
+		T_COORD v{};
+		if constexpr (gtlc::has__x<T_COORD>) { v.x = std::floor(coord.x); }
+		if constexpr (gtlc::has__y<T_COORD>) { v.y = std::floor(coord.y); }
+		if constexpr (gtlc::has__z<T_COORD>) { v.z = std::floor(coord.z); }
+		if constexpr (gtlc::has__w<T_COORD>) { v.w = std::floor(coord.w); }
+		if constexpr (gtlc::has__cx<T_COORD>) { v.cx = std::floor(coord.cx); }
+		if constexpr (gtlc::has__cy<T_COORD>) { v.cy = std::floor(coord.cy); }
+		if constexpr (gtlc::has__cz<T_COORD>) { v.cz = std::floor(coord.cz); }
+		if constexpr (gtlc::has__width<T_COORD>) { v.width = std::floor(coord.width); }
+		if constexpr (gtlc::has__height<T_COORD>) { v.height = std::floor(coord.height); }
+		if constexpr (gtlc::has__depth<T_COORD>) { v.depth = std::floor(coord.depth); }
+		return v;
 	}
 
 	// Boolean
