@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MatView">
+      <UniqueIdentifier>{544a6eae-06f5-4df7-a6a6-511f5c1d8220}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="[ framework ]">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>[ framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>[ framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\wx\MatView.h">
+      <Filter>MatView</Filter>
+    </ClInclude>
+    <ClInclude Include="MatView\DlgMatViewOption.h">
+      <Filter>MatView</Filter>
+    </ClInclude>
+    <ClInclude Include="MatView\wxGLCanvasAdapter.h">
+      <Filter>MatView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\wx\_lib_gtl_wx.h">
+      <Filter>[ framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\wx\wxMatView.h">
+      <Filter>MatView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\wx\wx.h">
+      <Filter>[ framework ]</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MatView\DlgMatViewOption.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatView.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\wxGLCanvasAdapter.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\wxMatView.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>[ framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>[ framework ]</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MatView\wxMatView.fbp">
+      <Filter>MatView</Filter>
+    </None>
+  </ItemGroup>
+</Project>

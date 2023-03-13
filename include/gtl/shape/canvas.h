@@ -143,7 +143,7 @@ namespace gtl::shape {
 
 			deg_t t1 = t0 + tLength;
 			MoveTo(ct(point_t{radius1*cos(t0), radius2*sin(t0)}));
-			int n = Round(tLength * std::numbers::pi * std::max(radius1, radius2) / m_target_interpolation_inverval);
+			int n = Round<int, double>(tLength * std::numbers::pi * std::max(radius1, radius2) / m_target_interpolation_inverval);
 			for (int i = 0; i <= n; i++) {
 				deg_t t {std::lerp(t0, t1, (double)i/n)};
 				constexpr static auto m2pi = std::numbers::pi*2;
