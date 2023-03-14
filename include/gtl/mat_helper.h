@@ -359,7 +359,7 @@ namespace gtl {
 	GTL__API bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const* pMask = nullptr);
 
 
-	inline bool IsExtensionImage(std::filesystem::path const& path) {
+	inline bool IsImageExtension(std::filesystem::path const& path) {
 		auto ext = gtl::ToLower<char>(path.extension().string());
 		return gtl::IsValueOneOf(ext, ".bmp", ".jpg", ".jpeg", ".tiff", ".png", ".gif", ".jfif");
 	}
