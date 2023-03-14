@@ -464,11 +464,6 @@ namespace gtl {
 		return gtl::ToStringW(str);
 	}
 
-	GTL__API inline bool IsImageExtension(std::filesystem::path const& path) {
-		auto ext = gtl::ToLower<char>(path.extension().string());
-		return gtl::IsValueOneOf(ext, ".bmp", ".jpg", ".jpeg", ".tiff", ".png", ".gif", ".jfif");
-	}
-
 
 
 	namespace internal {
