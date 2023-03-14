@@ -486,6 +486,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\wx\MatView.h" />
+    <ClInclude Include="..\..\include\gtl\wx\util.h" />
     <ClInclude Include="..\..\include\gtl\wx\wx.h" />
     <ClInclude Include="..\..\include\gtl\wx\wxMatView.h" />
     <ClInclude Include="..\..\include\gtl\wx\_lib_gtl_wx.h" />
@@ -510,6 +511,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MatView\wxMatView.fbp" />

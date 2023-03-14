@@ -38,6 +38,9 @@
     <ClInclude Include="..\..\include\gtl\wx\wx.h">
       <Filter>[ framework ]</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\wx\util.h">
+      <Filter>MatView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MatView\DlgMatViewOption.cpp">
@@ -57,6 +60,9 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>[ framework ]</Filter>
+    </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>MatView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
