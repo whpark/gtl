@@ -167,6 +167,16 @@ namespace std::inline literals {
 }
 #endif
 
+#ifdef __cpp_lib_to_underlying
+#else
+namespace std {
+	template <typename T>
+	constexpr underlying_type_t<T> to_underlying(T value) noexcept {
+		return static_cast<underlying_type_t<T>>(value);
+	}
+}
+#endif
+
 
 // NUM_ARGS(...) macro arg 갯수
 #define NUM_ARGS_64(                            _64,_63,_62,_61,_60,_59,_58,_57,_56,_55,_54,_53,_52,_51,_50,_49,_48,_47,_46,_45,_44,_43,_42,_41,_40,_39,_38,_37,_36,_35,_34,_33,_32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1, N, ...) N
