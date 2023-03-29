@@ -98,16 +98,17 @@ namespace gtl::wx {
 			rect.x+=1, rect.y+=1;
 		}
 		wxBrush brush(cr);
-		dc.SetPen(*wxBLACK_PEN);
+		dc.SetPen(wxPen(m_border.cr, m_border.width, wxPENSTYLE_SOLID));
 		dc.SetBrush(brush);
 		rect.Deflate(2, 2);
-		dc.DrawRoundedRectangle(rect, m_radius);
+		int r = std::max(0, m_border.radius);
+		dc.DrawRoundedRectangle(rect, r);
 		if (HasFocus()) {
 			auto rectFocus = rect;
 			rectFocus.Deflate(2, 2);
 			static wxPen pen(wxColour(0, 0, 0), 1, wxPenStyle::wxPENSTYLE_DOT);
 			dc.SetPen(pen);
-			dc.DrawRoundedRectangle(rectFocus, m_radius);
+			dc.DrawRoundedRectangle(rectFocus, std::max(0, r-1));
 		}
 
 		if (this->m_markupText) {
@@ -129,7 +130,7 @@ namespace gtl::wx {
 			dcMem.SetBrush(brushBackground);
 			dcMem.DrawRectangle(0, 0, bmp.GetWidth(), bmp.GetHeight());
 			dcMem.SetBrush(brushDisabled);
-			dcMem.DrawRoundedRectangle(0, 0, bmp.GetWidth(), bmp.GetHeight(), m_radius);
+			dcMem.DrawRoundedRectangle(0, 0, bmp.GetWidth(), bmp.GetHeight(), r);
 			dc.Blit(rect.GetTopLeft(), rect.GetSize(), &dcMem, wxPoint(0, 0), wxOR);
 		}
 

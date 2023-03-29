@@ -15,14 +15,25 @@ namespace gtl::wx {
     
 		virtual ~wxRoundButton() = default;
 
-		int m_radius{7};
-
 	protected:
+		struct {
+			int radius{7};
+			wxColor cr{};
+			int width{1};
+		} m_border;
 		State m_eState{ State::State_Normal };
 
 	public:
-		void SetRadius(int radius) { m_radius = radius; }
-		int GetRadius() const { return m_radius; }
+		void SetBorder(wxColor cr, int radius = -1, int width = -1) {
+			if (cr.IsOk())
+				m_border.cr = cr;
+			if (radius >= 0)
+				m_border.radius = radius;
+			if (width >= 0)
+				m_border.width = width;
+			Refresh(false);
+		}
+		std::tuple<wxColor, int, int> GetBorder() const { return {m_border.cr, m_border.radius, m_border.width}; }
 
 		virtual bool Enable(bool enable = true) override;
 
