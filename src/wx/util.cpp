@@ -13,6 +13,9 @@ namespace gtl::wx {
 			return false;
 
 		gtl::xRect2i rc {pWindow->GetRect()};
+		reg.SetValue(strWindowName+"_raw", gtl::ToString<wchar_t>(rc));
+		rc.pt0() = pWindow->ToDIP(wxPoint(rc.pt0()));
+		rc.pt1() = pWindow->ToDIP(wxPoint(rc.pt1()));
 		reg.SetValue(strWindowName, gtl::ToString<wchar_t>(rc));
 		return true;
 	}
