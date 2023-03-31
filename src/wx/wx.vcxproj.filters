@@ -41,10 +41,10 @@
     <ClInclude Include="..\..\include\gtl\wx\wx.h">
       <Filter>[ framework ]</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\wx\util.h">
-      <Filter>wx\MatView</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\wx\wxRoundButton.h">
+      <Filter>wx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\wx\util.h">
       <Filter>wx</Filter>
     </ClInclude>
   </ItemGroup>
@@ -67,10 +67,10 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>[ framework ]</Filter>
     </ClCompile>
-    <ClCompile Include="util.cpp">
-      <Filter>wx\MatView</Filter>
-    </ClCompile>
     <ClCompile Include="wxRoundButton.cpp">
+      <Filter>wx</Filter>
+    </ClCompile>
+    <ClCompile Include="util.cpp">
       <Filter>wx</Filter>
     </ClCompile>
   </ItemGroup>

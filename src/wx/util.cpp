@@ -28,6 +28,9 @@ namespace gtl::wx {
 		if (reg.HasValue(strWindowName))
 			reg.QueryValue(strWindowName, strWindowPosition);
 		auto rc = gtl::FromString<gtl::xRect2i, wchar_t>({strWindowPosition, strWindowPosition.size()});
+		// High DPI
+		rc.pt0() = pWindow->FromDIP(wxPoint(rc.pt0()));
+		rc.pt1() = pWindow->FromDIP(wxPoint(rc.pt1()));
 		std::vector<gtl::xPoint2i> pts{ {rc.left, rc.top}, {rc.left, rc.bottom}, {rc.right, rc.top}, {rc.right, rc.bottom} };
 
 		// get display bounds
