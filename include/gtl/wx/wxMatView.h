@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version 3.10.1-0-g8feb16b3)
+// C++ code generated with wxFormBuilder (version 3.10.1-282-g1fa54006)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -130,7 +130,7 @@ namespace gtl::wx::ui
 
 		public:
 
-			IDlgMatViewOption( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("options..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 312,490 ), long style = wxDEFAULT_DIALOG_STYLE );
+			IDlgMatViewOption( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("options..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 312,490 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 
 			~IDlgMatViewOption();
 
