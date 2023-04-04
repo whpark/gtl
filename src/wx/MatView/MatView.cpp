@@ -609,8 +609,10 @@ bool xMatView::UpdateScrollBars() {
 		int p = m_option.bExtendedPanning
 			? rectScrollRange.Height() - (m_ctScreenFromImage.m_offset.y + std::max(0, rectImageScreen.Height() - m_option.nScrollMargin) + rectClient.Height())
 			: -m_ctScreenFromImage.m_offset.y;
-		p = std::clamp(p, 0, rectScrollRange.Height());
-		m_view->SetScrollbar(wxVERTICAL, p, rectClient.Height(), rectScrollRange.Height(), true);
+		if (rectScrollRange.Height() > 0) {
+			p = std::clamp(p, 0, rectScrollRange.Height());
+			m_view->SetScrollbar(wxVERTICAL, p, rectClient.Height(), rectScrollRange.Height(), true);
+		}
 	}
 
 	return true;
