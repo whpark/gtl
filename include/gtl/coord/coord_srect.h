@@ -263,8 +263,8 @@ namespace gtl {
 		void SetRect(coord_point_t const& pt, coord_size_t const& size)			{ tl() = pt; coord_size() = size; }
 		void SetRect(coord_point_t const& pt0, coord_point_t const& pt1)		{ tl() = pt0; coord_size() = pt1-pt0; }
 		void SetRectEmpty()														{ SetRect(); }
-		void SetRectEmptyForMinMax()											{ tl().SetAll(DBL_MAX); coord_size().SetAll(-DBL_MAX); }
-		void SetRectEmptyForMinMax2d()											{ this->x = this->y = DBL_MAX; this->width = this->height = -DBL_MAX; }
+		void SetRectEmptyForMinMax()											{ tl().SetAll(std::numeric_limits<T>::max()); coord_size().SetAll(std::numeric_limits<double>::lowest()); }
+		void SetRectEmptyForMinMax2d()											{ this->x = this->y = std::numeric_limits<T>::max(); this->width = this->height = std::numeric_limits<double>::lowest(); }
 
 		// infflate the rectangles's width, height and depth
 		this_t& InflateRect(T x, T y)						requires (dim == 2) { this->x -= x; this->y -= y; this->width += 2*x; this->height += 2*y; return *this; }

@@ -275,10 +275,10 @@ namespace gtl {
 		void SetRect(coord_point_t const& pt, coord_size_t const& size)			{ pt0() = pt; pt1() = pt+size; }
 		void SetRect(coord_point_t const& pt0, coord_point_t const& pt1)		{ pt0() = pt0; pt1() = pt1; }
 		void SetRectEmpty()														{ SetRect(); }
-		void SetRectEmptyForMinMax()											{ pt0().SetAll(DBL_MAX); pt1().SetAll(-DBL_MAX); }
-		void SetRectEmptyForMinMax2d()											{ this->left = this->top = DBL_MAX; this->right = this->bottom = -DBL_MAX; }
+		void SetRectEmptyForMinMax()											{ pt0().SetAll(std::numeric_limits<T>::max()); pt1().SetAll(std::numeric_limits<T>::lowest()); }
+		void SetRectEmptyForMinMax2d()											{ this->left = this->top = std::numeric_limits<T>::max(); this->right = this->bottom = std::numeric_limits<T>::lowest(); }
 
-		// infflate the rectangles's width, height and depth
+		// inflate the rectangle's width, height and depth
 		this_t& InflateRect(T x, T y)						requires (dim == 2) { this->left -= x; this->top -= y; this->right += x; this->bottom += y; return *this; }
 		this_t& InflateRect(T x, T y, T z)					requires (dim == 3) { this->left -= x; this->top -= y; this->front -= z; this->right += x; this->bottom += y; this->back += z; return *this; }
 		this_t& InflateRect(coord_size_t const& size)							{ pt0() -= size; pt1() += size; return *this; }

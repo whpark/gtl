@@ -121,7 +121,8 @@ TEST(gtl_coord, point) {
 	pt.SetAsNAN();
 	EXPECT_FALSE(pt.IsAllValid());
 
-	xPoint3d ptMin(DBL_MAX, DBL_MAX, DBL_MAX), ptMax(-DBL_MAX, -DBL_MAX, -DBL_MAX);
+	xPoint3d ptMin(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()),
+		ptMax(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest());
 	std::vector<xPoint3d> pts{ {0, 0, 0}, {-10, 3, 2}, { 10, 4, 3}, {2, -10, 2}, {3, 9, 1}, { 0, 10, 1}, { 0, 0, 10}, {3, 9, -10}, };
 	for (auto const& pt : pts) {
 		pt.CheckMinMax(ptMin, ptMax);
@@ -261,7 +262,8 @@ TEST(gtl_coord, size) {
 	pt.SetAsNAN();
 	EXPECT_FALSE(pt.IsAllValid());
 
-	xSize3d ptMin(DBL_MAX, DBL_MAX, DBL_MAX), ptMax(-DBL_MAX, -DBL_MAX, -DBL_MAX);
+	xSize3d ptMin(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()),
+		ptMax(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest());
 	std::vector<xSize3d> pts{ {0, 0, 0}, {-10, 3, 2}, { 10, 4, 3}, {2, -10, 2}, {3, 9, 1}, { 0, 10, 1}, { 0, 0, 10}, {3, 9, -10}, };
 	for (auto const& pt : pts) {
 		pt.CheckMinMax(ptMin, ptMax);

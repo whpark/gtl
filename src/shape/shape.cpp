@@ -409,7 +409,7 @@ namespace gtl::shape {
 				continue;
 			auto pt = r->second;
 
-			auto minDist = DBL_MAX;
+			auto minDist = std::numeric_limits<double>::max();
 			size_t jMin = (size_t)(-1);
 			bool bReverse{};
 			auto i1{i+1};
