@@ -116,6 +116,7 @@
     <ClCompile Include="test_json_proxy.cpp" />
     <ClCompile Include="test_lock.cpp" />
     <ClCompile Include="test_misc.cpp" />
+    <ClCompile Include="test_mutex.cpp" />
     <ClCompile Include="test_reflection.cpp" />
     <ClCompile Include="test_shape.cpp" />
     <ClCompile Include="test_string.cpp" />

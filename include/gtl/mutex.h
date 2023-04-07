@@ -247,5 +247,48 @@ namespace gtl {
 	};
 #endif
 
+	// Mutex Locker
+	// inspired from :
+	//			https://www.reddit.com/r/cpp/comments/12def1f/mutexprotected_a_c_pattern_for_easier_concurrency/
+	//
+	template < typename T, typename TMutex = std::mutex >
+	class TMutexLocker {
+	protected:
+		T m_value;
+		mutable TMutex m_mutex;
+
+	public:
+		using value_type = T;
+		using mutex_type = TMutex;
+
+		template < typename ... TArgs >
+		TMutexLocker(TArgs&& ... args) : m_value(std::forward<TArgs>(args) ...) {}
+
+		struct Locker {
+			TMutexLocker& m_locker;
+			std::unique_lock<TMutex> m_lock;
+			Locker(TMutexLocker& locker) : m_locker(locker), m_lock(locker.m_mutex) {}
+			Locker(const Locker&) = delete;
+			Locker(Locker&&) = delete;
+			Locker& operator=(const Locker&) = delete;
+			Locker& operator=(Locker&&) = delete;
+			T& operator*() = delete;
+			const T& operator*() const = delete;
+			T* operator->() noexcept { return &m_locker.m_value; }
+			const T* operator->() const noexcept { return &m_locker.m_value; }
+		};
+
+		Locker Lock() noexcept {
+			return Locker(*this);
+		}
+
+		T Release() noexcept {
+			std::unique_lock lock(m_mutex);
+			return std::move(m_value);
+		}
+
+	};
+
+
 #pragma pack(pop)
 }	// namespace gtl
