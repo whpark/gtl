@@ -269,7 +269,7 @@ namespace gtl {
 			std::unique_lock<TMutex> m_lock;
 			Locker(TMutexLocker& locker) : m_locker(locker), m_lock(locker.m_mutex) {}
 			Locker(const Locker&) = delete;
-			Locker(Locker&&) = delete;
+			Locker(Locker&&) = default;
 			Locker& operator=(const Locker&) = delete;
 			Locker& operator=(Locker&&) = delete;
 			T& operator*() = delete;
