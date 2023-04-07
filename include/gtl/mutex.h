@@ -54,6 +54,34 @@ namespace gtl {
 		void unlock_shared() const noexcept {}
 	};
 
+	//------------------------------------------------------------------------
+	/// @brief mutex - spin lock
+	class spin_mutex {
+	protected:
+		std::atomic<bool> m_flag;
+	public:
+		//null_mutex() noexcept {}
+		//~null_mutex() noexcept {}
+
+		spin_mutex(bool bOwn = false) noexcept : m_flag(bOwn) {}
+		spin_mutex(spin_mutex const&) = delete;
+		spin_mutex& operator = (spin_mutex const&) = delete;
+		spin_mutex(spin_mutex&&) = default;
+		spin_mutex& operator = (spin_mutex&&) = default;
+
+		void lock() { // lock the mutex
+			while (!m_flag.exchange(true)) {
+				std::this_thread::yield();
+			}
+		}
+		[[nodiscard]] bool try_lock() { // try to lock the mutex
+			return !m_flag.exchange(true);
+		}
+		void unlock() { // unlock the mutex
+			m_flag = false;
+		}
+	};
+
 #if 1
 	//------------------------------------------------------------------------
 	/// @brief recursive shared mutex
@@ -65,6 +93,9 @@ namespace gtl {
 		std::shared_mutex m_mutex;
 		std::atomic<std::thread::id> m_owner;
 		size_t m_counter{};
+
+		std::mutex m_mtxShared;
+		std::map<std::thread::id, size_t> m_mapShared;
 
 	public:
 		//using base_t::base_t;
@@ -85,9 +116,22 @@ namespace gtl {
 		}
 		void lock_shared() noexcept {
 			if (auto idCurrent = std::this_thread::get_id(); idCurrent == m_owner) {
+				// if lock/unlock_shared or unlock/lock_shared crosses, it will fail.
+				lock();
 			}
 			else {
-				m_mutex.lock_shared();
+				size_t n{};
+				{
+					std::lock_guard lock(m_mtxShared);
+					n = m_mapShared[idCurrent];
+				}
+				if (n == 0) {
+					m_mutex.lock_shared();
+					{
+						std::lock_guard lock(m_mtxShared);
+						m_mapShared[idCurrent]++;
+					}
+				}
 			}
 		}
 		bool try_lock() noexcept {
@@ -104,9 +148,16 @@ namespace gtl {
 		bool try_lock_shared() noexcept {
 			if (auto idCurrent = std::this_thread::get_id(); idCurrent == m_owner) {
 				m_counter++;
-				return true;
+			} else {
+				std::lock_guard lock(m_mtxShared);
+				auto n = m_mapShared[idCurrent];
+				if (n == 0) {
+					if (!m_mutex.try_lock_shared())
+						return false;
+				}
+				m_mapShared[idCurrent]++;
 			}
-			return m_mutex.try_lock_shared();
+			return true;
 		}
 		void unlock() noexcept {
 			if (--m_counter == 0) {
@@ -116,8 +167,15 @@ namespace gtl {
 		}
 		void unlock_shared() noexcept {
 			if (auto idCurrent = std::this_thread::get_id(); idCurrent == m_owner) {
+				unlock();
 			} else {
-				m_mutex.unlock_shared();
+				size_t n{};
+				{
+					std::lock_guard lock(m_mtxShared);
+					n = --m_mapShared[idCurrent];
+				}
+				if (n == 0)
+					m_mutex.unlock_shared();
 			}
 		}
 
