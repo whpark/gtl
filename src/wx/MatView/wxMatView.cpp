@@ -143,36 +143,41 @@ IDlgMatViewOption::IDlgMatViewOption( wxWindow* parent, wxWindowID id, const wxS
 	m_chkPyrImageDown = new wxCheckBox( this, wxID_ANY, _("Build Image Pyramid (for down sampling)"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizerTOP->Add( m_chkPyrImageDown, 0, wxALL, 5 );
 
-	wxBoxSizer* bSizer3;
-	bSizer3 = new wxBoxSizer( wxHORIZONTAL );
+	wxFlexGridSizer* fgSizer1;
+	fgSizer1 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer1->SetFlexibleDirection( wxBOTH );
+	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
 	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Mouse Speed :"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1->Wrap( -1 );
-	bSizer3->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer1->Add( m_staticText1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_spinMouseSpeed = new wxSpinCtrlDouble( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, 0.01, 10, 1.000000, 0.25 );
 	m_spinMouseSpeed->SetDigits( 3 );
 	m_spinMouseSpeed->SetMinSize( wxSize( 80,-1 ) );
 
-	bSizer3->Add( m_spinMouseSpeed, 0, wxALL, 5 );
-
-
-	bSizerTOP->Add( bSizer3, 0, wxEXPAND, 5 );
-
-	wxBoxSizer* bSizer4;
-	bSizer4 = new wxBoxSizer( wxHORIZONTAL );
+	fgSizer1->Add( m_spinMouseSpeed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_staticText2 = new wxStaticText( this, wxID_ANY, _("Scroll Margin :"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText2->Wrap( -1 );
-	bSizer4->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer1->Add( m_staticText2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_spinScrollMargin = new wxSpinCtrl( this, wxID_ANY, wxT("5"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT|wxSP_ARROW_KEYS, 0, 1000, 0 );
 	m_spinScrollMargin->SetMinSize( wxSize( 80,-1 ) );
 
-	bSizer4->Add( m_spinScrollMargin, 0, wxALL, 5 );
+	fgSizer1->Add( m_spinScrollMargin, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+	m_staticText3 = new wxStaticText( this, wxID_ANY, _("Scroll Time (in ms) :"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText3->Wrap( -1 );
+	fgSizer1->Add( m_staticText3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+
+	m_spinScrollTime = new wxSpinCtrl( this, wxID_ANY, wxT("250"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT|wxSP_ARROW_KEYS, 0, 100000, 250 );
+	m_spinScrollTime->SetMinSize( wxSize( 80,-1 ) );
+
+	fgSizer1->Add( m_spinScrollTime, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-	bSizerTOP->Add( bSizer4, 0, wxEXPAND, 5 );
+	bSizerTOP->Add( fgSizer1, 1, wxEXPAND, 5 );
 
 	wxString m_radioZoomInMethodChoices[] = { _("Neareset"), _("Linear"), _("Bicubic"), _("Lanczos4") };
 	int m_radioZoomInMethodNChoices = sizeof( m_radioZoomInMethodChoices ) / sizeof( wxString );
@@ -189,9 +194,9 @@ IDlgMatViewOption::IDlgMatViewOption( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer5;
 	bSizer5 = new wxBoxSizer( wxHORIZONTAL );
 
-	m_staticText3 = new wxStaticText( this, wxID_ANY, _("Background Color :"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText3->Wrap( -1 );
-	bSizer5->Add( m_staticText3, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	m_staticText4 = new wxStaticText( this, wxID_ANY, _("Background Color :"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText4->Wrap( -1 );
+	bSizer5->Add( m_staticText4, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_crBackground = new wxColourPickerCtrl( this, wxID_ANY, *wxBLACK, wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
 	bSizer5->Add( m_crBackground, 0, wxALL, 5 );

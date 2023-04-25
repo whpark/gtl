@@ -113,9 +113,11 @@ namespace gtl::wx::ui
 			wxSpinCtrlDouble* m_spinMouseSpeed;
 			wxStaticText* m_staticText2;
 			wxSpinCtrl* m_spinScrollMargin;
+			wxStaticText* m_staticText3;
+			wxSpinCtrl* m_spinScrollTime;
 			wxRadioBox* m_radioZoomInMethod;
 			wxRadioBox* m_radioZoomOutMethod;
-			wxStaticText* m_staticText3;
+			wxStaticText* m_staticText4;
 			wxColourPickerCtrl* m_crBackground;
 			wxButton* m_btnRestoreColor;
 			wxButton* m_btnOK;
