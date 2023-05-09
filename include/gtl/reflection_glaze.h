@@ -87,8 +87,8 @@ namespace gtl {
 			//for (auto i = str2bin(str.begin()), e = str2bin(str.end()); max_size-- > 0 && i != e; ++i) {
 			//	*iterOutput++ = *i;
 			//}
-			auto e = std::min(str.begin()+std::min(str.size(), max_size*8/6), str.end());
-			std::copy(str2bin(str.begin()), str2bin(e), iterOutput);
+			auto end = str.begin() + std::min(str.size(), max_size*8/6);
+			std::copy(str2bin(str.begin()), str2bin(end), iterOutput);
 		}
 
 		struct glaze {
