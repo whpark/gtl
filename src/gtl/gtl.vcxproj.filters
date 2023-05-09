@@ -170,6 +170,9 @@
     <ClInclude Include="..\..\include\gtl\stop_watch.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\reflection_glaze.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">

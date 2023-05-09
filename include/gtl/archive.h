@@ -1050,6 +1050,10 @@ namespace gtl {
 	using xOFArchive = TArchive<std::ofstream>;
 	using xArchive = TArchive<std::fstream, true, true>;
 
+	/// @brief file to std-container
+	/// @tparam TContainer : such as std::vector<char> or std::string
+	/// @param path 
+	/// @return 
 	template < gtlc::contiguous_container TContainer = std::vector<char> >
 		requires (std::is_trivial_v<typename TContainer::value_type>)
 	std::optional<TContainer> FileToContainer(std::filesystem::path const& path) {
@@ -1084,6 +1088,17 @@ namespace gtl {
 		return FileToContainer<TContainer>(path);
 	}
 
+	/// @brief 
+	/// @tparam TContainer 
+	/// @param  
+	/// @param path 
+	/// @return 
+	template < typename T > requires (std::is_trivial_v<T>)
+	bool ContainerToFile(std::span<T> buf, std::filesystem::path const& path) {
+		std::ofstream f(path, std::ios_base::binary);
+		f.write(buf.data(), buf.size() * sizeof(T));
+		return (bool)f;
+	}
 
 #pragma pack(pop)
 }	// namespace gtl;

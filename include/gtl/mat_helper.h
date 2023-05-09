@@ -125,7 +125,7 @@ namespace gtl {
 
 #if 0	// using boost
 	template < typename TData > requires (sizeof(TData) == 1)
-		std::string EncodeBase64(std::span<TData> data) {
+	std::string EncodeBase64(std::span<TData> data) {
 		using namespace boost::archive::iterators;
 		using It = base64_from_binary<transform_width<std::span<TData>::iterator, 6, 8>>;
 		auto tmp = std::string(It(std::begin(data)), It(std::end(data)));
