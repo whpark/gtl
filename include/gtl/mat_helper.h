@@ -346,7 +346,7 @@ namespace gtl {
 
 	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {
 		cv::Mat img;
-		if (auto buf = FileToBuffer<uint8_t>(path); buf) {
+		if (auto buf = FileToContainer<std::vector<uint8_t>>(path); buf) {
 			try {
 				img = cv::imdecode(*buf, -1);
 			}

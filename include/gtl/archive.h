@@ -1050,22 +1050,38 @@ namespace gtl {
 	using xOFArchive = TArchive<std::ofstream>;
 	using xArchive = TArchive<std::fstream, true, true>;
 
-
-	template < typename T > requires (std::is_trivial_v<T>)
-	std::optional<std::vector<T>> FileToBuffer(std::filesystem::path path) {
+	template < gtlc::contiguous_container TContainer = std::vector<char> >
+		requires (std::is_trivial_v<typename TContainer::value_type>)
+	std::optional<TContainer> FileToContainer(std::filesystem::path const& path) {
+		using T = typename TContainer::value_type;
+		std::optional<TContainer> r;
 		std::ifstream f(path, std::ios_base::binary);
 		if (!f.seekg(0, std::ios_base::end))
-			return {};
+			return r;
 		auto len = f.tellg();
 		if (len < 0)
-			return {};
-		if (len == 0)
-			return std::vector<T>{};
+			return r;
+		if (len == 0) {
+			r.emplace();
+			return r;
+		}
 		auto nItem = len / sizeof(T);
-		std::vector<T> buf((size_t)nItem, T{});
+		r.emplace((size_t)nItem, T{});
 		f.seekg(0, std::ios_base::beg);
-		f.read((char*)buf.data(), buf.size()*sizeof(T));
-		return std::move(buf);
+		f.read((char*)r->data(), r->size()*sizeof(T));
+		return r;
+	}
+
+	template < typename T = char > requires (std::is_trivial_v<T>)
+	constexpr std::optional<std::vector<T>> FileToVector(std::filesystem::path const& path) {
+		return FileToContainer<std::vector<T>>(path);
+	}
+
+	// better use FileToContainer
+	template < typename T = char, gtlc::contiguous_type_container<T> TContainer = std::vector<T> >
+		requires (std::is_trivial_v<T>)
+	[[deprecated("better use FileToContainer()")]] std::optional<TContainer> FileToBuffer(std::filesystem::path const& path) {
+		return FileToContainer<TContainer>(path);
 	}
 
 
