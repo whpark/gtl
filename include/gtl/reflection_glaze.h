@@ -2,6 +2,7 @@
 
 #include "gtl/coord.h"
 #include "gtl/base64.h"
+#include "gtl/unit.h"
 
 #include "opencv2/opencv.hpp"
 
@@ -108,10 +109,29 @@ namespace gtl {
 		static constexpr auto value = [](auto&& self) -> decltype(auto) { return self.arr(); };
 	};
 
+	// gtl::xCoordTrans2d, xCorodTrans3d
 	template < int dim >
 	struct glz::meta<gtl::TCoordTransDim<dim>> {
 		using T = gtl::TCoordTransDim<dim>;
 		static constexpr auto value = object("scale", &T::m_scale, "mat", &T::m_mat, "origin", &T::m_origin, "offset", &T::m_offset);
+	};
+
+	// gtl::tlength_mm_t
+	template < typename T >
+	struct glz::meta<gtl::tlength_mm_t<T>> {
+		static constexpr auto value = &gtl::tlength_mm_t<T>::dValue;
+	};
+
+	// gtl::tangle_deg_t
+	template < std::floating_point tvalue_t >
+	struct glz::meta<gtl::tangle_deg_t<tvalue_t>> {
+		static constexpr auto value = &gtl::tangle_deg_t<tvalue_t>::dValue;
+	};
+
+	// gtl::tangle_rad_t
+	template < std::floating_point tvalue_t >
+	struct glz::meta<gtl::tangle_rad_t<tvalue_t>> {
+		static constexpr auto value = &gtl::tangle_rad_t<tvalue_t>::dValue;
 	};
 
 #pragma pack(pop)

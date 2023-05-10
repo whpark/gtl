@@ -30,6 +30,11 @@ namespace gtl::test::reflection_glaze {
 		std::wstring strw = L"나";
 		std::u16string stru16 = u"다";
 		std::u32string stru32 = U"라";
+		gtl::mm_t len{10_um};
+		gtl::deg_t td1{90_deg};
+		gtl::deg_t td2{3.14159265358979323846264_rad/2.};
+		gtl::rad_t tr1{90_deg};
+		gtl::rad_t tr2{3.14159265358979323846264_rad/2.};
 		int dd{};
 		double dValue{};
 		int iValue{};
@@ -40,7 +45,7 @@ namespace gtl::test::reflection_glaze {
 
 		auto operator <=> (this_t const& ) const = default;
 
-		GLZ_LOCAL_META(this_t, dd, str, dValue, iValue, on_off, values, m, stru8, strw, stru16, stru32);
+		GLZ_LOCAL_META(this_t, dd, str, dValue, iValue, on_off, values, m, stru8, strw, stru16, stru32, len, td1, td2, tr1, tr2);
 		//struct glaze {
 		//	static constexpr auto value = glz::object(
 		//		"str", &this_t::str,
