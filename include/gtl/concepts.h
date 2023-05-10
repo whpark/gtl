@@ -154,7 +154,7 @@ namespace gtl::concepts {
 	/// @brief type for string buffer with type constraints
 	template < typename tcontainer, typename tchar >
 	concept contiguous_type_string_container = 
-		(std::is_same_v<std::remove_cvref_t<typename tcontainer::value_type>, tchar> or std::is_same_v<std::remove_cvref_t<decltype(tcontainer()[0])>, tchar>)
+		(std::is_same_v<std::remove_cvref_t<typename tcontainer::value_type>, tchar> or std::is_same_v<std::remove_cvref_t<decltype(tcontainer{}[0])>, tchar>)
 		and
 		contiguous_string_container<tcontainer>;
 

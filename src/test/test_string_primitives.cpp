@@ -151,6 +151,24 @@ TEST(gtl_string, tszlen) {
 
 }
 
+//namespace test {
+//	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
+//	constexpr GTL__DEPR_SEC errno_t tsz(tstring_buf& szDest, tchar const* const& pszSrc) {
+//	#pragma warning(suppress:4996)
+//		return tszcpy(std::data(szDest), std::size(szDest), pszSrc);
+//	}
+//
+//	void Test() {
+//		auto const* psz1 = "ABCDEF";
+//		using arrbuf = char[32];
+//		char buf3[32]{};
+//
+//		static_assert(gtlc::contiguous_type_string_container<arrbuf, char>);
+//
+//		tsz(buf3, psz1);
+//	}
+//}
+
 
 TEST(gtl_string, tszcpy) {
 
@@ -183,7 +201,7 @@ TEST(gtl_string, tszcpy) {
 
 		char buf3[32]{};
 	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
-		EXPECT_TRUE(     0 == tszcpy(buf3, psz1));
+		EXPECT_TRUE(     0 == tszcpy<char>(buf3, psz1));
 		EXPECT_TRUE(buf3 == "ABCDEF"sv);
 
 	SUPPRESS_DEPRECATED_WARNING													// will generate compiler warning ("NOT Secure")
