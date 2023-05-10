@@ -9,7 +9,7 @@
 namespace gtl {
 
 	bool IsMatEqual(cv::Mat const& a, cv::Mat const& b) {
-		if (a.cols != b.cols or a.rows != b.rows or a.size != b.size or a.type() != b.type())
+		if (a.cols != b.cols or a.rows != b.rows or a.size() != b.size() or a.type() != b.type())
 			return false;
 		if (a.empty())
 			return true;
