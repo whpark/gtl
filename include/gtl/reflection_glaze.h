@@ -1,14 +1,12 @@
 ﻿#pragma once
 
+#include "gtl/coord.h"
+#include "gtl/base64.h"
+
 #include "opencv2/opencv.hpp"
 
 #include "glaze/glaze.hpp"
-//#include "glaze/core/macros.hpp"
-
-// encode / decode base64
-#include "boost/archive/iterators/binary_from_base64.hpp"
-#include "boost/archive/iterators/base64_from_binary.hpp"
-#include "boost/archive/iterators/transform_width.hpp"
+#include "glaze/core/macros.hpp"
 
 
 // macro for derived classes
@@ -32,9 +30,10 @@
    }
 
 
-// for cv::Mat
 namespace gtl {
 #pragma pack(push, 8)
+
+	// for cv::Mat
 
 	struct cvMat {
 		int rows{};
@@ -72,25 +71,6 @@ namespace gtl {
 			return m;
 		}
 
-		template < typename T = uint8_t > requires (sizeof(T) == 1)
-		static std::string EncodeBase64(std::span<T> data) {
-			using namespace boost::archive::iterators;
-			using It = base64_from_binary<transform_width< typename std::span<T>::iterator, 6, 8>>;
-			auto tmp = std::string(It(std::begin(data)), It(std::end(data)));
-			return tmp.append((3 - data.size() % 3) % 3, '=');
-		}
-
-		template < typename TString, typename TOutpytIterator >
-		static void DecodeBase64(TString const& str, TOutpytIterator iterOutput, size_t max_size) {
-			using namespace boost::archive::iterators;
-			using str2bin = transform_width<binary_from_base64<typename TString::const_iterator>, 8, 6>;
-			//for (auto i = str2bin(str.begin()), e = str2bin(str.end()); max_size-- > 0 && i != e; ++i) {
-			//	*iterOutput++ = *i;
-			//}
-			auto end = str.begin() + std::min(str.size(), max_size*8/6);
-			std::copy(str2bin(str.begin()), str2bin(end), iterOutput);
-		}
-
 		struct glaze {
 			static constexpr auto value = glz::object(
 				"rows", &cvMat::rows,
@@ -101,8 +81,41 @@ namespace gtl {
 		};
 	};
 
+	// cv::Matx<...>
+	template <typename T, int m, int n>
+	struct glz::meta<cv::Matx<T, m, n>> {
+		static constexpr auto value{ &cv::Matx<T, m, n>::val };
+	};
+
+	// gtl::coord
+	template < typename T, int dim >
+	struct glz::meta<gtl::TSizeT<T, dim>> {
+		static constexpr auto value = [](auto&& self) -> decltype(auto) { return self.arr(); };
+	};
+
+	template < typename T, int dim >
+	struct glz::meta<gtl::TPointT<T, dim>> {
+		static constexpr auto value = [](auto&& self) -> decltype(auto) { return self.arr(); };
+	};
+
+	template < typename T, int dim >
+	struct glz::meta<gtl::TRectT<T, dim>> {
+		static constexpr auto value = [](auto&& self) -> decltype(auto) { return self.arr(); };
+	};
+
+	template < typename T, int dim >
+	struct glz::meta<gtl::TSRectT<T, dim>> {
+		static constexpr auto value = [](auto&& self) -> decltype(auto) { return self.arr(); };
+	};
+
+	template < int dim >
+	struct glz::meta<gtl::TCoordTransDim<dim>> {
+		using T = gtl::TCoordTransDim<dim>;
+		static constexpr auto value = object("scale", &T::m_scale, "mat", &T::m_mat, "origin", &T::m_origin, "offset", &T::m_offset);
+	};
+
 #pragma pack(pop)
-}
+}	// namespace gtl;
 
 
 template <>
@@ -199,4 +212,3 @@ struct glz::detail::from_json<std::u32string> {
 		value = gtl::ToStringU32(str);
 	}
 };
-

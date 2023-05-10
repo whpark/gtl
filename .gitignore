@@ -265,3 +265,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+src/test/shape_test/
+src/test/stream_test/
+src/test/reflection_test/

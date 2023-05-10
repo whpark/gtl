@@ -1093,10 +1093,11 @@ namespace gtl {
 	/// @param  
 	/// @param path 
 	/// @return 
-	template < typename T > requires (std::is_trivial_v<T>)
-	bool ContainerToFile(std::span<T> buf, std::filesystem::path const& path) {
+	template < gtlc::contiguous_container TContainer >
+	bool ContainerToFile(TContainer const& buf, std::filesystem::path const& path) {
+		static_assert(std::is_trivial_v<typename std::decay_t<decltype(buf)>::value_type>, "TContainer::value_type must be trivial");
 		std::ofstream f(path, std::ios_base::binary);
-		f.write(buf.data(), buf.size() * sizeof(T));
+		f.write(buf.data(), buf.size() * sizeof(typename TContainer::value_type));
 		return (bool)f;
 	}
 

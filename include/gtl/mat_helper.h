@@ -124,21 +124,6 @@ namespace gtl {
 
 
 #if 0	// using boost
-	template < typename TData > requires (sizeof(TData) == 1)
-	std::string EncodeBase64(std::span<TData> data) {
-		using namespace boost::archive::iterators;
-		using It = base64_from_binary<transform_width<std::span<TData>::iterator, 6, 8>>;
-		auto tmp = std::string(It(std::begin(data)), It(std::end(data)));
-		return tmp.append((3 - data.size() % 3) % 3, '=');
-	}
-
-	template < typename TString, typename TOutpytIterator >
-	void DecodeBase64(TString const& str, TOutpytIterator iterOutput) {
-		using namespace boost::archive::iterators;
-		using str2bin = transform_width<binary_from_base64<TString::const_iterator>, 8, 6>;
-		std::copy(str2bin(str.begin()), str2bin(str.end()), iterOutput);
-	}
-
 	template < typename archive >
 	void SyncMatBase64(archive& ar, cv::Mat& mat) {
 		if constexpr (archive::is_saving::value) {

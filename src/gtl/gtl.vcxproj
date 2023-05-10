@@ -447,6 +447,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\2dMatArray.h" />
     <ClInclude Include="..\..\include\gtl\archive.h" />
+    <ClInclude Include="..\..\include\gtl\base64.h" />
     <ClInclude Include="..\..\include\gtl\concepts.h" />
     <ClInclude Include="..\..\include\gtl\coord.h" />
     <ClInclude Include="..\..\include\gtl\coord\coord_srect.h" />
