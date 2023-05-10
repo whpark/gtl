@@ -171,6 +171,7 @@ namespace gtl::test::reflection_glaze {
 		}
 
 		auto TestVariousSize = [&](int rows, int cols, stdfs::path const& path) {
+			constexpr glz::opts op{.error_on_unknown_keys = false, .prettify=true};	// might be MSVC 2019 bug.
 			{
 				std::string str;
 				cv::Mat m(rows, cols, CV_8UC1);
