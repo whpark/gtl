@@ -266,6 +266,4 @@ paket-files/
 __pycache__/
 *.pyc
 
-src/test/shape_test/
-src/test/stream_test/
 src/test/reflection_test/
