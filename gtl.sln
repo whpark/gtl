@@ -29,6 +29,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wx", "src\wx\wx.vcxproj", "
 		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0} = {0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qt", "src\qt\qt.vcxproj", "{E963DD40-A001-4874-9DEF-3C7646ABAECC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0} = {0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug.v142|x64 = Debug.v142|x64
@@ -177,6 +182,18 @@ Global
 		{75A8F096-3AF5-4368-A4B3-7C7CC0EB7F44}.Release|x64.Build.0 = Release|x64
 		{75A8F096-3AF5-4368-A4B3-7C7CC0EB7F44}.Release|x86.ActiveCfg = Release|Win32
 		{75A8F096-3AF5-4368-A4B3-7C7CC0EB7F44}.Release|x86.Build.0 = Release|Win32
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Debug.v142|x64.ActiveCfg = Debug.v142|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Debug.v142|x64.Build.0 = Debug.v142|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Debug.v142|x86.ActiveCfg = Debug|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Debug|x64.ActiveCfg = Debug|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Debug|x64.Build.0 = Debug|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Debug|x86.ActiveCfg = Debug|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release.v142|x64.ActiveCfg = Release.v142|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release.v142|x64.Build.0 = Release.v142|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release.v142|x86.ActiveCfg = Release|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release|x64.ActiveCfg = Release|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release|x64.Build.0 = Release|x64
+		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
