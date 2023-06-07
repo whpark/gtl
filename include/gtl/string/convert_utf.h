@@ -51,7 +51,7 @@ namespace gtl {
 			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
 		>
-		inline bool UTFCharConverter_FromUTF8(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
+		constexpr inline bool UTFCharConverter_FromUTF8(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 
 			auto MAS = [&pos] (int i, tchar_to mask, int sh) -> tchar_to {	// MaskAndShift
 				return (((tchar_to)pos[i]) & mask) << sh;
@@ -80,7 +80,7 @@ namespace gtl {
 					}
 				}
 				if constexpr (bAddChar) {
-					r.push_back( MAS(0, uc::bitmask_6bit, 6) | MAS(1, uc::bitmask_6bit, 6) );
+					r.push_back( MAS(0, uc::bitmask_6bit, 6) | MAS(1, uc::bitmask_6bit, 0) );
 				}
 				else {
 					r++;
@@ -165,7 +165,7 @@ namespace gtl {
 			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
 		>
-		inline bool UTFCharConverter_FromUTF16(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
+		constexpr inline bool UTFCharConverter_FromUTF16(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 
 			auto MAS = [&pos] (int i, tchar_to mask, int sh) -> tchar_to {	// MaskAndShift
 				return (((tchar_to)pos[i]) & mask) << sh;
@@ -283,7 +283,7 @@ namespace gtl {
 			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
 		>
-		inline bool UTFCharConverter_FromUTF32(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
+		constexpr inline bool UTFCharConverter_FromUTF32(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 
 			namespace uc = utf_const;
 			auto c = pos[0];
@@ -394,7 +394,7 @@ namespace gtl {
 			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, size_t>
 		>
-		inline bool UTFCharConverter(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
+		constexpr inline bool UTFCharConverter(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 			//if (pos >= end)
 			//	return;
 			namespace uc = utf_const;

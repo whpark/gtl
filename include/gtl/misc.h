@@ -333,7 +333,7 @@ namespace gtl {
 	}
 #else
 	template < std::integral type >
-	[[nodiscard]] inline type GetByteSwap(type const v) {
+	[[nodiscard]] constexpr inline type GetByteSwap(type const v) {
 		if constexpr (sizeof(v) == 1) {
 			return v;
 		}
@@ -344,7 +344,7 @@ namespace gtl {
 		}
 	}
 	template < std::integral type >
-	inline void ByteSwap(type& v) {
+	constexpr inline void ByteSwap(type& v) {
 		if constexpr (sizeof(v) == 1) {
 			return ;
 		}

@@ -184,7 +184,7 @@ namespace gtl {
 	/// @param codepage 
 	/// @return 
 	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bCOUNT_FIRST = true >
-	std::basic_string<tchar_to> ToUTFString(std::basic_string_view<tchar_from> svFrom, S_CODEPAGE_OPTION codepage = {});
+	constexpr std::basic_string<tchar_to> ToUTFString(std::basic_string_view<tchar_from> svFrom, S_CODEPAGE_OPTION codepage = {});
 
 
 	/// @brief Convert Codepage (from -> to) ex, wstring -> u32string, u8string -> string, u16string -> string, string -> u16string...
@@ -468,7 +468,7 @@ namespace gtl {
 
 	namespace internal {
 		template < typename tchar >
-		inline [[nodiscard]] std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, eCODEPAGE eCodepage) {
+		constexpr inline [[nodiscard]] std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, eCODEPAGE eCodepage) {
 			if constexpr (gtlc::is_one_of<tchar, char, char8_t>) {
 				return {};
 			}
@@ -487,7 +487,7 @@ namespace gtl {
 		}
 
 		template < typename tchar, template < typename, typename ... tstr_args> typename tstr, typename ... tstr_args >
-		inline bool CheckAndConvertEndian(tstr<tchar, tstr_args...>& str, eCODEPAGE eCodepage) {
+		constexpr inline bool CheckAndConvertEndian(tstr<tchar, tstr_args...>& str, eCODEPAGE eCodepage) {
 			if constexpr (gtlc::is_one_of<tchar, char, char8_t>) {
 				return false;
 			}
@@ -510,7 +510,7 @@ namespace gtl {
 	/// @param codepage 
 	/// @return 
 	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bCOUNT_FIRST >
-	std::basic_string<tchar_to> ToUTFString(std::basic_string_view<tchar_from> svFrom, S_CODEPAGE_OPTION codepage) {
+	constexpr std::basic_string<tchar_to> ToUTFString(std::basic_string_view<tchar_from> svFrom, S_CODEPAGE_OPTION codepage) {
 		std::basic_string<tchar_to> str;
 		if (svFrom.size() <= 0)
 			return str;

@@ -13,6 +13,24 @@ TEST(gtl_string, codepage) {
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
+#if 0
+	{
+		constexpr std::wstring str1 {gtl::ToUTFString<wchar_t>(u8"¥"sv)};
+		constexpr static std::pair<std::wstring, std::wstring> const pairs0{gtl::ToUTFString<wchar_t>(u8"¥"sv), gtl::ToUTFString<wchar_t>(u"\\"sv)};
+		constinit static std::pair<std::wstring, std::wstring> const pairs1{gtl::ToUTFString<wchar_t>(L"¥"sv), gtl::ToUTFString<wchar_t>(U"\\"sv)};
+		constinit static std::pair<std::wstring, std::wstring> const pairs2{gtl::ToUTFString<wchar_t>(L"¥"sv), gtl::ToUTFString<wchar_t>(u8"\\"sv)};
+		constinit static std::pair<std::u8string, std::u8string> const pairs3{gtl::ToUTFString<char8_t>(u8"¥"sv), gtl::ToUTFString<char8_t>(u"\\"sv)};
+		constinit static std::pair<std::u8string, std::u8string> const pairs4{gtl::ToUTFString<char8_t>(L"¥"sv), gtl::ToUTFString<char8_t>(U"\\"sv)};
+		constinit static std::pair<std::u8string, std::u8string> const pairs5{gtl::ToUTFString<char8_t>(L"¥"sv), gtl::ToUTFString<char8_t>(u8"\\"sv)};
+		constinit static std::pair<std::u16string, std::u16string> const pairs6{gtl::ToUTFString<char16_t>(u8"¥"sv), gtl::ToUTFString<char16_t>(u"\\"sv)};
+		constinit static std::pair<std::u16string, std::u16string> const pairs7{gtl::ToUTFString<char16_t>(L"¥"sv), gtl::ToUTFString<char16_t>(U"\\"sv)};
+		constinit static std::pair<std::u16string, std::u16string> const pairs8{gtl::ToUTFString<char16_t>(L"¥"sv), gtl::ToUTFString<char16_t>(u8"\\"sv)};
+		constinit static std::pair<std::u32string, std::u32string> const pairs9{gtl::ToUTFString<char32_t>(u8"¥"sv), gtl::ToUTFString<char32_t>(u"\\"sv)};
+		constinit static std::pair<std::u32string, std::u32string> const pairsA{gtl::ToUTFString<char32_t>(L"¥"sv), gtl::ToUTFString<char32_t>(U"\\"sv)};
+		constinit static std::pair<std::u32string, std::u32string> const pairsB{gtl::ToUTFString<char32_t>(L"¥"sv), gtl::ToUTFString<char32_t>(u8"\\"sv)};
+	}
+#endif
+
 	gtl::g_eCodepageMBCS = gtl::GetHostCodepage();
 
 	// unicode <=> mbcs
