@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "gtl/wx/util.h"
 #include "wx/Display.h"
 

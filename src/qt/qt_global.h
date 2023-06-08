@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QtCore/qglobal.h>
 #include "gtl/qt/_lib_gtl_qt.h"

@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "wx/graphics.h"
 #include "gtl/wx/wxRoundButton.h"
 #include "wx/generic/private/markuptext.h"

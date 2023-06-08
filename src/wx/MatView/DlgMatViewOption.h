@@ -1,4 +1,4 @@
-#ifndef __IDlgMatViewOption__
+﻿#ifndef __IDlgMatViewOption__
 #define __IDlgMatViewOption__
 
 /**
