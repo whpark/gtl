@@ -483,6 +483,17 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\shape\canvas.h" />
     <ClInclude Include="..\..\include\gtl\shape\color_table.h" />
     <ClInclude Include="..\..\include\gtl\shape\shape.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\arc.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\block.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\circle.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\dot.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\drawing.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\ellipse.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\layer.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\line.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\polyline.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\spline.h" />
+    <ClInclude Include="..\..\include\gtl\shape\shapes\text.h" />
     <ClInclude Include="..\..\include\gtl\shape\shape_others.h" />
     <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h" />
     <ClInclude Include="..\..\include\gtl\shape\_lib_gtl_shape.h" />

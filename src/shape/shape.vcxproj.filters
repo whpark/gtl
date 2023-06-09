@@ -15,6 +15,9 @@
     <Filter Include="tinyspline">
       <UniqueIdentifier>{976f6fca-ba13-4986-a064-066182868640}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shape\shapes">
+      <UniqueIdentifier>{6e6f11ea-9266-48bb-a460-1ac1ab53ef93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -49,6 +52,39 @@
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h">
       <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\arc.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\circle.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\dot.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\drawing.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\ellipse.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\layer.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\line.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\polyline.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\spline.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\text.h">
+      <Filter>shape\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\block.h">
+      <Filter>shape\shapes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
