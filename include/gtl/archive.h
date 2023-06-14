@@ -1081,6 +1081,11 @@ namespace gtl {
 		return FileToContainer<std::vector<T>>(path);
 	}
 
+	template < typename T = char > requires (std::is_trivial_v<T>)
+	constexpr std::optional<std::basic_string<T>> FileToString(std::filesystem::path const& path) {
+		return FileToContainer<std::basic_string<T>>(path);
+	}
+
 	// better use FileToContainer
 	template < typename T = char, gtlc::contiguous_type_container<T> TContainer = std::vector<T> >
 		requires (std::is_trivial_v<T>)
