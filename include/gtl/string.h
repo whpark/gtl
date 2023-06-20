@@ -648,11 +648,20 @@ namespace gtl {
 	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return TFormatTo<char16_t>(out, fmt, std::forward<targs>(args)...); }
 	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return TFormatTo<char32_t>(out, fmt, std::forward<targs>(args)...); }
 
-	inline fmt::basic_runtime<char> RuntimeFormatString(std::string_view s) { return {{s}}; }
-	inline fmt::basic_runtime<wchar_t> RuntimeFormatString(std::wstring_view s) { return {{s}}; }
-	inline fmt::basic_runtime<char8_t> RuntimeFormatString(std::u8string_view s) { return {{s}}; }
-	inline fmt::basic_runtime<char16_t> RuntimeFormatString(std::u16string_view s) { return {{s}}; }
-	inline fmt::basic_runtime<char32_t> RuntimeFormatString(std::u32string_view s) { return {{s}}; }
+	//inline fmt::basic_runtime<char> RuntimeFormatString(std::string_view s) { return {{s}}; }
+	//inline fmt::basic_runtime<wchar_t> RuntimeFormatString(std::wstring_view s) { return {{s}}; }
+	//inline fmt::basic_runtime<char8_t> RuntimeFormatString(std::u8string_view s) { return {{s}}; }
+	//inline fmt::basic_runtime<char16_t> RuntimeFormatString(std::u16string_view s) { return {{s}}; }
+	//inline fmt::basic_runtime<char32_t> RuntimeFormatString(std::u32string_view s) { return {{s}}; }
+	template < gtlc::string_elem tchar >
+	constexpr std::basic_string_view<tchar> GetDefaultFormatString() {
+		if constexpr (std::is_same_v<tchar, char>) return "{}";
+		else if constexpr (std::is_same_v<tchar, wchar_t>) return L"{}";
+		else if constexpr (std::is_same_v<tchar, char16_t>) return u"{}";
+		else if constexpr (std::is_same_v<tchar, char32_t>) return U"{}";
+		else if constexpr (std::is_same_v<tchar, char8_t>) return u8"{}";
+		else static_assert(gtlc::dependent_false_v, "invalid type");
+	}
 
 	template < gtlc::string_elem tchar >
 	constexpr std::basic_string<tchar> ToExoticString(std::string const& sv) {

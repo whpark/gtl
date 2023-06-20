@@ -371,10 +371,16 @@ TEST(gtl_archive, WriteLine) {
 		xOFArchive ar(uR"x(.\stream_test\write_line_u16.txt)x");
 		ar.WriteCodepageBOM(eCODEPAGE::UTF16);
 		for (auto const& vstr : strs1) {
-			std::visit([&ar](auto const& str) { ar.WriteLine(RuntimeFormatString(str)); }, vstr);
+			std::visit([&ar](auto const& str) {
+				using char_t = std::decay_t<decltype(str)>::value_type;
+				ar.WriteLine(GetDefaultFormatString<char_t>(), str);
+				}, vstr);
 		}
 		for (auto const& vstr : strs2) {
-			std::visit([&ar](auto const& str) { ar.WriteLine(RuntimeFormatString(str)); }, vstr);
+			std::visit([&ar](auto const& str) {
+				using char_t = std::decay_t<decltype(str)>::value_type;
+				ar.WriteLine(GetDefaultFormatString<char_t>(), str);
+				}, vstr);
 		}
 	}
 

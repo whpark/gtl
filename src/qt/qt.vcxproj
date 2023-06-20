@@ -49,22 +49,22 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>DevTools_Qt6</QtInstall>
+    <QtInstall>tools_Qt6</QtInstall>
     <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug.v142|x64'" Label="QtSettings">
-    <QtInstall>DevTools_Qt6</QtInstall>
+    <QtInstall>tools_Qt6</QtInstall>
     <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>DevTools_Qt6</QtInstall>
+    <QtInstall>tools_Qt6</QtInstall>
     <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'" Label="QtSettings">
-    <QtInstall>DevTools_Qt6</QtInstall>
+    <QtInstall>tools_Qt6</QtInstall>
     <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
@@ -111,13 +111,13 @@
     <TargetName>$(ProjectName).x$(PlatformArchitecture)$(Configuration[0])</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgConfiguration>$(Configuration)</VcpkgConfiguration>
+    <VcpkgConfiguration>Debug</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug.v142|x64'">
     <VcpkgConfiguration>$(Configuration)</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgConfiguration>$(Configuration)</VcpkgConfiguration>
+    <VcpkgConfiguration>Release</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">
     <VcpkgConfiguration>$(Configuration)</VcpkgConfiguration>
