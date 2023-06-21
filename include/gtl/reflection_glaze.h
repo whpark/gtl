@@ -232,3 +232,24 @@ struct glz::detail::from_json<std::u32string> {
 		value = gtl::ToStringU32(str);
 	}
 };
+
+
+// std::filesystem::path
+template <>
+struct glz::detail::to_json<std::filesystem::path> {
+	template <auto Opts, is_context Ctx, class B, class IX>
+	inline static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
+		to_json<std::wstring>::op<Opts>(value.wstring(), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
+	}
+};
+
+template <>
+struct glz::detail::from_json<std::filesystem::path> {
+	template <auto Opts, is_context Ctx, class B, class IX>
+	GLZ_ALWAYS_INLINE static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
+		std::wstring str;
+		from_json<std::wstring>::op<Opts>(str, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
+		value = str;
+	}
+};
+
