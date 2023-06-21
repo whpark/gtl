@@ -49,7 +49,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>tools_Qt6</QtInstall>
+    <QtInstall>QT_6.5.0</QtInstall>
     <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
