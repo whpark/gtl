@@ -22,10 +22,25 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="MatView">
+      <UniqueIdentifier>{5d1fc05c-2fe6-42a8-a041-c1d50a9830fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="qt.cpp">
       <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatViewDlg.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatViewSettingsDlg.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatViewToolbar.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatViewWidget.cpp">
+      <Filter>MatView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -46,5 +61,33 @@
     <ClCompile Include="pch.cpp">
       <Filter>[ framework ]</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="MatView\MatViewSettingsDlg.h">
+      <Filter>MatView</Filter>
+    </QtMoc>
+    <QtMoc Include="MatView\MatViewToolbar.h">
+      <Filter>MatView</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewWidget.h">
+      <Filter>MatView</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewDlg.h">
+      <Filter>MatView</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="MatView\MatViewDlg.ui">
+      <Filter>MatView</Filter>
+    </QtUic>
+    <QtUic Include="MatView\MatViewSettingsDlg.ui">
+      <Filter>MatView</Filter>
+    </QtUic>
+    <QtUic Include="MatView\MatViewToolbar.ui">
+      <Filter>MatView</Filter>
+    </QtUic>
+    <QtUic Include="MatView\MatViewWidget.ui">
+      <Filter>MatView</Filter>
+    </QtUic>
   </ItemGroup>
 </Project>

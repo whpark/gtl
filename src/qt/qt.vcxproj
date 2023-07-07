@@ -243,9 +243,17 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewWidget.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewDlg.h" />
     <ClInclude Include="..\..\include\gtl\qt\_lib_gtl_qt.h" />
+    <QtMoc Include="MatView\MatViewSettingsDlg.h" />
+    <QtMoc Include="MatView\MatViewToolbar.h" />
     <ClInclude Include="qt_global.h" />
     <ClInclude Include="qt.h" />
+    <ClCompile Include="MatView\MatViewDlg.cpp" />
+    <ClCompile Include="MatView\MatViewSettingsDlg.cpp" />
+    <ClCompile Include="MatView\MatViewToolbar.cpp" />
+    <ClCompile Include="MatView\MatViewWidget.cpp" />
     <ClCompile Include="qt.cpp" />
     <ClInclude Include="pch.h" />
     <ClCompile Include="pch.cpp">
@@ -254,6 +262,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="MatView\MatViewDlg.ui" />
+    <QtUic Include="MatView\MatViewSettingsDlg.ui" />
+    <QtUic Include="MatView\MatViewToolbar.ui" />
+    <QtUic Include="MatView\MatViewWidget.ui" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
