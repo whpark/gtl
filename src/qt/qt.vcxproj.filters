@@ -42,6 +42,9 @@
     <ClCompile Include="MatView\MatViewWidget.cpp">
       <Filter>MatView</Filter>
     </ClCompile>
+    <ClCompile Include="MatView\MatView.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_global.h">
@@ -73,6 +76,9 @@
       <Filter>MatView</Filter>
     </QtMoc>
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewDlg.h">
+      <Filter>MatView</Filter>
+    </QtMoc>
+    <QtMoc Include="MatView\MatView.h">
       <Filter>MatView</Filter>
     </QtMoc>
   </ItemGroup>

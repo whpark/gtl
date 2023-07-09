@@ -3,7 +3,5 @@
 
 namespace gtl::qt {
 
-qt::qt() {
-}
 
 }	// namespace gtl::qt

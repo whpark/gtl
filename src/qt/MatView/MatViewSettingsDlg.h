@@ -3,14 +3,18 @@
 #include <QDialog>
 #include "ui_MatViewSettingsDlg.h"
 
-class xMatViewSettingsDlg : public QDialog
-{
-	Q_OBJECT
+namespace gtl::qt {
 
-public:
-	xMatViewSettingsDlg(QWidget *parent = nullptr);
-	~xMatViewSettingsDlg();
+	class xMatViewSettingsDlg : public QDialog {
+		Q_OBJECT
 
-private:
-	Ui::MatViewSettingsDlgClass ui;
-};
+	public:
+		xMatViewSettingsDlg(QWidget* parent = nullptr);
+		~xMatViewSettingsDlg();
+
+	private:
+		Ui::MatViewSettingsDlgClass ui;
+	};
+
+} // namespace gtl::qt
+

@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
-    <height>740</height>
+    <width>534</width>
+    <height>508</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MatView</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1">
    <property name="spacing">
     <number>1</number>
    </property>
@@ -30,10 +30,10 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="xMatViewToolbar" name="widget" native="true"/>
+    <widget class="gtl::qt::xMatViewToolbar" name="widget" native="true"/>
    </item>
    <item>
-    <widget class="QGraphicsView" name="graphicsView">
+    <widget class="gtl::qt::xMatView" name="graphicsView">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -46,17 +46,31 @@
        <height>100</height>
       </size>
      </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="renderHints">
+      <set>QPainter::TextAntialiasing</set>
+     </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QOpenGLWidget" name="openGLWidget"/>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>xMatViewToolbar</class>
+   <class>gtl::qt::xMatViewToolbar</class>
    <extends>QWidget</extends>
    <header>MatView/MatViewToolbar.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>gtl::qt::xMatView</class>
+   <extends>QGraphicsView</extends>
+   <header>MatView/MatView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

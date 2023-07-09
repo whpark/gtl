@@ -1,15 +1,20 @@
 #pragma once
 
+#include "gtl/qt/_lib_gtl_qt.h"
 #include <QWidget>
 #include "ui_MatViewWidget.h"
 
-class xMatViewWidget : public QWidget {
-	Q_OBJECT
+namespace gtl::qt {
 
-public:
-	xMatViewWidget(QWidget* parent = nullptr);
-	~xMatViewWidget();
+	class GTL__QT_CLASS xMatViewWidget : public QWidget {
+		Q_OBJECT
 
-private:
-	Ui::MatViewWidgetClass ui;
-};
+	public:
+		xMatViewWidget(QWidget* parent = nullptr);
+		~xMatViewWidget();
+
+	private:
+		Ui::MatViewWidgetClass ui;
+	};
+
+}	// namespace gtl::qt

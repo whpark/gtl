@@ -1,15 +1,24 @@
 #pragma once
 
+#include "gtl/qt/_lib_gtl_qt.h"
 #include <QDialog>
 #include "ui_MatViewDlg.h"
 
-class xMatViewDlg : public QDialog {
-	Q_OBJECT
+namespace gtl::qt {
 
-public:
-	xMatViewDlg(QWidget* parent = nullptr);
-	~xMatViewDlg();
+	class GTL__QT_CLASS xMatViewDlg : public QDialog {
+		Q_OBJECT
 
-private:
-	Ui::MatViewDlgClass ui;
-};
+	public:
+		using this_t = xMatViewDlg;
+		using base_t = QDialog;
+
+	public:
+		xMatViewDlg(QWidget* parent = nullptr);
+		~xMatViewDlg();
+
+	private:
+		Ui::MatViewDlgClass ui;
+	};
+
+} // namespace gtl::qt

@@ -1,11 +1,14 @@
 #include "pch.h"
 #include "MatViewSettingsDlg.h"
 
-xMatViewSettingsDlg::xMatViewSettingsDlg(QWidget *parent)
-	: QDialog(parent)
-{
-	ui.setupUi(this);
-}
+namespace gtl::qt {
 
-xMatViewSettingsDlg::~xMatViewSettingsDlg()
-{}
+	xMatViewSettingsDlg::xMatViewSettingsDlg(QWidget* parent)
+		: QDialog(parent) {
+		ui.setupUi(this);
+	}
+
+	xMatViewSettingsDlg::~xMatViewSettingsDlg() {
+	}
+
+} // namespace gtl::qt

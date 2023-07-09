@@ -4,10 +4,6 @@
 
 namespace gtl::qt {
 
-class GTL__QT_CLASS qt {
-public:
-	qt();
-};
 
 
 } // namespace gtl::qt

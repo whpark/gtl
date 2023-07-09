@@ -1,9 +1,13 @@
 #include "pch.h"
 #include "gtl/qt/MatView/MatViewWidget.h"
 
-xMatViewWidget::xMatViewWidget(QWidget* parent) : QWidget(parent) {
-	ui.setupUi(this);
-}
+namespace gtl::qt {
 
-xMatViewWidget::~xMatViewWidget() {
-}
+	xMatViewWidget::xMatViewWidget(QWidget* parent) : QWidget(parent) {
+		ui.setupUi(this);
+	}
+
+	xMatViewWidget::~xMatViewWidget() {
+	}
+
+} // namespace gtl::qt

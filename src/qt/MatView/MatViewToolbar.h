@@ -3,13 +3,17 @@
 #include <QWidget>
 #include "ui_MatViewToolbar.h"
 
-class xMatViewToolbar : public QWidget {
-	Q_OBJECT
+namespace gtl::qt {
 
-public:
-	xMatViewToolbar(QWidget* parent = nullptr);
-	~xMatViewToolbar();
+	class xMatViewToolbar : public QWidget {
+		Q_OBJECT
 
-private:
-	Ui::MatViewToolbarClass ui;
-};
+	public:
+		xMatViewToolbar(QWidget* parent = nullptr);
+		~xMatViewToolbar();
+
+	private:
+		Ui::MatViewToolbarClass ui;
+	};
+
+} // namespace gtl::qt

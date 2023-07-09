@@ -1,10 +1,14 @@
 #include "pch.h"
 #include "MatViewToolbar.h"
 
-xMatViewToolbar::xMatViewToolbar(QWidget* parent)
-	: QWidget(parent) {
-	ui.setupUi(this);
-}
+namespace gtl::qt {
 
-xMatViewToolbar::~xMatViewToolbar() {
-}
+	xMatViewToolbar::xMatViewToolbar(QWidget* parent)
+		: QWidget(parent) {
+		ui.setupUi(this);
+	}
+
+	xMatViewToolbar::~xMatViewToolbar() {
+	}
+
+} // namespace gtl::qt

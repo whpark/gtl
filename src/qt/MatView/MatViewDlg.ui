@@ -33,14 +33,14 @@
     <number>2</number>
    </property>
    <item>
-    <widget class="xMatViewWidget" name="widget" native="true"/>
+    <widget class="gtl::qt::xMatViewWidget" name="widget" native="true"/>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>xMatViewWidget</class>
+   <class>gtl::qt::xMatViewWidget</class>
    <extends>QWidget</extends>
    <header>matviewwidget.h</header>
    <container>1</container>
