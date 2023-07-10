@@ -349,6 +349,29 @@ namespace gtl {
 		return gtl::IsValueOneOf(ext, ".bmp", ".jpg", ".jpeg", ".tiff", ".png", ".gif", ".jfif");
 	}
 
+	inline cv::Scalar GetMatValue(uchar const* ptr, int depth, int channel, int row, int col) {
+		//if ( mat.empty() or (row < 0) or (row >= mat.rows) or (col < 0) or (col >= mat.cols) )
+		//	return;
+
+		cv::Scalar v;
+		auto GetValue = [&]<typename T>(T&&){
+			for (int i = 0; i < channel; ++i)
+				v[i] = ((T*)ptr)[col * channel + i];
+		};
+		switch (depth) {
+		case CV_8U:		GetValue(uint8_t{}); break;
+		case CV_8S:		GetValue(int8_t{}); break;
+		case CV_16U:	GetValue(uint16_t{}); break;
+		case CV_16S:	GetValue(int16_t{}); break;
+		case CV_32S:	GetValue(int32_t{}); break;
+		case CV_32F:	GetValue(float{}); break;
+		case CV_64F:	GetValue(double{}); break;
+			//case CV_16F:	GetValue(uint16_t{}); break;
+		}
+
+		return v;
+	}
+
 
 
 #pragma pack(pop)

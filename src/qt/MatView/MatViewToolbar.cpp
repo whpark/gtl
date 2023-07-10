@@ -3,9 +3,8 @@
 
 namespace gtl::qt {
 
-	xMatViewToolbar::xMatViewToolbar(QWidget* parent)
-		: QWidget(parent) {
-		ui.setupUi(this);
+	xMatViewToolbar::xMatViewToolbar(QWidget* parent) : QWidget(parent) {
+		setupUi(this);
 	}
 
 	xMatViewToolbar::~xMatViewToolbar() {

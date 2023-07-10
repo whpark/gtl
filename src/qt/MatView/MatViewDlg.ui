@@ -33,7 +33,7 @@
     <number>2</number>
    </property>
    <item>
-    <widget class="gtl::qt::xMatViewWidget" name="widget" native="true"/>
+    <widget class="gtl::qt::xMatViewWidget" name="widgetMatView" native="true"/>
    </item>
   </layout>
  </widget>
@@ -42,7 +42,7 @@
   <customwidget>
    <class>gtl::qt::xMatViewWidget</class>
    <extends>QWidget</extends>
-   <header>matviewwidget.h</header>
+   <header>gtl/qt/MatView/MatViewWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

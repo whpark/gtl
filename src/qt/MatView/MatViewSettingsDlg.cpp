@@ -8,6 +8,8 @@ namespace gtl::qt {
 		: QDialog(parent) {
 		ui.setupUi(this);
 		connect(ui.btnBackgroundColor, &QPushButton::clicked, this, &xMatViewSettingsDlg::OnBackgroundColor);
+		connect(ui.btnOK, &QPushButton::clicked, this, &this_t::OnBtnOK);
+		connect(ui.btnCancel, &QPushButton::clicked, this, &this_t::OnBtnCancel);
 	}
 
 	xMatViewSettingsDlg::~xMatViewSettingsDlg() {
@@ -15,22 +17,28 @@ namespace gtl::qt {
 
 	bool xMatViewSettingsDlg::UpdateData(bool bSaveAndValidate) {
 		if (bSaveAndValidate) {
-			m_option.bZoomLock = ui.chkZoomLock->isChecked();
-			m_option.bPanningLock = ui.chkPanningLock->isChecked();
-			m_option.bExtendedPanning = ui.chkExtendedPanning->isChecked();
-			m_option.bKeyboardNavigation = ui.chkKeyboardNavigation->isChecked();
 			m_option.bDrawPixelValue = ui.chkDrawPixelValue->isChecked();
 			m_option.bSmoothInterpolation = ui.chkSmoothInterpolation->isChecked();
+			m_option.dMouseSpeed = ui.spinMouseSpeed->value();
+			auto cr = QColor(ui.edtColorBackground->text());
+			m_option.crBackground = cv::Vec3b(cr.red(), cr.green(), cr.blue());
 		}
 		else {
-			ui.chkZoomLock->setChecked(m_option.bZoomLock);
-			ui.chkPanningLock->setChecked(m_option.bPanningLock);
-			ui.chkExtendedPanning->setChecked(m_option.bExtendedPanning);
-			ui.chkKeyboardNavigation->setChecked(m_option.bKeyboardNavigation);
 			ui.chkDrawPixelValue->setChecked(m_option.bDrawPixelValue);
 			ui.chkSmoothInterpolation->setChecked(m_option.bSmoothInterpolation);
+			ui.spinMouseSpeed->setValue(m_option.dMouseSpeed);
+			ui.edtColorBackground->setText(QColor(m_option.crBackground[0], m_option.crBackground[1], m_option.crBackground[2]).name());
 		}
 		return false;
+	}
+
+	void xMatViewSettingsDlg::OnBtnOK() {
+		UpdateData(true);
+		accept();
+	}
+
+	void xMatViewSettingsDlg::OnBtnCancel() {
+		reject();
 	}
 
 	void xMatViewSettingsDlg::OnBackgroundColor() {

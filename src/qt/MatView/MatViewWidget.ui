@@ -30,10 +30,10 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="gtl::qt::xMatViewToolbar" name="widget" native="true"/>
+    <widget class="gtl::qt::xMatViewToolbar" name="toolbar" native="true"/>
    </item>
    <item>
-    <widget class="gtl::qt::xMatView" name="graphicsView">
+    <widget class="gtl::qt::xMatViewCanvas" name="view">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -45,6 +45,11 @@
        <width>100</width>
        <height>100</height>
       </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>Cascadia Code</family>
+      </font>
      </property>
      <property name="lineWidth">
       <number>1</number>
@@ -65,9 +70,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>gtl::qt::xMatView</class>
+   <class>gtl::qt::xMatViewCanvas</class>
    <extends>QGraphicsView</extends>
-   <header>gtl/qt/MatView/MatView.h</header>
+   <header>gtl/qt/MatView/MatViewCanvas.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

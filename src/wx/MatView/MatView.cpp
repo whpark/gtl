@@ -21,29 +21,6 @@
 
 namespace gtl::wx {
 
-inline cv::Scalar GetMatValue(uchar const* ptr, int depth, int channel, int row, int col) {
-	//if ( mat.empty() or (row < 0) or (row >= mat.rows) or (col < 0) or (col >= mat.cols) )
-	//	return;
-
-	cv::Scalar v;
-	auto GetValue = [&]<typename T>(T&&){
-		for (int i = 0; i < channel; ++i)
-			v[i] = ptr[col * channel + i];
-	};
-	switch (depth) {
-	case CV_8U:		GetValue(uint8_t{}); break;
-	case CV_8S:		GetValue(int8_t{}); break;
-	case CV_16U:	GetValue(uint16_t{}); break;
-	case CV_16S:	GetValue(int16_t{}); break;
-	case CV_32S:	GetValue(int32_t{}); break;
-	case CV_32F:	GetValue(float{}); break;
-	case CV_64F:	GetValue(double{}); break;
-	//case CV_16F:	GetValue(uint16_t{}); break;
-	}
-
-	return v;
-}
-
 // returns eInternalColorFormat, ColorFormat, PixelType
 std::tuple<GLint, GLenum, GLenum> GetGLImageFormatType(int type) {
 	static std::unordered_map<int, std::tuple<GLint, GLenum, GLenum>> const m {
@@ -136,7 +113,6 @@ bool DrawPixelValue(cv::Mat& canvas, cv::Mat const& imgOriginal, cv::Rect roi, g
 		for (int x{roi.x}; x < x1; x++) {
 			auto pt = ctCanvasFromImage(xPoint2d{x, y});
 			//auto p = SkPoint::Make(pt.x, pt.y);
-			auto& org = imgOriginal;
 			auto v = GetMatValue(ptr, depth, nChannel, y, x);
 			auto avg = (v[0] + v[1] + v[2]) / nChannel;
 			auto cr = (avg > 128) ? cv::Scalar{0, 0, 0, 255} : cv::Scalar{255, 255, 255, 255};
@@ -417,6 +393,9 @@ bool xMatView::SetImage(cv::Mat const& img, bool bCenter, eZOOM eZoomMode, bool 
 		return false;
 	}
 
+	m_mouse.Clear();
+	m_smooth_scroll.Clear();
+
 	if (eZoomMode != eZOOM::none) {
 		base_t::m_cmbZoomMode->SetSelection((int)eZoomMode);
 		wxCommandEvent evt;
@@ -436,7 +415,7 @@ bool xMatView::SetZoomMode(eZOOM eZoomMode, bool bCenter) {
 	UpdateCT(bCenter, eZoomMode);
 	UpdateScrollBars();
 	m_view->Refresh();
-	return false;
+	return true;
 }
 
 void xMatView::SetSelectionRect(xRect2i const& rect) {

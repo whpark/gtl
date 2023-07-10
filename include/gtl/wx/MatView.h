@@ -142,10 +142,21 @@ namespace gtl::wx {
 			std::optional<xPoint2i> ptAnchor;			// Anchor Point in Screen Coordinate
 			xPoint2i ptOffset0;			// offset backup
 			xPoint2d ptSel0, ptSel1;	// Selection Point in Image Coordinate
+			void Clear() {
+				bInSelectionMode = {};
+				bRectSelected = {};
+				ptAnchor.reset();
+				ptOffset0 = {};
+				ptSel0 = ptSel1 = {};
+			}
 		} m_mouse;
 		mutable struct {
 			xPoint2d pt0, pt1;
 			std::chrono::steady_clock::time_point t0, t1;
+			void Clear() {
+				pt0 = pt1 = {};
+				t0 = t1 = {};
+			}
 		} m_smooth_scroll;
 
 		S_OPTION m_option;

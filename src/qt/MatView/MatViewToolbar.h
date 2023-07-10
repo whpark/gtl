@@ -5,15 +5,13 @@
 
 namespace gtl::qt {
 
-	class xMatViewToolbar : public QWidget {
+	class xMatViewToolbar : public QWidget, public Ui::MatViewToolbarClass {
 		Q_OBJECT
 
 	public:
 		xMatViewToolbar(QWidget* parent = nullptr);
 		~xMatViewToolbar();
 
-	private:
-		Ui::MatViewToolbarClass ui;
 	};
 
 } // namespace gtl::qt

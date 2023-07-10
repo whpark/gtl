@@ -12,3 +12,9 @@
 #include <QtWidgets>
 #include <QApplication>
 
+inline QPoint Floor(QPointF pt) {
+	return QPoint{ (int)pt.x(), (int)pt.y() };
+}
+inline QRect Floor(QRectF rect) {
+	return QRect{ Floor(rect.topLeft()), Floor(rect.bottomRight()) };
+}

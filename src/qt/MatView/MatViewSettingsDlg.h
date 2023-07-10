@@ -2,7 +2,7 @@
 
 #include <QDialog>
 #include "ui_MatViewSettingsDlg.h"
-#include "gtl/qt/MatView/MatView.h"
+#include "gtl/qt/MatView/MatViewCanvas.h"
 
 namespace gtl::qt {
 
@@ -14,7 +14,7 @@ namespace gtl::qt {
 		using base_t = QDialog;
 
 	public:
-		xMatView::S_OPTION m_option;
+		xMatViewCanvas::S_OPTION m_option;
 
 	public:
 		xMatViewSettingsDlg(QWidget* parent = nullptr);
@@ -24,6 +24,8 @@ namespace gtl::qt {
 
 	protected slots:
 		void OnBackgroundColor();
+		void OnBtnOK();
+		void OnBtnCancel();
 
 	private:
 		Ui::MatViewSettingsDlgClass ui;
