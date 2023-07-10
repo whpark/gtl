@@ -42,7 +42,7 @@
     <ClCompile Include="MatView\MatViewWidget.cpp">
       <Filter>MatView</Filter>
     </ClCompile>
-    <ClCompile Include="MatView\MatView.cpp">
+    <ClCompile Include="MatView\MatViewCanvas.cpp">
       <Filter>MatView</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,8 +56,11 @@
     <ClInclude Include="..\..\include\gtl\qt\_lib_gtl_qt.h">
       <Filter>[ framework ]</Filter>
     </ClInclude>
-    <ClInclude Include="qt.h">
+    <ClInclude Include="..\..\include\gtl\qt\qt.h">
       <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>[ framework ]</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -78,7 +81,7 @@
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewDlg.h">
       <Filter>MatView</Filter>
     </QtMoc>
-    <QtMoc Include="MatView\MatView.h">
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewCanvas.h">
       <Filter>MatView</Filter>
     </QtMoc>
   </ItemGroup>

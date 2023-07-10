@@ -6,15 +6,154 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>210</width>
+    <height>254</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>xMatViewSettingsDlg</string>
+   <string notr="true">options</string>
   </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="2" column="0" colspan="2">
+    <widget class="QCheckBox" name="chkExtendedPanning">
+     <property name="text">
+      <string notr="true">Extended Panning</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QCheckBox" name="chkKeyboardNavigation">
+     <property name="text">
+      <string notr="true">Keyboard Navigation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string notr="true">Mouse Speed:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QDoubleSpinBox" name="spinMouseSpeed">
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="minimum">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>100.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.250000000000000</double>
+     </property>
+     <property name="value">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string notr="true">Scroll Time:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QDoubleSpinBox" name="spinScrollTime">
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="suffix">
+      <string> ms</string>
+     </property>
+     <property name="decimals">
+      <number>0</number>
+     </property>
+     <property name="minimum">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>100000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>250.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>250.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLineEdit" name="edtColorBackground">
+     <property name="inputMask">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string>black</string>
+     </property>
+     <property name="frame">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QPushButton" name="btnBackgroundColor">
+     <property name="text">
+      <string>Background Color :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QCheckBox" name="chkPanningLock">
+     <property name="text">
+      <string notr="true">Panning Lock</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QCheckBox" name="chkZoomLock">
+     <property name="text">
+      <string notr="true">Zoom Lock</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QCheckBox" name="chkDrawPixelValue">
+     <property name="text">
+      <string notr="true">Pixel Value</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QCheckBox" name="chkSmoothInterpolation">
+     <property name="text">
+      <string notr="true">Smooth Interpolation</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>chkZoomLock</tabstop>
+  <tabstop>chkPanningLock</tabstop>
+  <tabstop>chkExtendedPanning</tabstop>
+  <tabstop>chkKeyboardNavigation</tabstop>
+  <tabstop>chkDrawPixelValue</tabstop>
+  <tabstop>spinMouseSpeed</tabstop>
+  <tabstop>spinScrollTime</tabstop>
+  <tabstop>btnBackgroundColor</tabstop>
+  <tabstop>edtColorBackground</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
