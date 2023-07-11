@@ -4,6 +4,8 @@
 #include "gtl/qt/_lib_gtl_qt.h"
 #include "gtl/reflection_glaze.h"
 
+#include "MatViewCanvas.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MatViewClass; };
 QT_END_NAMESPACE
@@ -17,6 +19,9 @@ class gtl::qt::xMatView : public QWidget {
 	Q_OBJECT
 
 public:
+	using this_t = xMatView;
+	using base_t = QWidget;
+
 	using string_t = std::wstring;
 	using xCoordTrans = gtl::xCoordTrans2d;
 
@@ -65,7 +70,7 @@ protected:
 	////GLuint m_textureID{};
 
 	cv::Mat m_imgOriginal;	// original image
-	mutable cv::Mat m_imgScreen;	// image for screen
+	mutable cv::Mat m_img;	// image for screen
 	mutable struct {
 		std::mutex mtx;
 		std::deque<cv::Mat> imgs;
@@ -88,24 +93,91 @@ protected:
 	mutable struct {
 		xPoint2d pt0, pt1;
 		std::chrono::steady_clock::time_point t0, t1;
+		QTimer timer;
 		void Clear() {
 			pt0 = pt1 = {};
 			t0 = t1 = {};
+			timer.stop();
 		}
 	} m_smooth_scroll;
+
+	std::unique_ptr<xMatViewCanvas> m_view;
 
 	S_OPTION m_option;
 	eZOOM m_eZoom{eZOOM::fit2window};
 	xCoordTrans m_ctScreenFromImage;
+	mutable bool m_bSkipSpinZoomEvent{};
 
 public:
 	xMatView(QWidget* parent = nullptr);
 	~xMatView();
 
-	bool Init();
-
 protected:
 	void OnSettings();
+
+public:
+	bool SetImage(cv::Mat const& img, bool bCenter = true, eZOOM eZoomMode = eZOOM::none, bool bCopy = false);
+	bool SetZoomMode(eZOOM eZoomMode, bool bCenter = true);
+	std::optional<xRect2i> GetSelectionRect() const {
+		if (!m_mouse.bRectSelected)
+			return {};
+		xRect2i rect(xPoint2i(gtl::Floor(m_mouse.ptSel0)), xPoint2i(gtl::Floor(m_mouse.ptSel1)));
+		rect.NormalizeRect();
+		return rect;
+	}
+	std::optional<std::pair<xPoint2d, xPoint2d>> GetSelectionPoints() const {
+		if (!m_mouse.bRectSelected)
+			return {};
+		return std::pair<xPoint2d, xPoint2d>{m_mouse.ptSel0, m_mouse.ptSel1};
+	}
+	void SetSelectionRect(xRect2i const& rect);
+	void ClearSelectionRect();
+
+	bool LoadOption() { return m_fnSyncSetting and m_fnSyncSetting(false, m_strCookie, m_option) and SetOption(m_option, false); }
+	bool SaveOption() { return m_fnSyncSetting and m_fnSyncSetting(true, m_strCookie, m_option); }
+	S_OPTION const& GetOption() const { return m_option; }
+	bool SetOption(S_OPTION const& option, bool bStore = true);
+
+	bool ShowToolBar(bool bShow);
+	bool IsToolBarShown() const;
+
+	//virtual void OnClose(wxCloseEvent& event) override;
+
+	// ClientRect, ImageRect, ScrollRange
+	S_SCROLL_GEOMETRY GetScrollGeometry();
+	bool UpdateCT(bool bCenter = false, eZOOM eZoom = eZOOM::none);
+	bool UpdateScrollBars();
+	bool ZoomInOut(double step, xPoint2i ptAnchor, bool bCenter);
+	bool SetZoom(double scale, xPoint2i ptAnchor, bool bCenter);
+	bool ScrollTo(xPoint2d pt, std::chrono::milliseconds tsScroll = -1ms);
+	bool Scroll(xPoint2d delta, std::chrono::milliseconds tsScroll = -1ms);
+	bool KeyboardNavigate(int key, bool ctrl = false, bool alt = false, bool shift = false);
+
+protected:
+	xRect2i GetViewRect();
+	void InitializeGL(xMatViewCanvas* view);
+	void PaintGL(xMatViewCanvas* view);
+
+protected:
+	virtual void keyPressEvent(QKeyEvent *event) override;
+	void OnView_mousePressEvent(xMatViewCanvas* view, QMouseEvent *event);
+	void OnView_mouseReleaseEvent(xMatViewCanvas* view, QMouseEvent *event);
+	void OnView_mouseMoveEvent(xMatViewCanvas* view, QMouseEvent *event);
+	void OnView_wheelEvent(xMatViewCanvas* view, QWheelEvent* event);
+
+protected slots:
+	void OnCmbZoomMode_currentIndexChanged(int index);
+	void OnSpinZoom_valueChanged(double dZoom);
+	void OnBtnZoomIn_clicked();
+	void OnBtnZoomOut_clicked();
+	void OnBtnZoomFit_clicked();
+	void OnBtnSettings_clicked();
+	void OnSmoothScroll_timeout();
+	void OnView_resized();
+	void OnSbHorz_valueChanged(int value);
+	void OnSbHorz_sliderMoved(int value);
+	void OnSbVert_valueChanged(int value);
+	void OnSbVert_sliderMoved(int value);
 
 private:
 	std::unique_ptr<Ui::MatViewClass> ui;

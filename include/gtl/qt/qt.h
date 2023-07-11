@@ -17,6 +17,26 @@ namespace gtl::qt {
 		}
 	};
 
+	inline auto ToCoord(QPoint pt) { return xPoint2i(pt.x(), pt.y()); }
+	inline auto ToCoord(QPointF pt) { return xPoint2d(pt.x(), pt.y()); }
+	inline auto ToCoord(QSize s) { return xSize2i(s.width(), s.height()); }
+	inline auto ToCoord(QSizeF s) { return xSize2d(s.width(), s.height()); }
+	inline auto ToCoord(QRect rect) { return xRect2i(rect.left(), rect.top(), rect.right(), rect.bottom()); }
+	inline auto ToCoord(QRectF rect) { return xRect2d(rect.left(), rect.top(), rect.right(), rect.bottom()); }
+
+	inline auto ToQCoord(xPoint2i pt) { return QPoint (pt.x, pt.y); }
+	inline auto ToQCoord(xPoint2d pt) { return QPointF(pt.x, pt.y); }
+	inline auto ToQCoord(xSize2i s) { return QSize (s.cx, s.cy); }
+	inline auto ToQCoord(xSize2d s) { return QSizeF(s.cx, s.cy); }
+	inline auto ToQCoord(xRect2i rect) { return QRect (rect.left, rect.top, rect.Width(), rect.Height()); }
+	inline auto ToQCoord(xRect2d rect) { return QRectF(rect.left, rect.top, rect.Width(), rect.Height()); }
+
+	inline QPoint Floor(QPointF pt) {
+		return QPoint{ (int)pt.x(), (int)pt.y() };
+	}
+	inline QRect Floor(QRectF rect) {
+		return QRect{ Floor(rect.topLeft()), Floor(rect.bottomRight()) };
+	}
 
 	GTL__QT_API QImage::Format GetImageFormatType(int type);
 

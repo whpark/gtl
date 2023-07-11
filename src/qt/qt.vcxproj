@@ -292,14 +292,17 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGV.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatView.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewDlg.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewCanvas.h" />
     <ClInclude Include="..\..\include\gtl\qt\qt.h" />
     <ClInclude Include="..\..\include\gtl\qt\_lib_gtl_qt.h" />
     <ClInclude Include="framework.h" />
     <QtMoc Include="MatView\MatViewGVSettingsDlg.h" />
     <QtMoc Include="MatView\MatViewGVToolbar.h" />
     <QtMoc Include="MatView\MatViewSettingsDlg.h" />
+    <ClInclude Include="MatView\MatView_misc.h" />
     <ClInclude Include="qt_global.h" />
     <ClCompile Include="MatView\MatView.cpp" />
+    <ClCompile Include="MatView\MatViewCanvas.cpp" />
     <ClCompile Include="MatView\MatViewDlg.cpp" />
     <ClCompile Include="MatView\MatViewGV.cpp" />
     <ClCompile Include="MatView\MatViewGVCanvas.cpp" />
@@ -307,6 +310,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClCompile Include="MatView\MatViewGVSettingsDlg.cpp" />
     <ClCompile Include="MatView\MatViewGVToolbar.cpp" />
     <ClCompile Include="MatView\MatViewSettingsDlg.cpp" />
+    <ClCompile Include="MatView\MatView_misc.cpp" />
     <ClCompile Include="qt.cpp" />
     <ClInclude Include="pch.h" />
     <ClCompile Include="pch.cpp">

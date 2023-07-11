@@ -57,6 +57,12 @@
     <ClCompile Include="MatView\MatViewSettingsDlg.cpp">
       <Filter>MatView</Filter>
     </ClCompile>
+    <ClCompile Include="MatView\MatView_misc.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatViewCanvas.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_global.h">
@@ -73,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="framework.h">
       <Filter>[ framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="MatView\MatView_misc.h">
+      <Filter>MatView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +112,9 @@
       <Filter>MatView</Filter>
     </QtMoc>
     <QtMoc Include="MatView\MatViewSettingsDlg.h">
+      <Filter>MatView</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewCanvas.h">
       <Filter>MatView</Filter>
     </QtMoc>
   </ItemGroup>

@@ -47,6 +47,9 @@
     <ClInclude Include="..\..\include\gtl\wx\util.h">
       <Filter>wx</Filter>
     </ClInclude>
+    <ClInclude Include="MatView\MatView_misc.h">
+      <Filter>wx\MatView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MatView\DlgMatViewOption.cpp">
@@ -72,6 +75,9 @@
     </ClCompile>
     <ClCompile Include="util.cpp">
       <Filter>wx</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatView_misc.cpp">
+      <Filter>wx\MatView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

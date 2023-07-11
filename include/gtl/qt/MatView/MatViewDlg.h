@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gtl/qt/_lib_gtl_qt.h"
+#include "gtl/qt/MatView/MatView.h"
 
 #include <QDialog>
 
@@ -14,10 +15,17 @@ namespace gtl::qt {
 
 class gtl::qt::xMatViewDlg : public QDialog {
 	Q_OBJECT
+public:
+	using this_t = xMatViewDlg;
+	using base_t = QDialog;
 
+protected:
+	xMatView* m_view{};
 public:
 	xMatViewDlg(QWidget* parent = nullptr);
 	~xMatViewDlg();
+
+	xMatView& GetView() { return *m_view; }
 
 private:
 	std::unique_ptr<Ui::MatViewDlgClass> ui;

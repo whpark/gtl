@@ -55,7 +55,7 @@ test_qt::test_qt(QWidget *parent)
 	//m_option.bGLonly = false;
 	//m_option.bSkia = true;
 
-	//m_dlgMatView->SetImage(img, false);
+	m_dlgMatView->GetView().SetImage(img, false);
 
 }
 

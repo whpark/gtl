@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="gtl::qt::xMatView" name="widget" native="true"/>
+    <widget class="gtl::qt::xMatView" name="view" native="true"/>
    </item>
   </layout>
  </widget>
