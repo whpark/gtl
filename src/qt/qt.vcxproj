@@ -287,20 +287,20 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewWidget.h" />
-    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewDlg.h" />
-    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewCanvas.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVCanvas.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVDlg.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGV.h" />
     <ClInclude Include="..\..\include\gtl\qt\qt.h" />
     <ClInclude Include="..\..\include\gtl\qt\_lib_gtl_qt.h" />
-    <QtMoc Include="MatView\MatViewSettingsDlg.h" />
-    <QtMoc Include="MatView\MatViewToolbar.h" />
     <ClInclude Include="framework.h" />
+    <QtMoc Include="MatView\MatViewGVSettingsDlg.h" />
+    <QtMoc Include="MatView\MatViewGVToolbar.h" />
     <ClInclude Include="qt_global.h" />
-    <ClCompile Include="MatView\MatViewCanvas.cpp" />
-    <ClCompile Include="MatView\MatViewDlg.cpp" />
-    <ClCompile Include="MatView\MatViewSettingsDlg.cpp" />
-    <ClCompile Include="MatView\MatViewToolbar.cpp" />
-    <ClCompile Include="MatView\MatViewWidget.cpp" />
+    <ClCompile Include="MatView\MatViewGV.cpp" />
+    <ClCompile Include="MatView\MatViewGVCanvas.cpp" />
+    <ClCompile Include="MatView\MatViewGVDlg.cpp" />
+    <ClCompile Include="MatView\MatViewGVSettingsDlg.cpp" />
+    <ClCompile Include="MatView\MatViewGVToolbar.cpp" />
     <ClCompile Include="qt.cpp" />
     <ClInclude Include="pch.h" />
     <ClCompile Include="pch.cpp">
@@ -311,10 +311,10 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="MatView\MatViewDlg.ui" />
-    <QtUic Include="MatView\MatViewSettingsDlg.ui" />
-    <QtUic Include="MatView\MatViewToolbar.ui" />
-    <QtUic Include="MatView\MatViewWidget.ui" />
+    <QtUic Include="MatView\MatViewGV.ui" />
+    <QtUic Include="MatView\MatViewGVDlg.ui" />
+    <QtUic Include="MatView\MatViewGVSettingsDlg.ui" />
+    <QtUic Include="MatView\MatViewGVToolbar.ui" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

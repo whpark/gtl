@@ -2,23 +2,23 @@
 
 #include <QDialog>
 #include "ui_MatViewSettingsDlg.h"
-#include "gtl/qt/MatView/MatViewCanvas.h"
+#include "gtl/qt/MatView/MatViewGVCanvas.h"
 
 namespace gtl::qt {
 
-	class xMatViewSettingsDlg : public QDialog {
+	class xMatViewGVSettingsDlg : public QDialog {
 		Q_OBJECT
 
 	public:
-		using this_t = xMatViewSettingsDlg;
+		using this_t = xMatViewGVSettingsDlg;
 		using base_t = QDialog;
 
 	public:
-		xMatViewCanvas::S_OPTION m_option;
+		xMatViewGVCanvas::S_OPTION m_option;
 
 	public:
-		xMatViewSettingsDlg(QWidget* parent = nullptr);
-		~xMatViewSettingsDlg();
+		xMatViewGVSettingsDlg(QWidget* parent = nullptr);
+		~xMatViewGVSettingsDlg();
 
 		bool UpdateData(bool bSaveAndValidate = true);
 

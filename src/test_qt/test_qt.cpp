@@ -5,7 +5,7 @@ test_qt::test_qt(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    m_dlgMatView = std::make_unique<gtl::qt::xMatViewDlg>(this);
+    m_dlgMatView = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
     m_dlgMatView->show();
 
 	// Color Bar

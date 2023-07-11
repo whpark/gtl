@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MatViewWidgetClass</class>
- <widget class="QWidget" name="MatViewWidgetClass">
+ <class>MatViewGVClass</class>
+ <widget class="QWidget" name="MatViewGVClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,10 +30,10 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="gtl::qt::xMatViewToolbar" name="toolbar" native="true"/>
+    <widget class="gtl::qt::xMatViewGVToolbar" name="toolbar" native="true"/>
    </item>
    <item>
-    <widget class="gtl::qt::xMatViewCanvas" name="view">
+    <widget class="gtl::qt::xMatViewGVCanvas" name="view">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -64,15 +64,15 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>gtl::qt::xMatViewToolbar</class>
+   <class>gtl::qt::xMatViewGVToolbar</class>
    <extends>QWidget</extends>
-   <header>MatView/MatViewToolbar.h</header>
+   <header>MatView/MatViewGVToolbar.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>gtl::qt::xMatViewCanvas</class>
+   <class>gtl::qt::xMatViewGVCanvas</class>
    <extends>QGraphicsView</extends>
-   <header>gtl/qt/MatView/MatViewCanvas.h</header>
+   <header>gtl/qt/MatView/MatViewGVCanvas.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

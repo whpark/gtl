@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MatViewSettingsDlgClass</class>
- <widget class="QDialog" name="MatViewSettingsDlgClass">
+ <class>MatViewGVSettingsDlgClass</class>
+ <widget class="QDialog" name="MatViewGVSettingsDlgClass">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>210</width>
-    <height>152</height>
+    <height>154</height>
    </rect>
   </property>
   <property name="windowTitle">

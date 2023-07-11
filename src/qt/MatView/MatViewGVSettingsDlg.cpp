@@ -1,21 +1,21 @@
 #include "pch.h"
 #include <QColorDialog>
-#include "MatViewSettingsDlg.h"
+#include "MatViewGVSettingsDlg.h"
 
 namespace gtl::qt {
 
-	xMatViewSettingsDlg::xMatViewSettingsDlg(QWidget* parent)
+	xMatViewGVSettingsDlg::xMatViewGVSettingsDlg(QWidget* parent)
 		: QDialog(parent) {
 		ui.setupUi(this);
-		connect(ui.btnBackgroundColor, &QPushButton::clicked, this, &xMatViewSettingsDlg::OnBackgroundColor);
+		connect(ui.btnBackgroundColor, &QPushButton::clicked, this, &xMatViewGVSettingsDlg::OnBackgroundColor);
 		connect(ui.btnOK, &QPushButton::clicked, this, &this_t::OnBtnOK);
 		connect(ui.btnCancel, &QPushButton::clicked, this, &this_t::OnBtnCancel);
 	}
 
-	xMatViewSettingsDlg::~xMatViewSettingsDlg() {
+	xMatViewGVSettingsDlg::~xMatViewGVSettingsDlg() {
 	}
 
-	bool xMatViewSettingsDlg::UpdateData(bool bSaveAndValidate) {
+	bool xMatViewGVSettingsDlg::UpdateData(bool bSaveAndValidate) {
 		if (bSaveAndValidate) {
 			m_option.bDrawPixelValue = ui.chkDrawPixelValue->isChecked();
 			m_option.bSmoothInterpolation = ui.chkSmoothInterpolation->isChecked();
@@ -32,16 +32,16 @@ namespace gtl::qt {
 		return false;
 	}
 
-	void xMatViewSettingsDlg::OnBtnOK() {
+	void xMatViewGVSettingsDlg::OnBtnOK() {
 		UpdateData(true);
 		accept();
 	}
 
-	void xMatViewSettingsDlg::OnBtnCancel() {
+	void xMatViewGVSettingsDlg::OnBtnCancel() {
 		reject();
 	}
 
-	void xMatViewSettingsDlg::OnBackgroundColor() {
+	void xMatViewGVSettingsDlg::OnBackgroundColor() {
 		QColor color = QColorDialog::getColor(QColor(ui.edtColorBackground->text()), this, tr("Select Color"));
 		if (color.isValid()) {
 			m_option.crBackground[0] = color.red();

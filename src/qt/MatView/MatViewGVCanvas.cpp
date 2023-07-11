@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "gtl/qt/qt.h"
-#include "gtl/qt/MatView/MatViewCanvas.h"
+#include "gtl/qt/MatView/MatViewGVCanvas.h"
 
 namespace gtl::qt {
 	static double const dZoomLevels[] = {
@@ -22,22 +22,22 @@ namespace gtl::qt {
 		//60000000, 70000000, 80000000, 90000000
 	};
 
-	xMatViewCanvas::~xMatViewCanvas() {
+	xMatViewGVCanvas::~xMatViewGVCanvas() {
 		m_scene.release();
 	}
 
-	void xMatViewCanvas::Init() {
+	void xMatViewGVCanvas::Init() {
 		SetBackgroundColor(GetBackgroundColor());
 	}
 
-	void xMatViewCanvas::SetBackgroundColor(QColor crBackground) {
+	void xMatViewGVCanvas::SetBackgroundColor(QColor crBackground) {
 		m_option.crBackground[0] = crBackground.red();
 		m_option.crBackground[1] = crBackground.green();
 		m_option.crBackground[2] = crBackground.blue();
 		setBackgroundBrush(crBackground);
 	}
 
-	bool xMatViewCanvas::SetImage(cv::Mat const& img, bool bCopy) {
+	bool xMatViewGVCanvas::SetImage(cv::Mat const& img, bool bCopy) {
 		if (bCopy)
 			img.copyTo(m_img);
 		else
@@ -65,19 +65,19 @@ namespace gtl::qt {
 		return true;
 	}
 
-	void xMatViewCanvas::SetSelectionRect(xRect2i const& rect) {
+	void xMatViewGVCanvas::SetSelectionRect(xRect2i const& rect) {
 		m_mouse.bRectSelected = true;
 		m_mouse.ptSel0 = QPointF(rect.left, rect.top);
 		m_mouse.ptSel1 = QPointF(rect.right, rect.bottom);
 
 		this->update();
 	}
-	void xMatViewCanvas::ClearSelectionRect() {
+	void xMatViewGVCanvas::ClearSelectionRect() {
 		m_mouse.bRectSelected = false;
 		this->update();
 	}
 
-	bool xMatViewCanvas::SetOption(S_OPTION const& option, bool bStore) {
+	bool xMatViewGVCanvas::SetOption(S_OPTION const& option, bool bStore) {
 		if (&m_option != &option) {
 			m_option = option;
 			SetBackgroundColor(GetBackgroundColor());
@@ -91,7 +91,7 @@ namespace gtl::qt {
 		return true;
 	}
 
-	//bool xMatViewCanvas::ShowToolBar(bool bShow) {
+	//bool xMatViewGVCanvas::ShowToolBar(bool bShow) {
 	//	if (!m_toolBar)
 	//		return false;
 	//	m_toolBar->Show(bShow);
@@ -100,7 +100,7 @@ namespace gtl::qt {
 	//	return true;
 	//}
 
-	bool xMatViewCanvas::ZoomInOut(double step, QPointF ptAnchor) {
+	bool xMatViewGVCanvas::ZoomInOut(double step, QPointF ptAnchor) {
 		auto scale = transform().m11();
 		if (step > 0) {
 			for (auto dZoom : dZoomLevels) {
@@ -122,7 +122,7 @@ namespace gtl::qt {
 		return SetZoom(scale, ptAnchor);
 	}
 
-	bool xMatViewCanvas::SetZoom(double dScale, QPointF ptAnchor) {
+	bool xMatViewGVCanvas::SetZoom(double dScale, QPointF ptAnchor) {
 		if (m_img.empty() or dScale <= 0.0)
 			return false;
 
@@ -136,7 +136,7 @@ namespace gtl::qt {
 		return true;
 	}
 
-	void xMatViewCanvas::wheelEvent(QWheelEvent* event) {
+	void xMatViewGVCanvas::wheelEvent(QWheelEvent* event) {
 		setTransformationAnchor(base_t::AnchorUnderMouse);
 
 		auto dScale = transform().m11();
@@ -148,7 +148,7 @@ namespace gtl::qt {
 		}
 	}
 
-	void xMatViewCanvas::mousePressEvent(QMouseEvent* event) {
+	void xMatViewGVCanvas::mousePressEvent(QMouseEvent* event) {
 		if (event->button() & Qt::LeftButton) {
 			setTransformationAnchor(base_t::NoAnchor);
 			m_mouse.ptAnchor = event->pos();
@@ -169,7 +169,7 @@ namespace gtl::qt {
 		base_t::mousePressEvent(event);
 	}
 
-	void xMatViewCanvas::mouseMoveEvent(QMouseEvent* event) {
+	void xMatViewGVCanvas::mouseMoveEvent(QMouseEvent* event) {
 		if (m_mouse.ptAnchor) {
 			setTransformationAnchor(base_t::NoAnchor);
 			QPointF oldp = mapToScene(*m_mouse.ptAnchor);
@@ -207,14 +207,14 @@ namespace gtl::qt {
 		base_t::mouseMoveEvent(event);
 	}
 
-	void xMatViewCanvas::mouseReleaseEvent(QMouseEvent* event) {
+	void xMatViewGVCanvas::mouseReleaseEvent(QMouseEvent* event) {
 		if (event->button() & Qt::LeftButton)
 			m_mouse.ptAnchor.reset();
 
 		base_t::mouseReleaseEvent(event);
 	}
 
-	//void xMatViewCanvas::drawBackground(QPainter* painter, const QRectF& rect) {
+	//void xMatViewGVCanvas::drawBackground(QPainter* painter, const QRectF& rect) {
 	//	base_t::drawBackground(painter, rect);
 	//
 	//	QColor cr = GetBackgroundColor();
@@ -227,7 +227,7 @@ namespace gtl::qt {
 	//	painter->drawRect(r);
 	//}
 
-	void xMatViewCanvas::drawForeground(QPainter* painter, const QRectF& rect) {
+	void xMatViewGVCanvas::drawForeground(QPainter* painter, const QRectF& rect) {
 		base_t::drawForeground(painter, rect);
 
 		// draw grid if zoom scale is greater than 10

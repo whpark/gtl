@@ -1,20 +1,20 @@
 #include "pch.h"
-#include "gtl/qt/MatView/MatViewDlg.h"
-#include "ui_MatViewDlg.h"
+#include "gtl/qt/MatView/MatViewGVDlg.h"
+#include "ui_MatViewGVDlg.h"
 
 namespace gtl::qt {
 
-	xMatViewDlg::xMatViewDlg(QWidget* parent)
+	xMatViewGVDlg::xMatViewGVDlg(QWidget* parent)
 		: QDialog(parent) {
-		ui = std::make_unique<Ui::MatViewDlgClass>();
+		ui = std::make_unique<Ui::MatViewGVDlgClass>();
 		ui->setupUi(this);
 		m_widgetMatView = ui->widgetMatView;
 	}
 
-	xMatViewDlg::~xMatViewDlg() {
+	xMatViewGVDlg::~xMatViewGVDlg() {
 	}
 
-	bool xMatViewDlg::SetImage(cv::Mat const& img, bool bCopy) {
+	bool xMatViewGVDlg::SetImage(cv::Mat const& img, bool bCopy) {
 		if (ui->widgetMatView->SetImage(img, bCopy)) {
 			ui->widgetMatView->update();
 			return true;

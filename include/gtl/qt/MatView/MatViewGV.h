@@ -2,29 +2,29 @@
 
 #include <QWidget>
 #include "gtl/qt/_lib_gtl_qt.h"
-#include "gtl/qt/MatView/MatViewCanvas.h"
+#include "gtl/qt/MatView/MatViewGVCanvas.h"
 
 namespace Ui {
-	class MatViewWidgetClass;
+	class MatViewGVClass;
 }
 
 namespace gtl::qt {
 
-	class GTL__QT_CLASS xMatViewWidget : public QWidget {
+	class GTL__QT_CLASS xMatViewGV : public QWidget {
 		Q_OBJECT
 
 	public:
-		using this_t = xMatViewWidget;
+		using this_t = xMatViewGV;
 		using base_t = QWidget;
 
 	protected:
-		xMatViewCanvas* m_view{};
+		xMatViewGVCanvas* m_view{};
 	public:
-		xMatViewWidget(QWidget* parent = nullptr);
-		~xMatViewWidget();
+		xMatViewGV(QWidget* parent = nullptr);
+		~xMatViewGV();
 
-		xMatViewCanvas& GetView() { assert(m_view); return *m_view; }
-		xMatViewCanvas const& GetView() const { assert(m_view); return *m_view; }
+		xMatViewGVCanvas& GetView() { assert(m_view); return *m_view; }
+		xMatViewGVCanvas const& GetView() const { assert(m_view); return *m_view; }
 
 		bool SetImage(cv::Mat const& img, bool bCopy = false) {
 			if (!m_view)
@@ -43,7 +43,7 @@ namespace gtl::qt {
 		void OnBtnSettings();
 
 	private:
-		std::unique_ptr<Ui::MatViewWidgetClass> ui;
+		std::unique_ptr<Ui::MatViewGVClass> ui;
 	};
 
 }	// namespace gtl::qt

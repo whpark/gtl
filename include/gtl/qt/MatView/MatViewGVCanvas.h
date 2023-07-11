@@ -10,13 +10,13 @@ namespace gtl::qt {
 
 	using namespace std::literals;
 
-	class GTL__QT_CLASS xMatViewCanvas : public QGraphicsView {
-		friend class xMatViewWidget;
+	class GTL__QT_CLASS xMatViewGVCanvas : public QGraphicsView {
+		friend class xMatViewGV;
 
 		Q_OBJECT
 
 	public:
-		using this_t = xMatViewCanvas;
+		using this_t = xMatViewGVCanvas;
 		using base_t = QGraphicsView;
 
 		using string_t = std::string;
@@ -73,10 +73,10 @@ namespace gtl::qt {
 		S_OPTION m_option;
 
 	public:
-		xMatViewCanvas(QWidget *parent = nullptr) : QGraphicsView(parent) { Init(); }
-		xMatViewCanvas(QGraphicsScene *scene, QWidget *parent = nullptr) : QGraphicsView(scene, parent) { Init(); }
+		xMatViewGVCanvas(QWidget *parent = nullptr) : QGraphicsView(parent) { Init(); }
+		xMatViewGVCanvas(QGraphicsScene *scene, QWidget *parent = nullptr) : QGraphicsView(scene, parent) { Init(); }
 
-		~xMatViewCanvas();
+		~xMatViewGVCanvas();
 
 		void Init();
 		void SetBackgroundColor(QColor crBackground);

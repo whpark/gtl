@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MatViewDlgClass</class>
- <widget class="QDialog" name="MatViewDlgClass">
+ <class>MatViewGVDlgClass</class>
+ <widget class="QDialog" name="MatViewGVDlgClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -33,16 +33,16 @@
     <number>2</number>
    </property>
    <item>
-    <widget class="gtl::qt::xMatViewWidget" name="widgetMatView" native="true"/>
+    <widget class="gtl::qt::xMatViewGV" name="widgetMatView" native="true"/>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>gtl::qt::xMatViewWidget</class>
+   <class>gtl::qt::xMatViewGV</class>
    <extends>QWidget</extends>
-   <header>gtl/qt/MatView/MatViewWidget.h</header>
+   <header>gtl/qt/MatView/MatViewGV.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

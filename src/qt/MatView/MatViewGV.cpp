@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "gtl/qt/qt.h"
-#include "gtl/qt/MatView/MatViewWidget.h"
-#include "ui_MatViewWidget.h"
-#include "MatViewSettingsDlg.h"
+#include "gtl/qt/MatView/MatViewGV.h"
+#include "ui_MatViewGV.h"
+#include "MatViewGVSettingsDlg.h"
 
 namespace gtl::qt {
 
-	xMatViewWidget::xMatViewWidget(QWidget* parent) : QWidget(parent), ui(std::make_unique<Ui::MatViewWidgetClass>()) {
+	xMatViewGV::xMatViewGV(QWidget* parent) : QWidget(parent), ui(std::make_unique<Ui::MatViewGVClass>()) {
 		ui->setupUi(this);
 		m_view = ui->view;
 
@@ -16,17 +16,17 @@ namespace gtl::qt {
 		connect(ui->toolbar->btnZoomFit, &QPushButton::clicked, this, &this_t::OnBtnZoomFit);
 		connect(ui->toolbar->btnSettings, &QPushButton::clicked, this, &this_t::OnBtnSettings);
 
-		connect(m_view, &xMatViewCanvas::sigMouseMoved, this, &xMatViewWidget::OnSigMouseMoved);
-		connect(m_view, &xMatViewCanvas::sigMouseSelected, this, &xMatViewWidget::OnSigMouseSelected);
-		connect(m_view, &xMatViewCanvas::sigZoom, this, &xMatViewWidget::OnSigZoom);
+		connect(m_view, &xMatViewGVCanvas::sigMouseMoved, this, &xMatViewGV::OnSigMouseMoved);
+		connect(m_view, &xMatViewGVCanvas::sigMouseSelected, this, &xMatViewGV::OnSigMouseSelected);
+		connect(m_view, &xMatViewGVCanvas::sigZoom, this, &xMatViewGV::OnSigZoom);
 
 
 	}
 
-	xMatViewWidget::~xMatViewWidget() {
+	xMatViewGV::~xMatViewGV() {
 	}
 
-	void xMatViewWidget::OnSigMouseMoved(int x, int y) {
+	void xMatViewGV::OnSigMouseMoved(int x, int y) {
 		if (!m_view or m_view->m_img.empty())
 			return;
 		auto status = std::format("{},{}", x, y);
@@ -51,27 +51,27 @@ namespace gtl::qt {
 		//}
 	}
 
-	void xMatViewWidget::OnSigMouseSelected(QRect rect) {
+	void xMatViewGV::OnSigMouseSelected(QRect rect) {
 
 	}
 
-	void xMatViewWidget::OnSigZoom(double zoom) {
+	void xMatViewGV::OnSigZoom(double zoom) {
 		ui->toolbar->spinZoom->setValue(zoom);
 	}
 
-	void xMatViewWidget::OnSpinZoomValueChanged(double value) {
+	void xMatViewGV::OnSpinZoomValueChanged(double value) {
 		m_view->SetZoom(value, m_view->rect().center());
 	}
 
-	void xMatViewWidget::OnBtnZoomIn() {
+	void xMatViewGV::OnBtnZoomIn() {
 		m_view->ZoomInOut(1, {});
 	}
 
-	void xMatViewWidget::OnBtnZoomOut() {
+	void xMatViewGV::OnBtnZoomOut() {
 		m_view->ZoomInOut(-1, {});
 	}
 
-	void xMatViewWidget::OnBtnZoomFit() {
+	void xMatViewGV::OnBtnZoomFit() {
 		if (m_view->m_img.empty() or m_view->m_img.size().area() <= 0)
 			return;
 		auto rect = m_view->rect();
@@ -81,8 +81,8 @@ namespace gtl::qt {
 		m_view->SetZoom(dScale, {});
 	}
 
-	void xMatViewWidget::OnBtnSettings() {
-		xMatViewSettingsDlg dlg;
+	void xMatViewGV::OnBtnSettings() {
+		xMatViewGVSettingsDlg dlg;
 		dlg.m_option = m_view->m_option;
 		dlg.UpdateData(false);
 		auto r = dlg.exec();
