@@ -5,8 +5,15 @@ test_qt::test_qt(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    m_dlgMatView = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
-    m_dlgMatView->show();
+    //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
+    //m_dlgMatViewGV->show();
+
+	m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
+	m_ctrlMatView->move({4, 100});
+	m_ctrlMatView->show();
+
+	m_dlgMatView = std::make_unique<gtl::qt::xMatViewDlg>(this);
+	m_dlgMatView->show();
 
 	// Color Bar
 	//cv::Mat img = cv::Mat::zeros(1080*2, 1920*2, CV_8UC3);
@@ -47,7 +54,8 @@ test_qt::test_qt(QWidget *parent)
 	//}
 	//m_option.bGLonly = false;
 	//m_option.bSkia = true;
-	m_dlgMatView->SetImage(img, false);
+
+	//m_dlgMatView->SetImage(img, false);
 
 }
 

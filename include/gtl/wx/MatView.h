@@ -59,7 +59,7 @@ namespace gtl::wx {
 			bool bKeyboardNavigation{};			// page up/down, scroll down to next blank of image
 			bool bDrawPixelValue{true};			// draw pixel value on image
 			bool bPyrImageDown{true};			// build cache image for down sampling. (such as mipmap)
-			double dMouseSpeed{2.0};			// Image Panning Speed. 1.0 is same with mouse move.
+			double dPanningSpeed{2.0};			// Image Panning Speed. 1.0 is same with mouse move.
 			int nScrollMargin{5};				// bExtendedPanning, px margin to scroll
 			std::chrono::milliseconds tsScroll{250ms};	// Smooth Scroll. duration
 			eZOOM_IN eZoomIn{eZOOM_IN::nearest};
@@ -79,7 +79,7 @@ namespace gtl::wx {
 				bKeyboardNavigation = j.value("bKeyboardNavigation", bKeyboardNavigation);
 				bDrawPixelValue = j.value("bDrawPixelValue", bDrawPixelValue);
 				bPyrImageDown = j.value("bPyrImageDown", bPyrImageDown);
-				dMouseSpeed = j.value("dMouseSpeed", dMouseSpeed);
+				dPanningSpeed = j.value("dPanningSpeed", dPanningSpeed);
 				nScrollMargin = j.value("nScrollMargin", nScrollMargin);
 				tsScroll = std::chrono::milliseconds(j.value("tsScroll", tsScroll.count()));
 				eZoomIn = (eZOOM_IN)j.value("eZoomIn", std::to_underlying(eZoomIn));
@@ -100,7 +100,7 @@ namespace gtl::wx {
 				j["bKeyboardNavigation"] = bKeyboardNavigation;
 				j["bDrawPixelValue"] = bDrawPixelValue;
 				j["bPyrImageDown"] = bPyrImageDown;
-				j["dMouseSpeed"] = dMouseSpeed;
+				j["dPanningSpeed"] = dPanningSpeed;
 				j["nScrollMargin"] = nScrollMargin;
 				j["tsScroll"] = tsScroll.count();
 				j["eZoomIn"] = std::to_underlying(eZoomIn);

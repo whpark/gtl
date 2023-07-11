@@ -290,17 +290,23 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVCanvas.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVDlg.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGV.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatView.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewDlg.h" />
     <ClInclude Include="..\..\include\gtl\qt\qt.h" />
     <ClInclude Include="..\..\include\gtl\qt\_lib_gtl_qt.h" />
     <ClInclude Include="framework.h" />
     <QtMoc Include="MatView\MatViewGVSettingsDlg.h" />
     <QtMoc Include="MatView\MatViewGVToolbar.h" />
+    <QtMoc Include="MatView\MatViewSettingsDlg.h" />
     <ClInclude Include="qt_global.h" />
+    <ClCompile Include="MatView\MatView.cpp" />
+    <ClCompile Include="MatView\MatViewDlg.cpp" />
     <ClCompile Include="MatView\MatViewGV.cpp" />
     <ClCompile Include="MatView\MatViewGVCanvas.cpp" />
     <ClCompile Include="MatView\MatViewGVDlg.cpp" />
     <ClCompile Include="MatView\MatViewGVSettingsDlg.cpp" />
     <ClCompile Include="MatView\MatViewGVToolbar.cpp" />
+    <ClCompile Include="MatView\MatViewSettingsDlg.cpp" />
     <ClCompile Include="qt.cpp" />
     <ClInclude Include="pch.h" />
     <ClCompile Include="pch.cpp">
@@ -311,10 +317,13 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="MatView\MatView.ui" />
+    <QtUic Include="MatView\MatViewDlg.ui" />
     <QtUic Include="MatView\MatViewGV.ui" />
     <QtUic Include="MatView\MatViewGVDlg.ui" />
     <QtUic Include="MatView\MatViewGVSettingsDlg.ui" />
     <QtUic Include="MatView\MatViewGVToolbar.ui" />
+    <QtUic Include="MatView\MatViewSettingsDlg.ui" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

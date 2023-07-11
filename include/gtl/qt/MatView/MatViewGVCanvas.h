@@ -31,14 +31,14 @@ public:
 	struct S_OPTION {
 		bool bDrawPixelValue{true};			// draw pixel value on image
 		bool bSmoothInterpolation{false};	// smooth interpolation
-		double dMouseSpeed{2.0};			// Image Panning Speed. 1.0 is same with mouse move.
+		double dPanningSpeed{2.0};			// Image Panning Speed. 1.0 is same with mouse move.
 		cv::Vec3b crBackground{161, 114, 230};	// rgb
 
 		bool operator == (S_OPTION const&) const = default;
 		bool operator != (S_OPTION const&) const = default;
 
 		// Sync with json
-		GLZ_LOCAL_META(S_OPTION, bDrawPixelValue, bSmoothInterpolation, dMouseSpeed, crBackground);
+		GLZ_LOCAL_META(S_OPTION, bDrawPixelValue, bSmoothInterpolation, dPanningSpeed, crBackground);
 	};
 
 	std::string m_strCookie;

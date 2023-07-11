@@ -1247,8 +1247,8 @@ void xMatView::OnMotion_View( wxMouseEvent& event ) {
 				break;
 			}
 		}
-		auto dMouseSpeed = m_mouse.bInSelectionMode ? 1.0 : m_option.dMouseSpeed;
-		auto ptOffset = (pt - *m_mouse.ptAnchor) * dMouseSpeed;
+		auto dPanningSpeed = m_mouse.bInSelectionMode ? 1.0 : m_option.dPanningSpeed;
+		auto ptOffset = (pt - *m_mouse.ptAnchor) * dPanningSpeed;
 		if (m_eZoom == eZOOM::fit2width)
 			ptOffset.x = 0;
 		if (m_eZoom == eZOOM::fit2height)

@@ -22,8 +22,11 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="MatView">
+    <Filter Include="MatViewGV">
       <UniqueIdentifier>{5d1fc05c-2fe6-42a8-a041-c1d50a9830fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MatView">
+      <UniqueIdentifier>{65e7502c-3bee-4f21-a3eb-a1cd08133b5f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,18 +34,27 @@
       <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="MatView\MatViewGV.cpp">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </ClCompile>
     <ClCompile Include="MatView\MatViewGVCanvas.cpp">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </ClCompile>
     <ClCompile Include="MatView\MatViewGVDlg.cpp">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </ClCompile>
     <ClCompile Include="MatView\MatViewGVSettingsDlg.cpp">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </ClCompile>
     <ClCompile Include="MatView\MatViewGVToolbar.cpp">
+      <Filter>MatViewGV</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatView.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatViewDlg.cpp">
+      <Filter>MatView</Filter>
+    </ClCompile>
+    <ClCompile Include="MatView\MatViewSettingsDlg.cpp">
       <Filter>MatView</Filter>
     </ClCompile>
   </ItemGroup>
@@ -70,32 +82,50 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MatView\MatViewGVSettingsDlg.h">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </QtMoc>
     <QtMoc Include="MatView\MatViewGVToolbar.h">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </QtMoc>
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVCanvas.h">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </QtMoc>
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVDlg.h">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </QtMoc>
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGV.h">
+      <Filter>MatViewGV</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatView.h">
+      <Filter>MatView</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewDlg.h">
+      <Filter>MatView</Filter>
+    </QtMoc>
+    <QtMoc Include="MatView\MatViewSettingsDlg.h">
       <Filter>MatView</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MatView\MatViewGV.ui">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </QtUic>
     <QtUic Include="MatView\MatViewGVDlg.ui">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </QtUic>
     <QtUic Include="MatView\MatViewGVSettingsDlg.ui">
-      <Filter>MatView</Filter>
+      <Filter>MatViewGV</Filter>
     </QtUic>
     <QtUic Include="MatView\MatViewGVToolbar.ui">
+      <Filter>MatViewGV</Filter>
+    </QtUic>
+    <QtUic Include="MatView\MatView.ui">
+      <Filter>MatView</Filter>
+    </QtUic>
+    <QtUic Include="MatView\MatViewDlg.ui">
+      <Filter>MatView</Filter>
+    </QtUic>
+    <QtUic Include="MatView\MatViewSettingsDlg.ui">
       <Filter>MatView</Filter>
     </QtUic>
   </ItemGroup>

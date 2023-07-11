@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "gtl/qt/qt.h"
 #include <QColorDialog>
 #include "MatViewGVSettingsDlg.h"
 
@@ -7,26 +8,24 @@ namespace gtl::qt {
 	xMatViewGVSettingsDlg::xMatViewGVSettingsDlg(QWidget* parent)
 		: QDialog(parent) {
 		ui.setupUi(this);
-		connect(ui.btnBackgroundColor, &QPushButton::clicked, this, &xMatViewGVSettingsDlg::OnBackgroundColor);
 		connect(ui.btnOK, &QPushButton::clicked, this, &this_t::OnBtnOK);
 		connect(ui.btnCancel, &QPushButton::clicked, this, &this_t::OnBtnCancel);
+		connect(ui.btnBackgroundColor, &QPushButton::clicked, this, &this_t::OnBackgroundColor);
 	}
 
 	xMatViewGVSettingsDlg::~xMatViewGVSettingsDlg() {
 	}
 
 	bool xMatViewGVSettingsDlg::UpdateData(bool bSaveAndValidate) {
+		UpdateWidgetValue(bSaveAndValidate, ui.chkDrawPixelValue, m_option.bDrawPixelValue);
+		UpdateWidgetValue(bSaveAndValidate, ui.chkSmoothInterpolation, m_option.bSmoothInterpolation);
+		UpdateWidgetValue(bSaveAndValidate, ui.spinPanningSpeed, m_option.dPanningSpeed);
+
 		if (bSaveAndValidate) {
-			m_option.bDrawPixelValue = ui.chkDrawPixelValue->isChecked();
-			m_option.bSmoothInterpolation = ui.chkSmoothInterpolation->isChecked();
-			m_option.dMouseSpeed = ui.spinMouseSpeed->value();
 			auto cr = QColor(ui.edtColorBackground->text());
 			m_option.crBackground = cv::Vec3b(cr.red(), cr.green(), cr.blue());
 		}
 		else {
-			ui.chkDrawPixelValue->setChecked(m_option.bDrawPixelValue);
-			ui.chkSmoothInterpolation->setChecked(m_option.bSmoothInterpolation);
-			ui.spinMouseSpeed->setValue(m_option.dMouseSpeed);
 			ui.edtColorBackground->setText(QColor(m_option.crBackground[0], m_option.crBackground[1], m_option.crBackground[2]).name());
 		}
 		return false;

@@ -18,7 +18,7 @@ namespace gtl::wx {
 		m_chkKeyboardNavigation->Set3StateValue(m_option.bKeyboardNavigation ? wxCHK_CHECKED : wxCHK_UNCHECKED);
 		m_chkDrawPixelValue->Set3StateValue(m_option.bDrawPixelValue ? wxCHK_CHECKED : wxCHK_UNCHECKED);
 		m_chkPyrImageDown->Set3StateValue(m_option.bPyrImageDown ? wxCHK_CHECKED : wxCHK_UNCHECKED);
-		m_spinMouseSpeed->SetValue(m_option.dMouseSpeed);
+		m_spinMouseSpeed->SetValue(m_option.dPanningSpeed);
 		m_spinScrollMargin->SetValue(m_option.nScrollMargin);
 		m_spinScrollTime->SetValue(std::chrono::milliseconds(m_option.tsScroll).count());
 		m_radioZoomInMethod->SetSelection(std::to_underlying(m_option.eZoomIn));
@@ -51,7 +51,7 @@ namespace gtl::wx {
 		m_option.bKeyboardNavigation = (m_chkKeyboardNavigation->Get3StateValue() == wxCHK_CHECKED);
 		m_option.bDrawPixelValue = (m_chkDrawPixelValue->Get3StateValue() == wxCHK_CHECKED);
 		m_option.bPyrImageDown = (m_chkPyrImageDown->Get3StateValue() == wxCHK_CHECKED);
-		m_option.dMouseSpeed = m_spinMouseSpeed->GetValue();
+		m_option.dPanningSpeed = m_spinMouseSpeed->GetValue();
 		m_option.nScrollMargin = m_spinScrollMargin->GetValue();
 		m_option.tsScroll = std::chrono::milliseconds(m_spinScrollTime->GetValue());
 		m_option.eZoomIn = (xMatView::eZOOM_IN)m_radioZoomInMethod->GetSelection();
