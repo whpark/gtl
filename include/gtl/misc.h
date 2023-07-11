@@ -108,6 +108,53 @@ namespace gtl {
 		constexpr bool operator()(T const& v) const { return v != T{}; }
 	};
 
+	/// @brief string to int/double ...
+	/// @tparam value_t arithmetic type
+	/// @param str 
+	/// @param base 
+	/// @return 
+	template < gtlc::arithmetic value_t >
+	value_t ToArithmeticValue(std::string_view sv, int base = 0, std::from_chars_result* result = {}) {
+		value_t value{};
+		auto* b = sv.data();
+		auto* e = sv.data() + sv.size();
+		// skip leading spaces
+		while (b < e and std::isspace(*b)) b++;
+		if constexpr (std::is_integral_v<value_t>) {
+			if (base == 0) {
+				std::string_view sv(b, e);
+				if (sv.starts_with("0x")) {
+					base = 16;
+					b += 2;
+				}
+				else if (sv.starts_with("0b")) {
+					b += 2;
+					base = 2;
+				}
+				else if (sv.starts_with("0")) {
+					b += 1;
+					base = 8;
+				}
+				else {
+					base = 10;
+				}
+			}
+			auto r = std::from_chars(b, e, value, base);
+			if (result)
+				*result = r;
+		}
+		else {
+			auto r = std::from_chars(b, e, value);
+			if (result)
+				*result = r;
+		}
+		return value;
+	}
+
+	template < gtlc::arithmetic value_t, gtlc::string_elem tchar_t >
+	value_t ToArithmeticValue(std::basic_string<tchar_t> const& str, int base = 0, std::from_chars_result* result = {}) {
+		return ToArithmeticValue<value_t>(std::string_view(ToString<char, tchar_t>(str)), base, result);
+	}
 
 	/// @brief RAI helper
 	// xTrigger -> xFinalAction (naming from gsl::final_action)
