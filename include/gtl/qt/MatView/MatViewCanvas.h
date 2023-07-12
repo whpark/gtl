@@ -8,13 +8,14 @@ namespace gtl::qt {
 }
 
 class gtl::qt::xMatViewCanvas : public QOpenGLWidget {
+	friend class xMatView;
 	Q_OBJECT
 
 public:
 	using this_t = xMatViewCanvas;
 	using base_t = QOpenGLWidget;
 
-
+protected:
 	std::function<void(xMatViewCanvas*)> m_fnInitializeGL;
 	std::function<void(xMatViewCanvas*)> m_fnPaintGL;
 	std::function<void(xMatViewCanvas*, QMouseEvent* event)> m_fnMousePress;

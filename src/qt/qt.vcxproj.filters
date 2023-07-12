@@ -60,9 +60,6 @@
     <ClCompile Include="MatView\MatView_misc.cpp">
       <Filter>MatView</Filter>
     </ClCompile>
-    <ClCompile Include="MatView\MatViewCanvas.cpp">
-      <Filter>MatView</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_global.h">

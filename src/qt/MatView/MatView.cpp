@@ -34,21 +34,23 @@ namespace gtl::qt {
 		ui->setupUi(this);
 
 		// openGL object
-		m_view = std::make_unique<xMatViewCanvas>(this);
-		m_view->m_fnInitializeGL =	[this](auto* p) { this->InitializeGL(p); };
-		m_view->m_fnPaintGL =		[this](auto* p) { this->PaintGL(p); };
-		m_view->m_fnMousePress =	[this](auto* p, auto* e) { this->OnView_mousePressEvent(p, e); };
-		m_view->m_fnMouseRelease =	[this](auto* p, auto* e) { this->OnView_mouseReleaseEvent(p, e); };
-		m_view->m_fnMouseMove =		[this](auto* p, auto* e) { this->OnView_mouseMoveEvent(p, e); };
-		m_view->m_fnWheel =			[this](auto* p, auto* e) { this->OnView_wheelEvent(p, e); };
-		m_view->setObjectName("view");
-		m_view->setMouseTracking(true);
-		QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-		sizePolicy.setHorizontalStretch(0);
-		sizePolicy.setVerticalStretch(0);
-		sizePolicy.setHeightForWidth(false);
-		m_view->setSizePolicy(sizePolicy);
-		ui->gridLayout->addWidget(m_view.get(), 0, 0, 1, 1);
+		//ui->view = std::make_unique<xMatViewCanvas>(this);
+		if (auto* view = ui->view) {
+			view->m_fnInitializeGL =	[this](auto* p) { this->InitializeGL(p); };
+			view->m_fnPaintGL =			[this](auto* p) { this->PaintGL(p); };
+			view->m_fnMousePress =		[this](auto* p, auto* e) { this->OnView_mousePressEvent(p, e); };
+			view->m_fnMouseRelease =	[this](auto* p, auto* e) { this->OnView_mouseReleaseEvent(p, e); };
+			view->m_fnMouseMove =		[this](auto* p, auto* e) { this->OnView_mouseMoveEvent(p, e); };
+			view->m_fnWheel =			[this](auto* p, auto* e) { this->OnView_wheelEvent(p, e); };
+			view->setMouseTracking(true);
+		}
+		//ui->view->setObjectName("view");
+		//QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+		//sizePolicy.setHorizontalStretch(0);
+		//sizePolicy.setVerticalStretch(0);
+		//sizePolicy.setHeightForWidth(false);
+		//ui->view->setSizePolicy(sizePolicy);
+		//ui->gridLayout->addWidget(ui->view.get(), 0, 0, 1, 1);
 
 		if (m_fnSyncSetting) {
 			m_fnSyncSetting(false, m_strCookie, m_option);
@@ -60,8 +62,12 @@ namespace gtl::qt {
 		connect(ui->btnZoomOut, &QPushButton::clicked, this, &this_t::OnBtnZoomOut_clicked);
 		connect(ui->btnZoomFit, &QPushButton::clicked, this, &this_t::OnBtnZoomFit_clicked);
 		connect(ui->btnSettings, &QPushButton::clicked, this, &this_t::OnSettings);
+		connect(ui->sbHorz, &QScrollBar::valueChanged, this, &this_t::OnSbHorz_valueChanged);
+		connect(ui->sbHorz, &QScrollBar::sliderMoved, this, &this_t::OnSbHorz_valueChanged);
+		connect(ui->sbVert, &QScrollBar::valueChanged, this, &this_t::OnSbVert_valueChanged);
+		connect(ui->sbVert, &QScrollBar::sliderMoved, this, &this_t::OnSbVert_valueChanged);
 		connect(&m_smooth_scroll.timer, &QTimer::timeout, this, &this_t::OnSmoothScroll_timeout);
-		connect(m_view.get(), &QOpenGLWidget::resized, this, &this_t::OnView_resized);
+		connect(ui->view, &QOpenGLWidget::resized, this, &this_t::OnView_resized);
 	}
 
 	xMatView::~xMatView() {
@@ -118,16 +124,13 @@ namespace gtl::qt {
 
 		if (eZoomMode != eZOOM::none) {
 			ui->cmbZoomMode->setCurrentIndex(std::to_underlying(eZoomMode));
-			// todo: check if event happens or NOT
 			OnCmbZoomMode_currentIndexChanged(std::to_underlying(eZoomMode));
 		} else {
 			UpdateCT(bCenter);
 			UpdateScrollBars();
 
-			// to do Check.
-			m_view->update();
-			//m_view->Refresh();
-			//m_view->Update();
+			if (ui->view)
+				ui->view->update();
 		}
 		return true;
 	}
@@ -137,9 +140,8 @@ namespace gtl::qt {
 		m_eZoom = eZoomMode;
 		UpdateCT(bCenter, eZoomMode);
 		UpdateScrollBars();
-		// to do Check.
-		m_view->update();
-		//m_view->Refresh();
+		if (ui->view)
+			ui->view->update();
 		return true;
 	}
 
@@ -147,10 +149,8 @@ namespace gtl::qt {
 		m_mouse.bRectSelected = true;
 		m_mouse.ptSel0 = rect.pt0();
 		m_mouse.ptSel1 = rect.pt1();
-		// to do Check.
-		m_view->update();
-		//m_view->Refresh(false);
-		//m_view->Update();
+		if (ui->view)
+			ui->view->update();
 	}
 	void xMatView::ClearSelectionRect() {
 		m_mouse.bRectSelected = false;
@@ -162,10 +162,8 @@ namespace gtl::qt {
 
 		UpdateCT(false, eZOOM::none);
 		UpdateScrollBars();
-		// to do Check.
-		m_view->update();
-		//m_view->Refresh(false);
-		//m_view->Update();
+		if (ui->view)
+			ui->view->update();
 
 		if (bStore) {
 			return m_fnSyncSetting and m_fnSyncSetting(true, m_strCookie, m_option);
@@ -176,8 +174,10 @@ namespace gtl::qt {
 	bool xMatView::ShowToolBar(bool bShow) {
 		if (!ui->toolbar)
 			return false;
-		// todo: check
-		ui->toolbar->show();
+		if (bShow)
+			ui->toolbar->show();
+		else
+			ui->toolbar->hide();
 		return true;
 	}
 
@@ -307,7 +307,7 @@ namespace gtl::qt {
 				: -m_ctScreenFromImage.m_offset.x;
 			if (rectScrollRange.Width() > 0) {
 				p = std::clamp(p, 0, rectScrollRange.Width());
-				sb->setRange(0, rectScrollRange.Width());
+				sb->setRange(0, std::max(0, rectScrollRange.Width() - rectClient.Width()));
 				sb->setPageStep(rectClient.Width());
 				sb->setSliderPosition(p);
 			}
@@ -319,15 +319,15 @@ namespace gtl::qt {
 				: -m_ctScreenFromImage.m_offset.y;
 			if (rectScrollRange.Height() > 0) {
 				p = std::clamp(p, 0, rectScrollRange.Height());
-				sb->setRange(0, rectScrollRange.Height());
+				sb->setRange(0, std::max(0, rectScrollRange.Height()-rectClient.Height()));
 				sb->setPageStep(rectClient.Height());
 				sb->setSliderPosition(p);
 			}
 		}
 
-		if (m_ctScreenFromImage.m_scale != ui->spinZoom->value()) {
+		if (m_ctScreenFromImage.m_scale != ui->spinZoom->value()*1.e-2) {
 			m_bSkipSpinZoomEvent = true;
-			ui->spinZoom->setValue(m_ctScreenFromImage.m_scale);
+			ui->spinZoom->setValue(m_ctScreenFromImage.m_scale*1.e2);
 			m_bSkipSpinZoomEvent = false;
 		}
 
@@ -375,15 +375,11 @@ namespace gtl::qt {
 		if (m_eZoom != eZOOM::mouse_wheel_locked)
 			m_eZoom = eZOOM::free;
 		ui->cmbZoomMode->setCurrentIndex(std::to_underlying(m_eZoom));
-		// todo: check...
 		OnCmbZoomMode_currentIndexChanged(std::to_underlying(m_eZoom));
 		UpdateCT(bCenter);
 		UpdateScrollBars();
-
-		// todo: Check
-		m_view->update();
-		//m_view->Refresh(false);
-		//m_view->Update();
+		if (ui->view)
+			ui->view->update();
 		return true;
 	}
 
@@ -393,10 +389,8 @@ namespace gtl::qt {
 			m_ctScreenFromImage.m_offset = pt;
 			UpdateCT(false);
 			UpdateScrollBars();
-			// todo: Check
-			m_view->update();
-			//m_view->Refresh();
-			//m_view->Update();
+			if (ui->view)
+				ui->view->update();
 		}
 		else {
 			m_smooth_scroll.pt0 = m_ctScreenFromImage.m_offset;
@@ -540,8 +534,11 @@ namespace gtl::qt {
 	}
 
 	xRect2i xMatView::GetViewRect() {
-		auto r = m_view->rect();
-		return xRect2i(r.left(), r.top(), r.right(), r.bottom());
+		if (!ui->view)
+			return {};
+		auto rect = ToCoord(ui->view->rect());
+		rect.MoveToXY(0, 0);
+		return rect;
 	}
 
 	void xMatView::keyPressEvent(QKeyEvent* event) {
@@ -558,10 +555,8 @@ namespace gtl::qt {
 			)
 		{
 			m_mouse.bRectSelected = m_mouse.bInSelectionMode = false;
-			// to do Check.
-			m_view->update();
-			//m_view->Refresh(false);
-			//m_view->Update();
+			if (ui->view)
+				ui->view->update();
 			event->accept();
 			return ;
 		}
@@ -584,6 +579,8 @@ namespace gtl::qt {
 	}
 
 	void xMatView::OnView_mousePressEvent(xMatViewCanvas* view, QMouseEvent* event) {
+		if (!view)
+			return;
 		if (event->button() == Qt::MouseButton::LeftButton) {
 			if (m_option.bPanningLock and (m_eZoom == eZOOM::fit2window))
 				return;
@@ -609,14 +606,13 @@ namespace gtl::qt {
 				m_mouse.ptSel0.y = std::clamp<int>(pt.y, 0, m_img.rows);
 
 			}
-			// to do Check.
 			view->update();
-			//m_view->Refresh(false);
-			//m_view->Update();
 		}
 	}
 
 	void xMatView::OnView_mouseReleaseEvent(xMatViewCanvas* view, QMouseEvent* event) {
+		if (!view)
+			return;
 		if (event->button() == Qt::MouseButton::LeftButton) {
 			if (!mouseGrabber())
 				return;
@@ -629,6 +625,8 @@ namespace gtl::qt {
 	}
 
 	void xMatView::OnView_mouseMoveEvent(xMatViewCanvas* view, QMouseEvent* event) {
+		if (!view)
+			return;
 		event->accept();
 		xPoint2i pt;
 		pt = ToCoord(event->pos());
@@ -653,9 +651,7 @@ namespace gtl::qt {
 			m_ctScreenFromImage.m_offset = m_mouse.ptOffset0 + ptOffset;
 			UpdateCT();
 			UpdateScrollBars();
-			// to do Check.
 			view->update();
-			//m_view->Refresh(false);
 		}
 
 		// Selection Mode
@@ -663,10 +659,7 @@ namespace gtl::qt {
 			auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()));
 			m_mouse.ptSel1.x = std::clamp<int>(pt.x, 0, m_img.cols);
 			m_mouse.ptSel1.y = std::clamp<int>(pt.y, 0, m_img.rows);
-			// to do Check.
 			view->update();
-			//m_view->Refresh(false);
-			//m_view->Update();
 		}
 
 		// status
@@ -677,13 +670,14 @@ namespace gtl::qt {
 				gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
 				status += std::format(L" w{}, h{}", size.cx, size.cy);
 			}
-			//if (status != m_textStatus->GetValue().ToStdWstring()) {
-			ui->edtInfo->setText(ToQString(status));
-			//}
+			if (auto str = ToQString(status); str != ui->edtInfo->text())
+				ui->edtInfo->setText(str);
 		}
 	}
 
 	void xMatView::OnView_wheelEvent(xMatViewCanvas* view, QWheelEvent* event) {
+		if (!view)
+			return;
 		if ((m_eZoom == eZOOM::mouse_wheel_locked) or (m_option.bZoomLock and m_eZoom != eZOOM::free)) {
 			return;
 		}
@@ -692,6 +686,8 @@ namespace gtl::qt {
 	}
 
 	void xMatView::OnCmbZoomMode_currentIndexChanged(int index) {
+		//static int count{};
+		//OutputDebugStringA(std::format("{} : index : {}, count {}\n", std::source_location{}.function_name(), index, count++).c_str());
 		{
 			eZOOM cur = (eZOOM)index;
 			using enum eZOOM;
@@ -702,16 +698,19 @@ namespace gtl::qt {
 
 		//// Scroll Bar Visibility
 		//bool bHorz{true}, bVert{true};
-		//m_view->AlwaysShowScrollbars(bHorz, bVert);
+		//ui->view->AlwaysShowScrollbars(bHorz, bVert);
 
 		UpdateCT(true);
 		UpdateScrollBars();
-
-		// todo: check. org: Refresh(false)
-		update();
+		if (ui->view)
+			ui->view->update();
 	}
 
-	void xMatView::OnSpinZoom_valueChanged(double scale) {
+	void xMatView::OnSpinZoom_valueChanged(double value) {
+		auto scale = value * 1.e-2;
+		static auto const dMinZoom = dZoomLevels[0];
+		static auto const dMaxZoom = dZoomLevels[std::size(dZoomLevels)-1];
+		scale = std::clamp<double>(scale, dMinZoom, dMaxZoom);
 		if (m_bSkipSpinZoomEvent)
 			return;
 		if ( m_option.bZoomLock and gtl::IsValueNoneOf(m_eZoom, eZOOM::free, eZOOM::mouse_wheel_locked) )
@@ -744,10 +743,8 @@ namespace gtl::qt {
 		UpdateCT(true, eZOOM::fit2window);
 		UpdateScrollBars();
 
-		// todo: check.
-		m_view->update();
-		//m_view->Refresh(false);
-		//m_view->Update();
+		if (ui->view)
+			ui->view->update();
 	}
 
 	void xMatView::OnBtnSettings_clicked() {
@@ -773,9 +770,9 @@ namespace gtl::qt {
 		}
 		UpdateCT(false);
 		UpdateScrollBars();
-		// to do Check.
-		m_view->update();
-		//m_view->Refresh(false);
+		if (!ui->view)
+			return;
+		ui->view->update();
 	}
 
 	void xMatView::OnView_resized() {
@@ -783,60 +780,32 @@ namespace gtl::qt {
 		UpdateScrollBars();
 	}
 
-	void xMatView::OnSbHorz_valueChanged(int value) {
+	void xMatView::OnSbHorz_valueChanged(int pos) {
+		auto [rectClient, rectImageScreen, rectScrollRange] = GetScrollGeometry();
+		int range = rectScrollRange.Width();
+		int page =  rectClient.Width();
+		pos = std::clamp(pos, 0, range);
+		m_ctScreenFromImage.m_offset.x = - pos;
+		if (m_option.bExtendedPanning)
+			m_ctScreenFromImage.m_offset.x += rectScrollRange.Width() - std::max(0, rectImageScreen.Width() - m_option.nScrollMargin) - rectClient.Width();
+		UpdateScrollBars();
+		if (!ui->view)
+			ui->view->update();
 	}
-	void xMatView::OnSbVert_valueChanged(int value) {
+	void xMatView::OnSbVert_valueChanged(int pos) {
+		auto [rectClient, rectImageScreen, rectScrollRange] = GetScrollGeometry();
+		int range = rectScrollRange.Height();
+		int page =  rectClient.Height();
+		pos = std::clamp(pos, 0, range);
+		m_ctScreenFromImage.m_offset.y = - pos;
+		if (m_option.bExtendedPanning)
+			m_ctScreenFromImage.m_offset.y += rectScrollRange.Height() - std::max(0, rectImageScreen.Height() - m_option.nScrollMargin) - rectClient.Height();
+		UpdateScrollBars();
+		if (!ui->view)
+			ui->view->update();
 	}
-	void xMatView::OnSbHorz_sliderMoved(int value) {
-	}
-	void xMatView::OnSbVert_sliderMoved(int value) {
-	}
-
-	//void xMatView::OnScrollWin_View( wxScrollWinEvent& event) {
-	//	auto const orientation = event.GetOrientation();
-	//	auto const bHorz = orientation == wxHORIZONTAL;
-	//	auto const thumb = event.GetPosition();
-	//	auto const pos0 = m_view->GetScrollPos(orientation);
-	//	auto pos = pos0;
-
-	//	auto [rectClient, rectImageScreen, rectScrollRange] = GetScrollGeometry();
-
-	//	auto evt = event.GetEventType();
-	//	bool bUpdateScroll{true};
-	//	int range = bHorz ? rectScrollRange.Width() : rectScrollRange.Height();
-	//	int page =  bHorz ? rectClient.Width() : rectClient.Height();
-
-	//	if (evt == wxEVT_SCROLLWIN_TOP) { pos = 0; }
-	//	else if (evt == wxEVT_SCROLLWIN_BOTTOM) { pos = range-page; }
-	//	else if (evt == wxEVT_SCROLLWIN_LINEUP) { pos--; }
-	//	else if (evt == wxEVT_SCROLLWIN_LINEDOWN) { pos++; }
-	//	else if (evt == wxEVT_SCROLLWIN_PAGEUP) { pos -= page; }
-	//	else if (evt == wxEVT_SCROLLWIN_PAGEDOWN) { pos += page; }
-	//	else if ( (evt == wxEVT_SCROLLWIN_THUMBTRACK) or (evt == wxEVT_SCROLLWIN_THUMBRELEASE) ) {
-	//		bUpdateScroll = (evt == wxEVT_SCROLLWIN_THUMBRELEASE);
-	//		pos = thumb;
-	//	}
-
-	//	pos = std::clamp<std::remove_cvref_t<decltype(pos)>>(pos, 0, range);
-	//	if (bHorz) {
-	//		m_ctScreenFromImage.m_offset.x = - pos;
-	//		if (m_option.bExtendedPanning)
-	//			m_ctScreenFromImage.m_offset.x += rectScrollRange.Width() - std::max(0, rectImageScreen.Width() - m_option.nScrollMargin) - rectClient.Width();
-	//	} else {
-	//		m_ctScreenFromImage.m_offset.y = - pos;
-	//		if (m_option.bExtendedPanning)
-	//			m_ctScreenFromImage.m_offset.y += rectScrollRange.Height() - std::max(0, rectImageScreen.Height() - m_option.nScrollMargin) - rectClient.Height();
-	//	}
-
-	//	if (bUpdateScroll)
-	//		UpdateScrollBars();
-	//	m_view->Refresh(false);
-	//}
 
 	void xMatView::InitializeGL(xMatViewCanvas* view) {
-		//m_context = std::make_unique<wxGLContext>(m_view);
-		//m_view->SetCurrent(*m_context);
-		//glewExperimental = true;
 		GLenum err = glewInit();
 		if (err != GLEW_OK) {
 			const GLubyte* msg = glewGetErrorString(err);
@@ -845,7 +814,6 @@ namespace gtl::qt {
 			return;
 			//throw std::exception(reinterpret_cast<const char*>(msg));
 		}
-
 	}
 	void xMatView::PaintGL(xMatViewCanvas* view) {
 		if (!view)
@@ -919,6 +887,9 @@ namespace gtl::qt {
 		cv::Rect rcTargetC(rcTarget);	// 4 byte align
 		if (rcTarget.width*m_img.elemSize() % 4)
 			rcTargetC.width = gtl::AdjustAlign32(rcTargetC.width);
+		// check target image size
+		if ((uint64_t)rcTargetC.width * rcTargetC.height > 1ull *1024*1024*1024)
+			return;
 		cv::Mat img(rcTargetC.size(), m_img.type());
 		//img = m_option.crBackground;
 		int eInterpolation = cv::INTER_LINEAR;

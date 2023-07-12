@@ -6,9 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>419</width>
-    <height>292</height>
+    <width>409</width>
+    <height>141</height>
    </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::TabFocus</enum>
   </property>
   <property name="windowTitle">
    <string notr="true">MatView</string>
@@ -39,7 +42,7 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>391</width>
+       <width>409</width>
        <height>26</height>
       </size>
      </property>
@@ -80,6 +83,9 @@
        </property>
        <item>
         <widget class="QComboBox" name="cmbZoomMode">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
          <property name="placeholderText">
           <string notr="true"/>
          </property>
@@ -120,20 +126,47 @@
        </item>
        <item>
         <widget class="QDoubleSpinBox" name="spinZoom">
+         <property name="wrapping">
+          <bool>false</bool>
+         </property>
+         <property name="frame">
+          <bool>true</bool>
+         </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
          <property name="readOnly">
           <bool>false</bool>
          </property>
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::PlusMinus</enum>
+         </property>
+         <property name="specialValueText">
+          <string notr="true"/>
+         </property>
+         <property name="showGroupSeparator" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="prefix">
+          <string notr="true"/>
+         </property>
+         <property name="suffix">
+          <string notr="true"> %</string>
+         </property>
+         <property name="decimals">
+          <number>2</number>
+         </property>
          <property name="maximum">
           <double>100000.000000000000000</double>
          </property>
          <property name="singleStep">
-          <double>0.250000000000000</double>
+          <double>25.000000000000000</double>
+         </property>
+         <property name="stepType">
+          <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
          </property>
          <property name="value">
-          <double>1.000000000000000</double>
+          <double>100.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -232,7 +265,13 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0" columnstretch="1,0">
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="midLineWidth">
+      <number>0</number>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -262,11 +301,21 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="gtl::qt::xMatViewCanvas" name="view"/>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>gtl::qt::xMatViewCanvas</class>
+   <extends>QOpenGLWidget</extends>
+   <header>gtl/qt/MatView/MatViewCanvas.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>cmbZoomMode</tabstop>
   <tabstop>spinZoom</tabstop>

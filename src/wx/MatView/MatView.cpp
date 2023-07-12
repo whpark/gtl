@@ -941,6 +941,9 @@ void xMatView::OnPaint_View( wxPaintEvent& event ) {
 	cv::Rect rcTargetC(rcTarget);	// 4 byte align
 	if (rcTarget.width*m_img.elemSize() % 4)
 		rcTargetC.width = gtl::AdjustAlign32(rcTargetC.width);
+	// check target image size
+	if ((uint64_t)rcTargetC.width * rcTargetC.height > 1ull *1024*1024*1024)
+		return;
 	cv::Mat img(rcTargetC.size(), m_img.type());
 	//img = m_option.crBackground;
 	int eInterpolation = cv::INTER_LINEAR;

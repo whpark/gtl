@@ -101,7 +101,7 @@ protected:
 		}
 	} m_smooth_scroll;
 
-	std::unique_ptr<xMatViewCanvas> m_view;
+	//xMatViewCanvas* m_view{};
 
 	S_OPTION m_option;
 	eZOOM m_eZoom{eZOOM::fit2window};
@@ -165,9 +165,10 @@ protected:
 	void OnView_mouseMoveEvent(xMatViewCanvas* view, QMouseEvent *event);
 	void OnView_wheelEvent(xMatViewCanvas* view, QWheelEvent* event);
 
-protected slots:
+protected:
+	// slots
 	void OnCmbZoomMode_currentIndexChanged(int index);
-	void OnSpinZoom_valueChanged(double dZoom);
+	void OnSpinZoom_valueChanged(double value);
 	void OnBtnZoomIn_clicked();
 	void OnBtnZoomOut_clicked();
 	void OnBtnZoomFit_clicked();
@@ -175,9 +176,9 @@ protected slots:
 	void OnSmoothScroll_timeout();
 	void OnView_resized();
 	void OnSbHorz_valueChanged(int value);
-	void OnSbHorz_sliderMoved(int value);
+	//void OnSbHorz_sliderMoved(int value);
 	void OnSbVert_valueChanged(int value);
-	void OnSbVert_sliderMoved(int value);
+	//void OnSbVert_sliderMoved(int value);
 
 private:
 	std::unique_ptr<Ui::MatViewClass> ui;
