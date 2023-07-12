@@ -60,6 +60,12 @@
     <ClCompile Include="MatView\MatView_misc.cpp">
       <Filter>MatView</Filter>
     </ClCompile>
+    <ClCompile Include="QRoundButton.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="QColorButton.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_global.h">
@@ -113,6 +119,12 @@
     </QtMoc>
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewCanvas.h">
       <Filter>MatView</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\QColorButton.h">
+      <Filter>code</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\QRoundButton.h">
+      <Filter>code</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
