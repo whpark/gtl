@@ -23,7 +23,7 @@
 #		define GTL__WX_CLASS	GTL__IMPORT
 #		define GTL__WX_API		GTL__IMPORT
 #		define GTL__WX_DATA		GTL__IMPORT
-		GTL__IMPORT_LIB(wx)
+		GTL__IMPORT_LIB(gtl.wx)
 #	endif
 #else	// GTL__WX_AS_DLL
 #	define GTL__WX_CLASS

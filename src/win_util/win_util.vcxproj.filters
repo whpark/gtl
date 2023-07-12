@@ -5,20 +5,20 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="[ MFC Framework ]">
-      <UniqueIdentifier>{60987fce-85dd-42a6-95e8-b3d1a0d55769}</UniqueIdentifier>
-    </Filter>
     <Filter Include="win_util">
       <UniqueIdentifier>{4ab8a452-8efb-4794-b304-8ef32e82d757}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="[ Framework ]">
+      <UniqueIdentifier>{60987fce-85dd-42a6-95e8-b3d1a0d55769}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
-      <Filter>[ MFC Framework ]</Filter>
+      <Filter>[ Framework ]</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>[ MFC Framework ]</Filter>
+      <Filter>[ Framework ]</Filter>
     </ClCompile>
     <ClCompile Include="win_util.cpp">
       <Filter>win_util</Filter>
@@ -47,26 +47,23 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="win_util.def">
-      <Filter>[ MFC Framework ]</Filter>
+      <Filter>[ Framework ]</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
-      <Filter>[ MFC Framework ]</Filter>
+      <Filter>[ Framework ]</Filter>
     </ClInclude>
     <ClInclude Include="framework.h">
-      <Filter>[ MFC Framework ]</Filter>
+      <Filter>[ Framework ]</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>[ MFC Framework ]</Filter>
+      <Filter>[ Framework ]</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>[ MFC Framework ]</Filter>
+      <Filter>[ Framework ]</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\win_util\win_util.h">
-      <Filter>win_util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\_lib_gtl_win_util.h">
       <Filter>win_util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\win_util\serial_port.h">
@@ -86,6 +83,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\win_util\MatView.h">
       <Filter>win_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\_lib_gtl_win_util.h">
+      <Filter>[ Framework ]</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@
 #		define GTL__QT_CLASS	GTL__IMPORT
 #		define GTL__QT_API		GTL__IMPORT
 #		define GTL__QT_DATA		GTL__IMPORT
-		GTL__IMPORT_LIB(qt)
+		GTL__IMPORT_LIB(gtl.qt)
 #	endif
 #else	// GTL__QT_AS_DLL
 #	define GTL__QT_CLASS

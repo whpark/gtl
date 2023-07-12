@@ -25,7 +25,7 @@
 #		define GTL__WINUTIL_CLASS	GTL__IMPORT
 #		define GTL__WINUTIL_API		GTL__IMPORT
 #		define GTL__WINUTIL_DATA		GTL__IMPORT
-		GTL__IMPORT_LIB(win_util)
+		GTL__IMPORT_LIB(gtl.win_util)
 #	endif
 #else	// GTL__WINUTIL_AS_DLL
 #	define GTL__WINUTIL_CLASS
