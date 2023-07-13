@@ -1,12 +1,20 @@
 #include "pch.h"
+#include "gtl/qt/qt.h"
+#include "gtl/qt/util.h"
 #include "test_qt.h"
 
-test_qt::test_qt(QWidget *parent)
+#include <QSettings>
+
+QSettings s("Biscuit-lab.com", "gtl::test_qt");
+
+gtl::qt::test_qt::test_qt(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
     //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
     //m_dlgMatViewGV->show();
+
+	gtl::qt::SaveWindowPosition(s, "test_qt", this);
 
 	m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
 	m_ctrlMatView->move({4, 100});
@@ -56,8 +64,9 @@ test_qt::test_qt(QWidget *parent)
 	//m_option.bSkia = true;
 
 	m_dlgMatView->GetView().SetImage(img, false);
-
+	//m_dlgMatViewGV->SetImage(img, false);
 }
 
-test_qt::~test_qt()
-{}
+gtl::qt::test_qt::~test_qt() {
+	gtl::qt::SaveWindowPosition(s, "test_qt", this);
+}

@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
 	auto t2 = gtl::qt::ToArithmeticValue<int64_t>(str2);
 
 	QApplication a(argc, argv);
-	test_qt w;
+	gtl::qt::test_qt w;
 	w.show();
 	return a.exec();
 }

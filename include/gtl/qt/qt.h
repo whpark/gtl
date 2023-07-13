@@ -7,16 +7,6 @@
 
 namespace gtl::qt {
 
-	class xWaitCursor {
-	public:
-		xWaitCursor() {
-			QApplication::setOverrideCursor(Qt::WaitCursor);
-		}
-		~xWaitCursor() {
-			QApplication::restoreOverrideCursor();
-		}
-	};
-
 	inline auto ToCoord(QPoint pt) { return xPoint2i(pt.x(), pt.y()); }
 	inline auto ToCoord(QPointF pt) { return xPoint2d(pt.x(), pt.y()); }
 	inline auto ToCoord(QSize s) { return xSize2i(s.width(), s.height()); }
@@ -37,8 +27,6 @@ namespace gtl::qt {
 	inline QRect Floor(QRectF rect) {
 		return QRect{ Floor(rect.topLeft()), Floor(rect.bottomRight()) };
 	}
-
-	GTL__QT_API QImage::Format GetImageFormatType(int type);
 
 	//=================================================================================================================================
 	// helper inline functions
@@ -80,51 +68,29 @@ namespace gtl::qt {
 		}
 	}
 
+	//-------------------------------------------------------------------------
+	// to Text, From Text
+	template < gtlc::coord T_COORD >
+	QString ToQString(T_COORD const& coord, std::wstring_view svFMT = L"{}") {
+		return ToQString(gtl::ToString(coord, svFMT));
+	}
+	template < gtlc::coord T_COORD >
+	T_COORD FromString(QString const& str) {
+		T_COORD coord;
+		wchar_t const* pos = str.begin();
+		wchar_t const* const end = str.end();
+		for (auto& v : coord.arr()) {
+			if (pos >= end)
+				break;
+			v = tszto<typename T_COORD::value_type>(pos, end, &pos);
+			if (*pos == ',') pos++;	// or....... if (*pos) pos++
+		}
+		return coord;
+	}
+
 	template < gtlc::arithmetic value_t >
 	value_t ToArithmeticValue(QString const& str, int base = 0, std::from_chars_result* result = {}) {
 		return gtl::ToArithmeticValue<value_t>(str.toStdString(), base, result);
 	}
-
-
-#define GTL__QT_UPDATE_WIDGET_VALUE(widget_t, value_t, getter, setter)	\
-inline void UpdateWidgetValue(bool bSaveAndValidate, widget_t* w, value_t& value) {	\
-	if (bSaveAndValidate) value = w->getter(); else w->setter(value); \
-}
-
-#define GTL__QT_UPDATE_WIDGET_STRING(widget_t, getter, setter)	\
-	GTL__QT_UPDATE_WIDGET_VALUE(widget_t, QString, getter, setter) \
-template < gtlc::string_elem tchar_t > \
-inline void UpdateWidgetValue(bool bSaveAndValidate, widget_t* w, std::basic_string<tchar_t>& value) {	\
-	if (bSaveAndValidate) value = ToString(w->getter()); else w->setter(ToQString(value)); \
-}
-
-#define GTL__QT_UPDATE_WIDGET_ARITHMETIC(widget_t, str_getter, str_setter) \
-template < gtlc::arithmetic value_t>\
-inline void UpdateWidgetValue(bool bSaveAndValidate, widget_t* w, value_t& value, int base = 0,\
-	std::string_view fmt = "{}") {\
-	if (bSaveAndValidate) value = gtl::qt::ToArithmeticValue<value_t>(w->str_getter());\
-	else w->str_setter(std::vformat(fmt, std::make_format_args(value)).c_str());\
-}
-
-	GTL__QT_UPDATE_WIDGET_VALUE(QCheckBox, bool, isChecked, setChecked);
-	GTL__QT_UPDATE_WIDGET_STRING(QLineEdit, text, setText);
-	GTL__QT_UPDATE_WIDGET_ARITHMETIC(QLineEdit, text, setText);
-	GTL__QT_UPDATE_WIDGET_STRING(QPlainTextEdit, toPlainText, setPlainText);
-	GTL__QT_UPDATE_WIDGET_VALUE(QDoubleSpinBox, double, value, setValue);
-	GTL__QT_UPDATE_WIDGET_VALUE(QSpinBox, int, value, setValue);
-	GTL__QT_UPDATE_WIDGET_VALUE(QComboBox, int, currentIndex, setCurrentIndex);
-	GTL__QT_UPDATE_WIDGET_STRING(QComboBox, currentText, setCurrentText);
-
-
-	template < typename value_t > requires std::is_enum_v<value_t>
-	inline void UpdateWidgetValue(bool bSaveAndValidate, QComboBox* w, value_t& value) {
-		if (bSaveAndValidate)
-			value = (value_t)w->currentIndex();
-		else
-			w->setCurrentIndex(std::to_underlying(value));
-	}
-
-#undef GTL__QT_UPDATE_WIDGET_STRING
-#undef GTL__QT_UPDATE_WIDGET_VALUE
 
 } // namespace gtl::qt

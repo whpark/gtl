@@ -6,7 +6,9 @@
 #include "gtl/qt/MatView/MatView.h"
 #include "gtl/qt/MatView/MatViewDlg.h"
 
-class test_qt : public QMainWindow {
+namespace gtl::qt { class test_qt; }
+
+class gtl::qt::test_qt : public QMainWindow {
 	Q_OBJECT
 
 public:

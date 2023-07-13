@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "gtl/qt/qt.h"
+#include "gtl/qt/util.h"
 #include "gtl/qt/MatView/MatViewGVCanvas.h"
 
 namespace gtl::qt {

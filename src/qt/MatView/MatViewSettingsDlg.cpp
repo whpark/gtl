@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "gtl/qt/qt.h"
+#include "gtl/qt/util.h"
 #include "MatViewSettingsDlg.h"
 
 namespace gtlq = gtl::qt;

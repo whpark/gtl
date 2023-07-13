@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "gtl/qt/qt.h"
+#include "gtl/qt/util.h"
 #include "gtl/qt/MatView/MatView.h"
 #include "ui_MatView.h"
 
@@ -827,12 +828,12 @@ namespace gtl::qt {
 		// Client Rect
 		xRect2i rectClient;
 		rectClient = GetViewRect();
-		xSize2i const size = rectClient.GetSize();
-		glViewport(0, 0, size.cx, size.cy);
+		xSize2i const sizeView = rectClient.GetSize();
+		glViewport(0, 0, sizeView.cx, sizeView.cy);
 
 		glMatrixMode(GL_PROJECTION);     // Make a simple 2D projection on the entire window
 		glLoadIdentity();
-		glOrtho(0.0, size.cx, size.cy, 0.0, 0.0, 100.0);
+		glOrtho(0.0, sizeView.cx, sizeView.cy, 0.0, 0.0, 100.0);
 
 		glMatrixMode(GL_MODELVIEW);    // Set the matrix mode to object modeling
 		cv::Scalar cr = m_option.crBackground;

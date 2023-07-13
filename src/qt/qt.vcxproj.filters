@@ -66,6 +66,9 @@
     <ClCompile Include="QColorButton.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_global.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="MatView\MatView_misc.h">
       <Filter>MatView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\qt\util.h">
+      <Filter>code</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

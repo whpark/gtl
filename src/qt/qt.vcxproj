@@ -145,6 +145,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <PostBuildEvent>
       <Message>deploy</Message>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug.v142|x64'">
     <ClCompile>
@@ -168,6 +171,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <PostBuildEvent>
       <Message>deploy</Message>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -191,6 +197,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <PostBuildEvent>
       <Message>deploy</Message>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">
     <ClCompile>
@@ -214,6 +223,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <PostBuildEvent>
       <Message>deploy</Message>
     </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
@@ -288,6 +300,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="util.cpp" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVCanvas.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVDlg.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGV.h" />
@@ -297,6 +310,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <QtMoc Include="..\..\include\gtl\qt\QColorButton.h" />
     <QtMoc Include="..\..\include\gtl\qt\QRoundButton.h" />
     <ClInclude Include="..\..\include\gtl\qt\qt.h" />
+    <ClInclude Include="..\..\include\gtl\qt\util.h" />
     <ClInclude Include="..\..\include\gtl\qt\_lib_gtl_qt.h" />
     <ClInclude Include="framework.h" />
     <QtMoc Include="MatView\MatViewGVSettingsDlg.h" />
