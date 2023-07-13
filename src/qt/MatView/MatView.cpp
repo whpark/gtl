@@ -829,7 +829,7 @@ namespace gtl::qt {
 		xRect2i rectClient;
 		rectClient = GetViewRect();
 		xSize2i const sizeView = rectClient.GetSize();
-		glViewport(0, 0, sizeView.cx, sizeView.cy);
+		glViewport(0, 0, sizeView.cx*devicePixelRatio(), sizeView.cy*devicePixelRatio());
 
 		glMatrixMode(GL_PROJECTION);     // Make a simple 2D projection on the entire window
 		glLoadIdentity();
