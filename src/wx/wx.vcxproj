@@ -526,7 +526,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\wx\_lib_gtl_wx.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MatView\DlgMatViewOption.h" />
-    <ClInclude Include="MatView\MatView_misc.h" />
     <ClInclude Include="MatView\wxGLCanvasAdapter.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -534,7 +533,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="MatView\DlgMatViewOption.cpp" />
     <ClCompile Include="MatView\MatView.cpp" />
-    <ClCompile Include="MatView\MatView_misc.cpp" />
     <ClCompile Include="MatView\wxGLCanvasAdapter.cpp" />
     <ClCompile Include="MatView\wxMatView.cpp" />
     <ClCompile Include="pch.cpp">

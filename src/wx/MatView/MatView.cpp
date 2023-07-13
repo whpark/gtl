@@ -1,9 +1,9 @@
 ﻿#include "pch.h"
 
 #include "gtl/wx/MatView.h"
+#include "gtl/mat_gl.h"
 #include "wxGLCanvasAdapter.h"
 #include "DlgMatViewOption.h"
-#include "MatView_misc.h"
 
 #ifdef SK_GL
 #include "skia/core/SkTypes.h"
@@ -1199,10 +1199,10 @@ void xMatView::OnRightDown_View( wxMouseEvent& event ) {
 	} else {
 		m_mouse.bRectSelected = false;
 		m_mouse.bInSelectionMode = true;
-		auto pt = m_mouse.ptSel1 = m_ctScreenFromImage.TransI(event.GetPosition());
+		auto pt =  m_ctScreenFromImage.TransI(event.GetPosition());
 		m_mouse.ptSel0.x = std::clamp<int>(pt.x, 0, m_img.cols);
 		m_mouse.ptSel0.y = std::clamp<int>(pt.y, 0, m_img.rows);
-
+		m_mouse.ptSel1 = m_mouse.ptSel0;
 	}
 	m_view->Refresh(false);
 	m_view->Update();

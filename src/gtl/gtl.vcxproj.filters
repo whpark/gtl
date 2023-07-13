@@ -176,6 +176,9 @@
     <ClInclude Include="..\..\include\gtl\base64.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\mat_gl.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">
@@ -203,6 +206,9 @@
       <Filter>gtl.impl</Filter>
     </ClCompile>
     <ClCompile Include="2dMatArray.cpp">
+      <Filter>gtl.impl</Filter>
+    </ClCompile>
+    <ClCompile Include="mat_gl.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
   </ItemGroup>

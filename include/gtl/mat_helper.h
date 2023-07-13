@@ -372,7 +372,8 @@ namespace gtl {
 		return v;
 	}
 
-
+	GTL__API bool DrawPixelValue(cv::Mat& canvas, cv::Mat const& imgOriginal, cv::Rect roi, gtl::xCoordTrans2d const& ctCanvasFromImage, double const minTextHeight = 8);
 
 #pragma pack(pop)
-}
+}	// namespace gtl
+

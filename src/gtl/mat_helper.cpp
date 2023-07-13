@@ -1352,6 +1352,60 @@ namespace gtl {
 		}
 	}
 
+	//! @brief Draw gridlines and pixel value of Mat to canvas.
+	bool DrawPixelValue(cv::Mat& canvas, cv::Mat const& imgOriginal, cv::Rect roi, gtl::xCoordTrans2d const& ctCanvasFromImage, double const minTextHeight) {
+		using xPoint2d = gtl::xPoint2d;
+
+		// Draw Grid / pixel value
+		if (ctCanvasFromImage.m_scale < 4)
+			return false;
+		cv::Scalar cr{127, 127, 127, 255};
+		// grid - horizontal
+		for (int y{roi.y}, y1{roi.y+roi.height}; y < y1; y++) {
+			auto pt0 = ctCanvasFromImage(xPoint2d{roi.x, y});
+			auto pt1 = ctCanvasFromImage(xPoint2d{roi.x+roi.width, y});
+			cv::line(canvas, pt0, pt1, cr);
+		}
+		// grid - vertical
+		for (int x{roi.x}, x1{roi.x+roi.width}; x < x1; x++) {
+			auto pt0 = ctCanvasFromImage(xPoint2d{x, roi.y});
+			auto pt1 = ctCanvasFromImage(xPoint2d{x, roi.y+roi.height});
+			cv::line(canvas, pt0, pt1, cr);
+		}
+
+		// Pixel Value
+		auto nChannel = imgOriginal.channels();
+		auto depth = imgOriginal.depth();
+
+		if ( ctCanvasFromImage.m_scale < ((nChannel+0.5)*minTextHeight) )
+			return false;
+		double heightFont = std::clamp(ctCanvasFromImage.m_scale/(nChannel+0.5), 1., 40.) / 40.;
+		//auto t0 = stdc::steady_clock::now();
+		for (int y{roi.y}, y1{roi.y+roi.height}; y < y1; y++) {
+			auto* ptr = imgOriginal.ptr(y);
+			int x1{roi.x+roi.width};
+			//#pragma omp parallel for --------- little improvement
+			for (int x{roi.x}; x < x1; x++) {
+				auto pt = ctCanvasFromImage(xPoint2d{x, y});
+				//auto p = SkPoint::Make(pt.x, pt.y);
+				auto v = GetMatValue(ptr, depth, nChannel, y, x);
+				auto avg = (v[0] + v[1] + v[2]) / nChannel;
+				auto cr = (avg > 128) ? cv::Scalar{0, 0, 0, 255} : cv::Scalar{255, 255, 255, 255};
+				for (int ch{}; ch < nChannel; ch++) {
+					auto str = std::format("{:3}", v[ch]);
+					cv::putText(canvas, str, cv::Point(pt.x, pt.y+(ch+1)*heightFont*40), cv::FONT_HERSHEY_DUPLEX, heightFont, cr, 1, true);
+				}
+			}
+		}
+		//auto t1 = stdc::steady_clock::now();
+		//auto dur = stdc::duration_cast<stdc::milliseconds>(t1-t0).count();
+		//OutputDebugString(std::format(L"{} ms\n", dur).c_str());
+
+		return true;
+	}
+
+
+
 	//=============================================================================
 	//
 

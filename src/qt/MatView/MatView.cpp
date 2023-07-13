@@ -1,11 +1,11 @@
 #include "pch.h"
 
+#include "gtl/mat_gl.h"
 #include "gtl/qt/qt.h"
 #include "gtl/qt/util.h"
 #include "gtl/qt/MatView/MatView.h"
 #include "ui_MatView.h"
 
-#include "MatView_misc.h"
 #include "MatViewSettingsDlg.h"
 
 namespace gtlq = gtl::qt;
@@ -539,6 +539,8 @@ namespace gtl::qt {
 			return {};
 		auto rect = ToCoord(ui->view->rect());
 		rect.MoveToXY(0, 0);
+		for (auto r = devicePixelRatio(); auto& v : rect.arr())
+			v *= r;
 		return rect;
 	}
 
@@ -596,16 +598,16 @@ namespace gtl::qt {
 			if (m_mouse.bInSelectionMode) {
 				m_mouse.bInSelectionMode = false;
 				m_mouse.bRectSelected = true;
-				auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()));
+				auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()*devicePixelRatio()));
 				m_mouse.ptSel1.x = std::clamp<int>(pt.x, 0, m_img.cols);
 				m_mouse.ptSel1.y = std::clamp<int>(pt.y, 0, m_img.rows);
 			} else {
 				m_mouse.bRectSelected = false;
 				m_mouse.bInSelectionMode = true;
-				auto pt = m_mouse.ptSel1 = m_ctScreenFromImage.TransI(ToCoord(event->pos()));
+				auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()*devicePixelRatio()));
 				m_mouse.ptSel0.x = std::clamp<int>(pt.x, 0, m_img.cols);
 				m_mouse.ptSel0.y = std::clamp<int>(pt.y, 0, m_img.rows);
-
+				m_mouse.ptSel1 = m_mouse.ptSel0;
 			}
 			view->update();
 		}
@@ -644,7 +646,7 @@ namespace gtl::qt {
 				}
 			}
 			auto dPanningSpeed = m_mouse.bInSelectionMode ? 1.0 : m_option.dPanningSpeed;
-			auto ptOffset = (pt - *m_mouse.ptAnchor) * dPanningSpeed;
+			auto ptOffset = (pt - *m_mouse.ptAnchor) * dPanningSpeed *devicePixelRatio();
 			if (m_eZoom == eZOOM::fit2width)
 				ptOffset.x = 0;
 			if (m_eZoom == eZOOM::fit2height)
@@ -657,7 +659,7 @@ namespace gtl::qt {
 
 		// Selection Mode
 		if (m_mouse.bInSelectionMode) {
-			auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()));
+			auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()*devicePixelRatio()));
 			m_mouse.ptSel1.x = std::clamp<int>(pt.x, 0, m_img.cols);
 			m_mouse.ptSel1.y = std::clamp<int>(pt.y, 0, m_img.rows);
 			view->update();
@@ -683,7 +685,7 @@ namespace gtl::qt {
 			return;
 		}
 		event->accept();
-		ZoomInOut(event->angleDelta().y(), ToCoord(event->position()), false);
+		ZoomInOut(event->angleDelta().y(), ToCoord(event->position()*devicePixelRatio()), false);
 	}
 
 	void xMatView::OnCmbZoomMode_currentIndexChanged(int index) {
@@ -829,7 +831,7 @@ namespace gtl::qt {
 		xRect2i rectClient;
 		rectClient = GetViewRect();
 		xSize2i const sizeView = rectClient.GetSize();
-		glViewport(0, 0, sizeView.cx*devicePixelRatio(), sizeView.cy*devicePixelRatio());
+		glViewport(0, 0, sizeView.cx, sizeView.cy);
 
 		glMatrixMode(GL_PROJECTION);     // Make a simple 2D projection on the entire window
 		glLoadIdentity();
@@ -948,7 +950,7 @@ namespace gtl::qt {
 			if (m_option.bDrawPixelValue) {
 				auto ctCanvas = m_ctScreenFromImage;
 				ctCanvas.m_offset -= m_ctScreenFromImage(roi.tl());
-				DrawPixelValue(img, m_imgOriginal, roi, ctCanvas);
+				DrawPixelValue(img, m_imgOriginal, roi, ctCanvas, 8*devicePixelRatio());
 			}
 
 			glEnable(GL_BLEND);
