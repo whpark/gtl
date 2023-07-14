@@ -14,9 +14,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "src\test\test.vcxpr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bench", "src\bench\bench.vcxproj", "{446FCEAB-4FBE-4BE2-9B32-84B7B99F61FE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shape", "src\shape\shape.vcxproj", "{FBA95ADB-13A2-4139-BA8E-789BFE9AA1AE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.shape", "src\shape\shape.vcxproj", "{FBA95ADB-13A2-4139-BA8E-789BFE9AA1AE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "win_util", "src\win_util\win_util.vcxproj", "{5F0D7BD9-E1EC-45D1-96B9-2EA611944D5E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.win_util", "src\win_util\win_util.vcxproj", "{5F0D7BD9-E1EC-45D1-96B9-2EA611944D5E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_win", "src\test_win\test_win.vcxproj", "{0F115BD6-A104-41EB-8F5D-194C4E66DD0C}"
 EndProject
@@ -24,12 +24,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TEST and BENCH", "TEST and 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_ui_webview2", "src\test_ui_webview2\test_ui_webview2.vcxproj", "{0C8371F4-EB08-420B-A0CC-3C377B8969B3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wx", "src\wx\wx.vcxproj", "{75A8F096-3AF5-4368-A4B3-7C7CC0EB7F44}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.wx", "src\wx\wx.vcxproj", "{75A8F096-3AF5-4368-A4B3-7C7CC0EB7F44}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0} = {0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qt", "src\qt\qt.vcxproj", "{E963DD40-A001-4874-9DEF-3C7646ABAECC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.qt", "src\qt\qt.vcxproj", "{E963DD40-A001-4874-9DEF-3C7646ABAECC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0} = {0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}
 	EndProjectSection
@@ -199,8 +199,8 @@ Global
 		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release|x64.ActiveCfg = Release|x64
 		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release|x64.Build.0 = Release|x64
 		{E963DD40-A001-4874-9DEF-3C7646ABAECC}.Release|x86.ActiveCfg = Release|x64
-		{3A2A0FE4-DBAB-4A7C-BBBE-27F5F5B7671F}.Debug.v142|x64.ActiveCfg = Debug|x64
-		{3A2A0FE4-DBAB-4A7C-BBBE-27F5F5B7671F}.Debug.v142|x64.Build.0 = Debug|x64
+		{3A2A0FE4-DBAB-4A7C-BBBE-27F5F5B7671F}.Debug.v142|x64.ActiveCfg = Debug.v142|x64
+		{3A2A0FE4-DBAB-4A7C-BBBE-27F5F5B7671F}.Debug.v142|x64.Build.0 = Debug.v142|x64
 		{3A2A0FE4-DBAB-4A7C-BBBE-27F5F5B7671F}.Debug.v142|x86.ActiveCfg = Debug|x64
 		{3A2A0FE4-DBAB-4A7C-BBBE-27F5F5B7671F}.Debug.v142|x86.Build.0 = Debug|x64
 		{3A2A0FE4-DBAB-4A7C-BBBE-27F5F5B7671F}.Debug|x64.ActiveCfg = Debug|x64
