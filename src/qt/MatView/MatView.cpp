@@ -670,7 +670,7 @@ namespace gtl::qt {
 			auto ptImage = m_ctScreenFromImage.TransI(ptView);
 			auto status = std::format(L"{},{}", ptImage.x, ptImage.y);
 			// image value
-			if (gtl::IsInside(ptImage.x, 0, m_img.cols) and gtl::IsInside(ptImage.y, 0, m_img.rows)) {
+			if (xRect2i(0, 0, m_img.cols, m_img.rows).PtInRect(ptImage)) {
 				int n = m_imgOriginal.channels();
 				int depth = m_imgOriginal.depth();
 				auto cr = GetMatValue(m_imgOriginal.ptr(ptImage.y), m_imgOriginal.depth(), n, ptImage.y, ptImage.x);
