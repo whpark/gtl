@@ -339,6 +339,9 @@ namespace gtl {
 	template < typename T, typename ... Args > constexpr bool IsValueOneOf(T v, Args&& ... args)	{ return ((v == args) || ...); }
 	template < typename T, typename ... Args > constexpr bool IsValueNoneOf(T v, Args&& ... args)	{ return ((v != args) && ...); }
 
+	template < typename T >
+	constexpr bool IsInside(T const& v, T const& left, T const& right)						{ return (left <= v) && (v < right); }
+
 	// Bit Set
 	namespace internal {
 		template < typename T >						constexpr T bit_single(int b)					{ return ((T)1 << b); }

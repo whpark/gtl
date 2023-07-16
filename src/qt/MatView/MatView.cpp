@@ -18,7 +18,7 @@ namespace gtl::qt {
 		3./4, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10,
 		12.5, 15, 17.5, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100,
 		125, 150, 175, 200, 250, 300, 350, 400, 450, 500,
-		600, 700, 800, 900, 1000,
+		600, 700, 800, 900, 1'000,
 		//1250, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 4500, 5000,
 		//6000, 7000, 8000, 9000, 10000,
 		//12500, 15000, 17500, 20000, 25000, 30000, 35000, 40000, 45000, 50000,
@@ -584,6 +584,7 @@ namespace gtl::qt {
 	void xMatView::OnView_mousePressEvent(xMatViewCanvas* view, QMouseEvent* event) {
 		if (!view)
 			return;
+		xPoint2i ptView = ToCoord(event->pos() * devicePixelRatio());
 		if (event->button() == Qt::MouseButton::LeftButton) {
 			if (m_option.bPanningLock and (m_eZoom == eZOOM::fit2window))
 				return;
@@ -591,20 +592,20 @@ namespace gtl::qt {
 				return;
 			event->accept();
 			view->grabMouse();
-			m_mouse.ptAnchor = ToCoord(event->pos());
+			m_mouse.ptAnchor = ptView;
 			m_mouse.ptOffset0 = m_ctScreenFromImage.m_offset;
 		}
 		else if (event->button() == Qt::MouseButton::RightButton) {
 			if (m_mouse.bInSelectionMode) {
 				m_mouse.bInSelectionMode = false;
 				m_mouse.bRectSelected = true;
-				auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()*devicePixelRatio()));
+				auto pt = m_ctScreenFromImage.TransI(ptView);
 				m_mouse.ptSel1.x = std::clamp<int>(pt.x, 0, m_img.cols);
 				m_mouse.ptSel1.y = std::clamp<int>(pt.y, 0, m_img.rows);
 			} else {
 				m_mouse.bRectSelected = false;
 				m_mouse.bInSelectionMode = true;
-				auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()*devicePixelRatio()));
+				auto pt = m_ctScreenFromImage.TransI(ptView);
 				m_mouse.ptSel0.x = std::clamp<int>(pt.x, 0, m_img.cols);
 				m_mouse.ptSel0.y = std::clamp<int>(pt.y, 0, m_img.rows);
 				m_mouse.ptSel1 = m_mouse.ptSel0;
@@ -631,8 +632,7 @@ namespace gtl::qt {
 		if (!view)
 			return;
 		event->accept();
-		xPoint2i pt;
-		pt = ToCoord(event->pos());
+		xPoint2i ptView = ToCoord(event->pos()*devicePixelRatio());
 		if (m_mouse.ptAnchor) {
 			if (!m_option.bPanningLock) {
 				switch (m_eZoom) {
@@ -646,7 +646,7 @@ namespace gtl::qt {
 				}
 			}
 			auto dPanningSpeed = m_mouse.bInSelectionMode ? 1.0 : m_option.dPanningSpeed;
-			auto ptOffset = (pt - *m_mouse.ptAnchor) * dPanningSpeed *devicePixelRatio();
+			auto ptOffset = (ptView - *m_mouse.ptAnchor) * dPanningSpeed;
 			if (m_eZoom == eZOOM::fit2width)
 				ptOffset.x = 0;
 			if (m_eZoom == eZOOM::fit2height)
@@ -659,7 +659,7 @@ namespace gtl::qt {
 
 		// Selection Mode
 		if (m_mouse.bInSelectionMode) {
-			auto pt = m_ctScreenFromImage.TransI(ToCoord(event->pos()*devicePixelRatio()));
+			auto pt = m_ctScreenFromImage.TransI(ptView);
 			m_mouse.ptSel1.x = std::clamp<int>(pt.x, 0, m_img.cols);
 			m_mouse.ptSel1.y = std::clamp<int>(pt.y, 0, m_img.rows);
 			view->update();
@@ -667,8 +667,18 @@ namespace gtl::qt {
 
 		// status
 		{
-			auto ptImage = m_ctScreenFromImage.TransI(pt);
+			auto ptImage = m_ctScreenFromImage.TransI(ptView);
 			auto status = std::format(L"{},{}", ptImage.x, ptImage.y);
+			// image value
+			if (gtl::IsInside(ptImage.x, 0, m_img.cols) and gtl::IsInside(ptImage.y, 0, m_img.rows)) {
+				int n = m_imgOriginal.channels();
+				int depth = m_imgOriginal.depth();
+				auto cr = GetMatValue(m_imgOriginal.ptr(ptImage.y), m_imgOriginal.depth(), n, ptImage.y, ptImage.x);
+				auto strValue = std::format(L" [{}", cr[0]);
+				for (int i{1}; i < n; i++)
+					strValue += std::format(L", {}", cr[i]);
+				status += strValue + L"]";
+			}
 			if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
 				gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
 				status += std::format(L" w{}, h{}", size.cx, size.cy);
