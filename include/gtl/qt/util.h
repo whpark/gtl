@@ -68,14 +68,40 @@ namespace gtl::qt {
 	}
 
 	// std::duration
-	template < typename trep_t, typename tperiod_t, typename widget >
-	inline void UpdateWidgetValue(bool bSaveAndValidate, widget* w, std::chrono::duration<trep_t, tperiod_t>& value) {
+	template < typename trep_t, typename tperiod_t, typename twidget_t > requires (requires (twidget_t* w) {
+		{ w->value() } -> std::convertible_to<trep_t>;
+		w->setValue(trep_t{});
+	})
+	inline void UpdateWidgetValue(bool bSaveAndValidate, twidget_t* w, std::chrono::duration<trep_t, tperiod_t>& value) {
 		using duration_t = std::chrono::duration<trep_t, tperiod_t>;
 		if (bSaveAndValidate) {
 			value = duration_t{(trep_t)w->value()};
 		}
 		else {
 			w->setValue(value.count());
+		}
+	}
+	template < typename trep_t, typename tperiod_t, typename twidget_t > requires (requires (twidget_t* w) {
+		{ w->text() } -> std::convertible_to<QString>;
+		w->setText(QString{});
+	})
+		inline void UpdateWidgetValue(bool bSaveAndValidate, twidget_t* w, std::chrono::duration<trep_t, tperiod_t>& value) {
+		using duration_t = std::chrono::duration<trep_t, tperiod_t>;
+		if constexpr (std::is_floating_point_v<trep_t>) {
+			if (bSaveAndValidate) {
+				value = duration_t{ToArithmeticValue<trep_t>(w->text())};
+			}
+			else {
+				w->setText(ToQString(std::format("{:g}", value.count())));
+			}
+		}
+		else if constexpr (std::is_integral_v<trep_t>) {
+			if (bSaveAndValidate) {
+				value = duration_t{ToArithmeticValue<trep_t>(w->text())};
+			}
+			else {
+				w->setText(ToQString(std::format("{}", value.count())));
+			}
 		}
 	}
 
