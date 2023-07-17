@@ -44,7 +44,7 @@ public:
 
 protected:
 	void OnTimer_UpdateUI();
-	void OnAbort();
+	void OnButton(QAbstractButton *button);
 
 private:
 	std::unique_ptr<Ui::ProgressDlgClass> ui;

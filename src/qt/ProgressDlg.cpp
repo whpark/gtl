@@ -28,7 +28,9 @@ void gtl::qt::xProgressDlg::Init() {
 		return !m_bUserAbort;
 	};
 
+	connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &this_t::OnButton);
 	m_tStart  = std::chrono::system_clock::now();
+	connect(&m_timerUI, &QTimer::timeout, this, &this_t::OnTimer_UpdateUI);
 	m_timerUI.start(100ms);
 }
 
@@ -45,16 +47,18 @@ void gtl::qt::xProgressDlg::OnTimer_UpdateUI() {
 
 	if (m_bDone) {
 		if (m_bUserAbort)
-			emit rejected();
+			reject();
 		else if (m_bError)
-			emit rejected();
+			reject();
 		else
-			emit accepted();
+			accept();
 		return;
 	}
 }
 
-void gtl::qt::xProgressDlg::OnAbort() {
-	m_bUserAbort = true;
-	reject();
+void gtl::qt::xProgressDlg::OnButton(QAbstractButton* button) {
+	//if (button == (QAbstractButton*)ui->buttonBox->button(QDialogButtonBox::Abort)) {
+		m_bUserAbort = true;
+		reject();
+	//}
 }
