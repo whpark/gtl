@@ -34,6 +34,8 @@ namespace gtl::qt {
 	xMatView::xMatView(QWidget* parent) : QWidget(parent), ui(std::make_unique<Ui::MatViewClass>()) {
 		ui->setupUi(this);
 
+		ui->cmbZoomMode->setCurrentIndex(std::to_underlying(m_eZoom));
+
 		// openGL object
 		//ui->view = std::make_unique<xMatViewCanvas>(this);
 		if (auto* view = ui->view) {
@@ -93,8 +95,10 @@ namespace gtl::qt {
 		m_img = m_imgOriginal;
 
 		// Build Pyramid Image for down sampling { cv::InterpolationFlags::INTER_AREA }
-		if (m_pyramid.threadPyramidMaker.joinable())
+		if (m_pyramid.threadPyramidMaker.joinable()) {
+			m_pyramid.threadPyramidMaker.request_stop();
 			m_pyramid.threadPyramidMaker.join();
+		}
 		m_pyramid.imgs.clear();
 		m_pyramid.imgs.push_front(m_img);
 		if (m_option.bPyrImageDown) {
