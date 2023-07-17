@@ -16,7 +16,5 @@ public:
 	QRoundButton(QWidget* parent = nullptr);
 
 public:
-	auto GetMainColor() const { return m_crBackground; }
-	void SetMainColor(QColor colorBackground, std::optional<QColor> colorForeground = {});	// don't make it virtual. this function is called in constructor.
-
+	virtual void SetMainColor(QColor colorBackground, std::optional<QColor> colorForeground = {});
 };

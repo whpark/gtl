@@ -5,11 +5,8 @@
 namespace gtl::qt {
 
 QColorButton::QColorButton(QWidget* parent) : QPushButton(parent) {
-	//auto t0 = std::chrono::high_resolution_clock::now();
 	auto p = qApp->palette();
-	//auto t1 = std::chrono::high_resolution_clock::now();
-	SetMainColor(p.button().color(), p.buttonText().color());
-	//Log("QColorButton Time : {}", std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0));
+	//SetMainColor(p.button().color(), p.buttonText().color());
 }
 
 void QColorButton::SetMainColor(QColor colorBackground, std::optional<QColor> colorForeground) {

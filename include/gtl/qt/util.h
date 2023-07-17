@@ -58,13 +58,25 @@ namespace gtl::qt {
 	GTL__QT_UPDATE_WIDGET_VALUE(QComboBox, int, currentIndex, setCurrentIndex);
 	GTL__QT_UPDATE_WIDGET_STRING(QComboBox, currentText, setCurrentText);
 
-
+	// enum
 	template < typename value_t > requires std::is_enum_v<value_t>
 	inline void UpdateWidgetValue(bool bSaveAndValidate, QComboBox* w, value_t& value) {
 		if (bSaveAndValidate)
 			value = (value_t)w->currentIndex();
 		else
 			w->setCurrentIndex(std::to_underlying(value));
+	}
+
+	// std::duration
+	template < typename trep_t, typename tperiod_t, typename widget >
+	inline void UpdateWidgetValue(bool bSaveAndValidate, widget* w, std::chrono::duration<trep_t, tperiod_t>& value) {
+		using duration_t = std::chrono::duration<trep_t, tperiod_t>;
+		if (bSaveAndValidate) {
+			value = duration_t{(trep_t)w->value()};
+		}
+		else {
+			w->setValue(value.count());
+		}
 	}
 
 	#undef GTL__QT_UPDATE_WIDGET_STRING

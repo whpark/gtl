@@ -21,6 +21,7 @@ public:
 
 public:
 	auto GetMainColor() const { return m_crBackground; }
-	void SetMainColor(QColor colorBackground, std::optional<QColor> colorForeground = {});
+	auto GetMainColorText() const { return m_crForeground; }
+	virtual void SetMainColor(QColor colorBackground, std::optional<QColor> colorForeground = {});
 
 };

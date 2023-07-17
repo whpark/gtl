@@ -26,13 +26,16 @@ bool gtl::qt::xMatViewSettingsDlg::UpdateData(bool bSaveAndValidate) {
 	UpdateWidgetValue(b, ui.chkBuildPyramidImage, m_option.bPyrImageDown);
 	UpdateWidgetValue(b, ui.spinPanningSpeed, m_option.dPanningSpeed);
 	UpdateWidgetValue(b, ui.spinScrollMargin, m_option.nScrollMargin);
+	UpdateWidgetValue(b, ui.cmbZoomInMethod, m_option.eZoomIn);
+	UpdateWidgetValue(b, ui.cmbZoomOutMethod, m_option.eZoomOut);
+	UpdateWidgetValue(b, ui.spinScrollDuration, m_option.tsScroll);
+	//if (b) {
+	//	m_option.tsScroll = std::chrono::milliseconds{(int)ui.spinScrollDuration->value()};
+	//}
+	//else {
+	//	ui.spinScrollDuration->setValue(m_option.tsScroll.count());
+	//}
 	if (b) {
-		m_option.tsScroll = std::chrono::milliseconds{(int)ui.spinScrollDuration->value()};
-	}
-	else {
-		ui.spinScrollDuration->setValue(m_option.tsScroll.count());
-	}
-	if (bSaveAndValidate) {
 		auto cr = QColor(ui.edtColorBackground->text());
 		m_option.crBackground = cv::Vec3b(cr.red(), cr.green(), cr.blue());
 	}

@@ -7,7 +7,7 @@ namespace gtl::qt {
 
 QRoundButton::QRoundButton(QWidget* parent) : QColorButton(parent) {
 	auto p = qApp->palette();
-	SetMainColor(p.button().color(), p.buttonText().color());
+//	SetMainColor(p.button().color(), p.buttonText().color());
 }
 
 void QRoundButton::SetMainColor(QColor colorBackground, std::optional<QColor> colorForeground) {
