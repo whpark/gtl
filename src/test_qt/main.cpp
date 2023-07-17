@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "test_qt.h"
 
 int main(int argc, char* argv[]) {

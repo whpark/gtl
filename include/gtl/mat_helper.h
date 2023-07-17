@@ -326,8 +326,24 @@ namespace gtl {
 	GTL__API bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header);
 	GTL__API bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header);
 	GTL__API cv::Mat LoadBitmapMat(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback = nullptr);
+	struct sLoadBitmapMatResult {
+		cv::Mat img;
+		gtl::xSize2i pelsPerMeter;
+	};
+	inline sLoadBitmapMatResult LoadBitmapMat(std::filesystem::path const& path, callback_progress_t funcCallback = nullptr) {
+		sLoadBitmapMatResult result;
+		result.img = LoadBitmapMat(path, result.pelsPerMeter, funcCallback);
+		return result;
+	}
 	GTL__API cv::Mat LoadBitmapMatPixelArray(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette, callback_progress_t funcCallback = nullptr);
-
+	struct sLoadBitmapMatPixelArrayResult : public sLoadBitmapMatResult {
+		std::vector<gtl::color_bgra_t> palette;
+	};
+	inline sLoadBitmapMatPixelArrayResult LoadBitmapMatPixelArray(std::filesystem::path const& path, callback_progress_t funcCallback = nullptr) {
+		sLoadBitmapMatPixelArrayResult result;
+		result.img = LoadBitmapMatPixelArray(path, result.pelsPerMeter, result.palette, funcCallback);
+		return result;
+	}
 
 	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {
 		cv::Mat img;

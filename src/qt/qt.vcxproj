@@ -300,6 +300,8 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MatBitmapArchive.cpp" />
+    <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="util.cpp" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVCanvas.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVDlg.h" />
@@ -309,6 +311,8 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewCanvas.h" />
     <QtMoc Include="..\..\include\gtl\qt\QColorButton.h" />
     <QtMoc Include="..\..\include\gtl\qt\QRoundButton.h" />
+    <ClInclude Include="..\..\include\gtl\qt\MatBitmapArchive.h" />
+    <QtMoc Include="..\..\include\gtl\qt\ProgressDlg.h" />
     <ClInclude Include="..\..\include\gtl\qt\qt.h" />
     <ClInclude Include="..\..\include\gtl\qt\util.h" />
     <ClInclude Include="..\..\include\gtl\qt\_lib_gtl_qt.h" />
@@ -344,6 +348,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <QtUic Include="MatView\MatViewGVSettingsDlg.ui" />
     <QtUic Include="MatView\MatViewGVToolbar.ui" />
     <QtUic Include="MatView\MatViewSettingsDlg.ui" />
+    <QtUic Include="ProgressDlg.ui" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

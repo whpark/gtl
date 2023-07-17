@@ -66,6 +66,12 @@
     <ClCompile Include="util.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="MatBitmapArchive.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgressDlg.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_global.h">
@@ -84,6 +90,9 @@
       <Filter>[ framework ]</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\qt\util.h">
+      <Filter>code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\qt\MatBitmapArchive.h">
       <Filter>code</Filter>
     </ClInclude>
   </ItemGroup>
@@ -126,6 +135,9 @@
     <QtMoc Include="..\..\include\gtl\qt\QRoundButton.h">
       <Filter>code</Filter>
     </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\ProgressDlg.h">
+      <Filter>code</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MatView\MatViewGV.ui">
@@ -148,6 +160,9 @@
     </QtUic>
     <QtUic Include="MatView\MatViewSettingsDlg.ui">
       <Filter>MatView</Filter>
+    </QtUic>
+    <QtUic Include="ProgressDlg.ui">
+      <Filter>code</Filter>
     </QtUic>
   </ItemGroup>
 </Project>

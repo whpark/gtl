@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "gtl/qt/_lib_gtl_qt.h"
 #include "QColorButton.h"
