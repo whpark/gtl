@@ -52,7 +52,7 @@ namespace gtl {
 		using value_type = T;
 
 		constexpr auto& arr() { return reinterpret_cast<coord_t&>(*this); }
-		constexpr auto const& arr() const { return reinterpret_cast<coord_t&>(*this); }
+		constexpr auto const& arr() const { return reinterpret_cast<coord_t const&>(*this); }
 
 		constexpr auto* data() { return (reinterpret_cast<coord_t&>(*this)).data(); }
 		constexpr auto const* data() const { return (reinterpret_cast<coord_t const&>(*this)).data(); }
