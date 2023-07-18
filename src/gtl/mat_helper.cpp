@@ -1377,9 +1377,9 @@ namespace gtl {
 		auto nChannel = imgOriginal.channels();
 		auto depth = imgOriginal.depth();
 
-		if ( ctCanvasFromImage.m_scale < ((nChannel+0.5)*minTextHeight) )
+		if ( ctCanvasFromImage.m_scale < ((nChannel+1.0)*minTextHeight) )
 			return false;
-		double heightFont = std::clamp(ctCanvasFromImage.m_scale/(nChannel+0.5), 1., 40.) / 40.;
+		double heightFont = std::clamp(ctCanvasFromImage.m_scale/(nChannel+1.0), 1., 40.) / 40.;
 		//auto t0 = stdc::steady_clock::now();
 		for (int y{roi.y}, y1{roi.y+roi.height}; y < y1; y++) {
 			auto* ptr = imgOriginal.ptr(y);
