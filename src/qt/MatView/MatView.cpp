@@ -740,6 +740,8 @@ namespace gtl::qt {
 		auto pt2 = m_ctScreenFromImage(ptImage);
 		m_ctScreenFromImage.m_offset += rect.CenterPoint() - m_ctScreenFromImage(ptImage);
 		UpdateScrollBars();
+		if (ui->view)
+			ui->view->update();
 	}
 
 	void xMatView::OnBtnZoomIn_clicked() {
@@ -759,7 +761,6 @@ namespace gtl::qt {
 			return;
 		UpdateCT(true, eZOOM::fit2window);
 		UpdateScrollBars();
-
 		if (ui->view)
 			ui->view->update();
 	}
