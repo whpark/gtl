@@ -179,6 +179,9 @@
     <ClInclude Include="..\..\include\gtl\mat_gl.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\coord\coord_trans_perspective.h">
+      <Filter>gtl\coord</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">

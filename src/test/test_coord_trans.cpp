@@ -2,6 +2,7 @@
 
 #include "gtl/gtl.h"
 #include "gtl/coord/coord_trans.h"
+#include "gtl/coord/coord_trans_perspective.h"
 
 
 using namespace std::literals;
@@ -55,6 +56,39 @@ TEST(gtl_coord_trans, ct3) {
 	std::vector<xPoint3d> pts0{ {0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1} };
 	std::vector<xPoint3d> pts1{ {0, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 0, 0} };
 	EXPECT_TRUE(ct.SetFrom4Points(pts0, pts1));
+	EXPECT_EQ(ct(pts0[0]), pts1[0]);
+	EXPECT_EQ(ct(pts0[1]), pts1[1]);
+	EXPECT_EQ(ct(pts0[2]), pts1[2]);
+	EXPECT_EQ(ct(pts0[3]), pts1[3]);
+	EXPECT_EQ(ct.TransI(pts1[0]), pts0[0]);
+	EXPECT_EQ(ct.TransI(pts1[1]), pts0[1]);
+	EXPECT_EQ(ct.TransI(pts1[2]), pts0[2]);
+	EXPECT_EQ(ct.TransI(pts1[3]), pts0[3]);
+
+
+}
+
+TEST(gtl_coord_trans_perspective, ct) {
+	using namespace gtl;
+	xPoint3d pt{1, 2, 3};
+	xCoordTransPerspective ct;
+
+	EXPECT_EQ(ct(pt), xPoint3d(3, 2, 1));
+
+	std::vector<xPoint2d> pts0{ {0., 0.}, {1., 0.}, {0., 1.}, {1., 1.} };
+	std::vector<xPoint2d> pts1{ {0., 0.}, {1., 0.}, {0., 1.}, {1., 1.} };
+	EXPECT_TRUE(ct.SetFrom4Points(pts0, pts1));
+
+	auto v0 = ct(pts0[0]);
+	auto v1 = ct(pts0[1]);
+	auto v2 = ct(pts0[2]);
+	auto v3 = ct(pts0[3]);
+	auto v4 = ct.TransI(pts1[0]);
+	auto v5 = ct.TransI(pts1[1]);
+	auto v6 = ct.TransI(pts1[2]);
+	auto v7 = ct.TransI(pts1[3]);
+
+
 	EXPECT_EQ(ct(pts0[0]), pts1[0]);
 	EXPECT_EQ(ct(pts0[1]), pts1[1]);
 	EXPECT_EQ(ct(pts0[2]), pts1[2]);

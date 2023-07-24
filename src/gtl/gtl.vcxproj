@@ -479,6 +479,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\coord\coord_point.h" />
     <ClInclude Include="..\..\include\gtl\coord\coord_rect.h" />
     <ClInclude Include="..\..\include\gtl\coord\coord_size.h" />
+    <ClInclude Include="..\..\include\gtl\coord\coord_trans_perspective.h" />
     <ClInclude Include="..\..\include\gtl\dynamic.h" />
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h" />
