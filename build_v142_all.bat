@@ -12,16 +12,16 @@ echo +  x64 - Release
 echo ------------------
 msbuild gtl.sln /p:Platform=x64 /p:Configuration=Release.v142 -m
 if %ERRORLEVEL% neq 0  goto :error_end
-echo ------------------
-echo +  win32 - Debug
-echo ------------------
-msbuild gtl.sln /p:Platform=x86 /p:Configuration=Debug.v142 -m
-if %ERRORLEVEL% neq 0  goto :error_end
-echo ------------------
-echo +  win32 - Release
-echo ------------------
-msbuild gtl.sln /p:Platform=x86 /p:Configuration=Release.v142 -m
-if %ERRORLEVEL% neq 0  goto :error_end
+rem echo ------------------
+rem echo +  win32 - Debug
+rem echo ------------------
+rem msbuild gtl.sln /p:Platform=x86 /p:Configuration=Debug.v142 -m
+rem if %ERRORLEVEL% neq 0  goto :error_end
+rem echo ------------------
+rem echo +  win32 - Release
+rem echo ------------------
+rem msbuild gtl.sln /p:Platform=x86 /p:Configuration=Release.v142 -m
+rem if %ERRORLEVEL% neq 0  goto :error_end
 
 goto :end
 
