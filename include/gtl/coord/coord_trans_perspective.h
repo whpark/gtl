@@ -126,29 +126,21 @@ namespace gtl {
 			return ptNew;
 		}
 		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override  {
-			point3_t ptNew;
-			//ptNew.x = m_mat(0, 0) * pt.x + m_mat(0, 1) * pt.y + m_mat(0, 2) * pt.z + m_mat(0, 3);
-			//ptNew.y = m_mat(1, 0) * pt.x + m_mat(1, 1) * pt.y + m_mat(1, 2) * pt.z + m_mat(1, 3);
-			//ptNew.z = m_mat(2, 0) * pt.x + m_mat(2, 1) * pt.y + m_mat(2, 2) * pt.z + m_mat(2, 3);
-			//double d = m_mat(3, 0) * pt.x + m_mat(3, 1) * pt.y + m_mat(3, 2) * pt.z + m_mat(3, 3);
-			//if ( (d != 0.0) and (d != 1.0) and std::isfinite(d) ) {
-			//	ptNew.x /= d;
-			//	ptNew.y /= d;
-			//	ptNew.z /= d;
-			//}
-			return ptNew;
+			return Trans(point2_t{pt.x, pt.y});
 		}
 		virtual [[nodiscard]] double Trans(double dLength) const override  {
 			return std::sqrt(cv::determinant(m_mat))*dLength;
 		}
 		virtual [[nodiscard]] std::optional<point2_t> TransInverse(point2_t const& pt) const override {
-			return TransInverse(point3_t{pt.x, pt.y, 0.0});
-		}
-		virtual [[nodiscard]] std::optional<point3_t> TransInverse(point3_t const& pt) const override {
 			this_t ctI;
-			if (GetInv(ctI))
+			if (!GetInv(ctI))
 				return {};
 			return ctI.Trans(pt);
+		}
+		virtual [[nodiscard]] std::optional<point3_t> TransInverse(point3_t const& pt) const override {
+			if (pt.z == 0.0)
+				return TransInverse(point2_t{pt.x, pt.y});
+			return {};
 		}
 		virtual [[nodiscard]] std::optional<double> TransInverse(double dLength) const override {
 			double d = cv::determinant(m_mat);
@@ -242,8 +234,10 @@ namespace gtl {
 		bool GetInv(xCoordTransP44& ctI) const {
 			bool bOK{};
 			auto mat = m_mat.inv(cv::DECOMP_LU, &bOK);
-			ctI.m_mat = bOK ? mat : mat_t::eye();
-			return bOK;
+			if (!bOK)
+				return false;
+			ctI.m_mat = mat;
+			return true;
 		}
 
 		void clear() {
@@ -263,11 +257,28 @@ namespace gtl {
 				return false;
 
 			mat_t m, a, b;
-			
+			a(0, 0) = pts0[0].x; a(0, 1) = pts0[1].x; a(0, 2) = pts0[2].x; a(0, 3) = pts0[3].x;
+			a(1, 0) = pts0[0].y; a(1, 1) = pts0[1].y; a(1, 2) = pts0[2].y; a(1, 3) = pts0[3].y;
+			a(2, 0) = pts0[0].z; a(2, 1) = pts0[1].z; a(2, 2) = pts0[2].z; a(2, 3) = pts0[3].z;
+			a(3, 0) = 1.; a(3, 1) = 1.; a(3, 2) = 1.; a(3, 3) = 1.;
+
+			b(0, 0) = pts1[0].x; b(0, 1) = pts1[1].x; b(0, 2) = pts1[2].x; b(0, 3) = pts1[3].x;
+			b(1, 0) = pts1[0].y; b(1, 1) = pts1[1].y; b(1, 2) = pts1[2].y; b(1, 3) = pts1[3].y;
+			b(2, 0) = pts1[0].z; b(2, 1) = pts1[1].z; b(2, 2) = pts1[2].z; b(2, 3) = pts1[3].z;
+			b(3, 0) = 1.; b(3, 1) = 1.; b(3, 2) = 1.; b(3, 3) = 1.;
+
+			auto d = cv::determinant(a);
+			if (d == 0.0) {
 
 
+				//return false;
+			}
+
+			bool bOK{};
+			m = b * a.inv(cv::DECOMP_LU, &bOK);
+			if (!bOK)
+				return false;
 			m_mat = m;
-
 			return true;
 		}
 
@@ -278,6 +289,7 @@ namespace gtl {
 			return Trans(point3_t{pt.x, pt.y, 0.});
 		}
 		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override  {
+			auto t0 = std::chrono::steady_clock::now();
 			point3_t ptNew;
 			ptNew.x = m_mat(0, 0) * pt.x + m_mat(0, 1) * pt.y + m_mat(0, 2) * pt.z + m_mat(0, 3);
 			ptNew.y = m_mat(1, 0) * pt.x + m_mat(1, 1) * pt.y + m_mat(1, 2) * pt.z + m_mat(1, 3);
@@ -288,6 +300,8 @@ namespace gtl {
 				ptNew.y /= d;
 				ptNew.z /= d;
 			}
+			auto t1 = std::chrono::steady_clock::now();
+			auto duration = std::chrono::duration<double, std::micro>(t1-t0);
 			return ptNew;
 		}
 		virtual [[nodiscard]] double Trans(double dLength) const override  {
@@ -298,7 +312,7 @@ namespace gtl {
 		}
 		virtual [[nodiscard]] std::optional<point3_t> TransInverse(point3_t const& pt) const override {
 			this_t ctI;
-			if (GetInv(ctI))
+			if (!GetInv(ctI))
 				return {};
 			return ctI.Trans(pt);
 		}
