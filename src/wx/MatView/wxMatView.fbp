@@ -526,7 +526,7 @@
             <property name="minimum_size"></property>
             <property name="name">IDlgMatViewOption</property>
             <property name="pos"></property>
-            <property name="size">312,490</property>
+            <property name="size">332,541</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass">; ; forward_declare</property>
             <property name="title">options...</property>
