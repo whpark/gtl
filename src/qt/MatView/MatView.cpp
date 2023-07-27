@@ -844,8 +844,6 @@ namespace gtl::qt {
 	}
 
 	void xMatView::PaintGL(xMatViewCanvas* view) {
-		xWaitCursor wc;
-
 		//auto t0 = std::chrono::steady_clock::now();
 
 		if (!view)
@@ -957,6 +955,9 @@ namespace gtl::qt {
 				//	t0 = t;
 				//}
 				if (!imgPyr.empty()) {
+
+					xWaitCursor wc;
+
 					double scaleP = (double)imgPyr.cols / m_img.cols;
 					double scale = (double)size.width / imgPyr.cols;
 					cv::Rect roiP(roi);
