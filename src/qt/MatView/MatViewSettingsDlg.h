@@ -16,10 +16,10 @@ public:
 	using this_t = xMatViewSettingsDlg;
 	using base_t = QDialog;
 
-	xMatView::S_OPTION& m_option;
+	xMatView::S_OPTION m_option;
 
 public:
-	xMatViewSettingsDlg(xMatView::S_OPTION& option, QWidget* parent = nullptr);
+	xMatViewSettingsDlg(xMatView::S_OPTION option, QWidget* parent = nullptr);
 	~xMatViewSettingsDlg() {}
 
 	bool UpdateData(bool bSaveAndValidate = true);

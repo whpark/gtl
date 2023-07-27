@@ -64,7 +64,7 @@ namespace gtl::qt {
 		connect(ui->btnZoomIn, &QPushButton::clicked, this, &this_t::OnBtnZoomIn_clicked);
 		connect(ui->btnZoomOut, &QPushButton::clicked, this, &this_t::OnBtnZoomOut_clicked);
 		connect(ui->btnZoomFit, &QPushButton::clicked, this, &this_t::OnBtnZoomFit_clicked);
-		connect(ui->btnSettings, &QPushButton::clicked, this, &this_t::OnSettings);
+		connect(ui->btnSettings, &QPushButton::clicked, this, &this_t::OnBtnSettings_clicked);
 		connect(ui->sbHorz, &QScrollBar::valueChanged, this, &this_t::OnSbHorz_valueChanged);
 		connect(ui->sbHorz, &QScrollBar::sliderMoved, this, &this_t::OnSbHorz_valueChanged);
 		connect(ui->sbVert, &QScrollBar::valueChanged, this, &this_t::OnSbVert_valueChanged);
@@ -74,13 +74,6 @@ namespace gtl::qt {
 	}
 
 	xMatView::~xMatView() {
-	}
-
-	void xMatView::OnSettings() {
-		xMatViewSettingsDlg dlg(m_option, this);
-		if (dlg.exec() != QDialog::Accepted)
-			return;
-		SetOption(dlg.m_option);
 	}
 
 	bool xMatView::SetImage(cv::Mat const& img, bool bCenter, eZOOM eZoomMode, bool bCopy) {

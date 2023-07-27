@@ -6,7 +6,7 @@
 namespace gtlq = gtl::qt;
 using namespace std::literals;
 
-gtlq::xMatViewSettingsDlg::xMatViewSettingsDlg(xMatView::S_OPTION& option, QWidget* parent) : QDialog(parent), m_option(option) {
+gtlq::xMatViewSettingsDlg::xMatViewSettingsDlg(xMatView::S_OPTION option, QWidget* parent) : QDialog(parent), m_option(option) {
 	ui.setupUi(this);
 
 	connect(ui.buttonBox, &QDialogButtonBox::accepted, this, &this_t::OnOK);

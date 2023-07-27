@@ -32,21 +32,13 @@ public:
 	enum class eZOOM_IN : uint8_t { nearest, linear, bicubic, lanczos4/* EDSR, ESPCN, FSRCNN, LapSRN */};
 	enum class eZOOM_OUT : uint8_t { nearest, area, };
 
-	struct S_OPTION_flags {
+	struct S_OPTION {
 		bool bZoomLock{false};				// if eZoom is NOT free, zoom is locked
 		bool bPanningLock{true};			// image can be moved only eZoom == free
 		bool bExtendedPanning{true};		// image can move out of screen
 		bool bKeyboardNavigation{};			// page up/down, scroll down to next blank of image
 		bool bDrawPixelValue{true};			// draw pixel value on image
 		bool bPyrImageDown{true};			// build cache image for down sampling. (such as mipmap)
-
-		struct glaze {
-			using T = S_OPTION_flags;
-			static constexpr auto value = glz::flags(GLZ_FOR_EACH(GLZ_X,
-				bZoomLock, bPanningLock, bExtendedPanning, bKeyboardNavigation, bDrawPixelValue, bPyrImageDown));
-		};
-	};
-	struct S_OPTION : public S_OPTION_flags{
 		double dPanningSpeed{2.0};			// Image Panning Speed. 1.0 is same with mouse move.
 		int nScrollMargin{5};				// bExtendedPanning, px margin to scroll
 		std::chrono::milliseconds tsScroll{250ms};	// Smooth Scroll. duration
@@ -55,7 +47,8 @@ public:
 		cv::Vec3b crBackground{0, 0, 0};	// rgb	//{161, 114, 230}
 
 		// Sync with json
-		GLZ_LOCAL_META_DERIVED(S_OPTION, S_OPTION_flags, dPanningSpeed, nScrollMargin, tsScroll, eZoomIn, eZoomOut, crBackground);
+		GLZ_LOCAL_META(S_OPTION, bZoomLock, bPanningLock, bExtendedPanning, bKeyboardNavigation, bDrawPixelValue,
+			bPyrImageDown, dPanningSpeed, nScrollMargin, tsScroll, eZoomIn, eZoomOut, crBackground);
 	};
 
 	std::string m_strCookie;
@@ -112,9 +105,6 @@ protected:
 public:
 	xMatView(QWidget* parent = nullptr);
 	~xMatView();
-
-protected:
-	void OnSettings();
 
 public:
 	bool SetImage(cv::Mat const& img, bool bCenter = true, eZOOM eZoomMode = eZOOM::none, bool bCopy = false);
