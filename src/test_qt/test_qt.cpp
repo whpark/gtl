@@ -5,7 +5,7 @@
 
 #include <QSettings>
 
-QSettings s("Biscuit-lab.com", "gtl::test_qt");
+QSettings reg("Biscuit-lab.com", "gtl::test_qt");
 
 gtl::qt::test_qt::test_qt(QWidget *parent)
     : QMainWindow(parent)
@@ -14,7 +14,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
     //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
     //m_dlgMatViewGV->show();
 
-	gtl::qt::SaveWindowPosition(s, "test_qt", this);
+	gtl::qt::SaveWindowPosition(reg, "test_qt", this);
 
 	m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
 	m_ctrlMatView->move({4, 100});
@@ -22,6 +22,21 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	m_dlgMatView = std::make_unique<gtl::qt::xMatViewDlg>(this);
 	m_dlgMatView->show();
+	m_dlgMatView->GetView().m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
+		if (bStore) {
+			std::string buffer = glz::write_json(option);
+			reg.setValue("misc/viewOption", ToQString(buffer));
+		}
+		else {
+			auto str = reg.value("misc/viewOption").toString();
+			if (str.isEmpty())
+				return false;
+			auto buffer = ToString(str);
+			glz::read_json(option, buffer);
+		}
+		return true;
+	};
+	m_dlgMatView->GetView().LoadOption();
 
 	// Color Bar
 	//cv::Mat img = cv::Mat::zeros(1080*2, 1920*2, CV_8UC3);
@@ -68,5 +83,5 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 }
 
 gtl::qt::test_qt::~test_qt() {
-	gtl::qt::SaveWindowPosition(s, "test_qt", this);
+	gtl::qt::SaveWindowPosition(reg, "test_qt", this);
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>409</width>
-    <height>141</height>
+    <width>507</width>
+    <height>322</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -251,6 +251,11 @@
        </item>
        <item>
         <widget class="QLineEdit" name="edtInfo">
+         <property name="font">
+          <font>
+           <family>Lucida Console</family>
+          </font>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>

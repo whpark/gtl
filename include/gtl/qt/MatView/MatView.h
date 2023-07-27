@@ -52,12 +52,12 @@ public:
 		std::chrono::milliseconds tsScroll{250ms};	// Smooth Scroll. duration
 		eZOOM_IN eZoomIn{eZOOM_IN::nearest};
 		eZOOM_OUT eZoomOut{eZOOM_OUT::area};
-		cv::Vec3b crBackground{161, 114, 230};	// rgb
+		cv::Vec3b crBackground{0, 0, 0};	// rgb	//{161, 114, 230}
 
 		// Sync with json
-		GLZ_LOCAL_META_DERIVED(S_OPTION, S_OPTION_flags, bZoomLock, bPanningLock);
-
+		GLZ_LOCAL_META_DERIVED(S_OPTION, S_OPTION_flags, dPanningSpeed, nScrollMargin, tsScroll, eZoomIn, eZoomOut, crBackground);
 	};
+
 	std::string m_strCookie;
 	std::function<bool(bool bStore, std::string_view cookie, S_OPTION&)> m_fnSyncSetting;
 

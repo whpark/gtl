@@ -82,12 +82,6 @@ namespace gtl {
 		};
 	};
 
-	// cv::Matx<...>
-	template <typename T, int m, int n>
-	struct glz::meta<cv::Matx<T, m, n>> {
-		static constexpr auto value{ &cv::Matx<T, m, n>::val };
-	};
-
 	// gtl::coord
 	template < typename T, int dim >
 	struct glz::meta<gtl::TSizeT<T, dim>> {
@@ -156,6 +150,26 @@ struct glz::detail::from_json<cv::Mat> {
 	}
 };
 
+namespace cv {
+	// cv::Matx<...>
+	template <typename T, int m, int n>
+	struct glz::meta<Matx<T, m, n>> {
+		static constexpr auto value{ &cv::Matx<T, m, n>::val };
+	};
+
+	// cv::Vec
+	template<typename _Tp, int cn>
+	struct glz::meta<Vec<_Tp, cn>> {
+		static constexpr auto value{ &cv::Vec<_Tp, cn>::val };
+	};
+
+	// cv::Scalar_
+	template<typename _Tp>
+	struct glz::meta<Scalar_<_Tp>> {
+		static constexpr auto value{ &cv::Scalar_<_Tp>::val };
+	};
+
+}	// namespace cv
 
 // std::basic_string
 // std::u8string
@@ -253,3 +267,40 @@ struct glz::detail::from_json<std::filesystem::path> {
 	}
 };
 
+// std::chrono::duration
+template <class _Rep, class _Period>
+struct glz::detail::to_json<std::chrono::duration<_Rep, _Period>> {
+	template <auto Opts, is_context Ctx, class B, class IX>
+	inline static void op(std::chrono::duration<_Rep, _Period> const& value, Ctx&& ctx, B&& b, IX&& ix) {
+		to_json<_Rep>::op<Opts>(value.count(), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
+	}
+};
+
+template <class _Rep, class _Period>
+struct glz::detail::from_json<std::chrono::duration<_Rep, _Period>> {
+	template <auto Opts, is_context Ctx, class B, class IX>
+	GLZ_ALWAYS_INLINE static void op(std::chrono::duration<_Rep, _Period>& value, Ctx&& ctx, B&& b, IX&& ix) {
+		_Rep rep;
+		from_json<_Rep>::op<Opts>(rep, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
+		value = std::chrono::duration<_Rep, _Period>(rep);
+	}
+};
+
+// std::chrono::time_point
+template <class _Clock, class _Duration>
+struct glz::detail::to_json<std::chrono::time_point<_Clock, _Duration>> {
+	template <auto Opts, is_context Ctx, class B, class IX>
+	inline static void op(std::chrono::time_point<_Clock, _Duration> const& value, Ctx&& ctx, B&& b, IX&& ix) {
+		to_json<_Duration>::op<Opts>(value.time_since_epoch(), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
+	}
+};
+
+template <class _Clock, class _Duration>
+struct glz::detail::from_json<std::chrono::time_point<_Clock, _Duration>> {
+	template <auto Opts, is_context Ctx, class B, class IX>
+	GLZ_ALWAYS_INLINE static void op(std::chrono::time_point<_Clock, _Duration>& value, Ctx&& ctx, B&& b, IX&& ix) {
+		_Duration duration;
+		from_json<_Duration>::op<Opts>(duration, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
+		value = std::chrono::time_point<_Clock, _Duration>(duration);
+	}
+};

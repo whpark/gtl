@@ -672,21 +672,35 @@ namespace gtl::qt {
 		// status
 		{
 			auto ptImage = m_ctScreenFromImage.TransI(ptView);
-			auto status = std::format(L"{},{}", ptImage.x, ptImage.y);
+			std::wstring status;
+
+			// Current Position
+			int nx{}, ny{};
+			{
+				for (auto v = m_imgOriginal.cols; v; v/= 10, nx++);
+				for (auto v = m_imgOriginal.rows; v; v/= 10, ny++);
+				status += std::format(L"{0:{2}},{1:{3}}", ptImage.x, ptImage.y, nx, ny);
+			}
+
 			// image value
 			if (xRect2i(0, 0, m_img.cols, m_img.rows).PtInRect(ptImage)) {
 				int n = m_imgOriginal.channels();
 				int depth = m_imgOriginal.depth();
 				auto cr = GetMatValue(m_imgOriginal.ptr(ptImage.y), m_imgOriginal.depth(), n, ptImage.y, ptImage.x);
-				auto strValue = std::format(L" [{}", cr[0]);
+				auto strValue = std::format(L" [{:3}", cr[0]);
 				for (int i{1}; i < n; i++)
-					strValue += std::format(L", {}", cr[i]);
+					strValue += std::format(L",{:3}", cr[i]);
 				status += strValue + L"]";
 			}
+
+			// Selection
 			if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
 				gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
-				status += std::format(L"x{} y{} w{} h{}", m_mouse.ptSel0.x, m_mouse.ptSel0.y, size.cx, size.cy);
+				//status += std::format(L" ({0:{4}},{1:{5}} {2:{4}}x{3:{5}})", m_mouse.ptSel0.x, m_mouse.ptSel0.y, size.cx, size.cy, nx, ny);
+				status += std::format(L" ({0},{1} {2}x{3})", m_mouse.ptSel0.x, m_mouse.ptSel0.y, size.cx, size.cy);
 			}
+
+
 			if (auto str = ToQString(status); str != ui->edtInfo->text())
 				ui->edtInfo->setText(str);
 		}
