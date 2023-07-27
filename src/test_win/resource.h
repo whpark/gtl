@@ -122,6 +122,8 @@
 #define IDC_TEST_SAVE_BMP_1BPP3         1013
 #define IDC_TEST_SAVE_BMP_8BPP          1013
 #define IDC_MAT_SIZE                    1014
+#define IDC_TEST_SAVE_BMP               1015
+#define IDC_TEST_SAVE_BMP_COLOR         1015
 
 // Next default values for new objects
 // 
@@ -129,7 +131,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        316
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "framework.h"
+#include "scn/scn.h"
 // SHARED_HANDLERS can be defined in an ATL project implementing preview, thumbnail
 // and search filter handlers and allows sharing of document code with that project.
 #ifndef SHARED_HANDLERS
@@ -358,7 +359,27 @@ void CtestwinView::TestSaveBMP(int nBPP) {
 
 	gtlw::xStopWatch sw;
 
-	cv::Mat mat = CreateSampleImage(size, nBPP <= 8 ? CV_8UC1 : CV_8UC3);
+	cv::Mat mat;
+	CString strColor;
+	GetDlgItemText(IDC_TEST_SAVE_BMP_COLOR, strColor);
+	strColor.Trim();
+
+	if (strColor.IsEmpty()) {
+		mat = CreateSampleImage(size, nBPP <= 8 ? CV_8UC1 : CV_8UC3);
+	}
+	else {
+		//int v = _ttoi(strColor);
+		strColor.Replace(',', ' ');
+		std::wstring str = (LPCTSTR)strColor;
+		int v1{-1}, v2{-1}, v3{-1};
+		scn::scan(str, L"{} {} {}", v1, v2, v3);
+		v1 = std::clamp(v1, 0, 255);
+		v2 = std::clamp(v2, 0, 255);
+		v3 = std::clamp(v3, 0, 255);
+		cv::Scalar cr(v1, v2, v3);
+		mat = cv::Mat(size, nBPP <= 8 ? CV_8UC1 : CV_8UC3);
+		mat = cr;
+	}
 
 	auto folder = GetWorkingFolder();
 
@@ -377,7 +398,6 @@ void CtestwinView::OnBnClickedTestSaveBMP_nBPP() {
 	TestSaveBMP(4);
 	TestSaveBMP(8);
 }
-
 
 void CtestwinView::OnBnClickedTestLoadBMP() {
 	CFileDialog dlg(true, _T(".bmp"), nullptr, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR, _T("All Files(*.*)|*.*||"), this);
