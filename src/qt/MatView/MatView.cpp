@@ -685,7 +685,7 @@ namespace gtl::qt {
 			}
 			if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
 				gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
-				status += std::format(L" w{}, h{}", size.cx, size.cy);
+				status += std::format(L"x{} y{} w{} h{}", m_mouse.ptSel0.x, m_mouse.ptSel0.y, size.cx, size.cy);
 			}
 			if (auto str = ToQString(status); str != ui->edtInfo->text())
 				ui->edtInfo->setText(str);

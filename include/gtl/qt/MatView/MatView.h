@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <QWidget>
+#include <QTimer>
 #include "gtl/qt/_lib_gtl_qt.h"
 #include "gtl/reflection_glaze.h"
 

@@ -165,4 +165,7 @@
       <Filter>code</Filter>
     </QtUic>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Readme.md" />
+  </ItemGroup>
 </Project>
