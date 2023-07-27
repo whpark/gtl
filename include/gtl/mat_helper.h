@@ -325,6 +325,12 @@ namespace gtl {
 	GTL__API bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, BITMAP_V5_HEADER& header);
 	GTL__API bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header);
 	GTL__API bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header);
+	inline std::tuple<bool /*result*/, BMP_FILE_HEADER /*fileHeader*/, variant_BITMAP_HEADER /*header*/> LoadBitmapHeader(std::filesystem::path const& path) {
+		BMP_FILE_HEADER fileHeader{};
+		variant_BITMAP_HEADER header{};
+		bool result = LoadBitmapHeader(path, fileHeader, header);
+		return { result, fileHeader, header };
+	}
 	GTL__API cv::Mat LoadBitmapMat(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback = nullptr);
 	struct sLoadBitmapMatResult {
 		cv::Mat img;
