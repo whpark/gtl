@@ -8,6 +8,8 @@
 
 #include "MatViewSettingsDlg.h"
 
+#include "spdlog/stopwatch.h"
+
 namespace gtlq = gtl::qt;
 
 namespace gtl::qt {
@@ -122,14 +124,12 @@ namespace gtl::qt {
 
 		if (eZoomMode != eZOOM::none) {
 			ui->cmbZoomMode->setCurrentIndex(std::to_underlying(eZoomMode));
-			OnCmbZoomMode_currentIndexChanged(std::to_underlying(eZoomMode));
-		} else {
-			UpdateCT(bCenter);
-			UpdateScrollBars();
-
-			if (ui->view)
-				ui->view->update();
 		}
+		UpdateCT(bCenter, eZoomMode);
+		UpdateScrollBars();
+
+		if (ui->view)
+			ui->view->update();
 		return true;
 	}
 
@@ -185,6 +185,7 @@ namespace gtl::qt {
 			return false;
 		if (eZoom == eZOOM::none)
 			eZoom = m_eZoom;
+		ui->cmbZoomMode->setCurrentIndex(std::to_underlying(eZoom));
 
 		xRect2i rectClient;
 		rectClient = GetViewRect();
@@ -370,10 +371,11 @@ namespace gtl::qt {
 		m_ctScreenFromImage.m_scale = std::clamp(m_ctScreenFromImage.m_scale, dMinZoom, 1.e3);
 		m_ctScreenFromImage.m_offset += ptAnchor - m_ctScreenFromImage(ptImage);
 		// Anchor point
-		if (m_eZoom != eZOOM::mouse_wheel_locked)
-			m_eZoom = eZOOM::free;
-		ui->cmbZoomMode->setCurrentIndex(std::to_underlying(m_eZoom));
-		OnCmbZoomMode_currentIndexChanged(std::to_underlying(m_eZoom));
+		auto eZoom = m_eZoom;
+		if (eZoom != eZOOM::mouse_wheel_locked)
+			eZoom = eZOOM::free;
+		ui->cmbZoomMode->setCurrentIndex(std::to_underlying(eZoom));
+		//OnCmbZoomMode_currentIndexChanged(std::to_underlying(eZoom));
 		UpdateCT(bCenter);
 		UpdateScrollBars();
 		if (ui->view)
@@ -840,7 +842,12 @@ namespace gtl::qt {
 			//throw std::exception(reinterpret_cast<const char*>(msg));
 		}
 	}
+
 	void xMatView::PaintGL(xMatViewCanvas* view) {
+		xWaitCursor wc;
+
+		spdlog::stopwatch sw;
+		spdlog::debug("Start {}", sw);
 		if (!view)
 			return;
 		using namespace gtl;
@@ -915,6 +922,8 @@ namespace gtl::qt {
 		// check target image size
 		if ((uint64_t)rcTargetC.width * rcTargetC.height > 1ull *1024*1024*1024)
 			return;
+
+		spdlog::debug("1 {:.3}", sw);
 		cv::Mat img(rcTargetC.size(), m_img.type());
 		//img = m_option.crBackground;
 		int eInterpolation = cv::INTER_LINEAR;
@@ -968,6 +977,8 @@ namespace gtl::qt {
 			OutputDebugStringA("cv::.......\n");
 		}
 
+		spdlog::debug("2 {:.3}", sw);
+
 		if (!img.empty()) {
 			if (m_option.bDrawPixelValue) {
 				auto ctCanvas = m_ctScreenFromImage;
@@ -990,6 +1001,8 @@ namespace gtl::qt {
 				glDeleteTextures(std::size(textures), textures);
 			});
 
+			spdlog::debug("3 {:.3}", sw);
+
 			PutMatAsTexture(textures[0], img, rcTarget.width, rectTarget);
 
 			// Draw Selection Rect
@@ -1007,6 +1020,10 @@ namespace gtl::qt {
 			}
 		}
 
+		spdlog::debug("4 {:.3}", sw);
+
+		faSwapBuffer.DoAction();
+		spdlog::debug("5 {:.3}", sw);
 	}
 
 } // namespace gtl::qt
