@@ -846,7 +846,7 @@ namespace gtl::qt {
 	void xMatView::PaintGL(xMatViewCanvas* view) {
 		xWaitCursor wc;
 
-		auto t0 = std::chrono::steady_clock::now();
+		//auto t0 = std::chrono::steady_clock::now();
 
 		if (!view)
 			return;
@@ -937,11 +937,11 @@ namespace gtl::qt {
 				// resize from pyramid image
 				cv::Size2d size {ct.m_scale*m_img.cols, ct.m_scale*m_img.rows};
 				cv::Mat imgPyr;
-				{
-					auto t = std::chrono::steady_clock::now();
-					OutputDebugStringA(std::format("=======================\n1 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
-					t0 = t;
-				}
+				//{
+				//	auto t = std::chrono::steady_clock::now();
+				//	OutputDebugStringA(std::format("=======================\n1 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
+				//	t0 = t;
+				//}
 				{
 					std::unique_lock lock{m_pyramid.mtx};
 					for (auto const& img : m_pyramid.imgs) {
@@ -951,11 +951,11 @@ namespace gtl::qt {
 						break;
 					}
 				}
-				{
-					auto t = std::chrono::steady_clock::now();
-					OutputDebugStringA(std::format("=======================\n2 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
-					t0 = t;
-				}
+				//{
+				//	auto t = std::chrono::steady_clock::now();
+				//	OutputDebugStringA(std::format("=======================\n2 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
+				//	t0 = t;
+				//}
 				if (!imgPyr.empty()) {
 					double scaleP = (double)imgPyr.cols / m_img.cols;
 					double scale = (double)size.width / imgPyr.cols;
@@ -987,11 +987,11 @@ namespace gtl::qt {
 						}
 					}
 				}
-				{
-					auto t = std::chrono::steady_clock::now();
-					OutputDebugStringA(std::format("=======================\n3 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
-					t0 = t;
-				}
+				//{
+				//	auto t = std::chrono::steady_clock::now();
+				//	OutputDebugStringA(std::format("=======================\n3 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
+				//	t0 = t;
+				//}
 			}
 			else if (ct.m_scale > 1.) {
 				static std::unordered_map<eZOOM_IN, cv::InterpolationFlags> const mapInterpolation = {
