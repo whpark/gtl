@@ -846,8 +846,8 @@ namespace gtl::qt {
 	void xMatView::PaintGL(xMatViewCanvas* view) {
 		xWaitCursor wc;
 
-		spdlog::stopwatch sw;
-		spdlog::debug("Start {}", sw);
+		auto t0 = std::chrono::steady_clock::now();
+
 		if (!view)
 			return;
 		using namespace gtl;
@@ -923,7 +923,6 @@ namespace gtl::qt {
 		if ((uint64_t)rcTargetC.width * rcTargetC.height > 1ull *1024*1024*1024)
 			return;
 
-		spdlog::debug("1 {:.3}", sw);
 		cv::Mat img(rcTargetC.size(), m_img.type());
 		//img = m_option.crBackground;
 		int eInterpolation = cv::INTER_LINEAR;
@@ -939,6 +938,11 @@ namespace gtl::qt {
 				cv::Size2d size {ct.m_scale*m_img.cols, ct.m_scale*m_img.rows};
 				cv::Mat imgPyr;
 				{
+					auto t = std::chrono::steady_clock::now();
+					OutputDebugStringA(std::format("=======================\n1 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
+					t0 = t;
+				}
+				{
 					std::unique_lock lock{m_pyramid.mtx};
 					for (auto const& img : m_pyramid.imgs) {
 						if (img.cols < size.width)
@@ -946,6 +950,11 @@ namespace gtl::qt {
 						imgPyr = img;
 						break;
 					}
+				}
+				{
+					auto t = std::chrono::steady_clock::now();
+					OutputDebugStringA(std::format("=======================\n2 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
+					t0 = t;
 				}
 				if (!imgPyr.empty()) {
 					double scaleP = (double)imgPyr.cols / m_img.cols;
@@ -955,8 +964,33 @@ namespace gtl::qt {
 					roiP.y *= scaleP;
 					roiP.width *= scaleP;
 					roiP.height *= scaleP;
-					if (gtl::IsROI_Valid(roiP, imgPyr.size()))
-						cv::resize(imgPyr(roiP), img(rcTarget), rcTarget.size(), 0., 0., eInterpolation);
+					if (gtl::IsROI_Valid(roiP, imgPyr.size())) {
+						//cv::resize(imgPyr(roiP), img(rcTarget), rcTarget.size(), 0., 0., eInterpolation);
+						cv::Mat imgSrc(imgPyr(roiP));
+						cv::Mat imgDest;
+						if (IsGPUEnabled()) {
+							try {
+								cv::cuda::GpuMat dst;
+								cv::resize(cv::cuda::GpuMat(imgSrc), dst, rcTarget.size(), 0., 0., eInterpolation);
+								dst.download(imgDest);
+							}
+							catch (...) {
+								//TRACE((GTL__FUNCSIG " - Error\n").c_str());
+							}
+						}
+						//#endif
+						if (imgDest.empty())
+							cv::resize(imgSrc, img(rcTarget), rcTarget.size(), 0., 0., eInterpolation);
+						else {
+							if (imgDest.size() == rcTarget.size())
+								imgDest.copyTo(img(rcTarget));
+						}
+					}
+				}
+				{
+					auto t = std::chrono::steady_clock::now();
+					OutputDebugStringA(std::format("=======================\n3 {}\n", std::chrono::duration_cast<std::chrono::milliseconds>(t-t0)).c_str());
+					t0 = t;
 				}
 			}
 			else if (ct.m_scale > 1.) {
@@ -976,8 +1010,6 @@ namespace gtl::qt {
 		} catch (...) {
 			OutputDebugStringA("cv::.......\n");
 		}
-
-		spdlog::debug("2 {:.3}", sw);
 
 		if (!img.empty()) {
 			if (m_option.bDrawPixelValue) {
@@ -1001,8 +1033,6 @@ namespace gtl::qt {
 				glDeleteTextures(std::size(textures), textures);
 			});
 
-			spdlog::debug("3 {:.3}", sw);
-
 			PutMatAsTexture(textures[0], img, rcTarget.width, rectTarget);
 
 			// Draw Selection Rect
@@ -1020,10 +1050,6 @@ namespace gtl::qt {
 			}
 		}
 
-		spdlog::debug("4 {:.3}", sw);
-
-		faSwapBuffer.DoAction();
-		spdlog::debug("5 {:.3}", sw);
 	}
 
 } // namespace gtl::qt
