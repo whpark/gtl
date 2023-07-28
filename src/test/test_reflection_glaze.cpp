@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 
+#include "opencv2/opencv.hpp"
 #include "gtl/gtl.h"
 #include "gtl/mat_helper.h"
 #include "gtl/reflection_glaze.h"
@@ -12,6 +13,7 @@ using namespace gtl::literals;
 namespace stdfs = std::filesystem;
 namespace stdc = std::chrono;
 
+
 namespace gtl::test::reflection_glaze {
 
 	struct topmost {
@@ -20,10 +22,20 @@ namespace gtl::test::reflection_glaze {
 		bool operator == (topmost const& B) const {
 			return IsMatEqual(m, B.m);
 		};
+
+		virtual void Purturb() {
+			gtl::xRandUniI<> r(0, 255);
+			for (int y{}; y < m.rows; y++) {
+				auto* ptr = m.ptr(y);
+				for (int i{}; i < m.step; i++)
+					ptr[i] = r();
+			}
+		}
 	};
 
 	struct parent : topmost {
 		using this_t = parent;
+		using base_t = topmost;
 
 		std::string str;
 		std::u8string stru8 = u8"가";
@@ -40,12 +52,14 @@ namespace gtl::test::reflection_glaze {
 		int iValue{};
 		bool on_off{};
 		std::vector<int> values{1,2,3,4,5};
+		std::array<int, 3> arr {1, 2, 3};
+		//int arr[3] {1, 2, 3};
 
 		//cv::Mat m;
 
 		auto operator <=> (this_t const& ) const = default;
 
-		GLZ_LOCAL_META(this_t, dd, str, dValue, iValue, on_off, values, m, stru8, strw, stru16, stru32, len, td1, td2, tr1, tr2);
+		GLZ_LOCAL_META(this_t, dd, str, dValue, iValue, on_off, values, m, stru8, strw, stru16, stru32, len, td1, td2, tr1, tr2, arr);
 		//struct glaze {
 		//	static constexpr auto value = glz::object(
 		//		"str", &this_t::str,
@@ -56,6 +70,28 @@ namespace gtl::test::reflection_glaze {
 
 		//};	//GLZ_LOCAL_META(derived, str2);
 
+		virtual void Purturb() override {
+			base_t::Purturb();
+			gtl::xRandUniD<> r(0.1, 100.0);
+			str = std::format("{}", r());
+			stru8 = fmt::format(u8"{}", r());
+			strw = std::format(L"나{}", r());
+			stru16 = fmt::format(u"다{}", r());
+			stru32 = fmt::format(U"라{}", r());
+			len.dValue = r();
+			td1 = r();
+			td2 = r();
+			tr1 = r();
+			tr2 = r();
+			dd = (int)r();
+			dValue = r();
+			iValue = (int)r();
+			on_off = r() > 50.;
+			for (auto& v : values)
+				v = (int)r();
+			for (auto& v : arr)
+				v = (int)r();
+		}
 	};
 
 	struct derived1 : parent {
@@ -67,6 +103,12 @@ namespace gtl::test::reflection_glaze {
 		auto operator <=> (this_t const& ) const = default;
 
 		GLZ_LOCAL_META_DERIVED(derived1, parent, a);
+
+		virtual void Purturb() override {
+			base_t::Purturb();
+			gtl::xRandUniD<> r(0.1, 100.0);
+			a = std::format("{}", r());
+		}
 	};
 
 
@@ -82,6 +124,23 @@ namespace gtl::test::reflection_glaze {
 		auto operator <=> (this_t const& ) const = default;
 
 		GLZ_LOCAL_META_DERIVED(this_t, base_t, str2, pt, rc, ct);
+
+		virtual void Purturb() override {
+			base_t::Purturb();
+			gtl::xRandUniD<> r(0.1, 100.0);
+			str2 = std::format("{}", r());
+			for (auto& v: pt.arr())
+				v = r();
+			for (auto& v: rc.arr())
+				v = r();
+			ct.m_scale = r();
+			for (auto& v : ct.m_mat.val)
+				v = r();
+			for (auto& v: ct.m_origin.arr())
+				v = r();
+			for (auto& v : ct.m_offset.arr())
+				v = r();
+		}
 	};
 
 	struct second {
@@ -93,7 +152,6 @@ namespace gtl::test::reflection_glaze {
 
 		GLZ_LOCAL_META(second, d);
 	};
-
 	TEST(test, reflection_glaze_1) {
 		constexpr glz::opts op{.error_on_unknown_keys = false, .prettify=true};
 
@@ -113,8 +171,16 @@ namespace gtl::test::reflection_glaze {
 		gtl::ContainerToFile(buf, folder / "1.json");
 
 		derived2 d2;
-		auto r = glz::read<op>(d2, buf);
+		EXPECT_FALSE(glz::read<op>(d2, buf));
 
+		EXPECT_EQ((topmost&)d, (topmost&)d2);
+		EXPECT_EQ((parent&)d, (parent&)d2);
+		EXPECT_EQ((derived1&)d, (derived1&)d2);
+		EXPECT_EQ((derived2&)d, (derived2&)d2);
+
+		d.Purturb();
+		glz::write<op>(d, buf);
+		EXPECT_FALSE(glz::read<op>(d2, buf));
 		EXPECT_EQ((topmost&)d, (topmost&)d2);
 		EXPECT_EQ((parent&)d, (parent&)d2);
 		EXPECT_EQ((derived1&)d, (derived1&)d2);
@@ -139,7 +205,7 @@ namespace gtl::test::reflection_glaze {
 			//glz::read_json(s, *r);
 
 			glz::context ctx{};
-			glz::read<op>(d, *r, ctx);
+			EXPECT_TRUE(!glz::read<op>(d, *r, ctx));
 
 			EXPECT_EQ(d.d[0].str2, "ghi"s);
 		}
@@ -151,14 +217,14 @@ namespace gtl::test::reflection_glaze {
 			float* ptr = m.ptr<float>(y);
 			auto f = y * m.cols;
 			for (int x{}; x < m.cols; x++) {
-				ptr[x] = f + x;
+				ptr[x] = float(f + x);
 			}
 		}
 		glz::write_json(m, buf);
 		gtl::ContainerToFile(std::span(buf), folder / "3.json");
 		if (auto r = gtl::FileToContainer<std::string>(folder / "3.json")) {
 			cv::Mat m;
-			glz::read_json(m, *r);
+			EXPECT_FALSE(glz::read_json(m, *r));
 
 			for (int y{}; y < m.rows; y++) {
 				float* ptr = m.ptr<float>(y);
@@ -168,6 +234,32 @@ namespace gtl::test::reflection_glaze {
 			}
 			//second s;
 			//glz::read_json(s, *r);
+		}
+
+		// 4.
+		{
+			std::string str;
+			cv::Matx33d e{1., 2., 3., 4., 5., 6., 7., 8., 9.};
+			glz::write_json(e, str);
+			cv::Matx33d e2{};
+			EXPECT_FALSE(glz::read_json(e2, str));
+			EXPECT_EQ(e, e2);
+		}
+		{
+			std::string str;
+			cv::Vec3b cr{2, 3, 4};
+			glz::write_json(cr, str);
+			cv::Vec3b cr2{};
+			EXPECT_FALSE(glz::read_json(cr2, str));
+			EXPECT_EQ(cr, cr2);
+		}
+		{
+			std::string str;
+			cv::Vec4d cr{1., 2., 3., 4.};
+			glz::write_json(cr, str);
+			cv::Vec4d cr2{};
+			EXPECT_FALSE(glz::read_json(cr2, str));
+			EXPECT_EQ(cr, cr2);
 		}
 
 		auto TestVariousSize = [&](int rows, int cols, stdfs::path const& path) {
@@ -186,7 +278,7 @@ namespace gtl::test::reflection_glaze {
 			}
 			if (auto str = gtl::FileToContainer<std::string>(path); str) {
 				cv::Mat m;
-				glz::read<op>(m, *str);
+				EXPECT_FALSE(glz::read<op>(m, *str));
 				for (int y{}, i{127}; y < m.rows; y++) {
 					uchar* ptr = m.ptr<uchar>(y);
 					for (int x{}; x < m.cols; x++) {

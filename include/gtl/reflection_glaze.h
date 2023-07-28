@@ -150,26 +150,29 @@ struct glz::detail::from_json<cv::Mat> {
 	}
 };
 
-namespace cv {
-	// cv::Matx<...>
-	template <typename T, int m, int n>
-	struct glz::meta<Matx<T, m, n>> {
-		static constexpr auto value{ &cv::Matx<T, m, n>::val };
-	};
+// cv::Matx<...>
+template <typename _Tp, int m, int n>
+struct glz::meta<cv::Matx<_Tp, m, n>> {
+	using T = cv::Matx<_Tp, m, n>;
+	using array_t = std::array<_Tp, sizeof(T::val)/sizeof(_Tp)>;
+	static constexpr auto value = [](auto&& self)->auto&{ return *(array_t*)&self.val; };
+};
 
-	// cv::Vec
-	template<typename _Tp, int cn>
-	struct glz::meta<Vec<_Tp, cn>> {
-		static constexpr auto value{ &cv::Vec<_Tp, cn>::val };
-	};
+// cv::Vec
+template<typename _Tp, int cn>
+struct glz::meta<cv::Vec<_Tp, cn>> {
+	using T = cv::Vec<_Tp, cn>;
+	using array_t = std::array<_Tp, sizeof(T::val)/sizeof(_Tp)>;
+	static constexpr auto value = [](auto&& self)->auto&{ return *(array_t*)&self.val; };
+};
 
-	// cv::Scalar_
-	template<typename _Tp>
-	struct glz::meta<Scalar_<_Tp>> {
-		static constexpr auto value{ &cv::Scalar_<_Tp>::val };
-	};
-
-}	// namespace cv
+// cv::Scalar_
+template<typename _Tp>
+struct glz::meta<cv::Scalar_<_Tp>> {
+	using T = cv::Scalar_<_Tp>;
+	using array_t = std::array<_Tp, sizeof(T::val)/sizeof(_Tp)>;
+	static constexpr auto value = [](auto&& self)->auto&{ return *(array_t*)&self.val; };
+};
 
 // std::basic_string
 // std::u8string
