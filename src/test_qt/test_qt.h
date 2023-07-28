@@ -12,12 +12,19 @@ class gtl::qt::test_qt : public QMainWindow {
 	Q_OBJECT
 
 public:
+	using this_t = test_qt;
+	using base_t = QMainWindow;
+
+public:
 	test_qt(QWidget* parent = nullptr);
 	~test_qt();
 
 	std::unique_ptr<gtl::qt::xMatViewGVDlg> m_dlgMatViewGV;
 	std::unique_ptr<gtl::qt::xMatView> m_ctrlMatView;
 	std::unique_ptr<gtl::qt::xMatViewDlg> m_dlgMatView;
+
+protected:
+	void OnLoadImage();
 
 private:
 	Ui::test_qtClass ui;

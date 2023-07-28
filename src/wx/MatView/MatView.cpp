@@ -975,6 +975,10 @@ void xMatView::OnPaint_View( wxPaintEvent& event ) {
 				roiP.y *= scaleP;
 				roiP.width *= scaleP;
 				roiP.height *= scaleP;
+				if (roiP.width > imgPyr.cols)
+					roiP.width = imgPyr.cols;
+				if (roiP.height > imgPyr.rows)
+					roiP.height = imgPyr.rows;
 				if (gtl::IsROI_Valid(roiP, imgPyr.size()))
 					cv::resize(imgPyr(roiP), img(rcTarget), rcTarget.size(), 0., 0., eInterpolation);
 			}

@@ -13,7 +13,8 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
     ui.setupUi(this);
     //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
     //m_dlgMatViewGV->show();
-
+	auto strPath = reg.value("misc/LastImagePath").toString();
+	ui.edtPath->setText(strPath);
 	gtl::qt::SaveWindowPosition(reg, "test_qt", this);
 
 	m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
@@ -80,8 +81,57 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	m_dlgMatView->GetView().SetImage(img, false);
 	//m_dlgMatViewGV->SetImage(img, false);
+
+	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
+	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);
+
 }
 
 gtl::qt::test_qt::~test_qt() {
 	gtl::qt::SaveWindowPosition(reg, "test_qt", this);
+}
+
+void gtl::qt::test_qt::OnLoadImage() {
+
+	std::filesystem::path path = ui.edtPath->text().toStdWString();
+	if (path.empty())
+		return;
+
+	if (!gtl::IsImageExtension(path))
+		return ;
+
+	xWaitCursor wc;
+	cv::Mat img;
+	bool bLoadBitmapMatTRIED{};
+	if (path.extension() == L".bmp") {
+		auto [result, fileHeader, header] = gtl::LoadBitmapHeader(path);
+		if (result) {
+			auto [w, h] = std::visit([](auto& arg) { return std::pair<int32_t, int32_t>(arg.width, arg.height); }, header);
+			if (w < 0) w = -w;
+			if (h < 0) h = -h;
+			if ((uint64_t)w * h > 32767 * 32767) {
+				gtl::xSize2i pelsPerMeter;
+				bLoadBitmapMatTRIED = true;
+				img = gtl::LoadBitmapMat(path, pelsPerMeter);
+			}
+		}
+	}
+	if (img.empty())
+		img = gtl::LoadImageMat(path);
+	if (img.empty() and (path.extension() == L".bmp") and !bLoadBitmapMatTRIED) {
+		gtl::xSize2i pelsPerMeter;
+		img = gtl::LoadBitmapMat(path, pelsPerMeter);
+	}
+	if (img.empty())
+		return ;
+	if (img.channels() == 3) {
+		cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGR2RGB);
+	} else if (img.channels() == 4) {
+		cv::cvtColor(img, img, cv::ColorConversionCodes::COLOR_BGRA2RGBA);
+	}
+	auto str = ToQString(path);
+	if (!m_dlgMatView->GetView().SetImage(img, true, xMatView::eZOOM::fit2window))
+		return;
+	reg.setValue("misc/LastImagePath", ToQString(path));
+
 }
