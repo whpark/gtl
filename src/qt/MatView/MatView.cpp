@@ -565,8 +565,8 @@ namespace gtl::qt {
 
 		if ( bControl and bAlt and !bShift and (code == 'M') ) {
 			auto show = !ui->toolbar->isVisible();
-			event->accept();
 			ShowToolBar(show);
+			event->accept();
 			return ;
 		}
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="focusPolicy">
-   <enum>Qt::TabFocus</enum>
+   <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
    <string notr="true">MatView</string>
@@ -310,7 +310,11 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="gtl::qt::xMatViewCanvas" name="view"/>
+       <widget class="gtl::qt::xMatViewCanvas" name="view">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
