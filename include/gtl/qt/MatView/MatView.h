@@ -107,6 +107,8 @@ public:
 	~xMatView();
 
 public:
+	cv::Mat GetImage() { return m_imgOriginal; }
+	cv::Mat const& GetImage() const { return m_imgOriginal; }
 	bool SetImage(cv::Mat const& img, bool bCenter = true, eZOOM eZoomMode = eZOOM::none, bool bCopy = false);
 	bool SetZoomMode(eZOOM eZoomMode, bool bCenter = true);
 	std::optional<xRect2i> GetSelectionRect() const {
