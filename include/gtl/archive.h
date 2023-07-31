@@ -1102,7 +1102,7 @@ namespace gtl {
 	bool ContainerToFile(TContainer const& buf, std::filesystem::path const& path) {
 		static_assert(std::is_trivial_v<typename std::decay_t<decltype(buf)>::value_type>, "TContainer::value_type must be trivial");
 		std::ofstream f(path, std::ios_base::binary);
-		f.write(buf.data(), buf.size() * sizeof(typename TContainer::value_type));
+		f.write((char const*)buf.data(), buf.size() * sizeof(typename TContainer::value_type));
 		return (bool)f;
 	}
 
