@@ -39,6 +39,9 @@ namespace gtl::qt {
 	template < gtlc::string_elem tchar_t > \
 	inline void UpdateWidgetValue(bool bSaveAndValidate, widget_t* w, std::basic_string<tchar_t>& value) {	\
 		if (bSaveAndValidate) value = ToString(w->getter()); else w->setter(ToQString(value)); \
+	}\
+	inline void UpdateWidgetValue(bool bSaveAndValidate, widget_t* w, std::filesystem::path& path) {	\
+		if (bSaveAndValidate) path = ToWString(w->getter()); else w->setter(ToQString(path)); \
 	}
 
 	#define GTL__QT_UPDATE_WIDGET_ARITHMETIC(widget_t, str_getter, str_setter) \
