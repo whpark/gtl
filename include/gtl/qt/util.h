@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QGroupBox>
 #include <QlineEdit>
 #include <QPlainTextEdit>
 #include <QSpinBox>
@@ -53,6 +54,7 @@ namespace gtl::qt {
 	}
 
 	GTL__QT_UPDATE_WIDGET_VALUE(QCheckBox, bool, isChecked, setChecked);
+	GTL__QT_UPDATE_WIDGET_VALUE(QGroupBox, bool, isChecked, setChecked);
 	GTL__QT_UPDATE_WIDGET_STRING(QLineEdit, text, setText);
 	GTL__QT_UPDATE_WIDGET_ARITHMETIC(QLineEdit, text, setText);
 	GTL__QT_UPDATE_WIDGET_STRING(QPlainTextEdit, toPlainText, setPlainText);
