@@ -847,6 +847,14 @@ namespace gtl::qt {
 		//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
 		//OutputDebugStringA((std::format("GL_MAX_TEXTURE_SIZE: {}\n", maxTexSize)).c_str());
 
+
+		//// get opengl Version
+		//QString strVersion = QString::fromUtf8((char const*)glGetString(GL_VERSION));
+		//QString strVendor = QString::fromUtf8((char const*)glGetString(GL_VENDOR));
+		//QString strRenderer = QString::fromUtf8((char const*)glGetString(GL_RENDERER));
+		//QString strGLSL = QString::fromUtf8((char const*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+		//OutputDebugStringA((std::format("OpenGL Version: {}\n", strVersion.toStdString())).c_str());
+
 	}
 
 	void xMatView::PaintGL(xMatViewCanvas* view) {
