@@ -841,6 +841,12 @@ namespace gtl::qt {
 			return;
 			//throw std::exception(reinterpret_cast<const char*>(msg));
 		}
+
+		//// get max bitmap size
+		//GLint maxTexSize;
+		//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
+		//OutputDebugStringA((std::format("GL_MAX_TEXTURE_SIZE: {}\n", maxTexSize)).c_str());
+
 	}
 
 	void xMatView::PaintGL(xMatViewCanvas* view) {
