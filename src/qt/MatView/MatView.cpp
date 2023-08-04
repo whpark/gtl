@@ -367,7 +367,7 @@ namespace gtl::qt {
 			m_ctScreenFromImage.m_scale = scale;
 
 		auto rectClient = GetViewRect();
-		auto dMinZoom = std::max(4., rectClient.Width()/16.) / std::min(m_img.cols, m_img.rows);
+		auto dMinZoom = std::min(rectClient.Width()/4. / m_img.cols, rectClient.Height()/4. / m_img.rows);
 		m_ctScreenFromImage.m_scale = std::clamp(m_ctScreenFromImage.m_scale, dMinZoom, 1.e3);
 		m_ctScreenFromImage.m_offset += ptAnchor - m_ctScreenFromImage(ptImage);
 		// Anchor point
@@ -922,6 +922,10 @@ namespace gtl::qt {
 		rectTarget.pt0() = ct(rectImage.pt0());
 		rectTarget.pt1() = ct.Trans(xPoint2d(rectImage.pt1()));
 		rectTarget.NormalizeRect();
+		if (rectTarget.right == rectTarget.left)
+			rectTarget.right = rectTarget.left+1;
+		if (rectTarget.bottom == rectTarget.top)
+			rectTarget.bottom = rectTarget.top+1;
 		if (!gtl::IsROI_Valid(roi, m_img.size()))
 			return;
 
