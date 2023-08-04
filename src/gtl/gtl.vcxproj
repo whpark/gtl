@@ -480,6 +480,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\coord\coord_rect.h" />
     <ClInclude Include="..\..\include\gtl\coord\coord_size.h" />
     <ClInclude Include="..\..\include\gtl\coord\coord_trans_perspective.h" />
+    <ClInclude Include="..\..\include\gtl\cv_floodfill.h" />
     <ClInclude Include="..\..\include\gtl\dynamic.h" />
     <ClInclude Include="..\..\include\gtl\gtl.h" />
     <ClInclude Include="..\..\include\gtl\iconv_wrapper.h" />
@@ -525,6 +526,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2dMatArray.cpp" />
+    <ClCompile Include="cv_floodfill.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="HangeulCodeMapKSSM_UTF16.cpp" />
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp" />
