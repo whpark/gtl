@@ -797,9 +797,8 @@ namespace gtl::qt {
 		}
 		UpdateCT(false);
 		UpdateScrollBars();
-		if (!ui->view)
-			return;
-		ui->view->update();
+		if (ui->view)
+			ui->view->update();
 	}
 
 	void xMatView::OnView_resized() {
@@ -816,7 +815,7 @@ namespace gtl::qt {
 		if (m_option.bExtendedPanning)
 			m_ctScreenFromImage.m_offset.x += rectScrollRange.Width() - std::max(0, rectImageScreen.Width() - m_option.nScrollMargin) - rectClient.Width();
 		UpdateScrollBars();
-		if (!ui->view)
+		if (ui->view)
 			ui->view->update();
 	}
 	void xMatView::OnSbVert_valueChanged(int pos) {
@@ -828,7 +827,7 @@ namespace gtl::qt {
 		if (m_option.bExtendedPanning)
 			m_ctScreenFromImage.m_offset.y += rectScrollRange.Height() - std::max(0, rectImageScreen.Height() - m_option.nScrollMargin) - rectClient.Height();
 		UpdateScrollBars();
-		if (!ui->view)
+		if (ui->view)
 			ui->view->update();
 	}
 
@@ -979,11 +978,8 @@ namespace gtl::qt {
 					roiP.y *= scaleP;
 					roiP.width *= scaleP;
 					roiP.height *= scaleP;
-					if (roiP.width > imgPyr.cols)
-						roiP.width = imgPyr.cols;
-					if (roiP.height > imgPyr.rows)
-						roiP.height = imgPyr.rows;
-					if (gtl::IsROI_Valid(roiP, imgPyr.size())) {
+					roiP = gtl::GetSafeROI(roiP, imgPyr.size());
+					if (!roiP.empty()) {
 						//cv::resize(imgPyr(roiP), img(rcTarget), rcTarget.size(), 0., 0., eInterpolation);
 						cv::Mat imgSrc(imgPyr(roiP));
 						cv::Mat imgDest;
