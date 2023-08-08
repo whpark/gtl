@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "gtl/qt/qt.h"
 #include "gtl/qt/util.h"
+#include "gtl/reflection_glaze.h"
 #include <QImage>
 
 namespace gtl::qt {
@@ -29,71 +30,109 @@ namespace gtl::qt {
 		return QImage::Format_Invalid;
 	}
 
+	static std::string s_strKeyWindowPosition = "WindowPositions";
+	struct sWindowPosOption{
+		bool bVisible{true};
+		bool bMaximized{};
+		bool bMinimized{};
 
+		GLZ_LOCAL_META(sWindowPosOption, bVisible, bMaximized, bMinimized);
+
+		void operator << (QWidget& wnd) {
+			bVisible = wnd.isVisible();
+			bMaximized = wnd.isMaximized();
+			bMinimized = wnd.isMinimized();
+		}
+		void operator >> (QWidget& wnd) {
+			//if (bVisible)
+			//	wnd.show();
+			//else
+			//	wnd.hide();
+			if (bMaximized)
+				wnd.showMaximized();
+			//else if (bMinimized)
+			//	wnd.showMinimized();
+		}
+	};
 	bool SaveWindowPosition(QSettings& reg, std::string const& strWindowName, QWidget* wnd) {
 		if (!wnd)
 			return false;
-		auto strKey = std::format("WindowPositions/{}_rect", strWindowName);
 
-		auto rc  = ToCoord(wnd->geometry());
-		reg.setValue(strKey, ToQString(gtl::ToString<wchar_t>(rc)));
+		// option (Maximized, Minimized, ...)
+		sWindowPosOption option;
+		option << *wnd;
+		std::string str;
+		glz::write_json(option, str);
+		reg.setValue(std::format("{}/{}_misc", s_strKeyWindowPosition, strWindowName), ToQString(str));
+
+		if (!option.bMaximized and !option.bMinimized) {
+			// position
+			auto rc = ToCoord(wnd->geometry());
+			reg.setValue(std::format("{}/{}_rect", s_strKeyWindowPosition, strWindowName), ToQString(gtl::ToString<wchar_t>(rc)));
+		}
 
 		return true;
 	}
 	bool LoadWindowPosition(QSettings& reg, std::string const& strWindowName, QWidget* wnd) {
 		if (!wnd)
 			return false;
-		auto strKey = std::format("WindowPositions/{}_rect", strWindowName);
 
-		auto value = reg.value(strKey, "0,0,0,0").toString().toStdString();
-		auto rc = gtl::FromString<gtl::xRect2i, char>(value);
-
-		//// High DPI
-		//rc.pt0() = pWindow->FromDIP(wxPoint(rc.pt0()));
-		//rc.pt1() = pWindow->FromDIP(wxPoint(rc.pt1()));
-		std::vector<gtl::xPoint2i> pts{ {rc.left, rc.top}, {rc.left, rc.bottom}, {rc.right, rc.top}, {rc.right, rc.bottom} };
-
-		// get display bounds
-		std::vector<gtl::xRect2i> bounds;
-		for (auto* screen: qApp->screens()) {
-			bounds.emplace_back(ToCoord(screen->geometry()));
+		// options
+		auto misc = reg.value(std::format("{}/{}_misc", s_strKeyWindowPosition, strWindowName), "").toString().toStdString();
+		sWindowPosOption option;
+		if (glz::read_json(option, misc) == glz::error_code::none) {
+			option >> *wnd;
 		}
 
-		// count vertex in the display
-		int nPts{};
-		for (auto const& rect : bounds) {
-			for (auto const& pt : pts) {
-				if (!rect.PtInRect(pt))
-					continue;
-				nPts++;
+		if (!option.bMaximized and !option.bMaximized) {
+			auto value = reg.value(std::format("{}/{}_rect", s_strKeyWindowPosition, strWindowName), "0,0,0,0").toString().toStdString();
+			auto rc = gtl::FromString<gtl::xRect2i, char>(value);
+
+			//// High DPI
+			//rc.pt0() = pWindow->FromDIP(wxPoint(rc.pt0()));
+			//rc.pt1() = pWindow->FromDIP(wxPoint(rc.pt1()));
+			std::vector<gtl::xPoint2i> pts{ {rc.left, rc.top}, {rc.left, rc.bottom}, {rc.right, rc.top}, {rc.right, rc.bottom} };
+
+			// get display bounds
+			std::vector<gtl::xRect2i> bounds;
+			for (auto* screen: qApp->screens()) {
+				bounds.emplace_back(ToCoord(screen->geometry()));
 			}
-			if (nPts >= 4)
-				break;
-		}
 
-		gtl::xRect2i rectAdjusted;
-		if (nPts >= 3) {
-			// if 3 more points are in the display rect, accept it.
-			rectAdjusted = rc;
-		}
-		else {
-			// if not, adjust rectangle.
-			int maxArea{};
-			for (auto const& bound : bounds) {
-				auto u = rc;
-				u &= bound;
-				auto area = u.Width() * u.Height();
-				if (maxArea < area) {
-					maxArea = area;
-					rectAdjusted = u;
+			// count vertex in the display
+			int nPts{};
+			for (auto const& rect : bounds) {
+				for (auto const& pt : pts) {
+					if (!rect.PtInRect(pt))
+						continue;
+					nPts++;
+				}
+				if (nPts >= 4)
+					break;
+			}
+
+			gtl::xRect2i rectAdjusted;
+			if (nPts >= 3) {
+				// if 3 more points are in the display rect, accept it.
+				rectAdjusted = rc;
+			}
+			else {
+				// if not, adjust rectangle.
+				int maxArea{};
+				for (auto const& bound : bounds) {
+					auto u = rc;
+					u &= bound;
+					auto area = u.Width() * u.Height();
+					if (maxArea < area) {
+						maxArea = area;
+						rectAdjusted = u;
+					}
 				}
 			}
+			if (!rectAdjusted.IsRectEmpty())
+				wnd->setGeometry(ToQCoord(rectAdjusted));
 		}
-		if (rectAdjusted.IsRectEmpty())
-			return false;
-		//wnd->resize(ToQCoord(xSize2i(rectAdjusted.pt1()-rectAdjusted.pt0())));
-		//wnd->move(ToQCoord(rectAdjusted.pt0()));
-		wnd->setGeometry(ToQCoord(rectAdjusted));
+
 		return true;
 	}
 

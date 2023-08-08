@@ -15,7 +15,6 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
     //m_dlgMatViewGV->show();
 	auto strPath = reg.value("misc/LastImagePath").toString();
 	ui.edtPath->setText(strPath);
-	gtl::qt::SaveWindowPosition(reg, "test_qt", this);
 
 	m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
 	m_ctrlMatView->move({4, 100});
@@ -85,6 +84,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);
 
+	gtl::qt::LoadWindowPosition(reg, "test_qt", this);
 }
 
 gtl::qt::test_qt::~test_qt() {
