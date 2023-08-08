@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "gtl/qt/_lib_gtl_qt.h"
 #include "gtl/gtl.h"
+#include "gtl/qt/_lib_gtl_qt.h"
+#include "gtl/qt/qt.h"
 
 #include <QApplication>
 #include <QCheckBox>

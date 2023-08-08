@@ -41,6 +41,9 @@
     <ClCompile Include="MatView.cpp">
       <Filter>win_util</Filter>
     </ClCompile>
+    <ClCompile Include="EnvironmentVairable.cpp">
+      <Filter>win_util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\win_util.rc2">
@@ -86,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\win_util\_lib_gtl_win_util.h">
       <Filter>[ Framework ]</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\win_util\EnvironmentVairable.h">
+      <Filter>win_util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

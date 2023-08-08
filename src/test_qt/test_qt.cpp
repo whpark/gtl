@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "gtl/qt/qt.h"
 #include "gtl/qt/util.h"
+#include "gtl/win_util/EnvironmentVairable.h"
 #include "test_qt.h"
 
 #include <QSettings>
@@ -18,10 +19,10 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
 	m_ctrlMatView->move({4, 100});
-	m_ctrlMatView->show();
+	//m_ctrlMatView->show();
 
 	m_dlgMatView = std::make_unique<gtl::qt::xMatViewDlg>(this);
-	m_dlgMatView->show();
+	//m_dlgMatView->show();
 	m_dlgMatView->GetView().m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
 		if (bStore) {
 			std::string buffer = glz::write_json(option);
@@ -83,6 +84,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);
+	connect(ui.btnSetEnvVar, &QPushButton::clicked, this, &this_t::OnSetEnvVar);
 
 	gtl::qt::LoadWindowPosition(reg, "test_qt", this);
 }
@@ -134,4 +136,22 @@ void gtl::qt::test_qt::OnLoadImage() {
 		return;
 	reg.setValue("misc/LastImagePath", ToQString(path));
 
+}
+
+void gtl::qt::test_qt::OnSetEnvVar() {
+	using namespace gtl::win_util;
+	{
+		xEnvironmentVariable var(xEnvironmentVariable::eSCOPE::CURRENT_USER);
+		if (!var.Set(L"OPENCV_IO_MAX_IMAGE_PIXELS", std::format(L"{}", 0x01ull << 40)))
+			return;
+		auto r = var.GetAll();
+		var.Broadcast();
+	}
+	{
+		xEnvironmentVariable var(xEnvironmentVariable::eSCOPE::LOCAL_MACHINE);
+		if (!var.Set(L"OPENCV_IO_MAX_IMAGE_PIXELS", std::format(L"{}", 0x01ull << 40)))
+			return;
+		auto r = var.GetAll();
+		var.Broadcast();
+	}
 }

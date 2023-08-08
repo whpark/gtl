@@ -25,6 +25,7 @@ public:
 
 protected:
 	void OnLoadImage();
+	void OnSetEnvVar();
 
 private:
 	Ui::test_qtClass ui;
