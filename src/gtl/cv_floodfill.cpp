@@ -1,4 +1,4 @@
-// form opencv. FFillSegment::ushort -->> uint32_t
+﻿// form opencv. FFillSegment::ushort -->> uint32_t
 // PWH. 2023-08-04
 // 
 #include "pch.h"
