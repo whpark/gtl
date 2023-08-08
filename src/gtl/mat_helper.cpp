@@ -1071,8 +1071,7 @@ namespace gtl {
 
 	}	// namespace internal
 
-	bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, BITMAP_V5_HEADER& header) {
-		std::ifstream is(path, std::ios_base::binary);
+	bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, BITMAP_V5_HEADER& header) try {
 		if (!is)
 			return false;
 		if (!is.read((char*)&fileHeader, sizeof(fileHeader)))
@@ -1082,8 +1081,14 @@ namespace gtl {
 			return false;
 		header.size = sizeHeader;
 		return (bool)is.read((char*)&header + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
+	} catch (...) {
+		return false;
 	}
-	bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header) {
+	bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, BITMAP_V5_HEADER& header) {
+		std::ifstream is(path, std::ios_base::binary);
+		return LoadBitmapHeader(is, fileHeader, header);
+	}
+	bool LoadBitmapHeader(std::istream& is, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header) try {
 		if (!is.read((char*)&fileHeader, sizeof(fileHeader)))
 			return false;
 		uint32_t sizeHeader{};
@@ -1100,11 +1105,21 @@ namespace gtl {
 		*(uint32_t*)pos = sizeHeader;
 		return (bool)is.read(pos + sizeof(sizeHeader), sizeHeader - sizeof(sizeHeader));
 	}
+	catch (...) {
+		return false;
+	}
 	bool LoadBitmapHeader(std::filesystem::path const& path, BMP_FILE_HEADER& fileHeader, variant_BITMAP_HEADER& header) {
 		std::ifstream f(path, std::ios_base::binary);
-		if (!f)
-			return false;
 		return LoadBitmapHeader(f, fileHeader, header);
+	}
+	sLoadBitmapHeaderResult LoadBitmapHeader(std::istream& is) {
+		sLoadBitmapHeaderResult result{};
+		result.result = LoadBitmapHeader(is, result.fileHeader, result.header);
+		return result;
+	}
+	sLoadBitmapHeaderResult LoadBitmapHeader(std::filesystem::path const& path) {
+		std::ifstream is(path, std::ios_base::binary);
+		return LoadBitmapHeader(is);
 	}
 
 	/// @brief Load Image from BITMAP file. Image is COLOR or GRAY level image.
@@ -1113,97 +1128,112 @@ namespace gtl {
 	/// @param nBPP 
 	/// @param palette 
 	/// @return 
-	cv::Mat LoadBitmapMat(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback) {
+	cv::Mat LoadBitmapMat(std::istream& is, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback) {
 		bool bOK{};
 
 		// Trigger notifying it's over.
 		xFinalAction fa([&funcCallback, &bOK] {if (funcCallback) funcCallback(-1, true, !bOK); });
 
-
 		cv::Mat img;
-
-		std::ifstream f(path, std::ios_base::binary);
-		if (!f)
+		if (!is)
 			return img;
 
-		BMP_FILE_HEADER fh;
-		variant_BITMAP_HEADER varHeader{};
-		if (!LoadBitmapHeader(f, fh, varHeader))
-			return img;
+		try {
 
-		BITMAP_HEADER* pos {};
-		{
-			pos = std::get_if<BITMAP_HEADER>(&varHeader);
-			if (!pos)
-				pos = (BITMAP_HEADER*)std::get_if<BITMAP_V4_HEADER>(&varHeader);
-			if (!pos)
-				pos = (BITMAP_HEADER*)std::get_if<BITMAP_V5_HEADER>(&varHeader);
-			if (!pos)
+			BMP_FILE_HEADER fh;
+			variant_BITMAP_HEADER varHeader{};
+			if (!LoadBitmapHeader(is, fh, varHeader))
 				return img;
-		}
-		BITMAP_HEADER& header = *pos;
 
-		if (header.compression or (header.planes != 1))
-			return img;
+			BITMAP_HEADER* pos {};
+			{
+				pos = std::get_if<BITMAP_HEADER>(&varHeader);
+				if (!pos)
+					pos = (BITMAP_HEADER*)std::get_if<BITMAP_V4_HEADER>(&varHeader);
+				if (!pos)
+					pos = (BITMAP_HEADER*)std::get_if<BITMAP_V5_HEADER>(&varHeader);
+				if (!pos)
+					return img;
+			}
+			BITMAP_HEADER& header = *pos;
 
-		pelsPerMeter.cx = header.XPelsPerMeter;
-		pelsPerMeter.cy = header.YPelsPerMeter;
-
-		int cx = header.width;
-		int cy = header.height;
-		bool bFlipY{};
-		if (cy < 0) {
-			cy = -cy;
-		}
-		else {
-			bFlipY = true;
-		}
-		if ((cx <= 0) or (cy <= 0) /*or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull)*/)
-			return img;
-
-		std::vector<cv::Vec3b> palette;
-
-		// Load Palette
-		ptrdiff_t sizePalette = fh.offsetData - sizeof(fh) - header.size;
-		for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
-			gtl::color_bgra_t color{};
-			if (!f.read((char*)&color, sizeof(color)))
+			if (header.compression or (header.planes != 1))
 				return img;
-			palette.push_back(cv::Vec3b(color.b, color.g, color.r));
-		}
-		if (!f.seekg(fh.offsetData))
-			return img;
 
-		bool bGrayScale {};
-		if (header.nBPP <= 8) {
-			bGrayScale = true;
-			for (auto const& v : palette) {
-				if ((v[0] != v[1]) and (v[1] != v[2])) {
-					bGrayScale = false;
-					break;
+			pelsPerMeter.cx = header.XPelsPerMeter;
+			pelsPerMeter.cy = header.YPelsPerMeter;
+
+			int cx = header.width;
+			int cy = header.height;
+			bool bFlipY{};
+			if (cy < 0) {
+				cy = -cy;
+			}
+			else {
+				bFlipY = true;
+			}
+			if ((cx <= 0) or (cy <= 0) /*or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull)*/)
+				return img;
+
+			std::vector<cv::Vec3b> palette;
+
+			// Load Palette
+			ptrdiff_t sizePalette = fh.offsetData - sizeof(fh) - header.size;
+			for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
+				gtl::color_bgra_t color{};
+				if (!is.read((char*)&color, sizeof(color)))
+					return img;
+				palette.push_back(cv::Vec3b(color.b, color.g, color.r));
+			}
+			if (!is.seekg(fh.offsetData))
+				return img;
+
+			bool bGrayScale {};
+			if (header.nBPP <= 8) {
+				bGrayScale = true;
+				for (auto const& v : palette) {
+					if ((v[0] != v[1]) and (v[1] != v[2])) {
+						bGrayScale = false;
+						break;
+					}
 				}
 			}
-		}
 
-		img = cv::Mat::zeros(cv::Size(cx, cy), bGrayScale ? CV_8UC1 : CV_8UC3);
-		if (bGrayScale) {
-			std::vector<uint8> paletteG(palette.size(), 0);
-			for (size_t i{}; i < palette.size(); i++)
-				paletteG[i] = palette[i][0];
+			img = cv::Mat::zeros(cv::Size(cx, cy), bGrayScale ? CV_8UC1 : CV_8UC3);
+			if (bGrayScale) {
+				std::vector<uint8> paletteG(palette.size(), 0);
+				for (size_t i{}; i < palette.size(); i++)
+					paletteG[i] = palette[i][0];
 
-			bOK = gtl::internal::MatFromBitmapFile<uint8, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, paletteG, funcCallback);
-		}
-		else {
-			bOK = gtl::internal::MatFromBitmapFile<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, palette, funcCallback);
-		}
-		if (!bOK)
+				bOK = gtl::internal::MatFromBitmapFile<uint8, bLoopUnrolling, bMultiThreaded>(is, img, header.nBPP, paletteG, funcCallback);
+			}
+			else {
+				bOK = gtl::internal::MatFromBitmapFile<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(is, img, header.nBPP, palette, funcCallback);
+			}
+			if (!bOK)
+				img.release();
+
+			if (!img.empty() and bFlipY) {
+				cv::flip(img, img, 0);
+			}
+		} catch (...) {
 			img.release();
-
-		if (!img.empty() and bFlipY) {
-			cv::flip(img, img, 0);
 		}
-
 		return img;
+	}
+	cv::Mat LoadBitmapMat(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback) {
+		std::ifstream f(path, std::ios_base::binary);
+		return LoadBitmapMat(f, pelsPerMeter, funcCallback);
+	}
+
+	sLoadBitmapMatResult LoadBitmapMat(std::istream& is, callback_progress_t funcCallback) {
+		sLoadBitmapMatResult result;
+		result.img = LoadBitmapMat(is, result.pelsPerMeter, funcCallback);
+		return result;
+	}
+	sLoadBitmapMatResult LoadBitmapMat(std::filesystem::path const& path, callback_progress_t funcCallback) {
+		std::ifstream is(path, std::ios::binary);
+		return LoadBitmapMat(is, funcCallback);
 	}
 
 	/// @brief Load Image into Mat. Image is Pixel ColorIndex.
@@ -1212,7 +1242,7 @@ namespace gtl {
 	/// @param nBPP 
 	/// @param palette 
 	/// @return 
-	cv::Mat LoadBitmapMatPixelArray(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette, callback_progress_t funcCallback) {
+	cv::Mat LoadBitmapMatPixelArray(std::istream& is, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette, callback_progress_t funcCallback) {
 		bool bOK{};
 
 		// Trigger notifying it's over.
@@ -1220,84 +1250,101 @@ namespace gtl {
 
 
 		cv::Mat img;
-
-		std::ifstream f(path, std::ios_base::binary);
-		if (!f)
+		if (!is)
 			return img;
 
-		BMP_FILE_HEADER fh;
-		variant_BITMAP_HEADER varHeader{};
-		if (!LoadBitmapHeader(f, fh, varHeader))
-			return img;
+		try {
 
-		BITMAP_HEADER* pos {};
-		{
-			pos = std::get_if<BITMAP_HEADER>(&varHeader);
-			if (!pos)
-				pos = (BITMAP_HEADER*)std::get_if<BITMAP_V4_HEADER>(&varHeader);
-			if (!pos)
-				pos = (BITMAP_HEADER*)std::get_if<BITMAP_V5_HEADER>(&varHeader);
-			if (!pos)
+			BMP_FILE_HEADER fh;
+			variant_BITMAP_HEADER varHeader{};
+			if (!LoadBitmapHeader(is, fh, varHeader))
 				return img;
-		}
-		BITMAP_HEADER& header = *pos;
 
-		if (header.compression or (header.planes != 1))
-			return img;
-
-		pelsPerMeter.cx = header.XPelsPerMeter;
-		pelsPerMeter.cy = header.YPelsPerMeter;
-
-		int cx = header.width;
-		int cy = header.height;
-		bool bFlipY{};
-		if (cy < 0) {
-			cy = -cy;
-		}
-		else {
-			bFlipY = true;
-		}
-		if ((cx <= 0) or (cy <= 0) /*or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull)*/)
-			return img;
-
-		palette.clear();
-		// Load Palette
-		ptrdiff_t sizePalette = fh.offsetData - sizeof(fh) - header.size;
-		if (sizePalette/4 > 0) {
-			palette.reserve(sizePalette/4);
-			for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
-				gtl::color_bgra_t color{};
-				if (!f.read((char*)&color, sizeof(color)))
+			BITMAP_HEADER* pos {};
+			{
+				pos = std::get_if<BITMAP_HEADER>(&varHeader);
+				if (!pos)
+					pos = (BITMAP_HEADER*)std::get_if<BITMAP_V4_HEADER>(&varHeader);
+				if (!pos)
+					pos = (BITMAP_HEADER*)std::get_if<BITMAP_V5_HEADER>(&varHeader);
+				if (!pos)
 					return img;
-				palette.push_back(color);
+			}
+			BITMAP_HEADER& header = *pos;
+
+			if (header.compression or (header.planes != 1))
+				return img;
+
+			pelsPerMeter.cx = header.XPelsPerMeter;
+			pelsPerMeter.cy = header.YPelsPerMeter;
+
+			int cx = header.width;
+			int cy = header.height;
+			bool bFlipY{};
+			if (cy < 0) {
+				cy = -cy;
+			}
+			else {
+				bFlipY = true;
+			}
+			if ((cx <= 0) or (cy <= 0) /*or ((uint64_t)cx * (uint64_t)cy >= 0xffff'ff00ull)*/)
+				return img;
+
+			palette.clear();
+			// Load Palette
+			ptrdiff_t sizePalette = fh.offsetData - sizeof(fh) - header.size;
+			if (sizePalette/4 > 0) {
+				palette.reserve(sizePalette/4);
+				for (; sizePalette >= 4; sizePalette -= sizeof(gtl::color_bgra_t)) {
+					gtl::color_bgra_t color{};
+					if (!is.read((char*)&color, sizeof(color)))
+						return img;
+					palette.push_back(color);
+				}
+			}
+			if (!is.seekg(fh.offsetData))
+				return img;
+
+			if (header.nBPP <= 8) {
+				img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC1);
+				bOK = gtl::internal::MatFromBitmapFilePixelArray<uint8, bLoopUnrolling, bMultiThreaded>(is, img, header.nBPP, funcCallback);
+			} else if (header.nBPP <= 16) {
+				img = cv::Mat::zeros(cv::Size(cx, cy), CV_16UC1);
+				bOK = gtl::internal::MatFromBitmapFilePixelArray<uint16, bLoopUnrolling, bMultiThreaded>(is, img, header.nBPP, funcCallback);
+			} else if (header.nBPP <= 24) {
+				img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC3);
+				bOK = gtl::internal::MatFromBitmapFilePixelArray<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(is, img, header.nBPP, funcCallback);
+			} else if (header.nBPP <= 32) {
+				img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC4);
+				bOK = gtl::internal::MatFromBitmapFilePixelArray<cv::Vec4b, bLoopUnrolling, bMultiThreaded>(is, img, header.nBPP, funcCallback);
+			}
+
+			if (!bOK)
+				img.release();
+
+			if (!img.empty() and bFlipY) {
+				cv::flip(img, img, 0);
 			}
 		}
-		if (!f.seekg(fh.offsetData))
-			return img;
-
-		if (header.nBPP <= 8) {
-			img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC1);
-			bOK = gtl::internal::MatFromBitmapFilePixelArray<uint8, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, funcCallback);
-		} else if (header.nBPP <= 16) {
-			img = cv::Mat::zeros(cv::Size(cx, cy), CV_16UC1);
-			bOK = gtl::internal::MatFromBitmapFilePixelArray<uint16, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, funcCallback);
-		} else if (header.nBPP <= 24) {
-			img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC3);
-			bOK = gtl::internal::MatFromBitmapFilePixelArray<cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, funcCallback);
-		} else if (header.nBPP <= 32) {
-			img = cv::Mat::zeros(cv::Size(cx, cy), CV_8UC4);
-			bOK = gtl::internal::MatFromBitmapFilePixelArray<cv::Vec4b, bLoopUnrolling, bMultiThreaded>(f, img, header.nBPP, funcCallback);
-		}
-
-		if (!bOK)
+		catch (...) {
 			img.release();
-
-		if (!img.empty() and bFlipY) {
-			cv::flip(img, img, 0);
 		}
-
 		return img;
 	}
+	cv::Mat LoadBitmapMatPixelArray(std::filesystem::path const& path, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette, callback_progress_t funcCallback) {
+		std::ifstream f(path, std::ios_base::binary);
+		return LoadBitmapMatPixelArray(f, pelsPerMeter, palette, funcCallback);
+	}
+	sLoadBitmapMatPixelArrayResult LoadBitmapMatPixelArray(std::istream& is, callback_progress_t funcCallback) {
+		sLoadBitmapMatPixelArrayResult result;
+		result.img = LoadBitmapMatPixelArray(is, result.pelsPerMeter, result.palette, funcCallback);
+		return result;
+	}
+	sLoadBitmapMatPixelArrayResult LoadBitmapMatPixelArray(std::filesystem::path const& path, callback_progress_t funcCallback) {
+		std::ifstream is(path, std::ios::binary);
+		return LoadBitmapMatPixelArray(is, funcCallback);
+	}
+
 
 	//! @brief Copy smaller Mat to larger Mat. (to dest xy)
 	//! @param src 
