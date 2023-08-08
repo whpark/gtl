@@ -9,6 +9,12 @@
 namespace gtl::win_util {
 
 	xEnvironmentVariable::xEnvironmentVariable(eSCOPE scope) {
+		Open(scope);
+	}
+	xEnvironmentVariable::~xEnvironmentVariable() {
+	}
+
+	bool xEnvironmentVariable::Open(eSCOPE scope) {
 		try {
 			if (scope == eSCOPE::LOCAL_MACHINE)
 				m_reg.Open(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\Environment");
@@ -16,9 +22,9 @@ namespace gtl::win_util {
 				m_reg.Open(HKEY_CURRENT_USER, L"Environment");
 		}
 		catch (...) {
+			return false;
 		}
-	}
-	xEnvironmentVariable::~xEnvironmentVariable() {
+		return true;
 	}
 
 	bool xEnvironmentVariable::Broadcast(std::chrono::milliseconds timeout) {

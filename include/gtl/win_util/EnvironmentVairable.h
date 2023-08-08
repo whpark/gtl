@@ -34,6 +34,11 @@ namespace gtl::win_util {
 		xEnvironmentVariable(eSCOPE scope = eSCOPE::LOCAL_MACHINE);
 		~xEnvironmentVariable();
 
+		bool Open(eSCOPE scope = eSCOPE::LOCAL_MACHINE);
+
+		explicit operator bool() const noexcept { return (bool)m_reg; }
+		bool IsValid() const noexcept { return (bool)m_reg; }
+
 		bool Broadcast(std::chrono::milliseconds timeout = std::chrono::milliseconds(3'000));
 
 		// Operation
