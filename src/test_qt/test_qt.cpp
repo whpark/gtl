@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "gtl/qt/qt.h"
 #include "gtl/qt/util.h"
-#include "gtl/win_util/EnvironmentVariable.h"
+#include "gtl/win/EnvironmentVariable.h"
 #include "test_qt.h"
 
 #include <QSettings>
@@ -139,7 +139,7 @@ void gtl::qt::test_qt::OnLoadImage() {
 }
 
 void gtl::qt::test_qt::OnSetEnvVar() {
-	using namespace gtl::win_util;
+	using namespace gtl::win;
 	{
 		xEnvironmentVariable var(xEnvironmentVariable::eSCOPE::CURRENT_USER);
 		if (!var.Set(L"OPENCV_IO_MAX_IMAGE_PIXELS", std::format(L"{}", 0x01ull << 40)))

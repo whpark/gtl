@@ -34,10 +34,10 @@
 #include "opencv2/opencv.hpp"
 
 //#include "gtl/gtl.h"
-#include "gtl/win_util/win_util.h"
-#include "gtl/win_util/TMDialog.h"
-#include "gtl/win_util/MatHelper.h"
-#include "gtl/win_util/ProgressDlg.h"
+#include "gtl/mfc/mfc.h"
+#include "gtl/mfc/TMDialog.h"
+#include "gtl/mfc/MatHelper.h"
+#include "gtl/mfc/ProgressDlg.h"
 
 using namespace std::literals;
 

@@ -5,12 +5,12 @@
 #include "framework.h"
 #include "resource.h"
 #include "gtl/gtl.h"
-#include "gtl/win_util/ProgressDlg.h"
-#include "gtl/win_util/TMDialog.h"
+#include "gtl/mfc/ProgressDlg.h"
+#include "gtl/mfc/TMDialog.h"
 
 // CProgressDlg dialog
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 
 	IMPLEMENT_DYNAMIC(CProgressDlg, CDialogEx)
 
@@ -114,4 +114,4 @@ namespace gtl::win_util {
 		//CDialogEx::OnCancel();
 	}
 
-}	// namespace gtl::win_util;
+}	// namespace gtl::win::inline mfc;

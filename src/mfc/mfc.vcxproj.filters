@@ -5,12 +5,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="win_util">
-      <UniqueIdentifier>{4ab8a452-8efb-4794-b304-8ef32e82d757}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="[ Framework ]">
       <UniqueIdentifier>{60987fce-85dd-42a6-95e8-b3d1a0d55769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code">
+      <UniqueIdentifier>{4ab8a452-8efb-4794-b304-8ef32e82d757}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -20,36 +20,30 @@
     <ClCompile Include="pch.cpp">
       <Filter>[ Framework ]</Filter>
     </ClCompile>
-    <ClCompile Include="win_util.cpp">
-      <Filter>win_util</Filter>
-    </ClCompile>
-    <ClCompile Include="serial_port.cpp">
-      <Filter>win_util</Filter>
+    <ClCompile Include="mfc.cpp">
+      <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="ListCtrlEd.cpp">
-      <Filter>win_util</Filter>
+      <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="TMDialog.cpp">
-      <Filter>win_util</Filter>
+      <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="MatHelper.cpp">
-      <Filter>win_util</Filter>
+      <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="ProgressDlg.cpp">
-      <Filter>win_util</Filter>
+      <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="MatView.cpp">
-      <Filter>win_util</Filter>
-    </ClCompile>
-    <ClCompile Include="EnvironmentVariable.cpp">
-      <Filter>win_util</Filter>
+      <Filter>code</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\win_util.rc2">
+    <None Include="res\mfc.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="win_util.def">
+    <None Include="mfc.def">
       <Filter>[ Framework ]</Filter>
     </None>
   </ItemGroup>
@@ -66,36 +60,30 @@
     <ClInclude Include="resource.h">
       <Filter>[ Framework ]</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\win_util.h">
-      <Filter>win_util</Filter>
+    <ClInclude Include="..\..\include\gtl\mfc\mfc.h">
+      <Filter>code</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\serial_port.h">
-      <Filter>win_util</Filter>
+    <ClInclude Include="..\..\include\gtl\mfc\TMDialog.h">
+      <Filter>code</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\TMDialog.h">
-      <Filter>win_util</Filter>
+    <ClInclude Include="..\..\include\gtl\mfc\ListCtrlEd.h">
+      <Filter>code</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\ListCtrlEd.h">
-      <Filter>win_util</Filter>
+    <ClInclude Include="..\..\include\gtl\mfc\MatHelper.h">
+      <Filter>code</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\MatHelper.h">
-      <Filter>win_util</Filter>
+    <ClInclude Include="..\..\include\gtl\mfc\ProgressDlg.h">
+      <Filter>code</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\ProgressDlg.h">
-      <Filter>win_util</Filter>
+    <ClInclude Include="..\..\include\gtl\mfc\MatView.h">
+      <Filter>code</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\MatView.h">
-      <Filter>win_util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\_lib_gtl_win_util.h">
+    <ClInclude Include="..\..\include\gtl\mfc\_lib_gtl_mfc.h">
       <Filter>[ Framework ]</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\gtl\win_util\EnvironmentVariable.h">
-      <Filter>win_util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="win_util.rc">
+    <ResourceCompile Include="mfc.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

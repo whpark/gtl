@@ -2,12 +2,12 @@
 //
 
 #include "pch.h"
-#include "gtl/win_util/ListCtrlEd.h"
+#include "gtl/mfc/ListCtrlEd.h"
 
 // CListCtrlEd
 
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 
 	IMPLEMENT_DYNAMIC(CListCtrlEd, CListCtrl)
 

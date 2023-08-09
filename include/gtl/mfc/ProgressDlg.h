@@ -2,17 +2,17 @@
 
 // CProgressDlg dialog
 
-#include "gtl/win_util/_lib_gtl_win_util.h"
+#include "gtl/mfc/_lib_gtl_mfc.h"
 #include <chrono>
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 #pragma pack(push, 8)
 
-	class GTL__WINUTIL_CLASS CProgressDlg : public CDialogEx {
+	class GTL__MFC_CLASS CProgressDlg : public CDialogEx {
 		DECLARE_DYNAMIC(CProgressDlg)
 	public:
 		using base_t = CDialogEx;
-		static inline std::wstring const strIDD {L"GTL__WINUTIL_DLG_PROGRESS"};
+		static inline std::wstring const strIDD {L"GTL__MFC_DLG_PROGRESS"};
 
 	public:
 		CProgressDlg(CWnd* pParent = nullptr);   // standard constructor
@@ -50,4 +50,4 @@ namespace gtl::win_util {
 
 
 #pragma pack(pop)
-}	// namespace gtl::win_util
+}	// namespace gtl::win::inline mfc

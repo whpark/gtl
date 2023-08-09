@@ -10,14 +10,14 @@
 
 #pragma once
 
-#include "_lib_gtl_win_util.h"
 #include "gtl/_default.h"
+#include "_lib_gtl_win.h"
 #include "winreg/WinReg.hpp"
 
-namespace gtl::win_util {
+namespace gtl::win {
 
 	// Environment Setting
-	class GTL__WINUTIL_CLASS xEnvironmentVariable {
+	class GTL__WIN_CLASS xEnvironmentVariable {
 	public:
 		using this_t = xEnvironmentVariable;
 		using key_t = std::wstring;
@@ -48,4 +48,4 @@ namespace gtl::win_util {
 		bool Delete(key_t const& svVarName);
 	};
 
-};	// namespace gtl::win_util
+};	// namespace gtl::win

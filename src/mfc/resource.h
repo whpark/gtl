@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by win_util.rc
+// Used by mfc.rc
 //
 #define IDC_MESSAGE                     1011
 #define IDC_PROGRESS                    1012

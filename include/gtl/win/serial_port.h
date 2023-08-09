@@ -8,6 +8,7 @@
 // 2019.01.15.
 // 2019.07.24. QL -> GTL
 // 2021.06.10. gtl->gtl::win_util. NOT TESTED.
+// 2023-08-09 win_util -> win
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -17,12 +18,12 @@
 #include "gtl/log.h"
 #include "gtl/mutex.h"
 
-#include "gtl/win_util/_lib_gtl_win_util.h"
+#include "_lib_gtl_win.h"
 
-namespace gtl::win_util {
+namespace gtl::win {
 #pragma pack(push, 8)
 
-	class GTL__WINUTIL_CLASS xComm {
+	class GTL__WIN_CLASS xComm {
 	public:
 		enum eCONTROL_CHAR : uint8_t {
 			ACK = 0x06,
@@ -37,7 +38,7 @@ namespace gtl::win_util {
 
 		};
 
-		enum eCONTROL : DWORD {
+		enum eCONTROL : uint32_t {
 			CTS  = MS_CTS_ON,
 			DSR  = MS_DSR_ON,
 			RING = MS_RING_ON,
@@ -70,6 +71,7 @@ namespace gtl::win_util {
 
 	public:
 		xSimpleLog m_log;
+		bool m_bLog {};	// if true, leaves log for read/written texts.
 
 	protected:
 		HANDLE m_hComm;
@@ -85,12 +87,10 @@ namespace gtl::win_util {
 		DWORD m_dwError = 0;
 		//std::chrono::milliseconds m_durTimeoutTX { 1'000 };	// 1 sec
 		//std::chrono::milliseconds m_durTimeoutRX { 1'000 };	// 1 sec
-		DWORD m_dwTimeoutTX = 1'000;	// 1 sec
-		DWORD m_dwTimeoutRX = 1'000;	// 1 sec
+		DWORD m_dwTimeoutTX { 1'000 };	// 1 sec
+		DWORD m_dwTimeoutRX { 1'000 };	// 1 sec
 
 	public:
-		bool m_bLog {};	// if true, leaves log for read/written texts.
-
 		xComm() = default;
 
 		HANDLE GetCommHandle() { return m_hComm; }
@@ -118,4 +118,4 @@ namespace gtl::win_util {
 
 
 #pragma pack(pop)
-}	// namespace gtl::win_util
+}	// namespace gtl::win

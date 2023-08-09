@@ -11,12 +11,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "gtl/mutex.h"
-#include "gtl/win_util/serial_port.h"
-#include "gtl/win_util/win_util.h"
+#include "gtl/win/win.h"
+#include "gtl/win/serial_port.h"
 
 #include "gtl/string.h"
 
-namespace gtl::win_util {
+namespace gtl::win {
 
 	using tchar = wchar_t;
 

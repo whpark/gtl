@@ -10,27 +10,27 @@
 
 #pragma once
 
-#include "gtl/win_util/win_util.h"
+#include "gtl/mfc/mfc.h"
 
 #include <afxdialogex.h>
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 
 	// TMDialog dialog
 
-	GTL__WINUTIL_API int32_t	GetDlgItemInt32(CWnd* pWnd, int idc, int eRadix = 0);
-	GTL__WINUTIL_API void		SetDlgItemInt32(CWnd* pWnd, int idc, int32_t iValue, std::wstring_view fmt = L"{}");
-	GTL__WINUTIL_API int64_t	GetDlgItemInt64(CWnd* pWnd, int idc, int eRadix = 0);
-	GTL__WINUTIL_API void		SetDlgItemInt64(CWnd* pWnd, int idc, int64_t iValue, std::wstring_view fmt = L"{}");
-	GTL__WINUTIL_API double		GetDlgItemDouble(CWnd* pWnd, int idc);
-	GTL__WINUTIL_API void		SetDlgItemDouble(CWnd* pWnd, int idc, double dValue, std::wstring_view fmt = _T("{:.5f}"));
-	GTL__WINUTIL_API void		DDX_Double(CDataExchange* pDX, int idc, double& value, std::wstring_view fmt = _T("{:.5f}"));
-	GTL__WINUTIL_API void		DDX_DoubleScaled(CDataExchange* pDX, int idc, double& value, double scaleToView, std::wstring_view fmt = _T("{:.5f}"));
-	GTL__WINUTIL_API void		DDX_CheckBool(CDataExchange* pDX, int idc, bool& value);
+	GTL__MFC_API int32_t	GetDlgItemInt32(CWnd* pWnd, int idc, int eRadix = 0);
+	GTL__MFC_API void		SetDlgItemInt32(CWnd* pWnd, int idc, int32_t iValue, std::wstring_view fmt = L"{}");
+	GTL__MFC_API int64_t	GetDlgItemInt64(CWnd* pWnd, int idc, int eRadix = 0);
+	GTL__MFC_API void		SetDlgItemInt64(CWnd* pWnd, int idc, int64_t iValue, std::wstring_view fmt = L"{}");
+	GTL__MFC_API double		GetDlgItemDouble(CWnd* pWnd, int idc);
+	GTL__MFC_API void		SetDlgItemDouble(CWnd* pWnd, int idc, double dValue, std::wstring_view fmt = _T("{:.5f}"));
+	GTL__MFC_API void		DDX_Double(CDataExchange* pDX, int idc, double& value, std::wstring_view fmt = _T("{:.5f}"));
+	GTL__MFC_API void		DDX_DoubleScaled(CDataExchange* pDX, int idc, double& value, double scaleToView, std::wstring_view fmt = _T("{:.5f}"));
+	GTL__MFC_API void		DDX_CheckBool(CDataExchange* pDX, int idc, bool& value);
 	template < typename tchar > requires gtlc::string_elem<tchar>
 	void		DDX_String(CDataExchange* pDX, int idc, std::basic_string<tchar>& str);
-	GTL__WINUTIL_API bool		CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& sv, CString* pStrOrigin = nullptr);	// returns true if changed
-	GTL__WINUTIL_API CString	GetDlgItemString(CWnd* pWnd, int idc);
+	GTL__MFC_API bool		CheckAndSetDlgItemText(CWnd* pWnd, int idc, std::wstring const& sv, CString* pStrOrigin = nullptr);	// returns true if changed
+	GTL__MFC_API CString	GetDlgItemString(CWnd* pWnd, int idc);
 
 	template < typename T_COORD > requires gtlc::coord<T_COORD>
 	void DDX_Coord(CDataExchange* pDX, int idc, T_COORD& coord, fmt::basic_format_string<xString::value_type, typename T_COORD::value_type> fmt = {}) {
@@ -105,11 +105,11 @@ namespace gtl::win_util {
 	//=============================================================================
 	// Clipboard
 
-	GTL__WINUTIL_API CEdit* GetFocusedEdit(CWnd* pWnd);
-	GTL__WINUTIL_API bool OnEditCopy(CWnd* pWnd);
-	GTL__WINUTIL_API bool OnEditCut(CWnd* pWnd);
-	GTL__WINUTIL_API bool OnEditPaste(CWnd* pWnd);
-	GTL__WINUTIL_API bool OnEditUndo(CWnd* pWnd);
+	GTL__MFC_API CEdit* GetFocusedEdit(CWnd* pWnd);
+	GTL__MFC_API bool OnEditCopy(CWnd* pWnd);
+	GTL__MFC_API bool OnEditCut(CWnd* pWnd);
+	GTL__MFC_API bool OnEditPaste(CWnd* pWnd);
+	GTL__MFC_API bool OnEditUndo(CWnd* pWnd);
 
 
 	//=============================================================================
@@ -247,12 +247,12 @@ namespace gtl::win_util {
 	public:
 		virtual BOOL SyncData(BOOL bStore) { return true; }
 
-		int32_t GetDlgItemInt32 (int idc, int eRadix = 0)								{ return gtl::win_util::GetDlgItemInt32(this, idc, eRadix); }
-		void    SetDlgItemInt32 (int idc, int32_t iValue, std::wstring_view fmt = _T("{}"))	{ gtl::win_util::SetDlgItemInt32(this, idc, iValue, fmt); }
-		int64_t GetDlgItemInt64 (int idc, int eRadix = 0)								{ return gtl::win_util::GetDlgItemInt64(this, idc, eRadix); }
-		void    SetDlgItemInt64 (int idc, int64_t iValue, std::wstring_view fmt = _T("{}"))	{ gtl::win_util::SetDlgItemInt64(this, idc, iValue, fmt); }
-		double  GetDlgItemDouble(int idc)												{ return gtl::win_util::GetDlgItemDouble(this, idc); }
-		void    SetDlgItemDouble(int idc, double dValue, std::wstring_view fmt = _T("{:.5f}"))	{ gtl::win_util::SetDlgItemDouble(this, idc, dValue, fmt); }
+		int32_t GetDlgItemInt32 (int idc, int eRadix = 0)										{ return gtl::win::mfc::GetDlgItemInt32(this, idc, eRadix); }
+		void    SetDlgItemInt32 (int idc, int32_t iValue, std::wstring_view fmt = _T("{}"))		{ gtl::win::mfc::SetDlgItemInt32(this, idc, iValue, fmt); }
+		int64_t GetDlgItemInt64 (int idc, int eRadix = 0)										{ return gtl::win::mfc::GetDlgItemInt64(this, idc, eRadix); }
+		void    SetDlgItemInt64 (int idc, int64_t iValue, std::wstring_view fmt = _T("{}"))		{ gtl::win::mfc::SetDlgItemInt64(this, idc, iValue, fmt); }
+		double  GetDlgItemDouble(int idc)														{ return gtl::win::mfc::GetDlgItemDouble(this, idc); }
+		void    SetDlgItemDouble(int idc, double dValue, std::wstring_view fmt = _T("{:.5f}"))	{ gtl::win::mfc::SetDlgItemDouble(this, idc, dValue, fmt); }
 
 		template < typename T_COORD, class = T_COORD::coord_t >
 		T_COORD GetDlgItemCoord(int idc) {
@@ -272,19 +272,19 @@ namespace gtl::win_util {
 		}
 
 		bool CheckAndSetDlgItemText(int idc, LPCTSTR pszText, CString* pStrOrigin = nullptr) {
-			return gtl::win_util::CheckAndSetDlgItemText(this, idc, pszText, pStrOrigin);
+			return gtl::win::mfc::CheckAndSetDlgItemText(this, idc, pszText, pStrOrigin);
 		}
 		using base_t::GetDlgItemText;
 		//int GetDlgItemText(int idc, CString& str) { return __super::GetDlgItemText(idc, str); }
 		//int GetDlgItemText(int idc, LPTSTR lpStr, int nMaxCount ) { return __super::GetDlgItemText(idc, lpStr, nMaxCount); }
-		CString GetDlgItemString(int idc) { return gtl::win_util::GetDlgItemString(this, idc); }
+		CString GetDlgItemString(int idc) { return gtl::win::mfc::GetDlgItemString(this, idc); }
 
 	public:
 		//DECLARE_MESSAGE_MAP()
-		void OnEditCopy()  { gtl::win_util::OnEditCopy(this); }
-		void OnEditCut()   { gtl::win_util::OnEditCut(this); }
-		void OnEditPaste() { gtl::win_util::OnEditPaste(this);  }
-		void OnEditUndo()  { gtl::win_util::OnEditUndo(this);  }
+		void OnEditCopy()  { gtl::win::mfc::OnEditCopy(this); }
+		void OnEditCut()   { gtl::win::mfc::OnEditCut(this); }
+		void OnEditPaste() { gtl::win::mfc::OnEditPaste(this);  }
+		void OnEditUndo()  { gtl::win::mfc::OnEditUndo(this);  }
 
 		AFX_MSGMAP const* GetMessageMap() const override
 			{ return GetThisMessageMap(); }
@@ -310,4 +310,4 @@ namespace gtl::win_util {
 	using CMDialogEx = TMDialog<CDialogEx>;
 
 
-}	// namespace gtl::win_util
+}	// namespace gtl::win::inline mfc

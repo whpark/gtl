@@ -50,17 +50,17 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "_lib_gtl_win_util.h"
-#include "gtl/win_util/win_util.h"
+#include "_lib_gtl_mfc.h"
+#include "gtl/mfc/mfc.h"
 
 #include <afxlistctrl.h>
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 #pragma pack(push, 8)
 
 	///----------------------------------------------------------------------------------------------------------------------------
 	/// @brief CListCtrlEd
-	class GTL__WINUTIL_CLASS CListCtrlEd : public CListCtrl {
+	class GTL__MFC_CLASS CListCtrlEd : public CListCtrl {
 		DECLARE_DYNAMIC(CListCtrlEd)
 	protected:
 		BOOL m_bEditable;
@@ -98,7 +98,7 @@ namespace gtl::win_util {
 
 	///----------------------------------------------------------------------------------------------------------------------------
 	/// @brief CMFCListCtrlEd
-	class GTL__WINUTIL_CLASS CMFCListCtrlEd : public CMFCListCtrl {
+	class GTL__MFC_CLASS CMFCListCtrlEd : public CMFCListCtrl {
 		DECLARE_DYNAMIC(CMFCListCtrlEd)
 	protected:
 		BOOL m_bEditable;

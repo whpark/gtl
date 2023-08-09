@@ -1,12 +1,12 @@
 ﻿#include "pch.h"
 
 #include "gtl/mat_helper.h"
-#include "gtl/win_util/MatHelper.h"
-#include "gtl/win_util/ProgressDlg.h"
+#include "gtl/mfc/MatHelper.h"
+#include "gtl/mfc/ProgressDlg.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/stopwatch.h"
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 
 	bool MatToDC(cv::Mat const& img, cv::Size const& sizeEffective, CDC& dc, CRect const& rectTarget, std::span<RGBQUAD> palette) {
 
@@ -197,4 +197,4 @@ namespace gtl::win_util {
 	//=============================================================================
 	//
 
-}	// namespace gtl::win_util
+}	// namespace gtl::win::inline mfc

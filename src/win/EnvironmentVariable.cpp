@@ -4,9 +4,9 @@
 
 #include "windows.h"
 
-#include "gtl/win_util/EnvironmentVariable.h"
+#include "gtl/win/EnvironmentVariable.h"
 
-namespace gtl::win_util {
+namespace gtl::win {
 
 	xEnvironmentVariable::xEnvironmentVariable(eSCOPE scope) {
 		Open(scope);
@@ -70,4 +70,4 @@ namespace gtl::win_util {
 		return !!r;
 	}
 
-}	// namespace gtl::qt
+}	// namespace gtl::win

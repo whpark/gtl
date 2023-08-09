@@ -5,14 +5,14 @@
 #include "gtl/coord.h"
 #include "gtl/json_proxy.h"
 #include "gtl/2dMatArray.h"
-#include "gtl/win_util/_lib_gtl_win_util.h"
-#include "gtl/win_util/win_util.h"
+#include "gtl/mfc/_lib_gtl_mfc.h"
+#include "gtl/mfc/mfc.h"
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 #pragma pack(push, 8)
 
     //! @brief mat view
-    class GTL__WINUTIL_CLASS CMatView : public CWnd {
+    class GTL__MFC_CLASS CMatView : public CWnd {
 		DECLARE_DYNAMIC(CMatView)
 
 	public:

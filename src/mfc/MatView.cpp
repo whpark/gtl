@@ -4,16 +4,16 @@
 
 #include "gtl/_default.h"
 #include "gtl/mat_helper.h"
-#include "gtl/win_util/MatView.h"
-#include "gtl/win_util/MatHelper.h"
-#include "gtl/win_util/TMDialog.h"
+#include "gtl/mfc/MatView.h"
+#include "gtl/mfc/MatHelper.h"
+#include "gtl/mfc/TMDialog.h"
 
 #include "resource.h"
 #include <VersionHelpers.h>
 
 using namespace std::literals;
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 
 	enum {
 		WM_UPDATE_DISPLAY_IMAGE = WM_APP+30,

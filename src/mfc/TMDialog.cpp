@@ -2,9 +2,9 @@
 //
 
 #include "pch.h"
-#include "gtl/win_util/TMDialog.h"
+#include "gtl/mfc/TMDialog.h"
 
-namespace gtl::win_util {
+namespace gtl::win::inline mfc {
 
 	// CMDialog dialog
 
@@ -131,7 +131,7 @@ namespace gtl::win_util {
 		if (!pDX || !pDX->m_pDlgWnd)
 			return;
 		double dScaledValue = value * scaleToView;
-		gtlw::DDX_Double(pDX, idc, dScaledValue, fmt);
+		gtl::win::mfc::DDX_Double(pDX, idc, dScaledValue, fmt);
 		if (pDX->m_bSaveAndValidate) {
 			value = dScaledValue / scaleToView;
 		}
@@ -193,4 +193,4 @@ namespace gtl::win_util {
 	}
 
 
-}	// namespace gtl::win_util
+}	// namespace gtl::win::inline mfc
