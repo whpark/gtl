@@ -351,11 +351,11 @@ namespace gtl {
 	GTL__API sLoadBitmapMatPixelArrayResult LoadBitmapMatPixelArray(std::istream& is, callback_progress_t funcCallback = nullptr);
 	GTL__API sLoadBitmapMatPixelArrayResult LoadBitmapMatPixelArray(std::filesystem::path const& path, callback_progress_t funcCallback = nullptr);
 
-	inline cv::Mat LoadImageMat(std::filesystem::path const& path) {
+	inline cv::Mat LoadImageMat(std::filesystem::path const& path, cv::ImreadModes mode = cv::ImreadModes::IMREAD_ANYCOLOR) {
 		cv::Mat img;
 		if (auto buf = FileToContainer<std::vector<uint8_t>>(path); buf) {
 			try {
-				img = cv::imdecode(*buf, cv::IMREAD_ANYCOLOR);
+				img = cv::imdecode(*buf, mode);
 				return img;
 			} catch (...) { }
 		}
