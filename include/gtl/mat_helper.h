@@ -355,7 +355,7 @@ namespace gtl {
 		cv::Mat img;
 		if (auto buf = FileToContainer<std::vector<uint8_t>>(path); buf) {
 			try {
-				img = cv::imdecode(*buf, cv::IMREAD_ANYDEPTH);
+				img = cv::imdecode(*buf, cv::IMREAD_ANYCOLOR);
 				return img;
 			} catch (...) { }
 		}
