@@ -4,7 +4,7 @@
 
 #include "windows.h"
 
-#include "gtl/win_util/EnvironmentVairable.h"
+#include "gtl/win_util/EnvironmentVariable.h"
 
 namespace gtl::win_util {
 

@@ -556,7 +556,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="EnvironmentVairable.cpp" />
+    <ClCompile Include="EnvironmentVariable.cpp" />
     <ClCompile Include="ListCtrlEd.cpp" />
     <ClCompile Include="MatHelper.cpp" />
     <ClCompile Include="MatView.cpp" />
@@ -580,7 +580,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <None Include="res\win_util.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\gtl\win_util\EnvironmentVairable.h" />
+    <ClInclude Include="..\..\include\gtl\win_util\EnvironmentVariable.h" />
     <ClInclude Include="..\..\include\gtl\win_util\ListCtrlEd.h" />
     <ClInclude Include="..\..\include\gtl\win_util\MatHelper.h" />
     <ClInclude Include="..\..\include\gtl\win_util\MatView.h" />

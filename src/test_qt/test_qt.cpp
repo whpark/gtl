@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "gtl/qt/qt.h"
 #include "gtl/qt/util.h"
-#include "gtl/win_util/EnvironmentVairable.h"
+#include "gtl/win_util/EnvironmentVariable.h"
 #include "test_qt.h"
 
 #include <QSettings>
