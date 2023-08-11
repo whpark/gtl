@@ -17,6 +17,8 @@
 #include "gtl/misc.h"
 #include "opencv2/opencv.hpp"
 
+struct FIBITMAP;	// FreeImage
+
 namespace gtl {
 #pragma pack(push, 8)	// default align. (8 bytes)
 
@@ -394,6 +396,8 @@ namespace gtl {
 	}
 
 	GTL__API bool DrawPixelValue(cv::Mat& canvas, cv::Mat const& imgOriginal, cv::Rect roi, gtl::xCoordTrans2d const& ctCanvasFromImage, double const minTextHeight = 8);
+
+	GTL__API std::optional<cv::Mat> ConvertFI2Mat(FIBITMAP* src, bool bRGBtoBGR = true);
 
 #pragma pack(pop)
 }	// namespace gtl

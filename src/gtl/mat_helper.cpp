@@ -1,10 +1,10 @@
 ﻿#include "pch.h"
 
 #include <chrono>
+#include <windows.h>
 
 #include "gtl/mat_helper.h"
-
-#include <windows.h>
+#include "FreeImage.h"
 
 namespace gtl {
 
@@ -1450,6 +1450,110 @@ namespace gtl {
 		return true;
 	}
 
+	std::optional<cv::Mat> ConvertFI2Mat(FIBITMAP* src, bool bRGBtoBGR) {
+		int type{-1}, bpp{-1};
+		auto eImageType = FreeImage_GetImageType(src);
+		switch (eImageType) {
+		case FIT_UINT16:	type = CV_16UC1; break;
+		case FIT_INT16:		type = CV_16SC1; break;
+			//case FIT_UINT32:	type = CV_32SC1; break;
+		case FIT_INT32:		type = CV_32SC1; break;
+		case FIT_FLOAT:		type = CV_32FC1; break;
+		case FIT_DOUBLE:	type = CV_64FC1; break;
+		case FIT_COMPLEX:	type = CV_64FC2; break;
+		case FIT_RGB16:		type = CV_16UC3; break;
+		case FIT_RGBA16:	type = CV_16UC4; break;
+		case FIT_RGBF:		type = CV_32FC3; break;
+		case FIT_RGBAF:		type = CV_32FC4; break;
+		case FIT_BITMAP:
+			bpp = FreeImage_GetBPP(src);
+			switch (bpp) {
+			case 1:
+			case 2:	// probably there might not be 2bpp image
+			case 4:
+			case 8: type = CV_8UC1; break;	// To Be Determined
+			case 16: type = CV_8UC2; break;	// To Be Determined
+			case 24: type = CV_8UC3; break;
+			case 32: type = CV_8UC4; break;
+			}
+			break;
+		}
+		if (type < 0)
+			return {};
+
+		//auto* info = FreeImage_GetInfo(src);
+		//info->bmiHeader;
+
+		bool flip{true};
+		FIBITMAP* converted{};
+		FIBITMAP* fib = src;
+		if (eImageType == FIT_BITMAP) {	// Standard image type
+			// first check if grayscale image
+			if (bpp <= 16) {
+				bool bColor{};
+				bool bAlpha{};
+				// get palette
+				if (auto* palette = FreeImage_GetPalette(src)) {
+					for (auto nPalette = FreeImage_GetColorsUsed(src), i{ 0u }; i < nPalette; i++) {
+						if (auto c = palette[i]; c.rgbBlue != c.rgbGreen or c.rgbGreen != c.rgbRed) {	// todo: alpha channel?
+							bColor = true;
+							break;
+						}
+					}
+					for (auto nPalette = FreeImage_GetColorsUsed(src), i{ 0u }; i < nPalette; i++) {
+						if (auto c = palette[i]; c.rgbReserved) {	// todo: alpha channel?
+							bAlpha = true;
+							break;
+						}
+					}
+				}
+				if (bAlpha) {
+					converted = FreeImage_ConvertTo32Bits(src);
+					type = CV_8UC4;
+				} else if (bColor or (bpp == 16)) {
+					converted = FreeImage_ConvertTo24Bits(src);
+					type = CV_8UC3;
+				} else {
+					converted = FreeImage_ConvertToGreyscale(src);
+					type = CV_8UC1;
+				}
+				fib = converted;
+			}
+		}
+		else {
+			flip = true;	// don't know if image needs be flipped. so just flip it. :)
+		}
+
+		if (!fib)
+			return {};
+
+		auto data = FreeImage_GetBits(fib);
+		auto step = FreeImage_GetPitch(fib);
+		auto size = cv::Size2i(FreeImage_GetWidth(fib), FreeImage_GetHeight(fib));
+		if (!data or !step or size.empty())
+			return {};
+
+		cv::Mat img;
+		{
+			cv::Mat imgTemp = cv::Mat(size, type, data, step);	// !!! CAUTION no memory allocation.
+			if (flip)
+				cv::flip(imgTemp, img, 0);
+			else
+				imgTemp.copyTo(img);
+		}
+
+		int cvt = bRGBtoBGR ? [&]() -> int {
+			switch (img.channels()) {
+			case 3: return cv::COLOR_RGB2BGR;
+			case 4: return cv::COLOR_RGBA2BGRA;
+			}
+			return -1;
+		}() : -1;
+		if (cvt > 0)
+			cvtColor(img, img, cvt);
+
+		return std::move(img);
+	}
 
 
 	//=============================================================================
