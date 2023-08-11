@@ -141,7 +141,7 @@ namespace gtl::win::inline mfc {
 		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Saving : %s"), path.wstring().c_str());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, pelsPerMeter, palette, bNoPaletteLookup, bBottom2Top, dlgProgress.m_calback);
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, pelsPerMeter, palette, bNoPaletteLookup, bBottom2Top, dlgProgress.m_callback);
 
 		auto r = dlgProgress.DoModal();
 
@@ -161,7 +161,7 @@ namespace gtl::win::inline mfc {
 		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &pelsPerMeter, &dlgProgress]() { img = gtl::LoadBitmapMat(path, pelsPerMeter, dlgProgress.m_calback); });
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &pelsPerMeter, &dlgProgress]() { img = gtl::LoadBitmapMat(path, pelsPerMeter, dlgProgress.m_callback); });
 		auto r = dlgProgress.DoModal();
 
 		CWaitCursor wc;
@@ -180,7 +180,7 @@ namespace gtl::win::inline mfc {
 		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Loading : %s"), path.c_str());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &pelsPerMeter, &palette, &dlgProgress]() { img = gtl::LoadBitmapMatPixelArray(path, pelsPerMeter, palette, dlgProgress.m_calback); });
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&img, &path, &pelsPerMeter, &palette, &dlgProgress]() { img = gtl::LoadBitmapMatPixelArray(path, pelsPerMeter, palette, dlgProgress.m_callback); });
 		auto r = dlgProgress.DoModal();
 
 		CWaitCursor wc;

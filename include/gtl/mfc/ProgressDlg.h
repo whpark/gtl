@@ -24,7 +24,7 @@ namespace gtl::win::inline mfc {
 	//#endif
 	public:
 		std::chrono::system_clock::time_point m_tStart;
-		gtl::callback_progress_t m_calback;
+		gtl::callback_progress_t m_callback;
 		CString m_strMessage;
 		int m_iPercent{};
 		bool m_bUserAbort{};

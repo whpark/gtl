@@ -12,7 +12,7 @@ namespace gtl::qt {
 		xProgressDlg dlgProgress(nullptr);
 		dlgProgress.m_message = std::format(L"Saving : {}", path.wstring());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, pelsPerMeter, palette, bNoPaletteLookup, bBottom2Top, dlgProgress.m_calback);
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, pelsPerMeter, palette, bNoPaletteLookup, bBottom2Top, dlgProgress.GetCallback());
 
 		auto r = dlgProgress.exec();
 
@@ -32,7 +32,7 @@ namespace gtl::qt {
 		dlgProgress.m_message = std::format(L"Loading : {}", path.wstring());
 
 		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&result, &path, &dlgProgress]() {
-			result = gtl::LoadBitmapMat(path, dlgProgress.m_calback); });
+			result = gtl::LoadBitmapMat(path, dlgProgress.GetCallback()); });
 
 		auto r = dlgProgress.exec();
 
@@ -53,7 +53,7 @@ namespace gtl::qt {
 		dlgProgress.m_message = std::format(L"Loading : {}", path.wstring());
 
 		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>([&result, &path, &dlgProgress]() {
-			result = gtl::LoadBitmapMatPixelArray(path, dlgProgress.m_calback); });
+			result = gtl::LoadBitmapMatPixelArray(path, dlgProgress.GetCallback()); });
 
 		auto r = dlgProgress.exec();
 

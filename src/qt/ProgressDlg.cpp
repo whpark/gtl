@@ -21,12 +21,7 @@ void gtl::qt::xProgressDlg::Init() {
 	ui->labelMessage->setText(ToQString(m_message));
 	ui->progressBar->setRange(0, 100);
 
-	m_calback = [&](int iPercent, bool bDone, bool bError)->bool{
-		m_iPercent = iPercent;
-		m_bError = bError;
-		m_bDone = bDone;
-		return !m_bUserAbort;
-	};
+	m_callback = [&](int iPercent, bool bDone, bool bError)->bool{ return UpdateProgress(iPercent, bDone, bError); };
 
 	connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &this_t::OnButton);
 	m_tStart  = std::chrono::system_clock::now();

@@ -368,6 +368,7 @@ namespace gtl::qt {
 
 		auto rectClient = GetViewRect();
 		auto dMinZoom = std::min(rectClient.Width()/4. / m_img.cols, rectClient.Height()/4. / m_img.rows);
+		dMinZoom = std::min(dMinZoom, 0.5);
 		m_ctScreenFromImage.m_scale = std::clamp(m_ctScreenFromImage.m_scale, dMinZoom, 1.e3);
 		m_ctScreenFromImage.m_offset += ptAnchor - m_ctScreenFromImage(ptImage);
 		// Anchor point

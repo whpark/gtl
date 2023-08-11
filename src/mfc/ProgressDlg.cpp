@@ -18,7 +18,7 @@ namespace gtl::win::inline mfc {
 		: CDialogEx(strIDD.c_str(), pParent) {
 
 		m_strMessage = _T("Working...");
-		m_calback = [&](int iPercent, bool bDone, bool bError)->bool{
+		m_callback = [&](int iPercent, bool bDone, bool bError)->bool{
 			m_iPercent = iPercent;
 			m_bError = bError;
 			m_bDone = bDone;
