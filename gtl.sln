@@ -17,8 +17,14 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.shape", "src\shape\shape.vcxproj", "{FBA95ADB-13A2-4139-BA8E-789BFE9AA1AE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.win", "src\win\win.vcxproj", "{A7A07211-7966-4626-9DC3-02F8CC2A9042}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0} = {0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.mfc", "src\mfc\mfc.vcxproj", "{5F0D7BD9-E1EC-45D1-96B9-2EA611944D5E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A7A07211-7966-4626-9DC3-02F8CC2A9042} = {A7A07211-7966-4626-9DC3-02F8CC2A9042}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_win", "src\test_win\test_win.vcxproj", "{0F115BD6-A104-41EB-8F5D-194C4E66DD0C}"
 EndProject
