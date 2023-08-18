@@ -38,7 +38,7 @@ namespace gtl {
 	/// digit contants to integral type value.
 	///  - radix detecting (c++ notation)
 	///	   ex "0b1001'1100", "0xABCD1234", "0123456"
-	///  - digit seperator (such as ',' or '\'' for c++ notation.)
+	///  - digit separator (such as ',' or '\'' for c++ notation.)
 	///  - only throws when (radix > 36)
 	/// </summary>
 	/// <param name="psz"></param>
@@ -104,7 +104,7 @@ namespace gtl {
 	/// digit contants to integral type value.
 	///  - radix detecting (c++ notation)
 	///	   ex "0b1001'1100", "0xABCD1234", "0123456"
-	///  - digit seperator (such as ',' or '\'' for c++ notation.)
+	///  - digit separator (such as ',' or '\'' for c++ notation.)
 	///  - only throws when (radix > 36)
 	/// </summary>
 	/// <param name="psz"></param>
