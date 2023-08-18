@@ -114,13 +114,13 @@ namespace gtl::qt {
 		if (eColorType == 0)
 			return false;
 
-		if (!m_img.isContinuous()) {
+		m_mouse.Clear();
+		m_smooth_scroll.Clear();
+
+		if (!img.empty() and !m_img.isContinuous()) {
 			assert(false);
 			return false;
 		}
-
-		m_mouse.Clear();
-		m_smooth_scroll.Clear();
 
 		if (eZoomMode != eZOOM::none) {
 			ui->cmbZoomMode->setCurrentIndex(std::to_underlying(eZoomMode));
