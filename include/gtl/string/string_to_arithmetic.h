@@ -15,6 +15,7 @@
 #include "gtl/_lib_gtl.h"
 #include "gtl/_default.h"
 #include "gtl/concepts.h"
+#include "gtl/string/string_primitives.h"
 
 #if !defined(__cpp_lib_concepts)
 #	error ERROR! Supports C++v20 only.
@@ -329,6 +330,40 @@ namespace gtl {
 	template < std::floating_point tvalue, gtlc::string_elem tchar>
 	tvalue tsztod(tchar const* psz, tchar const** ppszStopped, tchar cSplitter) {
 		return tsztod<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz+tszlen(psz) }, ppszStopped, cSplitter);
+	}
+
+
+
+	/// @brief adds comma into number string
+	/// @param separator 
+	template < gtlc::string_elem tchar, int interval = 3 >
+	constexpr std::basic_string<tchar> AddThousandComma(std::basic_string_view<tchar> sv, tchar separator = ',') {
+		static_assert(interval > 0);
+		using namespace std::literals;
+		using view_t = std::basic_string_view<tchar>;
+		using string_t = std::basic_string<tchar>;
+
+		string_t result;
+
+		int nComma{};
+		auto pos = sv.find_first_of(ElevateAnsiToStandard<tchar>("0123456789"sv));
+		if (pos != sv.npos) {
+			auto len = std::min(sv.size()-pos, sv.substr(pos).find_first_not_of(ElevateAnsiToStandard<tchar>("0123456789"sv)));
+			nComma = (len - 1) / interval;
+			if (auto jump = len % interval)
+				pos += jump;
+			else
+				pos += interval;
+		}
+
+		result.reserve(sv.size()+nComma);
+		result = sv.substr(0, pos);
+		for (; nComma > 0; nComma--, pos += interval) {
+			result += separator;
+			result += sv.substr(pos, interval);
+		}
+		result += sv.substr(pos);
+		return result;
 	}
 
 #pragma pack(pop)

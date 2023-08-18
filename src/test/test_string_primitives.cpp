@@ -722,3 +722,79 @@ TEST(gtl_string, etc) {
 	EXPECT_TRUE(buf == u"9876543210"sv);
 
 }
+
+TEST(gtl_string, AddThousandComma) {
+
+	//std::locale::global(std::locale("en_US.UTF-8"));
+	auto str = fmt::format(std::locale("en_US.UTF-8"), L"{}", 123'456'789);	// NOT Working code. Why?
+	//EXPECT_EQ(str, L"123,456,789"sv);	// NOT Working code. Why?
+
+	EXPECT_EQ(AddThousandComma(L"1"sv),											L"1"sv);
+	EXPECT_EQ(AddThousandComma(L"12"sv),										L"12"sv);
+	EXPECT_EQ(AddThousandComma(L"123"sv),										L"123"sv);
+	EXPECT_EQ(AddThousandComma(L"1234"sv),										L"1,234"sv);
+	EXPECT_EQ(AddThousandComma(L"12345"sv),										L"12,345"sv);
+	EXPECT_EQ(AddThousandComma(L"123456"sv),									L"123,456"sv);
+	EXPECT_EQ(AddThousandComma(L"1234567"sv),									L"1,234,567"sv);
+	EXPECT_EQ(AddThousandComma(L"12345678"sv),									L"12,345,678"sv);
+	EXPECT_EQ(AddThousandComma(L"123456789"sv),									L"123,456,789"sv);
+	EXPECT_EQ(AddThousandComma(L"1234567890"sv),								L"1,234,567,890"sv);
+	EXPECT_EQ(AddThousandComma(L"12345678901"sv),								L"12,345,678,901"sv);
+	EXPECT_EQ(AddThousandComma(L"123456789012"sv),								L"123,456,789,012"sv);
+	EXPECT_EQ(AddThousandComma(L"1234567890123"sv),								L"1,234,567,890,123"sv);
+	EXPECT_EQ(AddThousandComma(L"12345678901234"sv),							L"12,345,678,901,234"sv);
+	EXPECT_EQ(AddThousandComma(L"123456789012345"sv),							L"123,456,789,012,345"sv);
+	EXPECT_EQ(AddThousandComma(L"1234567890123456"sv),							L"1,234,567,890,123,456"sv);
+	EXPECT_EQ(AddThousandComma(L"12345678901234567"sv),							L"12,345,678,901,234,567"sv);
+	EXPECT_EQ(AddThousandComma(L"123456789012345678"sv),						L"123,456,789,012,345,678"sv);
+	EXPECT_EQ(AddThousandComma(L"1234567890123456789"sv),						L"1,234,567,890,123,456,789"sv);
+	EXPECT_EQ(AddThousandComma(L"12345678901234567890"sv),						L"12,345,678,901,234,567,890"sv);
+	EXPECT_EQ(AddThousandComma(L"   -12345678901234567.123332342738491234"sv),	L"   -12,345,678,901,234,567.123332342738491234"sv);
+	EXPECT_EQ(AddThousandComma(L"aslkdfjasld;kfgjasd;fn3232asdfasd"sv),			L"aslkdfjasld;kfgjasd;fn3,232asdfasd"sv);
+	EXPECT_EQ(AddThousandComma(L"aslkdfjasld;kfgjasd;fn323asdfasd"sv),			L"aslkdfjasld;kfgjasd;fn323asdfasd"sv);
+	EXPECT_EQ(AddThousandComma(L"aslkdfjasld;kfgjasd;fn32asdfasd"sv),			L"aslkdfjasld;kfgjasd;fn32asdfasd"sv);
+	EXPECT_EQ(AddThousandComma(L"aslkdfjasld;kfgjasd;fn3asdfasd"sv),			L"aslkdfjasld;kfgjasd;fn3asdfasd"sv);
+	EXPECT_EQ(AddThousandComma(L"aslkdfjasld;kfgjasd;fn3232"sv),				L"aslkdfjasld;kfgjasd;fn3,232"sv);
+	EXPECT_EQ(AddThousandComma(L"aslkdfjasld;kfgjasd;fn323"sv),					L"aslkdfjasld;kfgjasd;fn323"sv);
+	EXPECT_EQ(AddThousandComma(L"aslkdfjasld;kfgjasd;fn32"sv),					L"aslkdfjasld;kfgjasd;fn32"sv);
+	EXPECT_EQ(AddThousandComma(L"aslkdfjasld;kfgjasd;fn3"sv),					L"aslkdfjasld;kfgjasd;fn3"sv);
+	EXPECT_EQ(AddThousandComma(L"3232asdfasd"sv),								L"3,232asdfasd"sv);
+	EXPECT_EQ(AddThousandComma(L"323asdfasd"sv),								L"323asdfasd"sv);
+	EXPECT_EQ(AddThousandComma(L"32asdfasd"sv),									L"32asdfasd"sv);
+	EXPECT_EQ(AddThousandComma(L"3asdfasd"sv),									L"3asdfasd"sv);
+
+	EXPECT_EQ(AddThousandComma("1"sv),											"1"sv);
+	EXPECT_EQ(AddThousandComma("12"sv),											"12"sv);
+	EXPECT_EQ(AddThousandComma("123"sv),										"123"sv);
+	EXPECT_EQ(AddThousandComma("1234"sv),										"1,234"sv);
+	EXPECT_EQ(AddThousandComma("12345"sv),										"12,345"sv);
+	EXPECT_EQ(AddThousandComma("123456"sv),										"123,456"sv);
+	EXPECT_EQ(AddThousandComma("1234567"sv),									"1,234,567"sv);
+	EXPECT_EQ(AddThousandComma("12345678"sv),									"12,345,678"sv);
+	EXPECT_EQ(AddThousandComma("123456789"sv),									"123,456,789"sv);
+	EXPECT_EQ(AddThousandComma("1234567890"sv),									"1,234,567,890"sv);
+	EXPECT_EQ(AddThousandComma("12345678901"sv),								"12,345,678,901"sv);
+	EXPECT_EQ(AddThousandComma("123456789012"sv),								"123,456,789,012"sv);
+	EXPECT_EQ(AddThousandComma("1234567890123"sv),								"1,234,567,890,123"sv);
+	EXPECT_EQ(AddThousandComma("12345678901234"sv),								"12,345,678,901,234"sv);
+	EXPECT_EQ(AddThousandComma("123456789012345"sv),							"123,456,789,012,345"sv);
+	EXPECT_EQ(AddThousandComma("1234567890123456"sv),							"1,234,567,890,123,456"sv);
+	EXPECT_EQ(AddThousandComma("12345678901234567"sv),							"12,345,678,901,234,567"sv);
+	EXPECT_EQ(AddThousandComma("123456789012345678"sv),							"123,456,789,012,345,678"sv);
+	EXPECT_EQ(AddThousandComma("1234567890123456789"sv),						"1,234,567,890,123,456,789"sv);
+	EXPECT_EQ(AddThousandComma("12345678901234567890"sv),						"12,345,678,901,234,567,890"sv);
+	EXPECT_EQ(AddThousandComma("   -12345678901234567.123332342738491234"sv),	"   -12,345,678,901,234,567.123332342738491234"sv);
+	EXPECT_EQ(AddThousandComma("aslkdfjasld;kfgjasd;fn3232asdfasd"sv),			"aslkdfjasld;kfgjasd;fn3,232asdfasd"sv);
+	EXPECT_EQ(AddThousandComma("aslkdfjasld;kfgjasd;fn323asdfasd"sv),			"aslkdfjasld;kfgjasd;fn323asdfasd"sv);
+	EXPECT_EQ(AddThousandComma("aslkdfjasld;kfgjasd;fn32asdfasd"sv),			"aslkdfjasld;kfgjasd;fn32asdfasd"sv);
+	EXPECT_EQ(AddThousandComma("aslkdfjasld;kfgjasd;fn3asdfasd"sv),				"aslkdfjasld;kfgjasd;fn3asdfasd"sv);
+	EXPECT_EQ(AddThousandComma("aslkdfjasld;kfgjasd;fn3232"sv),					"aslkdfjasld;kfgjasd;fn3,232"sv);
+	EXPECT_EQ(AddThousandComma("aslkdfjasld;kfgjasd;fn323"sv),					"aslkdfjasld;kfgjasd;fn323"sv);
+	EXPECT_EQ(AddThousandComma("aslkdfjasld;kfgjasd;fn32"sv),					"aslkdfjasld;kfgjasd;fn32"sv);
+	EXPECT_EQ(AddThousandComma("aslkdfjasld;kfgjasd;fn3"sv),					"aslkdfjasld;kfgjasd;fn3"sv);
+	EXPECT_EQ(AddThousandComma("3232asdfasd"sv),								"3,232asdfasd"sv);
+	EXPECT_EQ(AddThousandComma("323asdfasd"sv),									"323asdfasd"sv);
+	EXPECT_EQ(AddThousandComma("32asdfasd"sv),									"32asdfasd"sv);
+	EXPECT_EQ(AddThousandComma("3asdfasd"sv),									"3asdfasd"sv);
+
+}

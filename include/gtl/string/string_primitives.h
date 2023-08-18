@@ -46,6 +46,18 @@ namespace gtl {
 #pragma pack(push, 8)
 
 
+	//-----------------------------------------------------------------------------
+	/// @brief just char -> tchar_t (this function does not change sv's values.)
+	template < typename tcharTarget, typename tcharSource >
+	constexpr std::basic_string<tcharTarget> ElevateAnsiToStandard(std::basic_string_view<tcharSource> sv) {
+		std::basic_string<tcharTarget> result;
+		result.reserve(sv.size());
+		for (auto c : sv)
+			result += static_cast<tcharTarget>(c);
+		return result;
+	}
+
+
 	/// @brief ToLower, ToUpper
 	template < gtlc::string_elem tchar > [[nodiscard]] tchar ToLower(tchar c);
 	template < gtlc::string_elem tchar > [[nodiscard]] tchar ToUpper(tchar c);
