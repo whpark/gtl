@@ -692,7 +692,7 @@ namespace gtl::qt {
 				else {
 					auto strValue = std::format(L" [{:3}", ' ');
 					for (int i{1}; i < n; i++)
-						strValue += std::format(L",{:3}", ' ');
+						strValue += std::format(L" {:3}", ' ');
 					status += strValue + L"]";
 				}
 			}
