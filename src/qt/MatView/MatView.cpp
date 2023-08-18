@@ -679,7 +679,10 @@ namespace gtl::qt {
 				for (auto v = m_imgOriginal.rows; v; v/= 10, ny++);
 				ny = ny*4/3;
 				// print ptImage.x and ptImage.y with thousand comma separated
-				status += fmt::format(l, L"x{0:{2}} y{1:{3}}", ptImage.x, ptImage.y, nx, ny);
+				status += fmt::format(L"x{0:>{2}} y{1:>{3}}",
+					AddThousandCommaW((int)ptImage.x),
+					AddThousandCommaW((int)ptImage.y),
+					nx, ny);
 			}
 
 			// image value
@@ -704,8 +707,9 @@ namespace gtl::qt {
 			// Selection
 			if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
 				gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
-				status += fmt::format(l, L" (x{0} y{1} w{2} h{3})",
-					m_mouse.ptSel0.x, m_mouse.ptSel0.y, std::abs(size.cx), std::abs(size.cy));
+				status += fmt::format(L" (x{0} y{1} w{2} h{3})",
+					AddThousandCommaW((int)m_mouse.ptSel0.x), AddThousandCommaW((int)m_mouse.ptSel0.y),
+					AddThousandCommaW(std::abs(size.cx)), AddThousandCommaW(std::abs(size.cy)));
 			}
 
 

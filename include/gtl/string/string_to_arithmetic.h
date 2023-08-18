@@ -366,6 +366,15 @@ namespace gtl {
 		return result;
 	}
 
+	template < gtlc::arithmetic tvalue, int interval = 3 >
+	constexpr std::string AddThousandCommaA(tvalue value, char separator = ',') {
+		return AddThousandComma<char, interval>(std::to_string(value), separator);
+	}
+	template < gtlc::arithmetic tvalue, int interval = 3 >
+	constexpr std::wstring AddThousandCommaW(tvalue value, wchar_t separator = L',') {
+		return AddThousandComma<wchar_t, interval>(std::to_wstring(value), separator);
+	}
+
 #pragma pack(pop)
 };	// namespace gtl;
 
