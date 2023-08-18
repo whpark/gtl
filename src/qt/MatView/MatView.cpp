@@ -679,14 +679,22 @@ namespace gtl::qt {
 			}
 
 			// image value
-			if (xRect2i(0, 0, m_img.cols, m_img.rows).PtInRect(ptImage)) {
+			{
 				int n = m_imgOriginal.channels();
 				int depth = m_imgOriginal.depth();
-				auto cr = GetMatValue(m_imgOriginal.ptr(ptImage.y), m_imgOriginal.depth(), n, ptImage.y, ptImage.x);
-				auto strValue = std::format(L" [{:3}", cr[0]);
-				for (int i{1}; i < n; i++)
-					strValue += std::format(L",{:3}", cr[i]);
-				status += strValue + L"]";
+				if (xRect2i(0, 0, m_img.cols, m_img.rows).PtInRect(ptImage)) {
+					auto cr = GetMatValue(m_imgOriginal.ptr(ptImage.y), m_imgOriginal.depth(), n, ptImage.y, ptImage.x);
+					auto strValue = std::format(L" [{:3}", cr[0]);
+					for (int i{1}; i < n; i++)
+						strValue += std::format(L",{:3}", cr[i]);
+					status += strValue + L"]";
+				}
+				else {
+					auto strValue = std::format(L" [{:3}", ' ');
+					for (int i{1}; i < n; i++)
+						strValue += std::format(L",{:3}", ' ');
+					status += strValue + L"]";
+				}
 			}
 
 			// Selection
