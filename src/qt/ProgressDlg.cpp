@@ -38,6 +38,10 @@ void gtl::qt::xProgressDlg::OnTimer_UpdateUI() {
 		auto str = ToQString(std::format(L"{:.3f} 초, {} %", ts.count(), m_iPercent));
 		if (ui->edtStatus->text() != str)
 			ui->edtStatus->setText(str);
+
+		auto msg = ToQString(m_message);
+		if (ui->labelMessage->text() != msg)
+			ui->labelMessage->setText(msg);
 	}
 
 	if (m_bDone) {
@@ -47,7 +51,6 @@ void gtl::qt::xProgressDlg::OnTimer_UpdateUI() {
 			reject();
 		else
 			accept();
-		return;
 	}
 }
 

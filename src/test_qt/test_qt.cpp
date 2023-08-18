@@ -9,11 +9,13 @@
 QSettings reg("Biscuit-lab.com", "gtl::test_qt");
 
 gtl::qt::test_qt::test_qt(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), m_completer(this)
 {
     ui.setupUi(this);
     //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
     //m_dlgMatViewGV->show();
+	m_completer.Init({});
+	ui.edtPath->setCompleter(&m_completer);
 	auto strPath = reg.value("misc/LastImagePath").toString();
 	ui.edtPath->setText(strPath);
 
@@ -83,6 +85,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	m_dlgMatView->GetView().SetImage(img, false);
 	//m_dlgMatViewGV->SetImage(img, false);
 	m_ctrlMatView->SetImage(img, false);
+	m_ctrlMatView->SetImage({});
 
 	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);

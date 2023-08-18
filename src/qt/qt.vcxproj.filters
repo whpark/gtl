@@ -72,6 +72,9 @@
     <ClCompile Include="ProgressDlg.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="QPathCompleter.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_global.h">
@@ -136,6 +139,9 @@
       <Filter>code</Filter>
     </QtMoc>
     <QtMoc Include="..\..\include\gtl\qt\ProgressDlg.h">
+      <Filter>code</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\QPathCompleter.h">
       <Filter>code</Filter>
     </QtMoc>
   </ItemGroup>
