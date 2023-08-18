@@ -19,6 +19,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
 	m_ctrlMatView->move({4, 100});
+	m_ctrlMatView->resize({1200, 500});
 	//m_ctrlMatView->show();
 
 	m_dlgMatView = std::make_unique<gtl::qt::xMatViewDlg>(this);
@@ -41,7 +42,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	// Color Bar
 	//cv::Mat img = cv::Mat::zeros(1080*2, 1920*2, CV_8UC3);
-	cv::Mat img = cv::Mat::zeros(800, 600, CV_8UC3);
+	cv::Mat img = cv::Mat::zeros(1800, 600, CV_8UC3);
 	{
 		auto cy = img.rows/3;
 		auto cy2 = cy*2;
@@ -81,6 +82,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	m_dlgMatView->GetView().SetImage(img, false);
 	//m_dlgMatViewGV->SetImage(img, false);
+	m_ctrlMatView->SetImage(img, false);
 
 	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);
@@ -135,6 +137,7 @@ void gtl::qt::test_qt::OnLoadImage() {
 	if (!m_dlgMatView->GetView().SetImage(img, true, xMatView::eZOOM::fit2window))
 		return;
 	reg.setValue("misc/LastImagePath", ToQString(path));
+	m_dlgMatView->show();
 
 }
 

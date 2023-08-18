@@ -1172,7 +1172,7 @@ void xMatView::OnMotion_View( wxMouseEvent& event ) {
 
 	// status
 	{
-		auto ptImage = m_ctScreenFromImage.TransI(pt);
+		auto ptImage = gtl::Floor(m_ctScreenFromImage.TransI(xPoint2d(pt)));
 		auto status = std::format(L"{},{}", ptImage.x, ptImage.y);
 		if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
 			gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;

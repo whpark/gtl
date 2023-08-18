@@ -629,10 +629,11 @@ namespace gtl::qt {
 	}
 
 	void xMatView::OnView_mouseMoveEvent(xMatViewCanvas* view, QMouseEvent* event) {
+		static std::locale l("en_US.UTF-8");
 		if (!view)
 			return;
 		event->accept();
-		xPoint2i ptView = ToCoord(event->pos()*devicePixelRatio());
+		xPoint2d ptView = ToCoord(event->pos()*devicePixelRatio());
 		if (m_mouse.ptAnchor) {
 			if (!m_option.bPanningLock) {
 				switch (m_eZoom) {
@@ -667,15 +668,18 @@ namespace gtl::qt {
 
 		// status
 		{
-			auto ptImage = m_ctScreenFromImage.TransI(ptView);
+			auto ptImage = gtl::Floor(m_ctScreenFromImage.TransI(xPoint2d(ptView)));
 			std::wstring status;
 
 			// Current Position
 			int nx{}, ny{};
 			{
 				for (auto v = m_imgOriginal.cols; v; v/= 10, nx++);
+				nx = nx*4/3;
 				for (auto v = m_imgOriginal.rows; v; v/= 10, ny++);
-				status += std::format(L"{0:{2}},{1:{3}}", ptImage.x, ptImage.y, nx, ny);
+				ny = ny*4/3;
+				// print ptImage.x and ptImage.y with thousand comma separated
+				status += fmt::format(l, L"x{0:{2}} y{1:{3}}", ptImage.x, ptImage.y, nx, ny);
 			}
 
 			// image value
@@ -700,8 +704,8 @@ namespace gtl::qt {
 			// Selection
 			if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
 				gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
-				//status += std::format(L" ({0:{4}},{1:{5}} {2:{4}}x{3:{5}})", m_mouse.ptSel0.x, m_mouse.ptSel0.y, size.cx, size.cy, nx, ny);
-				status += std::format(L" ({0},{1} {2}x{3})", m_mouse.ptSel0.x, m_mouse.ptSel0.y, size.cx, size.cy);
+				status += fmt::format(l, L" (x{0} y{1} w{2} h{3})",
+					m_mouse.ptSel0.x, m_mouse.ptSel0.y, std::abs(size.cx), std::abs(size.cy));
 			}
 
 
