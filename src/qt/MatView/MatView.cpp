@@ -88,26 +88,7 @@ namespace gtl::qt {
 			m_imgOriginal = img;
 
 		m_img = m_imgOriginal;
-
-		// Build Pyramid Image for down sampling { cv::InterpolationFlags::INTER_AREA }
-		if (m_pyramid.threadPyramidMaker.joinable()) {
-			m_pyramid.threadPyramidMaker.request_stop();
-			m_pyramid.threadPyramidMaker.join();
-		}
-		m_pyramid.imgs.clear();
-		m_pyramid.imgs.push_front(m_img);
-		if (m_option.bPyrImageDown) {
-			m_pyramid.threadPyramidMaker = std::jthread([this](std::stop_token stop) {
-				cv::Mat imgPyr = m_pyramid.imgs[0];
-				while (!stop.stop_requested() and (imgPyr.size().area() > 1'000*1'000) ) {
-					cv::pyrDown(imgPyr, imgPyr);
-					{
-						std::unique_lock lock{m_pyramid.mtx};
-						m_pyramid.imgs.emplace_front(imgPyr);
-					}
-				}
-			});
-		}
+		BuildPyramid();
 
 		// check (opengl) texture format
 		auto [eColorType, eFormat, ePixelType] = GetGLImageFormatType(m_img.type());
@@ -157,6 +138,8 @@ namespace gtl::qt {
 	bool xMatView::SetOption(S_OPTION const& option, bool bStore) {
 		if (&m_option != &option)
 			m_option = option;
+
+		BuildPyramid();
 
 		UpdateCT(false, eZOOM::none);
 		UpdateScrollBars();
@@ -532,6 +515,29 @@ namespace gtl::qt {
 			return false;
 		}
 		return true;
+	}
+
+	void xMatView::BuildPyramid() {
+		// Build Pyramid Image for down sampling { cv::InterpolationFlags::INTER_AREA }
+		if (m_pyramid.threadPyramidMaker.joinable()) {
+			m_pyramid.threadPyramidMaker.request_stop();
+			m_pyramid.threadPyramidMaker.join();
+		}
+		m_pyramid.imgs.clear();
+		m_pyramid.imgs.push_front(m_img);
+		const int minArea = 1'000 * 1'000;
+		if (m_option.bPyrImageDown and m_option.eZoomOut == eZOOM_OUT::area and m_img.size().area() > minArea) {
+			m_pyramid.threadPyramidMaker = std::jthread([this](std::stop_token stop) {
+				cv::Mat imgPyr = m_pyramid.imgs[0];
+				while (!stop.stop_requested() and (imgPyr.size().area() > minArea)) {
+					cv::pyrDown(imgPyr, imgPyr);
+					{
+						std::unique_lock lock{ m_pyramid.mtx };
+						m_pyramid.imgs.emplace_front(imgPyr);
+					}
+				}
+			});
+		}
 	}
 
 	xRect2i xMatView::GetViewRect() {

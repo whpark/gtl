@@ -147,6 +147,7 @@ public:
 	bool KeyboardNavigate(int key, bool ctrl = false, bool alt = false, bool shift = false);
 
 protected:
+	void BuildPyramid();
 	xRect2i GetViewRect();
 	void InitializeGL(xMatViewCanvas* view);
 	void PaintGL(xMatViewCanvas* view);
