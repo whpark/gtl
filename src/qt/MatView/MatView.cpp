@@ -998,8 +998,8 @@ namespace gtl::qt {
 
 					xWaitCursor wc;
 
-					double scaleP = (double)imgPyr.cols / m_img.cols;
-					double scale = (double)size.width / imgPyr.cols;
+					double scaleP = m_img.cols < m_img.rows ? (double)imgPyr.rows / m_img.rows : (double)imgPyr.cols / m_img.cols;
+					double scale = imgPyr.cols < imgPyr.rows ? (double)size.height / imgPyr.rows : (double)size.width / imgPyr.cols;
 					cv::Rect roiP(roi);
 					roiP.x *= scaleP;
 					roiP.y *= scaleP;
