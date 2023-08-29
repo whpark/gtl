@@ -4,12 +4,29 @@
 #include "gtl/win/EnvironmentVariable.h"
 #include "test_qt.h"
 
+#include "glaze/glaze.hpp"
+
 #include <QSettings>
 
 QSettings reg("Biscuit-lab.com", "gtl::test_qt");
 
+struct sJson1 {
+	std::string str2{"test 스트링2"};
+	GLZ_LOCAL_META(sJson1, str2);
+};
+struct sJsonTest {
+	std::string str{"test 스트링"};
+	int i{3}, j{4};
+	double d{5.6};
+	bool b{true};
+	std::array<int, 10> arr{{1,2,3,4,5,6,7,8,9,10}};
+	sJson1 s1;
+
+	GLZ_LOCAL_META(sJsonTest, str, i, j, d, b, arr, s1);
+};
+
 gtl::qt::test_qt::test_qt(QWidget *parent)
-    : QMainWindow(parent), m_completer(this)
+    : QMainWindow(parent), m_completer(this), m_modelGlaze(this)
 {
     ui.setupUi(this);
     //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
@@ -19,9 +36,21 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	auto strPath = reg.value("misc/LastImagePath").toString();
 	ui.edtPath->setText(strPath);
 
-	m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
-	m_ctrlMatView->move({4, 100});
-	m_ctrlMatView->resize({1200, 500});
+	ui.treeView->setModel(&m_modelGlaze);
+
+	{
+		glz::json_t j{};
+		sJsonTest test;
+		std::string str;
+		//auto j = glz::write_json(test);
+		glz::write<glz::opts{}>(test, str);
+		glz::read_json(j, str);
+		m_modelGlaze.SetJson(j);
+	}
+
+	//m_ctrlMatView = std::make_unique<gtl::qt::xMatView>(this);
+	//m_ctrlMatView->move({4, 100});
+	//m_ctrlMatView->resize({1200, 500});
 	//m_ctrlMatView->show();
 
 	m_dlgMatView = std::make_unique<gtl::qt::xMatViewDlg>(this);
@@ -84,8 +113,8 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	m_dlgMatView->GetView().SetImage(img, false);
 	//m_dlgMatViewGV->SetImage(img, false);
-	m_ctrlMatView->SetImage(img, false);
-	m_ctrlMatView->SetImage({});
+	ui.view->SetImage(img, false);
+	ui.view->SetImage({});
 
 	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);

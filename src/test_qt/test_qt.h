@@ -6,6 +6,7 @@
 #include "gtl/qt/MatView/MatView.h"
 #include "gtl/qt/MatView/MatViewDlg.h"
 #include "gtl/qt/QPathCompleter.h"
+#include "gtl/qt/QGlazeModel.h"
 
 namespace gtl::qt { class test_qt; }
 
@@ -20,9 +21,10 @@ public:
 	test_qt(QWidget* parent = nullptr);
 	~test_qt();
 
+	QGlazeModel m_modelGlaze;
 	QPathCompleter m_completer;
 	std::unique_ptr<gtl::qt::xMatViewGVDlg> m_dlgMatViewGV;
-	std::unique_ptr<gtl::qt::xMatView> m_ctrlMatView;
+	//std::unique_ptr<gtl::qt::xMatView> m_ctrlMatView;
 	std::unique_ptr<gtl::qt::xMatViewDlg> m_dlgMatView;
 
 protected:

@@ -14,41 +14,74 @@
    <string>test_qt</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="btnOpenImage">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>75</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Image</string>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="edtPath">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>711</width>
+      <x>9</x>
+      <y>9</y>
+      <width>133</width>
       <height>22</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnSetEnvVar">
+   <widget class="gtl::qt::xMatView" name="view" native="true">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>40</y>
-      <width>75</width>
-      <height>24</height>
+      <x>9</x>
+      <y>69</y>
+      <width>727</width>
+      <height>161</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Set Env Var</string>
+   </widget>
+   <widget class="QTreeView" name="treeView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>241</y>
+      <width>711</width>
+      <height>291</height>
+     </rect>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>37</y>
+      <width>204</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnOpenImage">
+       <property name="text">
+        <string>Image</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSetEnvVar">
+       <property name="text">
+        <string>Set Env Var</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -72,6 +105,14 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>gtl::qt::xMatView</class>
+   <extends>QWidget</extends>
+   <header location="global">gtl/qt/MatView/MatView.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="test_qt.qrc"/>
  </resources>
