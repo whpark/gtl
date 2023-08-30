@@ -14,6 +14,7 @@ public:
 	using this_t = QGlazeModel;
 	using base_t = QAbstractItemModel;
 	using json_t = glz::json_t;
+	using decorator_t = std::function<std::optional<std::string>(glz::json_t const&)>;
 
 	enum class eCOLUMN : int { key, value, n, };
 	friend constexpr static std::string ToStringA(eCOLUMN e) {
@@ -27,6 +28,7 @@ public:
 protected:
 	json_t m_json;
 	std::map<json_t const*, json_t const*> m_mapChildToParent;
+	std::map<std::string, decorator_t> m_mapDecorator;	// var name -> decorator
 
 	size_t GetChildCount(json_t const& j) const {
 		if (j.get_if<json_t::null_t>() or j.get_if<double>() or j.get_if<std::string>() or j.get_if<bool>())
@@ -71,6 +73,16 @@ public:
 		endInsertRows();
 
 		return true;
+	}
+
+	void SetDecorator(std::string const& varname, decorator_t f) {
+		m_mapDecorator[varname] = f;
+	}
+	auto const& GetDecorator() {
+		return m_mapDecorator;
+	}
+	void ResetDecorator() {
+		m_mapDecorator.clear();
 	}
 
 protected:
@@ -199,6 +211,31 @@ public:
 			case std::to_underlying(eCOLUMN::value):
 				if (auto const* p = item->get_if<json_t::null_t>())
 					return "null";
+				if (!m_mapDecorator.empty()) {
+					// get variable name
+					std::string name;
+					for (QModelIndex iCurrent = index, iParent = parent(index);
+						iCurrent != QModelIndex();
+						iCurrent = iParent, iParent = parent(iCurrent))
+					{
+						auto* p = GetItem(iParent);
+						auto* m = p->get_if<json_t::object_t>();
+						if (!m) continue;
+
+						if (auto pos = std::find_if(m->begin(), m->end(),
+							[item](auto const& pair) { return &pair.second == item; }); pos != m->end())
+						{
+							name = pos->first;
+							break;
+						}
+					}
+					// if decorator exists
+					if (auto iter = m_mapDecorator.find(name); iter != m_mapDecorator.end()) {
+						auto func = iter->second;
+						if (auto str = func(*item))
+							return ToQString(*str);
+					}
+				}
 				if (auto const* p = item->get_if<double>())
 					return *p;
 				if (auto const* p = item->get_if<std::string>())
@@ -206,6 +243,19 @@ public:
 				if (auto const* p = item->get_if<bool>())
 					return *p;
 				break;
+			}
+		}
+		if (role == Qt::TextAlignmentRole) {
+			switch (index.column()) {
+			case std::to_underlying(eCOLUMN::value):
+				//if (auto const* p = item->get_if<json_t::null_t>())
+				//	return Qt::AlignLeft;
+				if (auto const* p = item->get_if<double>())
+					return Qt::AlignRight;
+				//if (auto const* p = item->get_if<std::string>())
+				//	return Qt::AlignLeft;
+				//if (auto const* p = item->get_if<bool>())
+				//	return Qt::AlignLeft;
 			}
 		}
 		return {};
