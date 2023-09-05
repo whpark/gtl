@@ -133,11 +133,13 @@
 #include "gtl/_config.h"
 
 #if (GTL__USE_WINDOWS_API)
-	#define NOMINMAX
-	#pragma warning(push)
-	#pragma warning(disable: 5104 5105)
-	#include <windows.h>
-	#pragma warning(pop)
+#	ifndef NOMINMAX
+#		define NOMINMAX	// disable Windows::min/max
+#	endif
+#	pragma warning(push)
+#	pragma warning(disable: 5104 5105)
+#	include <windows.h>
+#	pragma warning(pop)
 #endif
 
 // until c++20 source_location
@@ -151,7 +153,9 @@
 	#endif
 #endif
 
-#define NOMINMAX	// disable Windows::min/max
+#ifndef NOMINMAX
+#	define NOMINMAX	// disable Windows::min/max
+#endif
 #if defined(min) || defined(max)
 //#	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
 #	undef min

@@ -78,6 +78,9 @@ public:
 	void SetDecorator(std::string const& varname, decorator_t f) {
 		m_mapDecorator[varname] = f;
 	}
+	void SetDecorator(auto const& map) {
+		m_mapDecorator = map;
+	}
 	auto const& GetDecorator() {
 		return m_mapDecorator;
 	}
