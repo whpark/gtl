@@ -24,6 +24,8 @@ namespace gtl::qt {
 	}
 
 	void QCollapsibleGroupBox::Init() {
+		PrepareAnimation();
+
 		m_aniPropMaxHeight.setEasingCurve(QEasingCurve::OutExpo);
 		m_aniPropMaxHeightD.setEasingCurve(QEasingCurve::OutExpo);
 

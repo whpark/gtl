@@ -14,7 +14,7 @@ public:
 	int m_heightDeflated{20};
 	int m_heightInflated{};
 protected:
-	int m_heightMin0{}, m_heightMax0{};
+	int m_heightMin0{}, m_heightMax0{0xff'ffff};
 	QPropertyAnimation m_aniPropMaxHeightD, m_aniPropMaxHeight, m_aniPropMaxHeightFinal, m_aniPropMinHeightFinal;
 	QSequentialAnimationGroup m_animationsDeflate, m_animationsInflate;
 	std::chrono::milliseconds m_durAnimation{ 200 };

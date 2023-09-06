@@ -30,7 +30,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 {
     ui.setupUi(this);
 
-	ui.groupBox->PrepareAnimation(300ms);
+	//ui.groupBox->PrepareAnimation(300ms);
 
     //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
     //m_dlgMatViewGV->show();
@@ -131,7 +131,7 @@ gtl::qt::test_qt::~test_qt() {
 }
 
 void gtl::qt::test_qt::OnLoadImage() {
-	ui.groupBox->PrepareAnimation(1s);
+	//ui.groupBox->PrepareAnimation(1s);
 
 	std::filesystem::path path = ui.edtPath->text().toStdWString();
 	if (path.empty())
