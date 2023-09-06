@@ -298,6 +298,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   <ItemGroup>
     <ClCompile Include="MatBitmapArchive.cpp" />
     <ClCompile Include="ProgressDlg.cpp" />
+    <ClCompile Include="QCollapsibleGroupBox.cpp" />
     <ClCompile Include="QGlazeModel.cpp" />
     <ClCompile Include="QPathCompleter.cpp" />
     <ClCompile Include="util.cpp" />
@@ -313,6 +314,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <QtMoc Include="..\..\include\gtl\qt\ProgressDlg.h" />
     <QtMoc Include="..\..\include\gtl\qt\QPathCompleter.h" />
     <QtMoc Include="..\..\include\gtl\qt\QGlazeModel.h" />
+    <QtMoc Include="..\..\include\gtl\qt\QCollapsibleGroupBox.h" />
     <ClInclude Include="..\..\include\gtl\qt\qt.h" />
     <ClInclude Include="..\..\include\gtl\qt\util.h" />
     <ClInclude Include="..\..\include\gtl\qt\_lib_gtl_qt.h" />

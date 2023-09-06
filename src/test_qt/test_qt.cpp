@@ -29,6 +29,9 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
     : QMainWindow(parent), m_completer(this), m_modelGlaze(this)
 {
     ui.setupUi(this);
+
+	ui.groupBox->PrepareAnimation(300ms);
+
     //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);
     //m_dlgMatViewGV->show();
 	m_completer.Init({});
@@ -128,6 +131,7 @@ gtl::qt::test_qt::~test_qt() {
 }
 
 void gtl::qt::test_qt::OnLoadImage() {
+	ui.groupBox->PrepareAnimation(1s);
 
 	std::filesystem::path path = ui.edtPath->text().toStdWString();
 	if (path.empty())
