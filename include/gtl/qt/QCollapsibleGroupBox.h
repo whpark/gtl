@@ -22,9 +22,13 @@ public:
 	explicit QCollapsibleGroupBox(QWidget *parent = nullptr);
 	explicit QCollapsibleGroupBox(const QString &title, QWidget *parent = nullptr);
 	~QCollapsibleGroupBox();
-
-	bool PrepareAnimation(std::chrono::milliseconds durAnimation = std::chrono::milliseconds(300));
-
 protected:
 	void Init();
+
+public:
+	bool PrepareAnimation(std::chrono::milliseconds durAnimation = std::chrono::milliseconds(300));
+
+	bool Collapse(bool bCollapse, std::optional<std::chrono::milliseconds> durAnimation = std::nullopt);
+	bool IsCollapsed() const;
+
 };
