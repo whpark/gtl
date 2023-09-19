@@ -29,7 +29,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
     : QMainWindow(parent), m_completer(this), m_modelGlaze(this)
 {
     ui.setupUi(this);
-
+	//ui.groupBox->Collapse(true);
 	//ui.groupBox->PrepareAnimation(300ms);
 
     //m_dlgMatViewGV = std::make_unique<gtl::qt::xMatViewGVDlg>(this);

@@ -7,12 +7,15 @@ namespace gtl::qt { class GTL__QT_CLASS QCollapsibleGroupBox; }
 
 class gtl::qt::QCollapsibleGroupBox : public QGroupBox {
 	Q_OBJECT
+	Q_PROPERTY(bool collapsed READ IsCollapsed WRITE Collapse)
 public:
 	using this_t = QCollapsibleGroupBox;
 	using base_t = QGroupBox;
 
 	int m_heightDeflated{20};
 	int m_heightInflated{};
+
+	bool m_bCollapsed{false};
 protected:
 	int m_heightMin0{}, m_heightMax0{0xff'ffff};
 	QPropertyAnimation m_aniPropMaxHeightD, m_aniPropMaxHeight, m_aniPropMaxHeightFinal, m_aniPropMinHeightFinal;
@@ -30,5 +33,4 @@ public:
 
 	bool Collapse(bool bCollapse, std::optional<std::chrono::milliseconds> durAnimation = std::nullopt);
 	bool IsCollapsed() const;
-
 };

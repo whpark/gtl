@@ -45,7 +45,8 @@ namespace gtl::qt {
 		m_animationsInflate.addAnimation(&m_aniPropMaxHeightFinal);
 		m_animationsInflate.addAnimation(&m_aniPropMinHeightFinal);
 
-		QObject::connect(this, &QGroupBox::clicked, this, [this](bool checked) { Collapse(!checked); });
+		connect(this, &QGroupBox::clicked, this, [this](bool checked) { Collapse(!checked); });
+		connect(this, &QGroupBox::toggled, this, [this](bool checked) { Collapse(!checked); });
 	}
 
 	bool QCollapsibleGroupBox::PrepareAnimation(std::chrono::milliseconds durAnimation) {
@@ -63,6 +64,10 @@ namespace gtl::qt {
 			m_animationsDeflate.stop();
 			m_animationsInflate.stop();
 		}
+
+		if (m_bCollapsed == bCollapse)
+			return true;
+		m_bCollapsed = bCollapse;
 
 		if (bCollapse) {
 			if (this->isChecked()) {
@@ -133,13 +138,13 @@ namespace gtl::qt {
 	}
 
 	bool QCollapsibleGroupBox::IsCollapsed() const {
-		if (m_animationsDeflate.state() == m_animationsDeflate.Running) {
-			return true;
-		}
-		if (m_animationsInflate.state() == m_animationsInflate.Running) {
-			return false;
-		}
-		return height() <= m_heightDeflated;
+		//if (m_animationsDeflate.state() == m_animationsDeflate.Running) {
+		//	return true;
+		//}
+		//if (m_animationsInflate.state() == m_animationsInflate.Running) {
+		//	return false;
+		//}
+		return m_bCollapsed;
 	}
 
 } // namespace gtl::qt
