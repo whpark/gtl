@@ -629,8 +629,9 @@ namespace gtl {
 	};
 		
 	template < typename tchar, typename ... targs>
-	constexpr auto TFormat(fmt::basic_string_view<tchar> fmt, targs&& ... args) {
-		return fmt::vformat(fmt, fmt::make_format_args<fmt::buffer_context<tchar>>(std::forward<targs>(args)...));
+	constexpr auto TFormat(fmt::basic_string_view<tchar> fmt, targs&& ... args) -> std::basic_string<tchar> {
+		//return fmt::format(fmt, std::forward<targs>(args)...);
+		return fmt::vformat(fmt, fmt::make_format_args<fmt::buffer_context<tchar>>(args...));
 	}
 	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char> Format(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)			{ return TFormat<char>(fmt, std::forward<targs>(args)...); }
 	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<wchar_t> Format(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)		{ return TFormat<wchar_t>(fmt, std::forward<targs>(args)...); }

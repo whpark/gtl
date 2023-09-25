@@ -110,16 +110,16 @@ namespace gtl {
 
 	public:
 		// Write Log
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>("", Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>("", Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>("", Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char16_t>("", Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char32_t>("", Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>(svTag, Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>(svTag, Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>(svTag, Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char16_t>(svTag, Format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char32_t>(svTag, Format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>("", fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>("", fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>("", fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char16_t>("", fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char32_t>("", fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>(svTag, fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>(svTag, fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>(svTag, fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char16_t>(svTag, fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char32_t>(svTag, fmt::format(fmt, std::forward<targs>(args)...)); }
 
 	//#if 1
 	//	template < typename ... Args > void Log(std::string_view fmt, Args&& ... args) {
