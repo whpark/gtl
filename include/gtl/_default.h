@@ -9,7 +9,6 @@
 
 #pragma once
 
-
 #include <version>	// version information
 
 #if !defined(_HAS_CXX20)
@@ -71,7 +70,6 @@
 #include "fmt/ranges.h"
 #include "fmt/std.h"
 #include "fmt/xchar.h"
-
 
 #include <regex>
 //#if defined (__cpp_lib_ctre)
@@ -185,7 +183,7 @@ namespace std {
 #ifdef __cpp_lib_ranges_enumerate
 #else
 // https://www.reedbeta.com/blog/python-like-enumerate-in-cpp17/
-namespace std {
+namespace std::views {
 	template <typename T,
 		typename TIter = decltype(std::begin(std::declval<T>())),
 		typename = decltype(std::end(std::declval<T>()))>
@@ -209,6 +207,24 @@ namespace std {
 	}
 }
 #endif
+namespace gtl {
+	template < typename size_type, typename T, typename TIter = decltype(std::begin(std::declval<T>())), typename = decltype(std::end(std::declval<T>())) >
+	constexpr auto enumerate_as(T&& iterable) {
+		struct iterator {
+			size_type i;
+			TIter iter;
+			bool operator != (iterator const& other) const { return iter != other.iter; }
+			void operator ++ () { ++i; ++iter; }
+			auto operator * () const { return std::tie(i, *iter); }
+		};
+		struct iterable_wrapper {
+			T iterable;
+			auto begin() { return iterator{ 0, std::begin(iterable) }; }
+			auto end() { return iterator{ 0, std::end(iterable) }; }
+		};
+		return iterable_wrapper{ std::forward<T>(iterable) };
+	}
+}
 
 // NUM_ARGS(...) macro arg 갯수
 #define NUM_ARGS_64(                            _64,_63,_62,_61,_60,_59,_58,_57,_56,_55,_54,_53,_52,_51,_50,_49,_48,_47,_46,_45,_44,_43,_42,_41,_40,_39,_38,_37,_36,_35,_34,_33,_32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1, N, ...) N

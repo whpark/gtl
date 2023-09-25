@@ -11,7 +11,26 @@ static_assert(std::is_convertible_v<std::unique_ptr<int>, std::shared_ptr<int>>)
 static_assert(!std::is_convertible_v<std::shared_ptr<int>, std::unique_ptr<int>>);
 static_assert(!std::is_same_v<std::unique_ptr<int>, std::shared_ptr<int>>);
 
+
 namespace gtl::test::misc {
+
+	TEST(default_, enumerate_) {
+		std::vector<int> lst{1,3,5,7,9};
+		{
+			size_t sum{};
+			for (auto const [index, value] : std::views::enumerate(lst)) {
+				sum += index;
+			}
+			EXPECT_EQ(sum, 0+1+2+3+4);
+		}
+		{
+			int sum{};
+			for (auto const [index, value] : enumerate_as<decltype(sum)>(lst)) {
+				sum += index;
+			}
+			EXPECT_EQ(sum, 0+1+2+3+4);
+		}
+	}
 
 	class xTestVirtualBase {
 	public:
