@@ -47,6 +47,12 @@ namespace gtl::internal {
 namespace gtl {
 #pragma pack(push, 8)
 
+	template < typename ttime_point_t = std::chrono::seconds >
+	auto ToLocalTime(auto t) {
+		auto lt = std::chrono::current_zone()->to_local(t);
+		return std::chrono::time_point_cast<ttime_point_t>(lt);
+	}
+
 	template < gtlc::string_elem tchar_t, size_t N >
 	struct xStringLiteral {
 		tchar_t str[N];
