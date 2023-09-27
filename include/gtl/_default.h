@@ -208,7 +208,7 @@ namespace std::views {
 }
 #endif
 namespace gtl {
-	template < typename size_type, typename T, typename TIter = decltype(std::begin(std::declval<T>())), typename = decltype(std::end(std::declval<T>())) >
+	template < std::integral size_type, typename T, typename TIter = decltype(std::begin(std::declval<T>())), typename = decltype(std::end(std::declval<T>())) >
 	constexpr auto enumerate_as(T&& iterable) {
 		struct iterator {
 			size_type i;
