@@ -487,6 +487,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\mat_helper.h" />
     <ClInclude Include="..\..\include\gtl\misc.h" />
     <ClInclude Include="..\..\include\gtl\mutex.h" />
+    <ClInclude Include="..\..\include\gtl\profile.h" />
     <ClInclude Include="..\..\include\gtl\rand.h" />
     <ClInclude Include="..\..\include\gtl\reflection.h" />
     <ClInclude Include="..\..\include\gtl\reflection_glaze.h" />
@@ -512,6 +513,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\ui\ui_unit.h" />
     <ClInclude Include="..\..\include\gtl\ui\ui_widget.h" />
     <ClInclude Include="..\..\include\gtl\unit.h" />
+    <ClInclude Include="..\..\include\gtl\vector_map.h" />
     <ClInclude Include="..\..\include\gtl\_config.h" />
     <ClInclude Include="..\..\include\gtl\_default.h" />
     <ClInclude Include="..\..\include\gtl\string.h" />
@@ -540,6 +542,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="profile.cpp" />
     <ClCompile Include="string.cpp" />
   </ItemGroup>
   <ItemGroup>
