@@ -599,6 +599,11 @@ namespace gtl {
 		return ""sv;
 	}
 
+	inline bool IsChildPath(std::filesystem::path const& a, std::filesystem::path const& base) {
+		auto rel = std::filesystem::relative(a, base);
+		return !rel.empty() && rel.is_relative() and !rel.string().starts_with("..");
+	};
+
 	inline bool HasParentPath(std::filesystem::path const& path) {
 		return path.has_parent_path() and path != path.parent_path();
 	}

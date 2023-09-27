@@ -14,6 +14,38 @@ static_assert(!std::is_same_v<std::unique_ptr<int>, std::shared_ptr<int>>);
 
 namespace gtl::test::misc {
 
+	TEST(misc, IsChildPath) {
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/A/B"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C/a.txt", L"C:\\A\\"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/A/B/C"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/A/B/C/"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C/a.txt", L"C:\\A\\B\\C\\"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C/a.txt", L"C:\\A\\B\\C\\a.txt"));
+
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C", L"C:/"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C", L"C:/A/B"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C", L"C:\\A\\"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C", L"C:/A/B/C"));
+		EXPECT_TRUE(IsChildPath(L"C:/A/B/C", L"C:/A/B/C/"));
+
+		EXPECT_FALSE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/A/B/C/a"));
+		EXPECT_FALSE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/A/B/C/b"));
+		EXPECT_FALSE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/A/B/C/d/"));
+		EXPECT_FALSE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/A/D/C"));
+		EXPECT_FALSE(IsChildPath(L"D:/A/B/C/a.txt", L"C:/"));
+		EXPECT_FALSE(IsChildPath(L"D:/A/B/C/a.txt", L"C:/A/B"));
+		EXPECT_FALSE(IsChildPath(L"D:/A/B/C/a.txt", L"C:\\A\\B\\"));
+
+		EXPECT_FALSE(IsChildPath(L"C:/A/B/C", L"C:/A/B/C/a"));
+		EXPECT_FALSE(IsChildPath(L"C:/A/B/C", L"C:/A/B/C/b"));
+		EXPECT_FALSE(IsChildPath(L"C:/A/B/C", L"C:/A/B/C/d/"));
+		EXPECT_FALSE(IsChildPath(L"C:/A/B/C", L"C:/A/D/C"));
+		EXPECT_FALSE(IsChildPath(L"D:/A/B/C", L"C:/"));
+		EXPECT_FALSE(IsChildPath(L"D:/A/B/C", L"C:/A/B"));
+		EXPECT_FALSE(IsChildPath(L"D:/A/B/C", L"C:\\A\\B\\"));
+	}
+
 	TEST(default_, enumerate_) {
 		std::vector<int> lst{1,3,5,7,9};
 		{
