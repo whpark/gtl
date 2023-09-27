@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 
 #include "gtl/gtl.h"
+#include "gtl/vector_map.h"
 
 #pragma warning(disable:4566)	// character encoding
 
@@ -13,6 +14,17 @@ static_assert(!std::is_same_v<std::unique_ptr<int>, std::shared_ptr<int>>);
 
 
 namespace gtl::test::misc {
+
+	TEST(misc, TVectorMap) {
+		TVectorMap<std::string, int> map;
+		map.insert("z", 3);
+		map.insert("o", 2);
+		map.insert("o", 1);
+		map.insert("b", 100);
+		map.insert("a", 101);
+		map["o"] = 0;
+
+	}
 
 	TEST(misc, IsChildPath) {
 		EXPECT_TRUE(IsChildPath(L"C:/A/B/C/a.txt", L"C:/"));
