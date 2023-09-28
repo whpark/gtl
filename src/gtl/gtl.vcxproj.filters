@@ -185,7 +185,7 @@
     <ClInclude Include="..\..\include\gtl\cv_floodfill.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\profile.h">
+    <ClInclude Include="..\..\include\gtl\lazy_profile.h">
       <Filter>gtl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\vector_map.h">
@@ -226,7 +226,7 @@
     <ClCompile Include="cv_floodfill.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
-    <ClCompile Include="profile.cpp">
+    <ClCompile Include="lazy_profile.cpp">
       <Filter>gtl</Filter>
     </ClCompile>
   </ItemGroup>

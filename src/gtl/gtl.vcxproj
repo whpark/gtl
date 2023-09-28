@@ -487,7 +487,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\mat_helper.h" />
     <ClInclude Include="..\..\include\gtl\misc.h" />
     <ClInclude Include="..\..\include\gtl\mutex.h" />
-    <ClInclude Include="..\..\include\gtl\profile.h" />
+    <ClInclude Include="..\..\include\gtl\lazy_profile.h" />
     <ClInclude Include="..\..\include\gtl\rand.h" />
     <ClInclude Include="..\..\include\gtl\reflection.h" />
     <ClInclude Include="..\..\include\gtl\reflection_glaze.h" />
@@ -542,7 +542,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="profile.cpp" />
+    <ClCompile Include="lazy_profile.cpp" />
     <ClCompile Include="string.cpp" />
   </ItemGroup>
   <ItemGroup>

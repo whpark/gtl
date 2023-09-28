@@ -24,6 +24,11 @@ namespace gtl::test::misc {
 		map.insert("a", 101);
 		map["o"] = 0;
 
+		EXPECT_EQ(map["z"], 3);
+		EXPECT_EQ(map["o"], 0);
+		EXPECT_EQ(map["b"], 100);
+		EXPECT_EQ(map["a"], 101);
+
 	}
 
 	TEST(misc, IsChildPath) {
