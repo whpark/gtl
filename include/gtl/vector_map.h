@@ -57,21 +57,25 @@ namespace gtl {
 		using base_t::clear;
 		using base_t::swap;
 
-		auto& operator[](TKey const& key) {
+		template < typename TKey2 > requires (requires(TKey2 key2) { TKey{} = key2; })
+		auto& operator[](TKey2 const& key) {
 			return find(key)->second;
 		}
-		auto& operator[](TKey const& key) const {
+		template < typename TKey2 > requires (requires(TKey2 key2) { TKey{} = key2; })
+		auto& operator[](TKey2 const& key) const {
 			if (auto iter = find(key); iter != end()) {
 				return iter->second;
 			}
 			throw std::out_of_range("TVectorMap::operator[]");
 		}
 
-		auto find(TKey const& key) const {
+		template < typename TKey2 > requires (requires(TKey2 key2) { TKey{} = key2; })
+		auto find(TKey2 const& key) const {
 			return std::find_if(begin(), end(),
 				[&key](auto const& pair) { return TKeyEq{}(pair.first, key); });
 		}
-		auto find(TKey const& key) {
+		template < typename TKey2 > requires (requires(TKey2 key2) { TKey{} = key2; })
+		auto find(TKey2 const& key) {
 			if (auto iter = std::find_if(begin(), end(),
 				[&key](auto const& pair) { return TKeyEq{}(pair.first, key); });
 				iter != end())
@@ -82,7 +86,8 @@ namespace gtl {
 			return end()-1;
 		}
 
-		void insert(TKey const& key, T&& value) {
+		template < typename TKey2 > requires (requires(TKey2 key2) { TKey{} = key2; })
+		void insert(TKey2 const& key, T&& value) {
 			if (auto it = find(key); it != end()) {
 				// Key already exists, update the value
 				it->second = std::move(value);
@@ -90,7 +95,8 @@ namespace gtl {
 				base_t::emplace_back(key, std::move(value));
 			}
 		}
-		void insert(TKey const& key, T const& value) {
+		template < typename TKey2 > requires (requires(TKey2 key2) { TKey{} = key2; })
+		void insert(TKey2 const& key, T const& value) {
 			if (auto it = find(key); it != end()) {
 				// Key already exists, update the value
 				it->second = value;
@@ -99,7 +105,8 @@ namespace gtl {
 			}
 		}
 
-		bool erase(TKey const& key) {
+		template < typename TKey2 > requires (requires(TKey2 key2) { TKey{} = key2; })
+		bool erase(TKey2 const& key) {
 			if (auto it = find(key); it != end()) {
 				base_t::erase(it);
 				return true;
