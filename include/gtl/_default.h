@@ -183,7 +183,7 @@ namespace std {
 #ifdef __cpp_lib_ranges_enumerate
 #else
 // https://www.reedbeta.com/blog/python-like-enumerate-in-cpp17/
-namespace std::views {
+namespace std::ranges::views {
 	template <typename T,
 		typename TIter = decltype(std::begin(std::declval<T>())),
 		typename = decltype(std::end(std::declval<T>()))>
