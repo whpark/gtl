@@ -374,13 +374,13 @@ TEST(gtl_archive, WriteLine) {
 			std::visit([&ar](auto const& str) {
 				using char_t = std::decay_t<decltype(str)>::value_type;
 				ar.WriteLine(GetDefaultFormatString<char_t>(), str);
-				}, vstr);
+			}, vstr);
 		}
 		for (auto const& vstr : strs2) {
 			std::visit([&ar](auto const& str) {
 				using char_t = std::decay_t<decltype(str)>::value_type;
 				ar.WriteLine(GetDefaultFormatString<char_t>(), str);
-				}, vstr);
+			}, vstr);
 		}
 	}
 

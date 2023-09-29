@@ -226,9 +226,6 @@
     <ClCompile Include="cv_floodfill.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
-    <ClCompile Include="lazy_profile.cpp">
-      <Filter>gtl</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\dependency.txt" />

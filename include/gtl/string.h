@@ -664,6 +664,18 @@ namespace gtl {
 		else static_assert(gtlc::dependent_false_v, "invalid type");
 	}
 
+	//template <gtlc::string_elem tchar, std::size_t N >
+	//constexpr inline std::basic_string<tchar> ToTStringLiteral(const char (&str)[N]) {
+	//	std::basic_string<tchar> result;
+	//	if constexpr (N) {
+	//		result.reserve(N-1);
+	//		for (decltype(N) i{}, n(N-1); i < n; i++) {
+	//			result.push_back(static_cast<tchar>(str[i]));
+	//		}
+	//	}
+	//	return result;
+	//}
+
 	template < gtlc::string_elem tchar >
 	constexpr std::basic_string<tchar> ToExoticString(std::string const& sv) {
 		std::basic_string<tchar> result;

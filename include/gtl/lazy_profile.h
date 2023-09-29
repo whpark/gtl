@@ -22,122 +22,263 @@
 #include "gtl/vector_map.h"
 #include "gtl/archive.h"
 
+#include "ctre.hpp"
+#include "ctre-unicode.hpp"
+
 namespace gtl {
+
 
 	// utf-8 string
 
 	//=============================================================================================================================
 	//
 	template < gtlc::string_elem tchar >
-	class TLazyProfileSection {
+	class TLazyProfile {
 	public:
-		using this_t = TLazyProfileSection<tchar>;
+		using this_t = TLazyProfile;
 		using char_type = tchar;
 		using string_t = std::basic_string<tchar>;
 		using string_view_t = std::basic_string_view<tchar>;
+		
+		//regex for section name
+		// key : any trimmed(whitespace) chars quoted by bracket "[]", ex) [ HeadDriver1:1 ]
+		// trailing : any string after section name
+		static constexpr inline auto s_reSection = ctre::match<R"xxx(\s*\[\s*([^\]]*[^\]\s]+)\s*\](.*))xxx">;
+
+		// regex for item
+		// key : any string except '=', including space
+		// value : 1. any string except ';'.
+		//         2. if value starts with '"', it can contain any character except '"'.
+		// comment : any string after ';', including space.
+		static constexpr inline auto s_reItem = ctre::match<R"xxx(\s*([\w\s]*\w+)\s*(=)\s*("(?:[^\\"]|\\.)*"|[^;\n]*)\s*[^;]*(;.*)?)xxx">;
+
+	protected:
+		struct sCompareString {
+			bool operator()(std::basic_string_view<tchar> a, std::basic_string_view<tchar> b) const { return a == b; }
+		};
+		//string_t m_key;
+		TVectorMap<string_t, this_t, sCompareString> m_sections;	// child sections
+		std::vector<string_t> m_items;
+		string_t m_line;	// anything after section name
+
+	//protected:
+	//	constexpr static inline int posEQDefault = 25;
+	//	constexpr static inline int posCommentDefault = 80;
+	//	mutable int m_posEQ {posEQDefault};
+	//	mutable int m_posComment {posCommentDefault};
 
 	public:
+		TLazyProfile() = default;
+		TLazyProfile(TLazyProfile const&) = default;
+		TLazyProfile(TLazyProfile&&) = default;
+		TLazyProfile& operator=(TLazyProfile const&) = default;
+		TLazyProfile& operator=(TLazyProfile&&) = default;
+
+		TLazyProfile& operator[](string_view_t key) {
+			return m_sections[key];
+		}
+		TLazyProfile const& operator[](string_view_t key) const {
+			return m_sections[key];
+		}
+
 		void Clear() {
 			m_sections.clear();
 			m_items.clear();
 		}
 
-		string_view_t GetItem_String(string_view_t name) const {
-			for (auto& item : m_items) {
-				auto c = item.begin();
-				for (; c != item.end() and std::isspace(*c); c++)
-					;
-				string_view_t sv(c, item.end());
-				if (!sv.starts_with(name))
+		auto& GetSection(string_view_t key) {
+			return m_sections[key];
+		}
+		auto const& GetSection(string_view_t key) const {
+			return m_sections[key];
+		}
+
+		string_view_t GetItemValueRaw(string_view_t key) const {
+			for (auto const& item : m_items) {
+				auto [whole, key1, eq1, value1, comment1] = s_reItem(item);
+				if (!whole)
 					continue;
-				if (auto c2 = sv[name.size()];
-					std::isspace(c2) or c2 == '=') {
-					sv.remove_prefix(name.size());
-					if (auto pos = sv.find('='); pos != sv.npos) {
-						sv.remove_prefix(pos+1);
-						return sv;
-					}
-				}
+				if (gtl::tszicmp(string_view_t{key1.begin(), key1.end()}, key) == 0)
+					return string_view_t{value1.begin(), value1.end()};
 				return {};
 			}
 			return {};
 		}
 
-		template < std::integral tvalue >
-		tvalue GetItemValue(string_view_t name) const {
-			auto sv = GetItem_String(name);
+		void SetItemValueRaw(string_view_t key, string_view_t value, string_view_t comment={}/* comment starting with ';'*/) {
+			// if comment does not start with ';', add one.
+			string_t cmt;
+			if (!comment.empty() and !comment.starts_with(';')) {
+				cmt.reserve(comment.size() + 1);
+				cmt = ';';
+				cmt += comment;
+				comment = cmt;
+			}
+
+			int posEQ{-1};
+			int posComment{-1};
+			for (auto& item : m_items) {
+				auto [whole, key1, eq1, value1, comment1] = s_reItem(item);
+				if (!whole)
+					continue;
+				posEQ = std::max(posEQ, (int)(eq1.begin() - whole.begin()));
+				posComment = std::max(posComment, (int)(comment1.begin() - whole.begin()));
+				if (gtl::tszicmp(string_view_t{key1}, key) != 0)
+					continue;
+				if (comment.empty() and comment1)
+					comment = comment1;
+				int starting = key1.begin() - whole.begin();
+				auto str = fmt::format(ToExoticString<tchar>("{}{:<{}}{}"),
+					string_view_t(whole.begin(), value1.begin()),
+					string_view_t(value), comment.empty() ? value.size() :
+						( comment1 ? (comment1.begin()-value1.begin()) : std::max(0, (int)(posComment - (value1.begin()-whole.begin()))) ),
+					comment);
+				item = std::move(str);
+				return;
+			}
+			auto str = fmt::format(ToExoticString<tchar>("{:{}}= {}"),
+				string_view_t(key), std::max((int)key.size(), (int)posEQ),
+				string_view_t(value));
+			if (!comment.empty()) {
+				str += fmt::format(ToExoticString<tchar>("{:{}}{}"),
+					ToExoticString<tchar>(";"), std::max(0, posComment - (int)str.size()),
+					comment);
+			}
+			if (m_items.empty()) {
+				m_items.push_back(std::move(str));
+			}
+			else {
+				// let empty lines behinde.
+				for (auto iter = m_items.rbegin(); iter != m_items.rend(); iter++) {
+					auto const& cur = *iter;
+					if (gtl::TrimView<tchar>(cur).empty())
+						continue;
+
+					m_items.insert(m_items.begin() + std::distance(iter, m_items.rend()), std::move(str));
+					break;
+				}
+			}
+		}
+		bool SetItemComment(string_view_t key, string_view_t comment) {
+			string_t value = GetItemValueRaw(key);
+			return SetItemValueRaw(key, value, comment);
+		}
+
+		template < typename tvalue >
+		auto HasItem(string_view_t key) const {
+			auto sv = GetItemValueRaw(key);
+			sv = gtl::TrimView(sv);
+			return !sv.empty();
+		}
+
+		template < typename tvalue >
+		auto GetItemValue(string_view_t key, tvalue&& vDefault = tvalue{}) const {
+			auto sv = GetItemValueRaw(key);
 			if (sv.empty())
-				return 0;
-			return gtl::FromString<tvalue>(sv);
+				return vDefault;
+			if constexpr (std::is_same_v<tvalue, bool>) {
+				if (std::isdigit(sv[0]))
+					return (gtl::tsztod(sv) == 0.0) ? false : true;
+				return gtl::tszicmp(sv, ToExoticString<tchar>("true")) == 0;
+			}
+			else if constexpr (std::is_integral_v<tvalue>) {
+				return gtl::tsztoi<tvalue>(sv);
+			}
+			else if constexpr (std::is_floating_point_v<tvalue>) {
+				return gtl::tsztod<tvalue>(sv);
+			}
+			else if constexpr (std::is_convertible_v<tvalue, string_view_t>) {
+				return sv;
+			}
+			else {
+				static_assert(gtlc::dependent_false_v<tvalue>);
+			}
+			return tvalue{};
 		}
 
-		template < std::convertible_to<string_t> tstring >
-		bool SetItem(string_view_t name, tstring&& str) {
-			std::forward<tstring>(str);
+		template < typename tvalue >
+		bool SetItemValue(string_view_t key, tvalue&& value, string_view_t comment = {}) {
+			if constexpr (std::is_convertible_v<tvalue, string_view_t>) {
+				SetItemValueRaw(key, value, comment);
+			}
+			else {
+				SetItemValueRaw(key, fmt::format(ToExoticString<tchar>("{}"), value), comment);
+			}
 			return false;
-		}
-		bool SetItem(string_view_t name, std::integral auto&& item) {
-			return false;
-		}
-		bool SetItem(string_view_t name, std::floating_point auto&& item) {
-			return false;
-		}
-		bool SetItem(string_view_t name, bool item) {
 		}
 
-	protected:
-		//string_t m_name;
-		TVectorMap<string_t, this_t> m_sections;
-		std::vector<string_t> m_items;
-	};
-
-	//=============================================================================================================================
-	//
-	template < gtlc::string_elem tchar >
-	class TLazyProfile : public TLazyProfileSection<tchar> {
 	public:
-		using this_t = TProfile;
-		using base_t = TLazyProfileSection<tchar>;
-		using string_t = typename base_t::string_t;
+		bool Load(std::filesystem::path const& path) {
+			std::ifstream stream(path, std::ios::binary);
+			return Load(stream);
+		}
+		bool Save(std::filesystem::path const& path, bool bWriteBOM = true) const {
+			std::ofstream stream(path, std::ios::binary);
+			return Save(stream, bWriteBOM);
+		}
 
-	public:
-		bool Load(std::istream& stream) {
-			base_t::Clear();
+		bool Load(std::istream& stream) try {
+			Clear();
+			m_sections.base().emplace_back();
 			TArchive<std::istream> ar(stream);
 			ar.ReadCodepageBOM();
 
-			TLazyProfileSection<tchar>* section = &m_sections[""];
+			this_t* section = &m_sections.front().second;
 			while (auto rstr = ar.ReadLine<tchar>()) {
 				string_t& str = *rstr;
-				auto c = str.begin();
-				// skip space
-				for (; c != str.end() and std::isspace(*c); c++)
-					;
-				if (c == str.end())
-					continue;
 
-				if (*c == '[') {
-					// section
-					string_t name;
-					for (; c != str.end() and c != ']'; c++)
-						name += *c;
-					gtl::Trim(name);
-					section = &m_sections[name];
-
-					// comment
-					for (; c != str.end() and *c != ';'; c++)
-						;
-					if (c != str.end() and *c == ';') {
-						auto& item = section->m_items["[]"];
-						item.comment = string_t(c + 1, str.end());
-						item.iCommentPos = c - str.begin();
-					}
+				// section name
+				if (auto [whole, key1, trailing1] = s_reSection.match(str); whole) {
+					string_t key{key1.begin(), key1.end()};
+					m_sections.base().emplace_back(std::pair{key, this_t{}});
+					section = &m_sections.base().back().second;
+					section->m_line = std::move(str);
 					continue;
 				}
 
-				// item
+				// item : just put it into current section
+				//if (auto [whole, key1, eq1, value1, comment1] = s_reItem(str); whole) {
+				//}
 				section->m_items.push_back(std::move(str));
 			}
+
+			return true;
+		}
+		catch (...) {
+			return false;
+		}
+
+		bool Save(std::ostream& stream, bool bWriteBOM = true) const try {
+			TArchive ar(stream);
+			if (bWriteBOM) {
+				eCODEPAGE eCodepage = eCODEPAGE_DEFAULT<tchar>;
+				if (eCodepage == eCODEPAGE::DEFAULT)
+					eCodepage = eCODEPAGE::UTF8;
+				ar.WriteCodepageBOM(eCodepage);
+			}
+			for (auto& [key, section] : m_sections) {
+				if (!key.empty()) {
+					if (section.m_line.empty()) {
+						string_t str;
+						if constexpr (gtlc::is_one_of<tchar, char, wchar_t>) {
+							str = fmt::format(fmt::runtime_format_string<tchar>(ToExoticString<tchar>("[{}]")), key);
+						}
+						else {
+							str = fmt::format(std::basic_string_view<tchar>(ToExoticString<tchar>("[{}]")), key);
+						}
+						ar.WriteLine(GetDefaultFormatString<tchar>(), str);
+					}
+					else {
+						ar.WriteLine(GetDefaultFormatString<tchar>(), section.m_line);
+					}
+				}
+				for (auto& item : section.m_items) {
+					ar.WriteLine(GetDefaultFormatString<tchar>(), item);
+				}
+			}
+			return true;
+		}
+		catch (...) {
 			return false;
 		}
 	};
