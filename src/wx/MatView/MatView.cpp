@@ -667,6 +667,7 @@ bool xMatView::KeyboardNavigate(int key, bool ctrl, bool alt, bool shift) {
 				}
 			}
 
+			deltaImage *= m_ctScreenFromImage.m_scale;
 			Scroll({0., -deltaImage});
 		}
 		break;

@@ -575,6 +575,7 @@ namespace gtl::win::inline mfc {
 						//delta--;
 					}
 
+					deltaImage *= m_ctI2S.m_scale;
 					Scroll(xPoint2d(0., deltaImage));
 
 					return true;
