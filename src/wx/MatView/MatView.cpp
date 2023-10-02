@@ -593,7 +593,7 @@ bool xMatView::KeyboardNavigate(int key, bool ctrl, bool alt, bool shift) {
 			else if (key == WXK_PAGEUP)		delta.y += ptShiftPage.y;
 			else if (key == WXK_PAGEDOWN)	delta.y -= ptShiftPage.y;
 
-			Scroll(delta);
+			Scroll(delta, 0ms);
 		}
 		break;
 
