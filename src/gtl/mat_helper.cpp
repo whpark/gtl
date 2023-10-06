@@ -3,6 +3,13 @@
 #include <chrono>
 #include <windows.h>
 
+#include <opencv2/cvconfig.h>
+#ifdef HAVE_CUDA
+#include <opencv2/cudaarithm.hpp>
+#include <opencv2/cudawarping.hpp>
+#include <opencv2/cudaimgproc.hpp>
+#endif
+
 #include "gtl/mat_helper.h"
 #include "FreeImage.h"
 
@@ -90,7 +97,7 @@ namespace gtl {
 			if (s_bUseGPU) {
 				try {
 					cv::cuda::GpuMat dst;
-					cv::cvtColor(cv::cuda::GpuMat(imgSrc), dst, eCode);
+					cv::cuda::cvtColor(cv::cuda::GpuMat(imgSrc), dst, eCode);
 					dst.download(imgDest);
 					return true;
 				} catch (...) {
@@ -112,7 +119,7 @@ namespace gtl {
 			if (s_bUseGPU) {
 				try {
 					cv::cuda::GpuMat dst;
-					cv::resize(cv::cuda::GpuMat(imgSrc), dst, cv::Size(), dScale, dScale, eInterpolation);
+					cv::cuda::resize(cv::cuda::GpuMat(imgSrc), dst, cv::Size(), dScale, dScale, eInterpolation);
 					dst.download(imgDest);
 					return true;
 				}
@@ -129,13 +136,25 @@ namespace gtl {
 		return true;
 	}
 
+#ifdef HAVE_CUDA
+	GTL__API cv::cuda::TemplateMatching& GetCudaTemplateMatching(int mat_type, int method) {
+		static std::mutex mtxTemplateMatching;
+		static std::map<int, cv::Ptr<cv::cuda::TemplateMatching>> mapTemplateMatching;
+		std::lock_guard lock(mtxTemplateMatching);
+		auto& ref = mapTemplateMatching[mat_type];
+		if (ref.empty())
+			ref = cv::cuda::createTemplateMatching(mat_type, method);
+		return *ref;
+	}
+#endif
+
 	bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, cv::Mat& matResult, int method) {
 		try {
 			//#ifdef HAVE_CUDA
 			if (s_bUseGPU) {
 				try {
 					cv::cuda::GpuMat mat;
-					cv::matchTemplate(cv::cuda::GpuMat(img), cv::cuda::GpuMat(imgTempl), mat, method);
+					GetCudaTemplateMatching(img.type(), method).match(cv::cuda::GpuMat(img), cv::cuda::GpuMat(imgTempl), mat);
 					mat.download(matResult);
 					return true;
 				}
@@ -144,7 +163,7 @@ namespace gtl {
 				}
 			}
 			//#endif
-			matchTemplate(img, imgTempl, matResult, method);
+			cv::matchTemplate(img, imgTempl, matResult, method);
 		}
 		catch (...) {
 			return false;
@@ -168,12 +187,12 @@ namespace gtl {
 						imgGTempl.upload(imgTempl);
 					}
 					else {
-						cv::resize(cv::cuda::GpuMat(imgG), imgG, cv::Size(), dScale, dScale, eInterpolation);
-						cv::resize(cv::cuda::GpuMat(imgGTempl), imgGTempl, cv::Size(), dScale, dScale, eInterpolation);
+						cv::cuda::resize(cv::cuda::GpuMat(imgG), imgG, cv::Size(), dScale, dScale, eInterpolation);
+						cv::cuda::resize(cv::cuda::GpuMat(imgGTempl), imgGTempl, cv::Size(), dScale, dScale, eInterpolation);
 					}
 					cv::cuda::GpuMat matResult;
-					cv::matchTemplate(imgG, imgGTempl, matResult, method);
-					cv::minMaxLoc(matResult, &dMin, &dMax, &ptMin, &ptMax);
+					GetCudaTemplateMatching(imgG.type(), method).match(imgG, imgGTempl, matResult);
+					cv::cuda::minMaxLoc(matResult, &dMin, &dMax, &ptMin, &ptMax);
 					bSuccess = true;
 				}
 				catch (...) {

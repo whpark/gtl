@@ -16,6 +16,9 @@
 #include "gtl/archive.h"
 #include "gtl/misc.h"
 #include "opencv2/opencv.hpp"
+#ifdef HAVE_CUDA
+#include <opencv2/cudaimgproc.hpp>
+#endif
 
 struct FIBITMAP;	// FreeImage
 
@@ -182,6 +185,9 @@ namespace gtl {
 	GTL__API bool IsGPUEnabled();
 	GTL__API bool ConvertColor(cv::Mat const& imgSrc, cv::Mat& imgDest, int eCode);
 	GTL__API bool ResizeImage(cv::Mat const& imgSrc, cv::Mat& imgDest, double dScale, int eInterpolation = cv::INTER_LINEAR/*, int eScaleDownMethod = cv::INTER_AREA*/);
+#ifdef HAVE_CUDA
+	GTL__API cv::cuda::TemplateMatching& GetCudaTemplateMatching(int mat_type, int method);
+#endif
 	GTL__API bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, cv::Mat& matResult, int method);
 	GTL__API bool MatchTemplate(cv::Mat const& img, cv::Mat const& imgTempl, int method, xPoint2d& ptBest, double& dMinMax, double& dRate, double dScale = 0.0, int eInterpolation = cv::INTER_LINEAR);
 

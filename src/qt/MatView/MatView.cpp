@@ -6,6 +6,11 @@
 #include "gtl/qt/MatView/MatView.h"
 #include "ui_MatView.h"
 
+#include <opencv2/cvconfig.h>
+#ifdef HAVE_CUDA
+#include <opencv2/cudawarping.hpp>
+#endif
+
 #include "MatViewSettingsDlg.h"
 
 #include "spdlog/stopwatch.h"
@@ -1014,7 +1019,7 @@ namespace gtl::qt {
 						if (IsGPUEnabled()) {
 							try {
 								cv::cuda::GpuMat dst;
-								cv::resize(cv::cuda::GpuMat(imgSrc), dst, rcTarget.size(), 0., 0., eInterpolation);
+								cv::cuda::resize(cv::cuda::GpuMat(imgSrc), dst, rcTarget.size(), 0., 0., eInterpolation);
 								dst.download(imgDest);
 							}
 							catch (...) {
