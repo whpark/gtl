@@ -494,7 +494,7 @@ namespace gtl::qt {
 					}
 				}
 
-				deltaImage *- m_ctScreenFromImage.m_scale;
+				deltaImage *= m_ctScreenFromImage.m_scale;
 				Scroll({0., -deltaImage});
 			}
 			break;
