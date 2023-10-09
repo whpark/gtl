@@ -585,15 +585,17 @@ bool xMatView::KeyboardNavigate(int key, bool ctrl, bool alt, bool shift) {
 			auto ptShiftPage = ctS2I(rectClient.pt1()) - ctS2I(rectClient.pt0());
 			ptShiftPage *= 0.9;
 
-			xPoint2d delta;
-			if (key == WXK_LEFT)			delta.x += ptShift.x;
-			else if (key == WXK_RIGHT)		delta.x -= ptShift.x;
-			else if (key == WXK_UP)			delta.y += ptShift.y;
-			else if (key == WXK_DOWN)		delta.y -= ptShift.y;
-			else if (key == WXK_PAGEUP)		delta.y += ptShiftPage.y;
-			else if (key == WXK_PAGEDOWN)	delta.y -= ptShiftPage.y;
+			auto tsScroll = -1ms;
 
-			Scroll(delta, 0ms);
+			xPoint2d delta;
+			if (key == WXK_LEFT)			{ delta.x += ptShift.x;	tsScroll = 0ms; }
+			else if (key == WXK_RIGHT)		{ delta.x -= ptShift.x;	tsScroll = 0ms; }
+			else if (key == WXK_UP)			{ delta.y += ptShift.y;	tsScroll = 0ms; }
+			else if (key == WXK_DOWN)		{ delta.y -= ptShift.y;	tsScroll = 0ms; }
+			else if (key == WXK_PAGEUP)		{ delta.y += ptShiftPage.y; }
+			else if (key == WXK_PAGEDOWN)	{ delta.y -= ptShiftPage.y; }
+
+			Scroll(delta, tsScroll);
 		}
 		break;
 

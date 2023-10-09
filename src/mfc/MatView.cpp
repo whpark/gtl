@@ -433,13 +433,15 @@ namespace gtl::win::inline mfc {
 					ptShiftPage = m_ctI2S.TransI(rectClient.BottomRight()) - m_ctI2S.TransI(rectClient.TopLeft());
 					ptShiftPage *= 0.9;
 
+					auto tsScroll = -1ms;
+
 					xPoint2d delta;
-					if (key == VK_LEFT)			delta.x -= ptShift.x;
-					else if (key == VK_RIGHT)	delta.x += ptShift.x;
-					else if (key == VK_UP)		delta.y -= ptShift.y;
-					else if (key == VK_DOWN)	delta.y += ptShift.y;
-					else if (key == VK_PRIOR)	delta.y -= ptShiftPage.y;
-					else if (key == VK_NEXT)	delta.y += ptShiftPage.y;
+					if (key == VK_LEFT)			{ delta.x += ptShift.x;	tsScroll = 0ms; }
+					else if (key == VK_RIGHT)	{ delta.x -= ptShift.x;	tsScroll = 0ms; }
+					else if (key == VK_UP)		{ delta.y += ptShift.y;	tsScroll = 0ms; }
+					else if (key == VK_DOWN)	{ delta.y -= ptShift.y;	tsScroll = 0ms; }
+					else if (key == VK_PRIOR)	{ delta.y += ptShiftPage.y; }
+					else if (key == VK_NEXT)	{ delta.y -= ptShiftPage.y; }
 
 					Scroll(delta);
 

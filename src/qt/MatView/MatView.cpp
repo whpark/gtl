@@ -417,13 +417,15 @@ namespace gtl::qt {
 				auto ptShiftPage = ctS2I(rectClient.pt1()) - ctS2I(rectClient.pt0());
 				ptShiftPage *= 0.9;
 
+				auto tsScroll = -1ms;
+
 				xPoint2d delta;
-				if (key == Qt::Key_Left)			delta.x += ptShift.x;
-				else if (key == Qt::Key_Right)		delta.x -= ptShift.x;
-				else if (key == Qt::Key_Up)			delta.y += ptShift.y;
-				else if (key == Qt::Key_Down)		delta.y -= ptShift.y;
-				else if (key == Qt::Key_PageUp)		delta.y += ptShiftPage.y;
-				else if (key == Qt::Key_PageDown)	delta.y -= ptShiftPage.y;
+				if (key == Qt::Key_Left)			{ delta.x += ptShift.x;	tsScroll = 0ms; }
+				else if (key == Qt::Key_Right)		{ delta.x -= ptShift.x;	tsScroll = 0ms; }
+				else if (key == Qt::Key_Up)			{ delta.y += ptShift.y;	tsScroll = 0ms; }
+				else if (key == Qt::Key_Down)		{ delta.y -= ptShift.y;	tsScroll = 0ms; }
+				else if (key == Qt::Key_PageUp)		{ delta.y += ptShiftPage.y; }
+				else if (key == Qt::Key_PageDown)	{ delta.y -= ptShiftPage.y; }
 
 				Scroll(delta, 0ms);
 			}
