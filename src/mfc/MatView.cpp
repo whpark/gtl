@@ -464,39 +464,19 @@ namespace gtl::win::inline mfc {
 					auto y0 = std::min(Round(ptImgBottom.y) + heightMax, m_imgOrg.GetHeight() - 1);
 
 					auto CheckIfBlank = [&](int y) -> bool {
-						cv::Rect rc(0, y, m_imgOrg.GetWidth(), 1);
-						auto img = m_imgOrg.GetROI(rc);
-						if (img.empty())
+						constexpr static int margin = 5;
+						cv::Rect rc(margin, y, m_imgOrg.GetWidth() - 2 * margin, 1);
+						if (!gtl::IsROI_Valid(rc, m_imgOrg.size()))
+							return false;
+						auto imgRow = m_imgOrg.GetROI(rc);
+						if (imgRow.empty())
 							return true;
-						//auto const vMax = 250;
-						auto const vMin = 5;
-						if (img.channels() == 3) {
-							auto* ptr = img.ptr<cv::Vec3b>(0);
-							auto min = ptr[0], max = ptr[0];
-							int nDiff{};
-							for (int x = 1; x < img.cols; x++) {
-								auto const& v = ptr[x];
-								for (int i = 0; i < 3; i++) {
-									min[i] = std::min(v[i], min[i]);
-									max[i] = std::max(v[i], max[i]);
-									if (max[i] - min[i] > vMin)
-										if (nDiff++ > 2)
-											return false;
-								}
-							}
-						}
-						else if (img.channels() == 1) {
-							auto* ptr = img.ptr<uint8_t>(0);
-							auto min = ptr[0], max = ptr[0];
-							int nDiff{};
-							for (int x = 1; x < img.cols; x++) {
-								auto const& v = ptr[x];
-								min = std::min(v, min);
-								max = std::max(v, max);
-								if (max - min > vMin)
-									if (nDiff++ > 2)
-										return false;
-							}
+						cv::Scalar mean, stddev;
+						cv::meanStdDev(imgRow, mean, stddev);
+						for (int i{}, nChannel = std::min(3, imgRow.channels()); i < nChannel; i++) {
+							constexpr auto threshold = 4.0;
+							if (stddev[i] > threshold)
+								return false;
 						}
 						return true;
 					};

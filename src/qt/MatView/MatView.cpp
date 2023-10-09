@@ -440,29 +440,19 @@ namespace gtl::qt {
 				auto y0 = std::min(ptImgBottom.y + heightMax, m_img.rows - 1);
 
 				auto CheckIfBlank = [&](int y) -> bool {
-					cv::Rect rc(0, y, m_img.cols, 1);
+					constexpr static int margin = 5;
+					cv::Rect rc(margin, y, m_img.cols-2*margin, 1);
 					if (!gtl::IsROI_Valid(rc, m_img.size()))
 						return false;
-					auto img = m_img(rc);
-					if (img.empty())
+					auto imgRow = m_img(rc);
+					if (imgRow.empty())
 						return true;
-					//auto const vMax = 250;
-					auto const vMin = 5;
-					if (img.channels() == 4) {
-						auto* ptr = img.ptr<cv::Vec4b>(0);
-						auto min = ptr[0], max = ptr[0];
-						int nDiff{};
-						for (int x = 1; x < img.cols; x++) {
-							auto const& v = ptr[x];
-							for (int i = 0; i < 3; i++) {
-								min[i] = std::min(v[i], min[i]);
-								max[i] = std::max(v[i], max[i]);
-								if (max[i] - min[i] > vMin) {
-									if (nDiff++ > 2)
-										return false;
-								}
-							}
-						}
+					cv::Scalar mean, stddev;
+					cv::meanStdDev(imgRow, mean, stddev);
+					for (int i{}, nChannel = std::min(3, imgRow.channels()); i < nChannel; i++) {
+						constexpr auto threshold = 4.0;
+						if (stddev[i] > threshold)
+							return false;
 					}
 					return true;
 				};
