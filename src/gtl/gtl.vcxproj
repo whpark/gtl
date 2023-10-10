@@ -547,6 +547,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   <ItemGroup>
     <Text Include="..\..\dependency.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\etc\vcpkg\install-vcpkg.bat" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
