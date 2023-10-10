@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+//#include <QOpenGLShaderProgram>
 #include <QWidget>
 #include <QTimer>
 #include "gtl/qt/_lib_gtl_qt.h"
@@ -62,6 +63,29 @@ protected:
 	//// gl
 	//std::unique_ptr<wxGLContext> m_context;
 	////GLuint m_textureID{};
+
+	struct {
+		std::unique_ptr<QOpenGLExtraFunctions> gl{};
+		GLuint shaderProgram{};
+		GLuint VBO{}, VAO{};
+		QOpenGLExtraFunctions& operator () () { return *gl; }
+		QOpenGLExtraFunctions const& operator () () const { return *gl; }
+
+		void Clear() {
+			if (gl) {
+				if (auto r = std::exchange(shaderProgram, 0)) {
+					gl->glDeleteProgram(r);
+				}
+				if (auto r = std::exchange(VBO, 0)) {
+					gl->glDeleteBuffers(1, &r);
+				}
+				if (auto r = std::exchange(VAO, 0)) {
+					gl->glDeleteVertexArrays(1, &r);
+				}
+			}
+			gl.reset();
+		}
+	} m_gl;
 
 	cv::Mat m_imgOriginal;	// original image
 	mutable cv::Mat m_img;	// image for screen
@@ -151,6 +175,7 @@ protected:
 	xRect2i GetViewRect();
 	void InitializeGL(xMatViewCanvas* view);
 	void PaintGL(xMatViewCanvas* view);
+	bool PutMatAsTexture(GLuint textureID, cv::Mat const& img, int width, gtl::xRect2i const& rect, gtl::xRect2i const& rectClient);
 
 protected:
 	virtual void keyPressEvent(QKeyEvent *event) override;

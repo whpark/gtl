@@ -81,6 +81,7 @@ namespace gtl::qt {
 	}
 
 	xMatView::~xMatView() {
+		m_gl.Clear();
 	}
 
 	bool xMatView::SetImage(cv::Mat const& img, bool bCenter, eZOOM eZoomMode, bool bCopy) {
@@ -862,11 +863,96 @@ namespace gtl::qt {
 			//throw std::exception(reinterpret_cast<const char*>(msg));
 		}
 
+		// OpenGL Version in number
+		int nMajor = 0;
+		glGetIntegerv(GL_MAJOR_VERSION, &nMajor);
+		if (nMajor < 3) {
+			QMessageBox::critical(this, "openGL", "OpenGL 3.0 or higher is required.");
+			return;
+		}
+
+		//QString strVersion = QString::fromUtf8((char const*)glGetString(GL_VERSION));
+		// openGL Version Major
+
+		// Vertex Shader Source
+		static char const* vertexShaderSource = 
+R"(
+	#version 330 core
+	layout(location = 0) in vec2 inPosition;
+	layout(location = 1) in vec2 inTexCoord;
+	out vec2 TexCoord;
+	void main() {
+		gl_Position = vec4(inPosition, 0.0, 1.0);
+		TexCoord = inTexCoord;
+	}
+)";
+
+		// Fragment Shader Source
+		static char const* fragmentShaderSource =
+R"(
+	#version 330 core
+	in vec2 TexCoord;
+	out vec4 FragColor;
+	uniform sampler2D textureSampler;
+	void main() {
+		FragColor = texture(textureSampler, TexCoord);
+	}
+)";
+
+		// todo: TEMP
+		if (!m_gl.gl)
+			m_gl.gl = std::make_unique<QOpenGLExtraFunctions>(view->context());
+		if (!m_gl.shaderProgram) {
+
+			m_gl().glGenVertexArrays(1, &m_gl.VAO);
+			m_gl().glBindVertexArray(m_gl.VAO);
+
+			// Create Vertex Buffer Object (VBO)
+			m_gl().glGenBuffers(1, &m_gl.VBO);
+			m_gl().glBindBuffer(GL_ARRAY_BUFFER, m_gl.VBO);
+
+			// Define vertices and texture coordinates for a quad
+			float vertices[] = {
+				// Position    // Texture Coordinates
+				0.0f, 1.0f,  0.0f, 0.0f,
+				1.0f, 0.0f,  1.0f, 0.0f,
+				1.0f, 1.0f,  1.0f, 1.0f,
+				0.0f, 1.0f,  0.0f, 1.0f,
+			};
+			m_gl().glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+			// Create and compile the vertex shader
+			auto vertexShader = m_gl().glCreateShader(GL_VERTEX_SHADER);
+			m_gl().glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+			m_gl().glCompileShader(vertexShader);
+
+			// Create and compile the fragment shader
+			GLuint fragmentShader = m_gl().glCreateShader(GL_FRAGMENT_SHADER);
+			m_gl().glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+			m_gl().glCompileShader(fragmentShader);
+
+			// Create and link the shader program
+			m_gl.shaderProgram = m_gl().glCreateProgram();
+			m_gl().glAttachShader(m_gl.shaderProgram, vertexShader);
+			m_gl().glAttachShader(m_gl.shaderProgram, fragmentShader);
+		}
+		if (m_gl.shaderProgram) {
+			m_gl().glLinkProgram(m_gl.shaderProgram);
+			m_gl().glUseProgram(m_gl.shaderProgram);
+
+			m_gl().glUniform1i(m_gl().glGetUniformLocation(m_gl.shaderProgram, "textureSampler"), 0);
+		}
+
+		// Specify vertex attribute data
+		m_gl().glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+		m_gl().glEnableVertexAttribArray(0);
+		m_gl().glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+		m_gl().glEnableVertexAttribArray(1);
+
 		//// get max bitmap size
 		//GLint maxTexSize;
 		//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
 		//OutputDebugStringA((std::format("GL_MAX_TEXTURE_SIZE: {}\n", maxTexSize)).c_str());
-
 
 		//// get opengl Version
 		//QString strVersion = QString::fromUtf8((char const*)glGetString(GL_VERSION));
@@ -876,6 +962,74 @@ namespace gtl::qt {
 		//OutputDebugStringA((std::format("OpenGL Version: {}\n", strVersion.toStdString())).c_str());
 
 	}
+
+	bool xMatView::PutMatAsTexture(GLuint textureID, cv::Mat const& img, int width, gtl::xRect2i const& rect, gtl::xRect2i const& rectClient) {
+		if (!textureID or img.empty() or !img.isContinuous())
+			return false;
+
+		if (!m_gl.gl or !m_gl.shaderProgram or !m_gl.VAO or !m_gl.VBO) {
+			return gtl::PutMatAsTexture(textureID, img, width, rect);
+		}
+
+		if (rectClient.Width() <= 0 or rectClient.Height() <= 0)
+			return false;
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		if (img.step%4)
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		else
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+		// Create the texture
+		auto [eColorType, eFormat, ePixelType] = GetGLImageFormatType(img.type());
+		glTexImage2D(GL_TEXTURE_2D, 0, eColorType, img.cols, img.rows, 0, eFormat, ePixelType, img.ptr());
+
+		m_gl().glUniform1i(m_gl().glGetUniformLocation(m_gl.shaderProgram, "textureSampler"), 0);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		// Set texture clamping method
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+		// patch
+		m_gl().glBindVertexArray(m_gl.VAO);
+		m_gl().glBindBuffer(GL_ARRAY_BUFFER, m_gl.VBO);
+
+		gtl::TRect2<float> rc((float)rect.left/rectClient.Width(), (float)rect.top/rectClient.Height(), (float)rect.right/rectClient.Width(), (float)rect.bottom/rectClient.Height());
+		for (auto& v : rc.arr()) {
+			v = v*2 - 1;
+		}
+
+		// Define vertices and texture coordinates for a quad
+		auto r = (float)width/img.cols;
+		float vertices[] = {
+			// Position		// Texture Coordinates
+			//-r, -1.0f,		rc.right, rc.top,
+			//r, -1.0f,		rc.left, rc.top,
+			//r, 1.0f,		rc.left, rc.bottom,
+			//-r, 1.0f,		rc.right, rc.bottom,
+			rc.left, -rc.top, 	0, 0,
+			rc.right, -rc.top, 	r, 0,
+			rc.right, -rc.bottom, r, 1,
+			rc.left, -rc.bottom, 0, 1,
+		};
+
+		m_gl().glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+		m_gl().glBindVertexArray(0);
+
+		//glBegin(GL_QUADS);
+		//glTexCoord2f(0.f, 0.f);	glVertex2i(rect.left,   rect.top);
+		//glTexCoord2f(0.f, 1.f);	glVertex2i(rect.left,   rect.bottom);
+		//glTexCoord2f(r, 1.f);	glVertex2i(rect.right,  rect.bottom);
+		//glTexCoord2f(r, 0.f);	glVertex2i(rect.right,  rect.top);
+		//glEnd();
+
+		return true;
+	}
+
 
 	void xMatView::PaintGL(xMatViewCanvas* view) {
 		//auto t0 = std::chrono::steady_clock::now();
@@ -1073,7 +1227,12 @@ namespace gtl::qt {
 				glDeleteTextures(std::size(textures), textures);
 			});
 
-			PutMatAsTexture(textures[0], img, rcTarget.width, rectTarget);
+			// Use the shader program
+			if (m_gl.shaderProgram) {
+				m_gl().glUseProgram(m_gl.shaderProgram);
+			}
+
+			PutMatAsTexture(textures[0], img, rcTarget.width, rectTarget, rectClient);
 
 			// Draw Selection Rect
 			if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
@@ -1085,7 +1244,7 @@ namespace gtl::qt {
 				if (!rect.IsRectEmpty()) {
 					cv::Mat rectangle(16, 16, CV_8UC4);
 					rectangle = cv::Scalar(255, 255, 127, 128);
-					PutMatAsTexture(textures[1], rectangle, rectangle.cols, rect);
+					PutMatAsTexture(textures[1], rectangle, rectangle.cols, rect, rectClient);
 				}
 			}
 		}

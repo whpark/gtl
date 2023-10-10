@@ -117,7 +117,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	m_dlgMatView->GetView().SetImage(img, false);
 	//m_dlgMatViewGV->SetImage(img, false);
 	ui.view->SetImage(img, false);
-	ui.view->SetImage({});
+	//ui.view->SetImage({});
 
 	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);
