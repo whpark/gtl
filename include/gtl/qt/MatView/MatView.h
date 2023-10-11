@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 //#include <QOpenGLShaderProgram>
+#include <QOpenGLExtraFunctions>
 #include <QWidget>
 #include <QTimer>
 #include "gtl/qt/_lib_gtl_qt.h"
