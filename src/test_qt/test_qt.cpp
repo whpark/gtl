@@ -98,6 +98,10 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 		img.col(img.cols-1) = cv::Scalar(v, v, v);
 		img.row(0) = cv::Scalar(v, v, v);
 		img.row(img.rows-1) = cv::Scalar(v, v, v);
+
+		if (CheckGPU(true)) {
+			gtl::ResizeImage(img, img, 2.0);
+		}
 	}
 	// Color Bar
 	//img = cv::Mat::zeros(1080*2, 1920*2, CV_32SC3);

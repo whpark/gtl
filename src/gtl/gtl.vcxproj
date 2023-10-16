@@ -336,6 +336,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <DelayLoadDLLs>opencv_cuda*.dll</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
       <Command>echo /*---- Copy *.lib to /lib ----*/
@@ -371,6 +372,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <DelayLoadDLLs>opencv_cuda*.dll</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
       <Command>echo /*---- Copy *.lib to /lib ----*/
@@ -410,6 +412,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <DelayLoadDLLs>opencv_cuda*.dll</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
       <Command>echo /*---- Copy *.lib to /lib ----*/
@@ -449,6 +452,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <DelayLoadDLLs>opencv_cuda*.dll</DelayLoadDLLs>
     </Link>
     <PostBuildEvent>
       <Command>echo /*---- Copy *.lib to /lib ----*/
