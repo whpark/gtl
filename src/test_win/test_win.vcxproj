@@ -516,11 +516,14 @@
     <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\mfc\mfc.vcxproj">
+      <Project>{5f0d7bd9-e1ec-45d1-96b9-2ea611944d5e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\shape\shape.vcxproj">
       <Project>{fba95adb-13a2-4139-ba8e-789bfe9aa1ae}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\win_util\win_util.vcxproj">
-      <Project>{5f0d7bd9-e1ec-45d1-96b9-2ea611944d5e}</Project>
+    <ProjectReference Include="..\win\win.vcxproj">
+      <Project>{a7a07211-7966-4626-9dc3-02f8cc2a9042}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

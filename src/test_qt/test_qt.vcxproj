@@ -261,6 +261,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\gtl\gtl.vcxproj">
+      <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\qt\qt.vcxproj">
+      <Project>{e963dd40-a001-4874-9def-3c7646abaecc}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />

@@ -547,6 +547,11 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   <ItemGroup>
     <None Include="MatView\wxMatView.fbp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\gtl\gtl.vcxproj">
+      <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
