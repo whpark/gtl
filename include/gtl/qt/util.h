@@ -40,7 +40,7 @@ namespace gtl::qt {
 		GTL__QT_UPDATE_WIDGET_VALUE(widget_t, QString, getter, setter) \
 	template < gtlc::string_elem tchar_t > \
 	inline void UpdateWidgetValue(bool bSaveAndValidate, widget_t* w, std::basic_string<tchar_t>& value) {	\
-		if (bSaveAndValidate) value = ToString(w->getter()); else w->setter(ToQString(value)); \
+		if (bSaveAndValidate) value = ToTString<tchar_t>(w->getter()); else w->setter(ToQString(value)); \
 	}\
 	inline void UpdateWidgetValue(bool bSaveAndValidate, widget_t* w, std::filesystem::path& path) {	\
 		if (bSaveAndValidate) path = ToWString(w->getter()); else w->setter(ToQString(path)); \
@@ -55,6 +55,7 @@ namespace gtl::qt {
 	}
 
 	GTL__QT_UPDATE_WIDGET_VALUE(QCheckBox, bool, isChecked, setChecked);
+	//GTL__QT_UPDATE_WIDGET_VALUE(QCheckBox, int, isChecked, setChecked);
 	GTL__QT_UPDATE_WIDGET_VALUE(QGroupBox, bool, isChecked, setChecked);
 	GTL__QT_UPDATE_WIDGET_STRING(QLineEdit, text, setText);
 	GTL__QT_UPDATE_WIDGET_ARITHMETIC(QLineEdit, text, setText);
