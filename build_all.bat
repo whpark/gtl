@@ -36,6 +36,7 @@ set END_TIME=%TIME%
 echo .
 echo -----------------------------
 echo %START_TIME% ~ %END_TIME%
+python etc\calc_time.py %START_TIME% %END_TIME%
 echo -----------------------------
 echo .
 pause
