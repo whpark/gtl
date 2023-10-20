@@ -1,7 +1,10 @@
 @echo off
+set START_TIME=%TIME%
+
 rem call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 md bin
 md lib
+
 echo ------------------
 echo +  x64 - Debug
 echo ------------------
@@ -29,4 +32,10 @@ goto :end
 @echo ----------- ERROR -----------
 
 :end
+set END_TIME=%TIME%
+echo .
+echo -----------------------------
+echo %START_TIME% ~ %END_TIME%
+echo -----------------------------
+echo .
 pause
