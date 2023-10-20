@@ -649,6 +649,19 @@ namespace gtl {
 	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return TFormatTo<char16_t>(out, fmt, std::forward<targs>(args)...); }
 	template < typename toutput, typename ... targs> constexpr decltype(auto) FormatTo(toutput& out, gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return TFormatTo<char32_t>(out, fmt, std::forward<targs>(args)...); }
 
+
+	template < typename tchar_to, gtl::xStringLiteral literal, typename ... targs >
+	inline static std::basic_string<tchar_to> FormatToTString(targs&& ... args) {
+		fmt::basic_format_string<tchar_to, targs...>{gtl::TStringLiteral<tchar_to, literal>{}.value};	// Compiltime Validation only
+		static constexpr gtl::TStringLiteral<tchar_to, literal> tfmt{};
+		if constexpr (gtlc::is_one_of<tchar_to, char, wchar_t>) {
+			return fmt::format(fmt::runtime(tfmt.value), std::forward<targs>(args)...);
+		}
+		else {
+			return fmt::format(tfmt.value, std::forward<targs>(args)...);
+		}
+	}
+
 	//inline fmt::basic_runtime<char> RuntimeFormatString(std::string_view s) { return {{s}}; }
 	//inline fmt::basic_runtime<wchar_t> RuntimeFormatString(std::wstring_view s) { return {{s}}; }
 	//inline fmt::basic_runtime<char8_t> RuntimeFormatString(std::u8string_view s) { return {{s}}; }
@@ -662,30 +675,6 @@ namespace gtl {
 		else if constexpr (std::is_same_v<tchar, char32_t>) return U"{}";
 		else if constexpr (std::is_same_v<tchar, char8_t>) return u8"{}";
 		else static_assert(gtlc::dependent_false_v, "invalid type");
-	}
-
-	//template <gtlc::string_elem tchar, std::size_t N >
-	//constexpr inline std::basic_string<tchar> ToTStringLiteral(const char (&str)[N]) {
-	//	std::basic_string<tchar> result;
-	//	if constexpr (N) {
-	//		result.reserve(N-1);
-	//		for (decltype(N) i{}, n(N-1); i < n; i++) {
-	//			result.push_back(static_cast<tchar>(str[i]));
-	//		}
-	//	}
-	//	return result;
-	//}
-
-	template < gtlc::string_elem tchar >
-	constexpr std::basic_string<tchar> ToExoticString(std::string const& sv) {
-		std::basic_string<tchar> result;
-		result.reserve(sv.size());
-		for (auto c : sv) {
-			//if (c == '\r')
-			//	continue;
-			result.push_back(c);
-		}
-		return result;
 	}
 
 #pragma pack(pop)

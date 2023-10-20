@@ -47,18 +47,30 @@ namespace gtl::internal {
 namespace gtl {
 #pragma pack(push, 8)
 
-	template < typename ttime_point_t = std::chrono::seconds >
+	template < typename ttime_point = std::chrono::seconds >
 	auto ToLocalTime(auto t) {
 		auto lt = std::chrono::current_zone()->to_local(t);
-		return std::chrono::time_point_cast<ttime_point_t>(lt);
+		return std::chrono::time_point_cast<ttime_point>(lt);
 	}
 
-	template < gtlc::string_elem tchar_t, size_t N >
+	template < gtlc::string_elem tchar, size_t N >
 	struct xStringLiteral {
-		tchar_t str[N];
-
-		constexpr xStringLiteral(tchar_t const (&sz)[N]) {
+		tchar str[N];
+		constexpr xStringLiteral(tchar const (&sz)[N]) {
 			std::copy_n(sz, N, str);
+		}
+	};
+
+	template < gtlc::string_elem tchar_to, xStringLiteral literal >
+	struct TStringLiteral {
+		tchar_to value[std::size(literal.str)];
+		constexpr TStringLiteral() {
+			for (size_t i{}; i < std::size(literal.str); i++) {
+				//static_assert(literal.str[i] > 0 and literal.str[i] < 127);
+				if (literal.str[i] < 0 or literal.str[i] > 127)
+					throw std::exception("invalid charactor");
+				value[i] = static_cast<tchar_to>(literal.str[i]);
+			}
 		}
 	};
 

@@ -82,39 +82,11 @@ namespace gtl {
 		template < typename ... targs >
 		void Lap(gtl::internal::tformat_string<tchar, targs...> const& fmt, targs&& ... args) {
 			auto t = tclock::now();
-		#define GTL__PRINT_FMT_STOPWATCH "STOP_WATCH {:{}}[ "
-			if constexpr (gtlc::is_one_of<tchar, char>) {
-				os << fmt::format(GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
-			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
-				os << fmt::format(u8"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
-			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
-				os << fmt::format(u"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
-			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
-				os << fmt::format(U"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
-			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
-				os << fmt::format(L"" GTL__PRINT_FMT_STOPWATCH, ' ', depth * 4);
-			} else {
-				static_assert(gtlc::dependent_false_v);
-			}
-		#undef GTL__PRINT_FMT_STOPWATCH
+			os << FormatToTString<tchar, "STOP_WATCH {:{}}[ ">(' ', depth * 4);
 
 			os << Format(fmt, std::forward<targs>(args)...);
 
-		#define GTL__PRINT_FMT_STOPWATCH " ] {}\n"
-			if constexpr (gtlc::is_one_of<tchar, char>) {
-				os << fmt::format(GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t-t0));
-			} else if constexpr (gtlc::is_one_of<tchar, char8_t>) {
-				os << fmt::format(u8"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
-			} else if constexpr (gtlc::is_one_of<tchar, char16_t>) {
-				os << fmt::format(u"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
-			} else if constexpr (gtlc::is_one_of<tchar, char32_t>) {
-				os << fmt::format(U"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
-			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
-				os << fmt::format(L"" GTL__PRINT_FMT_STOPWATCH, std::chrono::duration_cast<tresolution>(t - t0));
-			} else {
-				static_assert(gtlc::dependent_false_v);
-			}
-		#undef GTL__PRINT_FMT_STOPWATCH
+			os << FormatToTString<tchar, " ] {}\n">(std::chrono::duration_cast<tresolution>(t-t0));
 			//os << (tchar)'\n';
 			t0 = tclock::now();
 		}

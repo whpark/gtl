@@ -100,7 +100,7 @@ namespace gtl {
 					continue;
 				if (gtl::tszicmp(string_view_t{key1.begin(), key1.end()}, key) == 0)
 					return string_view_t{value1.begin(), value1.end()};
-				return {};
+				//return {};
 			}
 			return {};
 		}
@@ -128,7 +128,7 @@ namespace gtl {
 				if (comment.empty() and comment1)
 					comment = comment1;
 				int starting = key1.begin() - whole.begin();
-				auto str = fmt::format(ToExoticString<tchar>("{}{:<{}}{}"),
+				auto str = FormatToTString<tchar, "{}{:<{}}{}">(
 					string_view_t(whole.begin(), value1.begin()),
 					string_view_t(value), comment.empty() ? value.size() :
 						( comment1 ? (comment1.begin()-value1.begin()) : std::max(0, (int)(posComment - (value1.begin()-whole.begin()))) ),
@@ -136,12 +136,12 @@ namespace gtl {
 				item = std::move(str);
 				return;
 			}
-			auto str = fmt::format(ToExoticString<tchar>("{:{}}= {}"),
+			auto str = FormatToTString<tchar, "{:{}}= {}">(
 				string_view_t(key), std::max((int)key.size(), (int)posEQ),
 				string_view_t(value));
 			if (!comment.empty()) {
-				str += fmt::format(ToExoticString<tchar>("{:{}}{}"),
-					ToExoticString<tchar>(";"), std::max(0, posComment - (int)str.size()),
+				str += FormatToTString<tchar, "{:{}}{}">(
+					tchar(';'), std::max(0, posComment - (int)str.size()),
 					comment);
 			}
 			if (m_items.empty()) {
@@ -179,7 +179,7 @@ namespace gtl {
 			if constexpr (std::is_same_v<tvalue, bool>) {
 				if (std::isdigit(sv[0]))
 					return (gtl::tsztod(sv) == 0.0) ? false : true;
-				return gtl::tszicmp(sv, ToExoticString<tchar>("true")) == 0;
+				return gtl::tszicmp(sv, ToTStringLiteral<tchar, "true">()) == 0;
 			}
 			else if constexpr (std::is_integral_v<tvalue>) {
 				return gtl::tsztoi<tvalue>(sv);
@@ -202,7 +202,7 @@ namespace gtl {
 				SetItemValueRaw(key, value, comment);
 			}
 			else {
-				SetItemValueRaw(key, fmt::format(ToExoticString<tchar>("{}"), value), comment);
+				SetItemValueRaw(key, fmt::format(GetDefaultFormatString<tchar>(), value), comment);
 			}
 			return false;
 		}
@@ -259,13 +259,7 @@ namespace gtl {
 			for (auto& [key, section] : m_sections) {
 				if (!key.empty()) {
 					if (section.m_line.empty()) {
-						string_t str;
-						if constexpr (gtlc::is_one_of<tchar, char, wchar_t>) {
-							str = fmt::format(fmt::runtime_format_string<tchar>(ToExoticString<tchar>("[{}]")), key);
-						}
-						else {
-							str = fmt::format(std::basic_string_view<tchar>(ToExoticString<tchar>("[{}]")), key);
-						}
+						string_t str = FormatToTString<tchar, "[{}]">(key);
 						ar.WriteLine(GetDefaultFormatString<tchar>(), str);
 					}
 					else {
