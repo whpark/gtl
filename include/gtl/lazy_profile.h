@@ -19,7 +19,7 @@
 #include "gtl/_lib_gtl.h"
 #include "gtl/concepts.h"
 #include "gtl/string.h"
-#include "gtl/vector_map.h"
+#include "gtl/container_map.h"
 #include "gtl/archive.h"
 
 #include "ctre.hpp"
@@ -39,7 +39,11 @@ namespace gtl {
 		using char_type = tchar;
 		using string_t = std::basic_string<tchar>;
 		using string_view_t = std::basic_string_view<tchar>;
-		
+		struct sCompareString {
+			bool operator()(std::basic_string_view<tchar> a, std::basic_string_view<tchar> b) const { return a == b; }
+		};
+		using map_t = TContainerMap<std::vector, string_t, this_t, sCompareString>;
+
 		//regex for section name
 		// key : any trimmed(whitespace) chars quoted by bracket "[]", ex) [ HeadDriver1:1 ]
 		// trailing : any string after section name
@@ -53,11 +57,8 @@ namespace gtl {
 		static constexpr inline auto s_reItem = ctre::match<R"xxx(\s*([\w\s]*\w+)\s*(=)\s*("(?:[^\\"]|\\.)*"|[^;\n]*)\s*[^;]*(;.*)?)xxx">;
 
 	protected:
-		struct sCompareString {
-			bool operator()(std::basic_string_view<tchar> a, std::basic_string_view<tchar> b) const { return a == b; }
-		};
 		//string_t m_key;
-		TVectorMap<string_t, this_t, sCompareString> m_sections;	// child sections
+		map_t m_sections;	// child sections
 		std::vector<string_t> m_items;
 		string_t m_line;	// anything after section name
 
@@ -122,16 +123,16 @@ namespace gtl {
 				if (!whole)
 					continue;
 				posEQ = std::max(posEQ, (int)(eq1.begin() - whole.begin()));
-				posComment = std::max(posComment, (int)(comment1.begin() - whole.begin()));
+				posComment = std::max(posComment, comment1 ? (int)(comment1.begin() - whole.begin()) : 0);
 				if (gtl::tszicmp(string_view_t{key1}, key) != 0)
 					continue;
 				if (comment.empty() and comment1)
 					comment = comment1;
-				int starting = key1.begin() - whole.begin();
+				//int starting = key1.begin() - whole.begin();
 				auto str = FormatToTString<tchar, "{}{:<{}}{}">(
-					string_view_t(whole.begin(), value1.begin()),
-					string_view_t(value), comment.empty() ? value.size() :
-						( comment1 ? (comment1.begin()-value1.begin()) : std::max(0, (int)(posComment - (value1.begin()-whole.begin()))) ),
+					string_view_t(whole.begin(), value1.begin()), string_view_t(value),
+					comment.empty() ? value.size()
+						: ( comment1 ? (comment1.begin()-value1.begin()) : std::max(0, (int)(posComment - (value1.begin()-whole.begin()))) ),
 					comment);
 				item = std::move(str);
 				return;
@@ -159,9 +160,9 @@ namespace gtl {
 				}
 			}
 		}
-		bool SetItemComment(string_view_t key, string_view_t comment) {
+		void SetItemComment(string_view_t key, string_view_t comment) {
 			string_t value = GetItemValueRaw(key);
-			return SetItemValueRaw(key, value, comment);
+			SetItemValueRaw(key, value, comment);
 		}
 
 		template < typename tvalue >
@@ -197,14 +198,13 @@ namespace gtl {
 		}
 
 		template < typename tvalue >
-		bool SetItemValue(string_view_t key, tvalue&& value, string_view_t comment = {}) {
+		void SetItemValue(string_view_t key, tvalue&& value, string_view_t comment = {}) {
 			if constexpr (std::is_convertible_v<tvalue, string_view_t>) {
 				SetItemValueRaw(key, value, comment);
 			}
 			else {
 				SetItemValueRaw(key, fmt::format(GetDefaultFormatString<tchar>(), value), comment);
 			}
-			return false;
 		}
 
 	public:

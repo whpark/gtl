@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 
 #include "gtl/gtl.h"
-#include "gtl/vector_map.h"
+#include "gtl/container_map.h"
 #include "gtl/lazy_profile.h"
 
 #include "fmt/compile.h"
@@ -124,8 +124,8 @@ doubleVar                = 3.1415926535897932384626433832795028 ; pi
 		}
 	}
 
-	TEST(misc, TVectorMap) {
-		TVectorMap<std::string, int> map;
+	TEST(misc, TContainerMap) {
+		TContainerMap<std::vector, std::string, int> map;
 		map.insert("z", 3);
 		map.insert("o", 2);
 		map.insert("o", 1);
@@ -333,7 +333,7 @@ doubleVar                = 3.1415926535897932384626433832795028 ; pi
 				latchQueue.wait();
 				//std::unique_lock lock(lst);
 				for (int i = 0; i < N; i++) {
-					lst.push_back(std::make_unique<int>(index*N + i));
+					lst.push_back(std::make_unique<int>((int)(index*N + i)));
 				}
 			};
 
