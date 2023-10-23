@@ -473,6 +473,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\archive.h" />
     <ClInclude Include="..\..\include\gtl\base64.h" />
     <ClInclude Include="..\..\include\gtl\concepts.h" />
+    <ClInclude Include="..\..\include\gtl\container_map.h" />
     <ClInclude Include="..\..\include\gtl\coord.h" />
     <ClInclude Include="..\..\include\gtl\coord\coord_srect.h" />
     <ClInclude Include="..\..\include\gtl\coord\coord_trans.h" />
@@ -517,7 +518,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\ui\ui_unit.h" />
     <ClInclude Include="..\..\include\gtl\ui\ui_widget.h" />
     <ClInclude Include="..\..\include\gtl\unit.h" />
-    <ClInclude Include="..\..\include\gtl\vector_map.h" />
     <ClInclude Include="..\..\include\gtl\_config.h" />
     <ClInclude Include="..\..\include\gtl\_default.h" />
     <ClInclude Include="..\..\include\gtl\string.h" />

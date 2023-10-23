@@ -194,7 +194,7 @@
     <ClInclude Include="..\..\include\gtl\lazy_profile.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\vector_map.h">
+    <ClInclude Include="..\..\include\gtl\container_map.h">
       <Filter>gtl</Filter>
     </ClInclude>
   </ItemGroup>
