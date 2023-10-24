@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 
 	QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
 	fmt.setRenderableType(QSurfaceFormat::OpenGL);
-	fmt.setVersion(2, 0);
+	fmt.setVersion(4, 6);
 	fmt.setProfile(QSurfaceFormat::CoreProfile);
 	fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	fmt.setRedBufferSize(8);
