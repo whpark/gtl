@@ -1543,6 +1543,11 @@ namespace gtl {
 			flip = true;	// don't know if image needs be flipped. so just flip it. :)
 		}
 
+		std::optional<gtl::xFinalAction> faConverted;
+		if (converted) {
+			faConverted.emplace([converted]{FreeImage_Unload(converted);});
+		}
+
 		if (!fib)
 			return {};
 
