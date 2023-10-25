@@ -169,6 +169,7 @@ public:
 	bool SetZoom(double scale, xPoint2i ptAnchor, bool bCenter);
 	bool ScrollTo(xPoint2d pt, std::chrono::milliseconds tsScroll = -1ms);
 	bool Scroll(xPoint2d delta, std::chrono::milliseconds tsScroll = -1ms);
+	void PurgeScroll(bool bUpdate = true);
 	bool KeyboardNavigate(int key, bool ctrl = false, bool alt = false, bool shift = false);
 
 protected:

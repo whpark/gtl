@@ -398,9 +398,26 @@ namespace gtl::qt {
 		return ScrollTo(m_ctScreenFromImage.m_offset + delta, tsScroll);
 	}
 
+	void xMatView::PurgeScroll(bool bUpdate) {
+		if (!m_smooth_scroll.timer.isActive())
+			return;
+		m_smooth_scroll.timer.stop();
+		m_ctScreenFromImage.m_offset = m_smooth_scroll.pt1;
+		m_smooth_scroll.Clear();
+		if (bUpdate) {
+			UpdateCT(false);
+			UpdateScrollBars();
+			if (ui->view)
+				ui->view->update();
+		}
+	}
+
 	bool xMatView::KeyboardNavigate(int key, bool ctrl, bool alt, bool shift) {
 		if (ctrl or alt or m_img.empty())
 			return false;
+
+		// if scroll is not finished, use target scroll position
+		PurgeScroll();
 
 		xCoordTrans ctS2I;
 		m_ctScreenFromImage.GetInv(ctS2I);

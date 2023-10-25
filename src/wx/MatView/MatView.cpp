@@ -565,9 +565,27 @@ bool xMatView::Scroll(xPoint2d delta, std::chrono::milliseconds tsScroll) {
 	return ScrollTo(m_ctScreenFromImage.m_offset + delta, tsScroll);
 }
 
+void xMatView::PurgeScroll(bool bUpdate) {
+	if (!m_timerScroll.IsRunning())
+		return;
+	m_timerScroll.Stop();
+	m_ctScreenFromImage.m_offset = m_smooth_scroll.pt1;
+	m_smooth_scroll.Clear();
+
+	if (bUpdate) {
+		UpdateCT(false);
+		UpdateScrollBars();
+		m_view->Refresh();
+		m_view->Update();
+	}
+}
+
 bool xMatView::KeyboardNavigate(int key, bool ctrl, bool alt, bool shift) {
 	if (ctrl or alt or m_img.empty())
 		return false;
+
+	// if scroll is not finished, use target scroll position
+	PurgeScroll(false);
 
 	xCoordTrans ctS2I;
 	m_ctScreenFromImage.GetInv(ctS2I);
@@ -588,10 +606,10 @@ bool xMatView::KeyboardNavigate(int key, bool ctrl, bool alt, bool shift) {
 			auto tsScroll = -1ms;
 
 			xPoint2d delta;
-			if (key == WXK_LEFT)			{ delta.x += ptShift.x;	tsScroll = 0ms; }
-			else if (key == WXK_RIGHT)		{ delta.x -= ptShift.x;	tsScroll = 0ms; }
-			else if (key == WXK_UP)			{ delta.y += ptShift.y;	tsScroll = 0ms; }
-			else if (key == WXK_DOWN)		{ delta.y -= ptShift.y;	tsScroll = 0ms; }
+			if (key == WXK_LEFT)			{ delta.x += ptShift.x;	}
+			else if (key == WXK_RIGHT)		{ delta.x -= ptShift.x;	}
+			else if (key == WXK_UP)			{ delta.y += ptShift.y;	}
+			else if (key == WXK_DOWN)		{ delta.y -= ptShift.y;	}
 			else if (key == WXK_PAGEUP)		{ delta.y += ptShiftPage.y; }
 			else if (key == WXK_PAGEDOWN)	{ delta.y -= ptShiftPage.y; }
 
