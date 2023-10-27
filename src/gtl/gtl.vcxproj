@@ -496,6 +496,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\rand.h" />
     <ClInclude Include="..\..\include\gtl\reflection.h" />
     <ClInclude Include="..\..\include\gtl\reflection_glaze.h" />
+    <ClInclude Include="..\..\include\gtl\sequence.h" />
     <ClInclude Include="..\..\include\gtl\smart_ptr_container.h" />
     <ClInclude Include="..\..\include\gtl\stop_watch.h" />
     <ClInclude Include="..\..\include\gtl\string\convert_utf.h" />

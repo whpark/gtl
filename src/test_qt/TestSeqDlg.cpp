@@ -21,7 +21,7 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent) {
 		ui.txtMessage3->clear();
 		//m_top.AddSequence([this](Generator<int>& self) -> Generator<int> { return Seq1(self); });
 		using namespace std::placeholders;
-		m_top.AddSequence(std::bind(&this_t::Seq1, this, _1));
+		m_main.CreateSequence(std::bind(&this_t::Seq1, this, _1));
 
 		//auto& self = m_top.m_sequences.back();
 		//std::function<Generator<int>()> fSeq = [this, &self]()->auto { return Seq1(self); };
@@ -31,7 +31,7 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent) {
 
 	});
 	connect(this, &xTestSeqDlg::sigSequence, this, [this]() {
-		m_top.DoSequenceLoop();
+		m_main.DoSequenceLoop();
 	}, Qt::QueuedConnection);
 
 	m_thread = std::jthread([this](std::stop_token st) {
@@ -51,38 +51,53 @@ xTestSeqDlg::~xTestSeqDlg() {
 		m_thread.join();
 }
 
-Generator<int> Suspend(Generator<int>& self) {
+gtl::xSequence Suspend2(gtl::xSequence& self, int) {
+	auto sl = std::source_location::current();
+
 	//static std::atomic<int>	counter{};
 	static int counter{};
 	auto i = counter++;
-	Log("Suspend <<<<<<<<< {} \n", i);
+	Log("{} <<<<<<<< {} \n", sl.function_name(), i);
 	for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {
 		co_await std::suspend_always();
 	}
-	Log("Suspend >>>>>>>>> {} \n", i);
+	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
+
+	co_yield true;
 }
-Generator<int> xTestSeqDlg::Seq1(Generator<int>& self) {
+
+gtl::xSequence Suspend(gtl::xSequence& self) {
+	auto sl = std::source_location::current();
+
+	//static std::atomic<int>	counter{};
+	static int counter{};
+	auto i = counter++;
+	Log("{} <<<<<<<< {} \n", sl.function_name(), i);
+	for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {
+		co_await std::suspend_always();
+	}
+	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
+
+	co_yield true;
+}
+
+gtl::xSequence xTestSeqDlg::Seq1(gtl::xSequence& self) {
 	Log("Seq1 Begin\n");
 	//co_await step1();
 	ui.txtMessage1->setText("1");
-	//co_await self.AddSequence(Suspend);
+	co_await self.CreateSequence(Suspend);
 
 	//for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {
 	//	co_await std::suspend_always();
 	//}
 	ui.txtMessage2->setText("2");
-	co_await self.AddSequence(Suspend), self.AddSequence(Suspend), self.AddSequence(Suspend), self.AddSequence(Suspend);
+	co_await self.CreateSequenceParams<int>(Suspend2, 3);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 
 	ui.txtMessage2->setText("2-2");
-	co_await self.AddSequence(Suspend), self.AddSequence(Suspend), self.AddSequence(Suspend), self.AddSequence(Suspend);
+	co_await self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 
 	ui.txtMessage3->setText("3");
 
 	Log("Seq1 END\n");
-	co_return ;
-}
-
-Generator<double> xTestSeqDlg::SubSeq() {
-	co_yield 1.1;
 	co_return ;
 }
