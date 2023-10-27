@@ -245,9 +245,12 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <QtMoc Include="TestSeqDlg.h" />
     <QtRcc Include="test_qt.qrc" />
+    <QtUic Include="TestSeqDlg.ui" />
     <QtUic Include="test_qt.ui" />
     <QtMoc Include="test_qt.h" />
+    <ClCompile Include="TestSeqDlg.cpp" />
     <ClCompile Include="test_qt.cpp" />
     <ClCompile Include="main.cpp" />
     <None Include="test_qt.ico" />

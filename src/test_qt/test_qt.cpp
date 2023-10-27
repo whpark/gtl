@@ -3,6 +3,7 @@
 #include "gtl/qt/util.h"
 #include "gtl/win/EnvironmentVariable.h"
 #include "test_qt.h"
+#include "FreeImagePlus.h"
 
 #include "glaze/glaze.hpp"
 
@@ -40,6 +41,14 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	ui.edtPath->setText(strPath);
 
 	ui.treeView->setModel(&m_modelGlaze);
+
+	// Test Sequence
+	{
+		if (!m_dlgTestSeq)
+			m_dlgTestSeq = std::make_unique<xTestSeqDlg>(this);
+		m_dlgTestSeq->show();
+		m_dlgTestSeq->setFocus();
+	}
 
 	{
 		glz::json_t j{};
@@ -126,7 +135,12 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);
 	connect(ui.btnSetEnvVar, &QPushButton::clicked, this, &this_t::OnSetEnvVar);
-
+	connect(ui.btnTestSeq, &QPushButton::clicked, [this]() {
+		if (!m_dlgTestSeq)
+			m_dlgTestSeq = std::make_unique<xTestSeqDlg>(this);
+		m_dlgTestSeq->show();
+		m_dlgTestSeq->setFocus();
+	});
 	gtl::qt::LoadWindowPosition(reg, "test_qt", this);
 }
 

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>xTestSeqDlgClass</class>
+ <widget class="QDialog" name="xTestSeqDlgClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>xTestSeqDlg</string>
+  </property>
+  <widget class="QPushButton" name="btnSeq1">
+   <property name="geometry">
+    <rect>
+     <x>18</x>
+     <y>44</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Seq 1</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="txtMainThreadID">
+   <property name="geometry">
+    <rect>
+     <x>115</x>
+     <y>12</y>
+     <width>113</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="txtWorkerThreadID">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>12</y>
+     <width>113</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>114</x>
+     <y>47</y>
+     <width>135</width>
+     <height>80</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLineEdit" name="txtMessage1"/>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="txtMessage2"/>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="txtMessage3"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

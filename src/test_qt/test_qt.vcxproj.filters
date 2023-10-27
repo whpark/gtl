@@ -35,6 +35,9 @@
     <ClCompile Include="main.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="TestSeqDlg.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -48,9 +51,15 @@
     <QtMoc Include="test_qt.h">
       <Filter>code</Filter>
     </QtMoc>
+    <QtMoc Include="TestSeqDlg.h">
+      <Filter>code</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="test_qt.ui">
+      <Filter>code</Filter>
+    </QtUic>
+    <QtUic Include="TestSeqDlg.ui">
       <Filter>code</Filter>
     </QtUic>
   </ItemGroup>

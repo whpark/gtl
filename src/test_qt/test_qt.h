@@ -8,6 +8,8 @@
 #include "gtl/qt/QPathCompleter.h"
 #include "gtl/qt/QGlazeModel.h"
 
+#include "TestSeqDlg.h"
+
 namespace gtl::qt { class test_qt; }
 
 class gtl::qt::test_qt : public QMainWindow {
@@ -26,6 +28,7 @@ public:
 	std::unique_ptr<gtl::qt::xMatViewGVDlg> m_dlgMatViewGV;
 	//std::unique_ptr<gtl::qt::xMatView> m_ctrlMatView;
 	std::unique_ptr<gtl::qt::xMatViewDlg> m_dlgMatView;
+	std::unique_ptr<xTestSeqDlg> m_dlgTestSeq;
 
 protected:
 	void OnLoadImage();
