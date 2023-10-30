@@ -31,7 +31,8 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent) {
 
 	});
 	connect(this, &xTestSeqDlg::sigSequence, this, [this]() {
-		m_main.DoSequenceLoop();
+		//Log("sigSequence\n");
+		m_main.ProcessSingleStep();
 	}, Qt::QueuedConnection);
 
 	m_thread = std::jthread([this](std::stop_token st) {
@@ -39,8 +40,8 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent) {
 		Log("{}\r\n", std::this_thread::get_id());
 		while (!st.stop_requested()) {
 			emit sigSequence();
-			//std::this_thread::yield();
-			std::this_thread::sleep_for(10ms);
+			std::this_thread::yield();
+			std::this_thread::sleep_for(100us);
 		}
 	});
 }
@@ -51,7 +52,7 @@ xTestSeqDlg::~xTestSeqDlg() {
 		m_thread.join();
 }
 
-gtl::xSequence Suspend2(gtl::xSequence& self, int) {
+gtl::xSequence Suspend3(gtl::xSequence& self, std::string const&) {
 	auto sl = std::source_location::current();
 
 	//static std::atomic<int>	counter{};
@@ -59,7 +60,28 @@ gtl::xSequence Suspend2(gtl::xSequence& self, int) {
 	auto i = counter++;
 	Log("{} <<<<<<<< {} \n", sl.function_name(), i);
 	for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {
+		Log("{} await < {}\n", sl.function_name(), i);
 		co_await std::suspend_always();
+		Log("{} await > {}\n", sl.function_name(), i);
+	}
+	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
+
+	co_yield true;
+}
+
+gtl::xSequence Suspend2(gtl::xSequence& self, int) {
+	auto sl = std::source_location::current();
+
+	//static std::atomic<int>	counter{};
+	static int counter{};
+	auto i = counter++;
+	Log("{} <<<<<<<< {} \n", sl.function_name(), i);
+	int loop{};
+	for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {
+		Log("{} await < {}, loop {}\n", sl.function_name(), i, loop++);
+		//co_await std::suspend_always();
+		co_yield true;
+		Log("{} await > {}\n", sl.function_name(), i);
 	}
 	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
 
@@ -73,8 +95,11 @@ gtl::xSequence Suspend(gtl::xSequence& self) {
 	static int counter{};
 	auto i = counter++;
 	Log("{} <<<<<<<< {} \n", sl.function_name(), i);
+	int loop{};
 	for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {
+		Log("{} await < {}, loop {}\n", sl.function_name(), i, loop++);
 		co_await std::suspend_always();
+		Log("{} await > {}\n", sl.function_name(), i);
 	}
 	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
 
@@ -92,9 +117,11 @@ gtl::xSequence xTestSeqDlg::Seq1(gtl::xSequence& self) {
 	//}
 	ui.txtMessage2->setText("2");
 	co_await self.CreateSequenceParams<int>(Suspend2, 3);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
+	//co_await self.CreateSequenceParams<std::string>(Suspend3, std::string{});//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 
 	ui.txtMessage2->setText("2-2");
-	co_await self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
+	self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
+	co_await std::suspend_always{};
 
 	ui.txtMessage3->setText("3");
 

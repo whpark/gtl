@@ -87,12 +87,12 @@ namespace gtl {
 			return {};
 		}
 
-		bool DoSequenceLoop() {
+		bool ProcessSingleStep() {
 			bool bContinue = false;
 			do {
 				bContinue = false;
 				for (auto iter = m_sequences.begin(); iter != m_sequences.end(); ) {
-					if (iter->DoSequenceLoop()) {
+					if (iter->ProcessSingleStep()) {
 						iter = m_sequences.erase(iter);
 					}
 					else {
@@ -100,10 +100,12 @@ namespace gtl {
 					}
 				}
 				if (m_sequences.empty() and m_handle) {	// wait for child sequences to finish
+					if (!*m_handle or (*m_handle).done())
+						break;
 					(*m_handle)();
 					if ((*m_handle).promise().m_exception)
 						std::rethrow_exception((*m_handle).promise().m_exception);
-					bool bContinue = true;
+					//bContinue = true;
 				}
 			} while (bContinue);
 			return !m_handle or !*m_handle or (*m_handle).done();
