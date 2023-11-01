@@ -21,97 +21,282 @@
 #include "gtl/_lib_gtl.h"
 #include "gtl/concepts.h"
 
-namespace gtl {
+#include <format>
+#include <debugapi.h>
+#undef max
+#undef min
 
-	struct GTL__CLASS xSequenceParam {
+namespace gtl::seq::inline v01 {
+
+	using clock_t= std::chrono::high_resolution_clock;
+	using ms_t = std::chrono::milliseconds;
+	using id_t = std::string;
+
+	//-------------------------------------------------------------------------
+	/// @brief sequence function parameter (in/out)
+	struct sContext {
 		glz::json_t in, out;
 	};
 
-	struct GTL__CLASS xSequence {
+	//-------------------------------------------------------------------------
+	/// @brief used as co_yield value
+	struct sState {
+		clock_t::time_point tNextDispatch{};
+		clock_t::time_point tNextDispatchChild{clock_t::time_point::max()};
+		//bool bDone{false};
 
-		template < typename ... targs >
-		using seq_func_t = std::function<xSequence(xSequence&, targs&& ...)>;
+		sState(clock_t::time_point t = clock_t::now()) : tNextDispatch(t) {}
+		sState(clock_t::duration d) {
+			tNextDispatch = (d.count() == 0) ? clock_t::time_point{} : clock_t::now() + d;
+		}
+		sState(std::suspend_always) : tNextDispatch(clock_t::time_point::max()) {}
+		sState(std::suspend_never) : tNextDispatch{} {}
+		sState(sState const&) = default;
+		sState(sState&&) = default;
+		sState& operator = (sState const&) = default;
+		sState& operator = (sState&&) = default;
+
+		void Clear() { *this = {}; }
+	};
+
+	//-------------------------------------------------------------------------
+	/// @brief sequence dispatcher
+	struct sSequence {
+	public:
 		struct promise_type;
-		using handle_t = std::coroutine_handle<promise_type>;
-
+		using coroutine_handle_t = std::coroutine_handle<promise_type>;
+		//-------------------------------------------------------------------------
+		/// @brief 
 		struct promise_type {
-			bool m_result{};
+			sState m_state;
 			std::exception_ptr m_exception;
 
-			xSequence get_return_object() {
-				return xSequence(handle_t::from_promise(*this));
+			coroutine_handle_t get_return_object() {
+				return coroutine_handle_t::from_promise(*this);
 			}
 			std::suspend_always initial_suspend() { return {}; }
 			std::suspend_always final_suspend() noexcept { return {}; }
 			void unhandled_exception() { m_exception = std::current_exception(); }
 
-			std::suspend_always yield_value(bool result) {
-				m_result = result;
+			std::suspend_always yield_value(sState state) {
+				m_state = state;
 				return {};
 			}
 			void return_void() {}
 		};
 
-		std::optional<handle_t> m_handle;
+	protected:
+		id_t m_name;
+		coroutine_handle_t m_handle;
+		clock_t::time_point m_timeout{clock_t::time_point::max()};
+		sState m_state;
+		std::list<sSequence> m_children;
 
-		xSequence() {}
-		xSequence(handle_t handle) : m_handle(handle) {}
-		~xSequence() {
-			if (auto handle = std::exchange(m_handle, {}); handle and *handle) {
-				(*handle).destroy();
-			}
+	public:
+		// constructor
+		sSequence(id_t name = "") : m_name(std::move(name)) {}
+		sSequence(coroutine_handle_t&& h) : m_handle(std::exchange(h, nullptr)) {}
+		sSequence(sSequence const&) = delete;
+		sSequence& operator = (sSequence const&) = delete;
+		sSequence(sSequence&& b) {
+			m_name.swap(b.m_name);
+			m_handle = std::exchange(b.m_handle, nullptr);
+			m_timeout = std::exchange(b.m_timeout, {});
+			m_state = std::exchange(b.m_state, {});
+			m_children.swap(b.m_children);
 		}
-		xSequence(xSequence const&) = delete;
-		xSequence& operator = (xSequence const&) = delete;
-		xSequence(xSequence&& o) {
-			m_handle = std::move(std::exchange(o.m_handle, {}));
-			m_sequences.swap(o.m_sequences);
-		}
-		xSequence& operator = (xSequence&& o) {
-			m_handle.reset();
-			m_handle = std::move(std::exchange(o.m_handle, {}));
-			m_sequences.clear();
-			m_sequences.swap(o.m_sequences);
+		sSequence& operator = (sSequence&& b) {
+			Destroy();
+			m_name.swap(b.m_name);
+			m_handle = std::exchange(b.m_handle, nullptr);
+			m_timeout = std::exchange(b.m_timeout, {});
+			m_state = std::exchange(b.m_state, {});
+			m_children.swap(b.m_children);
 			return *this;
 		}
+		//sSequence& operator = (coroutine_handle_t&& h) {
+		//	Destroy();
+		//	m_handle = std::exchange(h, nullptr);
+		//	return *this;
+		//}
+		void SetName(id_t name) {
+			this->m_name = std::move(name);
+		}
+
+		// destructor
+		~sSequence() {
+			Destroy();
+		}
+		void Destroy() {
+			m_name.clear();
+			if (auto h = std::exchange(m_handle, nullptr); h) {
+				h.destroy();
+			}
+		}
+
+		/// @brief 
+		/// @return Get Next Dispatch Time
+		/// this function seems to be very heavy. need to optimize.
+		clock_t::time_point GetNextDispatchTime(bool bRefreshChild = false) const {
+			auto t = clock_t::time_point::max();
+			if (bRefreshChild) {
+				for (auto const& child : m_children) {
+					t = std::min(t, child.GetNextDispatchTime(bRefreshChild));
+				}
+			}
+			else {
+				if (m_children.size())
+					t = std::min(t, m_state.tNextDispatchChild);
+			}
+			if (m_children.empty() and m_handle and !m_handle.done())
+				t = std::min(t, m_state.tNextDispatch);
+			return t;
+		}
+
+		/// @brief reserves next dispatch time. NOT dispatch, NOT reserve dispatch itself.
+		bool ReserveResume(clock_t::time_point tWhen = {}) {
+			if (!m_handle or m_handle.done())
+				return false;
+			m_state.tNextDispatch = tWhen;
+			return true;
+		}
+
+		/// @brief reserves next dispatch time. NOT dispatch, NOT reserve dispatch itself.
+		bool ReserveResume(clock_t::duration dur) { return ReserveResume(dur.count() ? clock_t::now() + dur : clock_t::time_point{}); }
+
+		/// @brief Dispatch.
+		/// @return true if need next dispatch
+		bool Dispatch(clock_t::time_point& tNextDispatchOut) {
+			// Dispatch Child Sequences
+			for (bool bContinue{true}; bContinue;) {
+				bContinue = false;
+				do {
+					auto const t0 = clock_t::now();
+					auto& tNextDispatchChild = m_state.tNextDispatchChild;
+					tNextDispatchChild = clock_t::time_point::max();	// send to the future
+					for (auto iter = m_children.begin(); iter != m_children.end();) {
+						tNextDispatchChild = clock_t::time_point::max();	// send to the future
+						auto& child = *iter;
+
+						//if (!child.m_handle or child.m_handle.done()) {
+						//	iter = m_children.erase(iter);
+						//	continue;
+						//}
+
+						// Check Time
+						if (auto t = child.GetNextDispatchTime(); t > t0) {	// not yet
+							tNextDispatchChild = std::min(tNextDispatchChild, t);
+							iter++;
+							continue;
+						}
+
+						// Dispatch Child
+						if (child.Dispatch(tNextDispatchChild)) {	// no more child or child done
+							iter++;
+						}
+						else {
+							iter = m_children.erase(iter);
+							continue;
+						}
+					}
+					if (m_state.tNextDispatchChild > t0)
+						break;
+				} while (m_children.size());
+
+				// if no more child sequence, Dispatch Self
+				if (m_children.empty() and m_handle and !m_handle.done()) {
+					m_handle.promise().m_state.tNextDispatch = clock_t::time_point::max();
+					m_handle.resume();
+					m_state = m_handle.promise().m_state;
+					bContinue = !m_children.empty();	// if new child sequence added, continue to dispatch child
+				}
+			}
+			tNextDispatchOut = std::min(tNextDispatchOut, GetNextDispatchTime());
+			return m_children.size() or (m_handle and !m_handle.done());
+		}
+
+		/// @brief Add Child Sequence
+		void AddChild(id_t name, std::function<sSequence(sSequence&)> func) {
+			m_children.emplace_back(std::move(name));
+			m_children.back() = func(m_children.back());
+		}
+
+		/// @brief Find Child Sequence
+		/// @param name 
+		/// @return child sequence. if not found, empty child sequence.
+		sSequence& FindChild(id_t const& name) {
+			for (auto& child : m_children) {
+				if (child.m_name == name)
+					return child;
+			}
+#ifdef _DEBUG
+			assert(false);
+#endif
+			static sSequence dummy(coroutine_handle_t{nullptr});
+			return dummy;
+		}
+
+	};
+
+	//-------------------------------------------------------------------------
+	/// @brief sequence wrapper
+	template < typename tSelf >
+	class TSequence {
+	public:
+		using this_t = TSequence;
+		using self_t = tSelf;
 
 		template < typename ... targs >
-		std::suspend_always CreateSequenceParams(seq_func_t<targs...> funcSequence, targs&& ... args) {
-			m_sequences.emplace_back();
-			m_sequences.back() = funcSequence(m_sequences.back(), std::forward<targs>(args)...);
+		using tseq_func_t = std::function<sSequence(self_t*, sSequence&, targs&& ...)>;
+		using seq_func_t = tseq_func_t<>;
+
+	public:
+		//struct sAwaitable {
+		//	bool await_ready() { return false; }
+		//	bool await_suspend(handle_t h) {
+		//		return false;
+		//	}
+		//	void await_resume() { }
+		//};
+
+	protected:
+		id_t m_name;
+		sSequence m_driver;
+		std::map<id_t/*sequence name*/, tseq_func_t<sContext&>> m_mapFuncs;
+
+	public:
+		//-----------------------------------
+		TSequence(id_t name) : m_name{std::move(name)} {}
+		~TSequence() {}
+		TSequence(TSequence const&) = delete;
+		TSequence& operator = (TSequence const&) = delete;
+		TSequence(TSequence&& b) = default;
+		TSequence& operator = (TSequence&& b) = default;
+
+		//-----------------------------------
+		template < typename ... targs >
+		std::suspend_always CreateSequence(id_t name, sSequence& driver, tseq_func_t<targs...> funcSequence, targs&& ... args) {
+			tSelf* self = static_cast<tSelf*>(this);
+			auto func = [&, this](sSequence& seq) {
+				return funcSequence(self, seq, std::forward<targs>(args)...);
+			};
+			driver.AddChild(std::move(name), func);
 			return {};
 		}
-		std::suspend_always CreateSequence(std::function<xSequence(xSequence&)> funcSequence) {
-			m_sequences.emplace_back();
-			m_sequences.back() = funcSequence(m_sequences.back());
+		std::suspend_always CreateSequence(id_t name, sSequence& driver, seq_func_t funcSequence) {
+			tSelf* self = static_cast<tSelf*>(this);
+			auto func = [&, this](sSequence& seq) {
+				return funcSequence(self, seq);
+			};
+			driver.AddChild(std::move(name), func);
 			return {};
 		}
 
-		bool ProcessSingleStep() {
-			bool bContinue = false;
-			do {
-				bContinue = false;
-				for (auto iter = m_sequences.begin(); iter != m_sequences.end(); ) {
-					if (iter->ProcessSingleStep()) {
-						iter = m_sequences.erase(iter);
-					}
-					else {
-						iter++;
-					}
-				}
-				if (m_sequences.empty() and m_handle) {	// wait for child sequences to finish
-					if (!*m_handle or (*m_handle).done())
-						break;
-					(*m_handle)();
-					if ((*m_handle).promise().m_exception)
-						std::rethrow_exception((*m_handle).promise().m_exception);
-					//bContinue = true;
-				}
-			} while (bContinue);
-			return !m_handle or !*m_handle or (*m_handle).done();
+		auto Dispatch() {
+			gtl::seq::v01::clock_t::time_point tNextDispatch{gtl::seq::v01::clock_t::time_point::max()};
+			m_driver.Dispatch(tNextDispatch);
+			return tNextDispatch;
 		}
-	protected:
-		std::list<xSequence> m_sequences;
 	};
 
 };
