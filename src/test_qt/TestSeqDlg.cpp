@@ -6,12 +6,14 @@ using gtl::qt::ToQString;
 using gtl::qt::ToString;
 using namespace std::literals;
 
+gtl::seq::v01::sSequence g_driver("base");
+
 template < typename ... TArgs>
 void Log(fmt::format_string<TArgs...> format_string, TArgs&& ... args) {
 	OutputDebugStringA(fmt::format(format_string, std::forward<TArgs>(args) ...).c_str());
 }
 
-xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), base_seq_t("main") {
+xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), base_seq_t(g_driver, "main") {
 	ui.setupUi(this);
 
 	ui.txtMainThreadID->setText(ToQString(fmt::format("{}", std::this_thread::get_id())));
@@ -116,6 +118,9 @@ seq_t xTestSeqDlg::SuspendAny(seq_t& self, int) {
 }
 
 seq_t xTestSeqDlg::SuspendHandler(seq_t& self, seq_param_t param) {
+	auto& in = param->in;
+	auto& out = param->out;
+
 	auto sl = std::source_location::current();
 	auto t0 = std::chrono::steady_clock::now();
 	//static std::atomic<int>	counter{};
@@ -145,10 +150,10 @@ seq_t xTestSeqDlg::Seq1(seq_t& self, seq_param_t param) {
 	ui.txtMessage1->setText(ToQString(fmt::format("{}", ++counter)));
 	//CreateSequence("child2", self, &this_t::Suspend);
 	auto param2 = std::make_shared<gtl::seq::sParam>();
-	param2->in["duration"] = 2000;
+	param2->in["duration"] = 1500;
 	CreateSequence("child2", self, &this_t::SuspendHandler, param2);
 	co_yield {10ms};
-	ui.txtMessage1->setText(ToQString(fmt::format("{}", gtl::ValueOr(param->out["result"], "no result"s))));
+	ui.txtMessage1->setText(ToQString(fmt::format("{}", gtl::ValueOr(param2->out["result"], "no result"s))));
 	//co_yield 10ms;
 
 	//for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {

@@ -86,10 +86,12 @@ namespace gtl::seq::inline v01 {
 		};
 
 	protected:
+		std::thread::id const m_threadID{std::this_thread::get_id()};
 		id_t m_name;
 		coroutine_handle_t m_handle;
 		clock_t::time_point m_timeout{clock_t::time_point::max()};
 		sState m_state;
+		std::mutex m_mtxChildren;
 		std::list<sSequence> m_children;
 
 	public:
@@ -169,6 +171,10 @@ namespace gtl::seq::inline v01 {
 		/// @brief Dispatch.
 		/// @return true if need next dispatch
 		bool Dispatch(clock_t::time_point& tNextDispatchOut) {
+			if (std::this_thread::get_id() != m_threadID) {
+				assert(false);
+				return false;
+			}
 			// Dispatch Child Sequences
 			for (bool bContinue{true}; bContinue;) {
 				bContinue = false;
@@ -176,6 +182,7 @@ namespace gtl::seq::inline v01 {
 					auto const t0 = clock_t::now();
 					auto& tNextDispatchChild = m_state.tNextDispatchChild;
 					tNextDispatchChild = clock_t::time_point::max();	// send to the future
+					//std::scoped_lock lock{m_mtxChildren};
 					for (auto iter = m_children.begin(); iter != m_children.end();) {
 						tNextDispatchChild = clock_t::time_point::max();	// send to the future
 						auto& child = *iter;
@@ -219,6 +226,9 @@ namespace gtl::seq::inline v01 {
 
 		/// @brief Add Child Sequence
 		sSequence& AddChild(id_t name, std::function<sSequence(sSequence&)> func) {
+			//std::optional<std::scoped_lock<std::mutex>> lock;
+			//if (std::this_thread::get_id() != m_threadID)
+			//	lock.emplace(m_mtxChildren);
 			m_children.emplace_back();
 			m_children.back() = func(m_children.back());
 			m_children.back().m_name = std::move(name);
@@ -252,7 +262,6 @@ namespace gtl::seq::inline v01 {
 
 		template < typename ... targs >
 		using tseq_func_t = std::function<sSequence(self_t*, sSequence&, targs&& ...)>;
-
 		using seq_func_t = tseq_func_t<>;
 		using seq_handler_t = tseq_func_t<std::shared_ptr<sParam>>;
 
@@ -267,12 +276,12 @@ namespace gtl::seq::inline v01 {
 
 	protected:
 		id_t m_name;
-		sSequence m_driver;
+		sSequence& m_driver;
 		std::map<id_t/*sequence name*/, seq_handler_t> m_mapFuncs;
 
 	public:
 		//-----------------------------------
-		TSequence(id_t name) : m_name{std::move(name)} {}
+		TSequence(sSequence& driver, id_t name) : m_driver(driver), m_name{std::move(name)} {}
 		~TSequence() {}
 		TSequence(TSequence const&) = delete;
 		TSequence& operator = (TSequence const&) = delete;
