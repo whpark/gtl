@@ -34,6 +34,15 @@
 namespace gtl {
 #pragma pack(push, 8)
 
+	template <typename T>
+	decltype(auto) ValueOr(glz::json_t const& j, T const& def) {
+		if (auto* v = j.get_if<T>()) {
+			return *v;
+		}
+		return def;
+	};
+
+
 	// for cv::Mat
 
 	struct cvMat {

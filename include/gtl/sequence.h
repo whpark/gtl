@@ -34,7 +34,7 @@ namespace gtl::seq::inline v01 {
 
 	//-------------------------------------------------------------------------
 	/// @brief sequence function parameter (in/out)
-	struct sContext {
+	struct sParam {
 		glz::json_t in, out;
 	};
 
@@ -49,8 +49,8 @@ namespace gtl::seq::inline v01 {
 		sState(clock_t::duration d) {
 			tNextDispatch = (d.count() == 0) ? clock_t::time_point{} : clock_t::now() + d;
 		}
-		sState(std::suspend_always) : tNextDispatch(clock_t::time_point::max()) {}
-		sState(std::suspend_never) : tNextDispatch{} {}
+		sState(std::suspend_always ) : tNextDispatch(clock_t::time_point::max()) {}
+		sState(std::suspend_never ) : tNextDispatch{} {}
 		sState(sState const&) = default;
 		sState(sState&&) = default;
 		sState& operator = (sState const&) = default;
@@ -127,11 +127,15 @@ namespace gtl::seq::inline v01 {
 		~sSequence() {
 			Destroy();
 		}
-		void Destroy() {
+		inline void Destroy() {
 			m_name.clear();
 			if (auto h = std::exchange(m_handle, nullptr); h) {
 				h.destroy();
 			}
+		}
+
+		inline bool IsDone() const {
+			return m_children.empty() and (!m_handle or m_handle.done());
 		}
 
 		/// @brief 
@@ -160,8 +164,6 @@ namespace gtl::seq::inline v01 {
 			m_state.tNextDispatch = tWhen;
 			return true;
 		}
-
-		/// @brief reserves next dispatch time. NOT dispatch, NOT reserve dispatch itself.
 		bool ReserveResume(clock_t::duration dur) { return ReserveResume(dur.count() ? clock_t::now() + dur : clock_t::time_point{}); }
 
 		/// @brief Dispatch.
@@ -212,13 +214,15 @@ namespace gtl::seq::inline v01 {
 				}
 			}
 			tNextDispatchOut = std::min(tNextDispatchOut, GetNextDispatchTime());
-			return m_children.size() or (m_handle and !m_handle.done());
+			return !IsDone();
 		}
 
 		/// @brief Add Child Sequence
-		void AddChild(id_t name, std::function<sSequence(sSequence&)> func) {
-			m_children.emplace_back(std::move(name));
+		sSequence& AddChild(id_t name, std::function<sSequence(sSequence&)> func) {
+			m_children.emplace_back();
 			m_children.back() = func(m_children.back());
+			m_children.back().m_name = std::move(name);
+			return m_children.back();
 		}
 
 		/// @brief Find Child Sequence
@@ -248,7 +252,9 @@ namespace gtl::seq::inline v01 {
 
 		template < typename ... targs >
 		using tseq_func_t = std::function<sSequence(self_t*, sSequence&, targs&& ...)>;
+
 		using seq_func_t = tseq_func_t<>;
+		using seq_handler_t = tseq_func_t<std::shared_ptr<sParam>>;
 
 	public:
 		//struct sAwaitable {
@@ -262,7 +268,7 @@ namespace gtl::seq::inline v01 {
 	protected:
 		id_t m_name;
 		sSequence m_driver;
-		std::map<id_t/*sequence name*/, tseq_func_t<sContext&>> m_mapFuncs;
+		std::map<id_t/*sequence name*/, seq_handler_t> m_mapFuncs;
 
 	public:
 		//-----------------------------------
@@ -275,25 +281,27 @@ namespace gtl::seq::inline v01 {
 
 		//-----------------------------------
 		template < typename ... targs >
-		std::suspend_always CreateSequence(id_t name, sSequence& driver, tseq_func_t<targs...> funcSequence, targs&& ... args) {
+		sSequence& CreateSequenceAny(id_t name, sSequence& seqParent, tseq_func_t<targs...> funcSequence, targs&& ... args) {
 			tSelf* self = static_cast<tSelf*>(this);
 			auto func = [&, this](sSequence& seq) {
 				return funcSequence(self, seq, std::forward<targs>(args)...);
 			};
-			driver.AddChild(std::move(name), func);
-			return {};
+			return seqParent.AddChild(std::move(name), func);
 		}
-		std::suspend_always CreateSequence(id_t name, sSequence& driver, seq_func_t funcSequence) {
+		sSequence& CreateSequence(id_t name, sSequence& seqParent, seq_handler_t funcSequence, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
 			tSelf* self = static_cast<tSelf*>(this);
 			auto func = [&, this](sSequence& seq) {
-				return funcSequence(self, seq);
+				if (!params)
+					params = std::make_shared<sParam>();
+				return funcSequence(self, seq, std::move(params));
 			};
-			driver.AddChild(std::move(name), func);
-			return {};
+			return seqParent.AddChild(std::move(name), func);
 		}
 
-		auto Dispatch() {
-			gtl::seq::v01::clock_t::time_point tNextDispatch{gtl::seq::v01::clock_t::time_point::max()};
+		/// @brief Dispatch
+		/// @return next dispatch time
+		clock_t::time_point Dispatch() {
+			clock_t::time_point tNextDispatch{gtl::seq::v01::clock_t::time_point::max()};
 			m_driver.Dispatch(tNextDispatch);
 			return tNextDispatch;
 		}
