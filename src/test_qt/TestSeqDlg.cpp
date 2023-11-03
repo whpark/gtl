@@ -6,7 +6,7 @@ using gtl::qt::ToQString;
 using gtl::qt::ToString;
 using namespace std::literals;
 
-gtl::seq::v01::sSequence g_driver("base");
+seq_t g_driver(nullptr);
 
 template < typename ... TArgs>
 void Log(fmt::format_string<TArgs...> format_string, TArgs&& ... args) {
@@ -24,8 +24,21 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), base_seq_t(g_driver
 	connect(ui.btnSeq1, &QPushButton::clicked, [this]() {
 		//m_top.AddSequence([this](Generator<int>& self) -> Generator<int> { return Seq1(self); });
 		using namespace std::placeholders;
-		CreateSequence("ChildSequence"s, m_driver, &this_t::Seq1);
+		//m_driver.CreateChildSequence("ChildSequence"s, [this]{ return this->Seq1(); });
+		//m_driver.CreateChildSequence("ChildSequence"s, std::bind(&this_t::Seq1, this, std::make_shared<gtl::seq::sParam>()));
+		CreateChildSequence(m_driver, "MainSequence"s, &this_t::Seq1);
 	});
+
+	connect(ui.btnSeqContinue, &QPushButton::clicked, [this]() {
+		if (auto* seq = m_driver.FindChildDFS("SuspendString")) {
+			seq->ReserveResume();
+		}
+	});
+
+	std::jthread j([this]{
+		CreateChildSequence(m_driver, "MainSequence"s, &this_t::Seq1);		// seq injection from other thread
+	});
+	j.join();
 
 	//connect(this, &xTestSeqDlg::sigSequence, this, [this]() { Dispatch();}, Qt::QueuedConnection);
 	//m_thread = std::jthread([this](std::stop_token st) {
@@ -62,7 +75,7 @@ void xTestSeqDlg::Dispatch() {
 	//}
 }
 
-seq_t Suspend3(seq_t& self, std::string const&) {
+seq_t Suspend3(std::string const&) {
 	auto sl = std::source_location::current();
 
 	//static std::atomic<int>	counter{};
@@ -79,7 +92,7 @@ seq_t Suspend3(seq_t& self, std::string const&) {
 	co_yield {10ms};
 }
 
-seq_t xTestSeqDlg::Suspend(seq_t& self, seq_param_t param) {
+seq_t xTestSeqDlg::Suspend(seq_param_t param) {
 	auto sl = std::source_location::current();
 
 	//static std::atomic<int>	counter{};
@@ -98,7 +111,7 @@ seq_t xTestSeqDlg::Suspend(seq_t& self, seq_param_t param) {
 	co_yield {0ms};
 }
 
-seq_t xTestSeqDlg::SuspendAny(seq_t& self, int) {
+seq_t xTestSeqDlg::SuspendAny(int) {
 	auto sl = std::source_location::current();
 
 	//static std::atomic<int>	counter{};
@@ -117,7 +130,7 @@ seq_t xTestSeqDlg::SuspendAny(seq_t& self, int) {
 	co_yield {0ms};
 }
 
-seq_t xTestSeqDlg::SuspendHandler(seq_t& self, seq_param_t param) {
+seq_t xTestSeqDlg::SuspendHandler(seq_param_t param) {
 	auto& in = param->in;
 	auto& out = param->out;
 
@@ -142,7 +155,7 @@ seq_t xTestSeqDlg::SuspendHandler(seq_t& self, seq_param_t param) {
 	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
 }
 
-seq_t xTestSeqDlg::Seq1(seq_t& self, seq_param_t param) {
+seq_t xTestSeqDlg::Seq1(seq_param_t param) {
 	static std::atomic<int> counter_{};
 	int counter = (counter_ += 3)-3;
 	Log("Seq1 Begin\n");
@@ -151,7 +164,7 @@ seq_t xTestSeqDlg::Seq1(seq_t& self, seq_param_t param) {
 	//CreateSequence("child2", self, &this_t::Suspend);
 	auto param2 = std::make_shared<gtl::seq::sParam>();
 	param2->in["duration"] = 1500;
-	CreateSequence("child2", self, &this_t::SuspendHandler, param2);
+	CreateChildSequence("child2", &this_t::SuspendHandler, param2);
 	co_yield {10ms};
 	ui.txtMessage1->setText(ToQString(fmt::format("{}", gtl::ValueOr(param2->out["result"], "no result"s))));
 	//co_yield 10ms;
@@ -160,12 +173,13 @@ seq_t xTestSeqDlg::Seq1(seq_t& self, seq_param_t param) {
 	//	co_await std::suspend_always();
 	//}
 	ui.txtMessage2->setText(ToQString(fmt::format("{}", ++counter)));
-	CreateSequenceAny<int>("child2", self, &this_t::SuspendAny, 3);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
+	
+	m_driver.GetCurrentSequence()->CreateChildSequence<std::string>("SuspendString", Suspend3, "sdfasdf"s);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 	co_yield {10ms};
 	//co_await self.CreateSequenceParams<std::string>(Suspend3, std::string{});//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 
 	ui.txtMessage2->setText(ToQString(fmt::format("{}-2", counter)));
-	CreateSequence("child3", self, &this_t::Suspend);
+	CreateChildSequence("child3", &this_t::Suspend);
 	//CreateSequence("child4", self, &this_t::Suspend);
 	//CreateSequence("child5", self, &this_t::Suspend);
 	//CreateSequence("child6", self, &this_t::Suspend);

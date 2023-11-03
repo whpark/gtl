@@ -46,7 +46,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>114</x>
@@ -66,6 +66,19 @@
      <widget class="QLineEdit" name="txtMessage3"/>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="btnSeqContinue">
+   <property name="geometry">
+    <rect>
+     <x>16</x>
+     <y>74</y>
+     <width>75</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Continue</string>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

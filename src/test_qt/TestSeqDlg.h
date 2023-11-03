@@ -4,7 +4,7 @@
 #include "ui_TestSeqDlg.h"
 #include "gtl/sequence.h"
 
-using seq_t = gtl::seq::sSequence;
+using seq_t = gtl::seq::xSequence;
 using seq_param_t = std::shared_ptr<gtl::seq::sParam>;
 
 class xTestSeqDlg : public QDialog, public gtl::seq::v01::TSequence<xTestSeqDlg> {
@@ -22,10 +22,10 @@ public:
 	std::jthread m_thread;
 	void Dispatch();
 
-	seq_t Seq1(seq_t& self, seq_param_t param = {});
-	seq_t Suspend(seq_t& self, seq_param_t param = {});
-	seq_t SuspendHandler(seq_t& self, seq_param_t param = {});
-	seq_t SuspendAny(seq_t& self, int);
+	seq_t Seq1(seq_param_t param = {});
+	seq_t Suspend(seq_param_t param = {});
+	seq_t SuspendHandler(seq_param_t param = {});
+	seq_t SuspendAny(int);
 
 Q_SIGNALS:
 	void sigSequence();
