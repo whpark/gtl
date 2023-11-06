@@ -68,7 +68,8 @@ void xTestSeqDlg::Dispatch() {
 	}
 	t0 = t1;
 
-	auto tNext = base_seq_t::Dispatch();
+	//auto tNext = base_seq_t::Dispatch();
+	auto tNext = m_driver.Dispatch();
 	//if (tNext < gtl::seq::clock_t::time_point::max()) {
 	//	auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(tNext - t1);
 	//	m_timer.start(std::max(1ms, dur));
@@ -131,8 +132,10 @@ seq_t xTestSeqDlg::SuspendAny(int) {
 }
 
 seq_t xTestSeqDlg::SuspendHandler(seq_param_t param) {
-	auto& in = param->in;
-	auto& out = param->out;
+	glz::json_t in;
+	glz::read_json(in, param->in);
+	glz::json_t out;
+	gtl::xFinalAction result([&] { glz::write_json(out, param->out); });
 
 	auto sl = std::source_location::current();
 	auto t0 = std::chrono::steady_clock::now();
@@ -141,7 +144,7 @@ seq_t xTestSeqDlg::SuspendHandler(seq_param_t param) {
 	auto i = counter++;
 	Log("{} <<<<<<<< {} \n", sl.function_name(), i);
 	int loop{};
-	auto duration = std::chrono::milliseconds{param->in["duration"].as<int>()};
+	auto duration = std::chrono::milliseconds{in["duration"].as<int>()};
 	if (duration <= 1000ms)
 		duration = 1000ms;
 	for (auto t = t0; t - t0 < duration; t = std::chrono::steady_clock::now()) {
@@ -150,7 +153,7 @@ seq_t xTestSeqDlg::SuspendHandler(seq_param_t param) {
 		co_yield {100ms};
 		Log("{} await > {}\n", sl.function_name(), i);
 	}
-	param->out["result"] = std::format("time : {}",
+	out["result"] = std::format("time : {}",
 		std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0));
 	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
 }
@@ -162,11 +165,15 @@ seq_t xTestSeqDlg::Seq1(seq_param_t param) {
 	//co_await step1();
 	ui.txtMessage1->setText(ToQString(fmt::format("{}", ++counter)));
 	//CreateSequence("child2", self, &this_t::Suspend);
-	auto param2 = std::make_shared<gtl::seq::sParam>();
-	param2->in["duration"] = 1500;
+	glz::json_t in;
+	in["duration"] = 1500;
+	auto param2 = std::make_shared<base_seq_t::sParam>();
+	glz::write_json(in, param2->in);
 	CreateChildSequence("child2", &this_t::SuspendHandler, param2);
 	co_yield {10ms};
-	ui.txtMessage1->setText(ToQString(fmt::format("{}", gtl::ValueOr(param2->out["result"], "no result"s))));
+	glz::json_t out;
+	glz::read_json(out, param2->out);
+	ui.txtMessage1->setText(ToQString(fmt::format("{}", gtl::ValueOr(out["result"], "no result"s))));
 	//co_yield 10ms;
 
 	//for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {

@@ -2,7 +2,7 @@
 
 //////////////////////////////////////////////////////////////////////
 //
-// sequence.h: Sequence Loop (using co-routine) Mocha::MIP like ...
+// sequence.h: Sequence Loop (using co-routine) (Mocha::MIP like ...)
 //
 // PWH
 // 2023-10-27
@@ -16,18 +16,23 @@
 #include <functional>
 #include <optional>
 #include <format>
+#include <chrono>
+#include <mutex>
+#include <thread>
+#include <set>
+#include <map>
 
 namespace gtl::seq::inline v01 {
 
-	using clock_t= std::chrono::high_resolution_clock;
+	using seq_id_t = std::string;
+	using clock_t = std::chrono::high_resolution_clock;
 	using ms_t = std::chrono::milliseconds;
-	using id_t = std::string;
 
 	//-------------------------------------------------------------------------
 	/// @brief used as co_yield value
 	struct sState {
 		clock_t::time_point tNextDispatch{};
-		clock_t::time_point tNextDispatchChild{clock_t::time_point::max()};
+		mutable clock_t::time_point tNextDispatchChild{clock_t::time_point::max()};	// cache
 		//bool bDone{false};
 
 		sState(clock_t::time_point t = clock_t::now()) : tNextDispatch(t) {}
@@ -75,7 +80,7 @@ namespace gtl::seq::inline v01 {
 		coroutine_handle_t m_handle;
 		inline thread_local static xSequence* s_seqCurrent{};
 		std::thread::id m_threadID{std::this_thread::get_id()};	// NOT const. may be created from other thread (injection)
-		id_t m_name;
+		seq_id_t m_name;
 		//clock_t::time_point m_timeout{clock_t::time_point::max()};
 		sState m_state;
 		std::list<xSequence> m_children;
@@ -84,7 +89,7 @@ namespace gtl::seq::inline v01 {
 
 	public:
 		// constructor
-		//xSequence(id_t name = "") : m_name(std::move(name)) {}
+		//xSequence(seq_id_t name = "") : m_name(std::move(name)) {}
 		xSequence(coroutine_handle_t&& h) : m_handle(std::exchange(h, nullptr)) { }
 		xSequence(xSequence const&) = delete;
 		xSequence& operator = (xSequence const&) = delete;
@@ -109,7 +114,7 @@ namespace gtl::seq::inline v01 {
 			m_handle = std::exchange(h, nullptr);
 			return *this;
 		}
-		void SetName(id_t name) {
+		void SetName(seq_id_t name) {
 			this->m_name = std::move(name);
 		}
 
@@ -211,7 +216,7 @@ namespace gtl::seq::inline v01 {
 		/// @param ...args for coroutine function. must be moved or copied.
 		/// @return 
 		template < typename ... targs >
-		xSequence& CreateChildSequence(id_t name, std::function<xSequence(targs ...)> func, targs... args) {
+		xSequence& CreateChildSequence(seq_id_t name, std::function<xSequence(targs ...)> func, targs... args) {
 			if constexpr (false) {	// todo: do I need this?
 				if (std::this_thread::get_id() != m_threadID) {
 					throw std::exception("CreateChildSequence() must be called from the same thread as the driver");
@@ -234,7 +239,7 @@ namespace gtl::seq::inline v01 {
 		/// @brief Find Child Sequence (Direct Child Only)
 		/// @param name 
 		/// @return child sequence. if not found, empty child sequence.
-		auto FindDirectChild(this auto&& self, id_t const& name) -> decltype(&self) {
+		auto FindDirectChild(this auto&& self, seq_id_t const& name) -> decltype(&self) {
 			std::optional<std::scoped_lock<std::mutex>> lock;
 			if (std::this_thread::get_id() != self.m_threadID)
 				lock.emplace(self.m_mtxChildren);
@@ -249,7 +254,7 @@ namespace gtl::seq::inline v01 {
 		/// @brief Find Child Sequence (Depth First Search)
 		/// @param name 
 		/// @return child sequence. if not found, empty child sequence.
-		auto FindChildDFS(this auto&& self, id_t const& name) -> decltype(&self) {
+		auto FindChildDFS(this auto&& self, seq_id_t const& name) -> decltype(&self) {
 			// todo: if called from other thread... how? use recursive mutex ?? too expansive
 			if (std::this_thread::get_id() != self.m_threadID)
 				return nullptr;
@@ -340,111 +345,17 @@ namespace gtl::seq::inline v01 {
 	};
 
 	//-------------------------------------------------------------------------
-	/// @brief sequence map manager
-	class xSequenceHandlerMap {
-	public:
-		struct sParam {
-			std::string in, out;
-		};
-
-		using this_t = xSequenceHandlerMap;
-		using handler_t = std::function<xSequence&(std::shared_ptr<sParam>)>;
-		using map_t = std::map<id_t, handler_t>;
-
-	protected:
-		id_t m_unit;
-		this_t* m_top{};
-		this_t* m_parent{};
-		std::set<this_t*> m_children;
-
-		map_t m_mapFuncs;
-	public:
-		// constructors and destructor
-		xSequenceHandlerMap(this_t* parent) : m_parent(parent) {
-			if (m_parent) {
-				m_parent->Register(this);
-				m_top = parent->m_top;
-			}
-		}
-		~xSequenceHandlerMap() {
-			if (auto* parent = std::exchange(m_parent, nullptr))
-				parent->Unregister(this);
-		}
-		xSequenceHandlerMap(xSequenceHandlerMap const&) = delete;
-		xSequenceHandlerMap& operator = (xSequenceHandlerMap const&) = delete;
-		xSequenceHandlerMap(xSequenceHandlerMap&& b) {
-			if (this == &b)
-				return ;
-
-			if (auto* parent = std::exchange(b.m_parent, nullptr)) {
-				parent->Unregister(&b);
-				m_parent = parent;
-				m_top = parent->m_top;
-			}
-			m_unit = std::exchange(b.m_unit, {});
-			m_top = std::exchange(b.m_top, nullptr);
-			m_children.swap(b.m_children);
-
-			if (m_parent)
-				m_parent->Register(this);
-		}
-		xSequenceHandlerMap& operator = (xSequenceHandlerMap&&) = delete;	// if has some children, no way to remove children from parent
-
-		//-----------------------------------
-		void Register(this_t* child) {
-			if (child)
-				m_children.insert(child);
-		}
-		void Unregister(this_t* child) {
-			if (child)
-				m_children.erase(child);
-		}
-
-		//-----------------------------------
-		// Find Handler
-		inline handler_t FindHandler(id_t const& sequence) const {
-			if (auto iter = m_mapFuncs.find(sequence); iter != m_mapFuncs.end())
-				return iter->second;
-			return nullptr;
-		}
-		handler_t FindHandlerDFS(id_t const& sequence) const {
-			if (auto handler = FindHandler(sequence))
-				return handler;
-			for (auto* child : m_children) {
-				if (auto func = child->FindHandlerDFS(sequence))
-					return func;
-			}
-			return nullptr;
-		}
-
-		//-----------------------------------
-		// Find Map
-		inline auto FindMapDFS(this auto&& self, id_t const& unit) -> decltype(&self) {
-			if (m_unit == unit)
-				return const_cast<this_t*>(this);
-			for (auto* child : self.m_children) {
-				if (auto* map = child->FindMapDFS(unit))
-					return map;
-			}
-			return nullptr;
-		}
-
-		inline xSequence& CreateChildSequence(xSequence& parent, id_t name, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
-			if (auto handler = FindHandler(name)) {
-				return parent.CreateChildSequence<std::shared_ptr<sParam>>(std::move(name), handler, std::move(params));
-			}
-			throw std::exception(std::format("no handler: {}", name).c_str());
-		}
-
-	};
-
-	//-------------------------------------------------------------------------
 	/// @brief sequence wrapper, with sequence map
 	template < typename tSelf >
-	class TSequence : public xSequenceHandlerMap {
+	class TSequence {
 	public:
 		using this_t = TSequence;
 		using self_t = tSelf;
+		using seq_unit_t = std::string;
+
+		struct sParam {
+			std::string in, out;
+		};
 
 		template < typename ... targs >
 		using tseq_handler_t = std::function<xSequence(self_t*, targs&& ...)>;
@@ -458,10 +369,13 @@ namespace gtl::seq::inline v01 {
 		//	}
 		//	void await_resume() { }
 		//};
+	protected:
+		seq_unit_t m_name;
+		xSequence& m_driver;
 
 	public:
 		//-----------------------------------
-		TSequence() : m_driver(driver), m_name{std::move(name)} {}
+		TSequence(xSequence& driver, seq_unit_t name) : m_driver(driver), m_name{std::move(name)} {}
 		~TSequence() {}
 		TSequence(TSequence const&) = delete;
 		TSequence& operator = (TSequence const&) = delete;
@@ -471,36 +385,17 @@ namespace gtl::seq::inline v01 {
 		//-----------------------------------
 		// Helper functions
 		auto const& GetName() const { return m_name; }
-		auto const& GetSeqMap() const { return m_mapFuncs; }
-
-		// Connect Sequence
-		bool ConnectSequence(gtl::seq::id_t const& name, seq_handler_t func) {
-			m_mapFuncs[name] = std::move(func);
-		}
-
-		// Find Child Handler
-		inline seq_handler_t FindSequenceHandler(id_t const& name) const {
-			if (auto iter = m_mapFuncs.find(name); iter == m_mapFuncs.end())
-				return iter->second;
-			return nullptr;
-		}
 
 		// Create Child Sequence
-		inline xSequence& CreateChildSequence(xSequence& seqParent, id_t name, seq_handler_t funcSequence, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
+		inline xSequence& CreateChildSequence(xSequence& seqParent, seq_unit_t name, seq_handler_t funcSequence, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
 			tSelf* self = static_cast<tSelf*>(this);
 			return seqParent.CreateChildSequence<tSelf*, std::shared_ptr<sParam>>(std::move(name), funcSequence, self, std::move(params));
 		}
-		inline xSequence& CreateChildSequence(id_t name, seq_handler_t funcSequence, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
+		inline xSequence& CreateChildSequence(seq_unit_t name, seq_handler_t funcSequence, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
 			auto* seqParent = m_driver.GetCurrentSequence();
 			if (!seqParent)
 				throw std::exception("CreateChildSequence() must be called from sequence function");
 			return CreateChildSequence(*seqParent, std::move(name), funcSequence, std::move(params));
-		}
-		inline xSequence& CreateChildSequence(id_t name, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
-			auto funcSequence = FindSequenceHandler(name);
-			if (!funcSequence)
-				throw std::exception("no such function");
-			return CreateChildSequence(std::move(name), funcSequence, std::move(params));
 		}
 	};
 

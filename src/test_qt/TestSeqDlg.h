@@ -5,7 +5,6 @@
 #include "gtl/sequence.h"
 
 using seq_t = gtl::seq::xSequence;
-using seq_param_t = std::shared_ptr<gtl::seq::sParam>;
 
 class xTestSeqDlg : public QDialog, public gtl::seq::v01::TSequence<xTestSeqDlg> {
 	Q_OBJECT
@@ -13,6 +12,7 @@ public:
 	using this_t = xTestSeqDlg;
 	using base_seq_t = gtl::seq::v01::TSequence<xTestSeqDlg>;
 	using base_t = QDialog;
+	using seq_param_t = std::shared_ptr<base_seq_t::sParam>;
 
 public:
 	xTestSeqDlg(QWidget* parent = nullptr);
