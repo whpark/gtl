@@ -38,6 +38,12 @@
     <ClCompile Include="TestSeqDlg.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="SeqMainDlg.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
+    <ClCompile Include="SeqChildDlg.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -54,12 +60,24 @@
     <QtMoc Include="TestSeqDlg.h">
       <Filter>code</Filter>
     </QtMoc>
+    <QtMoc Include="SeqMainDlg.h">
+      <Filter>code</Filter>
+    </QtMoc>
+    <QtMoc Include="SeqChildDlg.h">
+      <Filter>code</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="test_qt.ui">
       <Filter>code</Filter>
     </QtUic>
     <QtUic Include="TestSeqDlg.ui">
+      <Filter>code</Filter>
+    </QtUic>
+    <QtUic Include="SeqMainDlg.ui">
+      <Filter>code</Filter>
+    </QtUic>
+    <QtUic Include="SeqChildDlg.ui">
       <Filter>code</Filter>
     </QtUic>
   </ItemGroup>

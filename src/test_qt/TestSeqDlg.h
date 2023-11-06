@@ -7,13 +7,13 @@
 
 using seq_t = gtl::seq::xSequence;
 
-class xTestSeqDlg : public QDialog, public gtl::seq::v01::TSequence<xTestSeqDlg> {
+class xTestSeqDlg : public QDialog, public gtl::seq::v01::TSequenceMap<> {
 	Q_OBJECT
 public:
 	using this_t = xTestSeqDlg;
-	using base_seq_t = gtl::seq::v01::TSequence<xTestSeqDlg>;
+	using seq_map_t = gtl::seq::v01::TSequenceMap<>;
 	using base_t = QDialog;
-	using seq_param_t = std::shared_ptr<base_seq_t::sParam>;
+	using seq_param_t = std::shared_ptr<seq_map_t::sParam>;
 
 public:
 	xTestSeqDlg(QWidget* parent = nullptr);

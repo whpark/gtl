@@ -245,11 +245,17 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <QtMoc Include="SeqChildDlg.h" />
+    <QtMoc Include="SeqMainDlg.h" />
     <QtMoc Include="TestSeqDlg.h" />
     <QtRcc Include="test_qt.qrc" />
+    <QtUic Include="SeqChildDlg.ui" />
+    <QtUic Include="SeqMainDlg.ui" />
     <QtUic Include="TestSeqDlg.ui" />
     <QtUic Include="test_qt.ui" />
     <QtMoc Include="test_qt.h" />
+    <ClCompile Include="SeqChildDlg.cpp" />
+    <ClCompile Include="SeqMainDlg.cpp" />
     <ClCompile Include="TestSeqDlg.cpp" />
     <ClCompile Include="test_qt.cpp" />
     <ClCompile Include="main.cpp" />

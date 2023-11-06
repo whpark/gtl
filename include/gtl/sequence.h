@@ -83,13 +83,14 @@ namespace gtl::seq::inline v01 {
 		seq_id_t m_name;
 		//clock_t::time_point m_timeout{clock_t::time_point::max()};
 		sState m_state;
+
 		std::list<xSequence> m_children;
 	public:
 		mutable std::mutex m_mtxChildren;
 
 	public:
 		// constructor
-		//xSequence(seq_id_t name = "") : m_name(std::move(name)) {}
+		explicit xSequence(seq_id_t name = "") : m_name(std::move(name)) {}
 		xSequence(coroutine_handle_t&& h) : m_handle(std::exchange(h, nullptr)) { }
 		xSequence(xSequence const&) = delete;
 		xSequence& operator = (xSequence const&) = delete;
@@ -116,6 +117,9 @@ namespace gtl::seq::inline v01 {
 		}
 		void SetName(seq_id_t name) {
 			this->m_name = std::move(name);
+		}
+		auto const& GetName() const {
+			return m_name;
 		}
 
 		// destructor
@@ -235,6 +239,9 @@ namespace gtl::seq::inline v01 {
 			m_children.back().m_name = std::move(name);
 			return m_children.back();
 		}
+		inline xSequence& CreateChildSequence(seq_id_t name, std::function<xSequence()> func) {
+			return CreateChildSequence<>(std::move(name), func);
+		}
 
 		/// @brief Find Child Sequence (Direct Child Only)
 		/// @param name 
@@ -302,7 +309,7 @@ namespace gtl::seq::inline v01 {
 					tNextDispatchChild = clock_t::time_point::max();	// suspend (do preset for there is no child sequence)
 					std::scoped_lock lock{m_mtxChildren};
 					for (auto iter = m_children.begin(); iter != m_children.end();) {
-						tNextDispatchChild = clock_t::time_point::max();	// suspend
+						//tNextDispatchChild = clock_t::time_point::max();	// suspend
 						auto& child = *iter;
 
 						// Check Time
@@ -327,6 +334,7 @@ namespace gtl::seq::inline v01 {
 
 				// if no more child sequence, Dispatch Self
 				if (m_children.empty() and m_handle and !m_handle.done()) {
+					m_state.tNextDispatch = clock_t::time_point::max();
 					m_handle.promise().m_state.tNextDispatch = clock_t::time_point::max();
 
 					// Dispatch
@@ -336,6 +344,9 @@ namespace gtl::seq::inline v01 {
 
 					m_state = m_handle.promise().m_state;
 					bContinue = !m_children.empty();	// if new child sequence added, continue to dispatch child
+					if (m_handle.promise().m_exception) {
+						std::rethrow_exception(m_handle.promise().m_exception);
+					}
 				}
 			}
 			tNextDispatchOut = std::min(tNextDispatchOut, GetNextDispatchTime());

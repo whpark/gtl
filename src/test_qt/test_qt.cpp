@@ -42,14 +42,6 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	ui.treeView->setModel(&m_modelGlaze);
 
-	// Test Sequence
-	{
-		if (!m_dlgTestSeq)
-			m_dlgTestSeq = std::make_unique<xTestSeqDlg>(this);
-		m_dlgTestSeq->show();
-		m_dlgTestSeq->setFocus();
-	}
-
 	{
 		glz::json_t j{};
 		sJsonTest test;
@@ -142,6 +134,23 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 		m_dlgTestSeq->setFocus();
 	});
 	gtl::qt::LoadWindowPosition(reg, "test_qt", this);
+
+	// Test Sequence
+	{
+		if (!m_dlgTestSeq)
+			m_dlgTestSeq = std::make_unique<xTestSeqDlg>(this);
+		m_dlgTestSeq->show();
+
+		if (!m_dlgSeqMain)
+			m_dlgSeqMain = std::make_unique<xSeqMainDlg>(this);
+		m_dlgSeqMain->show();
+		m_dlgSeqMain->setFocus();
+		if (!m_dlgSeqChild)
+			m_dlgSeqChild = std::make_unique<xSeqChildDlg>(*m_dlgSeqMain.get(), this);
+		m_dlgSeqChild->show();
+		m_dlgSeqChild->move(m_dlgSeqMain->pos() + QPoint(0, m_dlgSeqMain->height()+30));
+	}
+
 }
 
 gtl::qt::test_qt::~test_qt() {

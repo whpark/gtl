@@ -10,6 +10,9 @@
 
 #include "TestSeqDlg.h"
 
+#include "SeqMainDlg.h"
+#include "SeqChildDlg.h"
+
 namespace gtl::qt { class test_qt; }
 
 class gtl::qt::test_qt : public QMainWindow {
@@ -29,6 +32,8 @@ public:
 	//std::unique_ptr<gtl::qt::xMatView> m_ctrlMatView;
 	std::unique_ptr<gtl::qt::xMatViewDlg> m_dlgMatView;
 	std::unique_ptr<xTestSeqDlg> m_dlgTestSeq;
+	std::unique_ptr<xSeqMainDlg> m_dlgSeqMain;
+	std::unique_ptr<xSeqChildDlg> m_dlgSeqChild;
 
 protected:
 	void OnLoadImage();
