@@ -3,6 +3,7 @@
 #include <QDialog>
 #include "ui_TestSeqDlg.h"
 #include "gtl/sequence.h"
+#include "gtl/sequence_map.h"
 
 using seq_t = gtl::seq::xSequence;
 
