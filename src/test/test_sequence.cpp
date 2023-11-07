@@ -14,10 +14,10 @@ gtl::seq::xSequence g_driver("g_driver"s);
 
 TEST(gtl_sequence, normal) {
 
-	class Task1 : public seq::xSequenceMap<> {
+	class Task1 : public seq::TSequenceMap<std::string> {
 	public:
 		using this_t = Task1;
-		using base_t = seq::xSequenceMap<>;
+		using base_t = seq::TSequenceMap<std::string>;
 
 		Task1() : base_t("Task1", g_driver) {
 		}

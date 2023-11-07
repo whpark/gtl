@@ -26,11 +26,11 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), seq_map_t("main", g
 			QMessageBox::critical(this, "Error", e.what());
 		}
 	});
-	m_timer.start(5ms);
+	m_timer.start(1ms);
 
-	Connect("MainSequence"s, &this_t::Seq1, this);
-	Connect("SuspendHandler"s, &this_t::SuspendHandler, this);
-	Connect("Suspend"s, &this_t::Suspend, this);
+	Bind("MainSequence"s, this, &this_t::Seq1);
+	Bind("SuspendHandler"s, this, &this_t::SuspendHandler);
+	Bind("Suspend"s, this, &this_t::Suspend);
 
 	connect(ui.btnSeq1, &QPushButton::clicked, [this]() {
 		//m_top.AddSequence([this](Generator<int>& self) -> Generator<int> { return Seq1(self); });
@@ -41,7 +41,7 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), seq_map_t("main", g
 	});
 
 	connect(ui.btnSeqContinue, &QPushButton::clicked, [this]() {
-		if (auto* seq = m_driver->FindChildDFS("SuspendString")) {
+		if (auto* seq = GetSequenceDriver()->FindChildDFS("SuspendString")) {
 			seq->ReserveResume();
 		}
 	});
@@ -80,7 +80,7 @@ void xTestSeqDlg::Dispatch() {
 	t0 = t1;
 
 	//auto tNext = base_seq_t::Dispatch();
-	auto tNext = m_driver->Dispatch();
+	auto tNext = GetSequenceDriver()->Dispatch();
 	//if (tNext < gtl::seq::clock_t::time_point::max()) {
 	//	auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(tNext - t1);
 	//	m_timer.start(std::max(1ms, dur));
@@ -186,7 +186,7 @@ seq_t xTestSeqDlg::Seq1(seq_param_t param) {
 	//}
 	ui.txtMessage2->setText(ToQString(fmt::format("{}", ++counter)));
 	
-	m_driver->GetCurrentSequence()->CreateChildSequence<std::string>("SuspendString", Suspend3, "sdfasdf"s);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
+	GetSequenceDriver()->GetCurrentSequence()->CreateChildSequence<std::string>("SuspendString", Suspend3, "sdfasdf"s);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 	co_yield {10ms};
 	//co_await self.CreateSequenceParams<std::string>(Suspend3, std::string{});//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 
@@ -199,7 +199,7 @@ seq_t xTestSeqDlg::Seq1(seq_param_t param) {
 
 	ui.txtMessage3->setText(ToQString(fmt::format("{}", ++counter)));
 
-	CreateChildSequence("ERROR");
+	CreateChildSequence("No Such Sequence");	// exception
 
 	Log("Seq1 END\n");
 	co_return ;

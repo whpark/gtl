@@ -4,14 +4,17 @@
 #include "ui_SeqChildDlg.h"
 #include "gtl/sequence_map.h"
 
-using seq_t = gtl::seq::xSequence;
+#include "glaze/glaze.hpp"
 
-class xSeqChildDlg : public QDialog, public gtl::seq::TSequenceMap<> {
+using seq_t = gtl::seq::xSequence;
+using seq_map_t = gtl::seq::TSequenceMap<glz::json_t, glz::json_t>;
+using sParam = seq_map_t::sParam;
+
+class xSeqChildDlg : public QDialog, public gtl::seq::TSequenceMap<glz::json_t> {
 	Q_OBJECT
 public:
 	using this_t = xSeqChildDlg;
 	using base_t = QDialog;
-	using seq_map_t = gtl::seq::TSequenceMap<>;
 
 public:
 	xSeqChildDlg(seq_map_t& parentSeqMap, QWidget* parent = nullptr);

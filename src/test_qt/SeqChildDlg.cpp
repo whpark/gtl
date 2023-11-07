@@ -7,10 +7,10 @@ xSeqChildDlg::xSeqChildDlg(seq_map_t& parentSeqMap, QWidget* parent) : QDialog(p
 	ui.setupUi(this);
 
 
-	Connect("SeqShowSomeText", &xSeqChildDlg::SeqShowSomeText, this);
+	Bind("SeqShowSomeText", this, &xSeqChildDlg::SeqShowSomeText);
 	//Connect("SeqShowSomeText", [this](auto&& param) { return SeqShowSomeText(std::move(param)); });
 
-	connect(ui.btnContinue, &QPushButton::clicked, [this] { if (auto* seq = m_driver->FindChildDFS("SeqShowSomeText")) seq->ReserveResume(); });
+	connect(ui.btnContinue, &QPushButton::clicked, [this] { if (auto* seq = GetSequenceDriver()->FindChildDFS("SeqShowSomeText")) seq->ReserveResume(); });
 }
 
 xSeqChildDlg::~xSeqChildDlg() {
@@ -23,7 +23,7 @@ seq_t xSeqChildDlg::SeqShowSomeText(std::shared_ptr<seq_map_t::sParam> param) {
 	ui.txt2->setText("");
 	ui.txt3->setText("");
 
-	auto* curSeq = m_driver->GetCurrentSequence();
+	auto* curSeq = GetSequenceDriver()->GetCurrentSequence();
 
 	ui.txt1->setText(fmt::format("{} ...", curSeq->GetName()).c_str());
 	for (int i{}; i < 100; i++) {
