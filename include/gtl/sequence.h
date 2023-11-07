@@ -53,6 +53,8 @@ namespace gtl::seq::inline v01 {
 	/// @brief sequence dispatcher
 	struct xSequence {
 	public:
+		using this_t = xSequence;
+
 		struct promise_type;
 		using coroutine_handle_t = std::coroutine_handle<promise_type>;
 		//-------------------------------------------------------------------------
@@ -76,15 +78,15 @@ namespace gtl::seq::inline v01 {
 		};
 
 	protected:
-		xSequence* m_parent{};
+		this_t* m_parent{};
 		coroutine_handle_t m_handle;
-		inline thread_local static xSequence* s_seqCurrent{};
+		inline thread_local static this_t* s_seqCurrent{};
 		std::thread::id m_threadID{std::this_thread::get_id()};	// NOT const. may be created from other thread (injection)
 		seq_id_t m_name;
 		//clock_t::time_point m_timeout{clock_t::time_point::max()};
 		sState m_state;
 
-		std::list<xSequence> m_children;
+		std::list<this_t> m_children;
 	public:
 		mutable std::mutex m_mtxChildren;
 
@@ -141,7 +143,7 @@ namespace gtl::seq::inline v01 {
 
 		/// @brief 
 		/// @return current running sequence
-		static xSequence* GetCurrentSequence() { return s_seqCurrent; }
+		static this_t* GetCurrentSequence() { return s_seqCurrent; }
 
 		/// @brief 
 		/// @return working thread id
@@ -220,7 +222,7 @@ namespace gtl::seq::inline v01 {
 		/// @param ...args for coroutine function. must be moved or copied.
 		/// @return 
 		template < typename ... targs >
-		xSequence& CreateChildSequence(seq_id_t name, std::function<xSequence(targs ...)> func, targs... args) {
+		this_t& CreateChildSequence(seq_id_t name, std::function<this_t(targs ...)> func, targs... args) {
 			if constexpr (false) {	// todo: do I need this?
 				if (std::this_thread::get_id() != m_threadID) {
 					throw std::exception("CreateChildSequence() must be called from the same thread as the driver");
@@ -239,13 +241,15 @@ namespace gtl::seq::inline v01 {
 			m_children.back().m_name = std::move(name);
 			return m_children.back();
 		}
-		inline xSequence& CreateChildSequence(seq_id_t name, std::function<xSequence()> func) {
+		inline this_t& CreateChildSequence(seq_id_t name, std::function<this_t()> func) {
 			return CreateChildSequence<>(std::move(name), func);
 		}
 
+	#if __cpp_explicit_this_parameter
 		/// @brief Find Child Sequence (Direct Child Only)
 		/// @param name 
 		/// @return child sequence. if not found, empty child sequence.
+
 		auto FindDirectChild(this auto&& self, seq_id_t const& name) -> decltype(&self) {
 			std::optional<std::scoped_lock<std::mutex>> lock;
 			if (std::this_thread::get_id() != self.m_threadID)
@@ -276,6 +280,48 @@ namespace gtl::seq::inline v01 {
 			}
 			return nullptr;
 		}
+	#else
+		/// @brief Find Child Sequence (Direct Child Only)
+		/// @param name 
+		/// @return child sequence. if not found, empty child sequence.
+
+		this_t const* FindDirectChild(seq_id_t const& name) const {
+			std::optional<std::scoped_lock<std::mutex>> lock;
+			if (std::this_thread::get_id() != m_threadID)
+				lock.emplace(m_mtxChildren);
+
+			for (auto& child : m_children) {
+				if (child.m_name == name)
+					return &child;
+			}
+			return nullptr;
+		}
+		inline this_t* FindDirectChild(seq_id_t const& name) {
+			return const_cast<this_t*> ( (const_cast<this_t const*>(this))->FindDirectChild(name) );
+		}
+
+		/// @brief Find Child Sequence (Depth First Search)
+		/// @param name 
+		/// @return child sequence. if not found, empty child sequence.
+		this_t const* FindChildDFS(seq_id_t const& name) const {
+			// todo: if called from other thread... how? use recursive mutex ?? too expansive
+			if (std::this_thread::get_id() != m_threadID)
+				return nullptr;
+
+			for (auto& child : m_children) {
+				if (child.m_name == name)
+					return &child;
+			}
+			for (auto& child : m_children) {
+				if (auto* c = child.FindChildDFS(name))
+					return c;
+			}
+			return nullptr;
+		}
+		inline this_t* FindChildDFS(seq_id_t const& name) {
+			return const_cast<this_t*>( (const_cast<this_t const*>(this))->FindChildDFS(name) );
+		}
+	#endif
 
 		/// @brief main dispatch function
 		/// @return next dispatch time

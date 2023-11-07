@@ -80,12 +80,12 @@ namespace gtl::seq::inline v01 {
 
 		//-----------------------------------
 		/// @brief Register/Unregister this unit
-		void Register(this_t* child) {
+		inline void Register(this_t* child) {
 			if (child) {
 				m_children.insert(child);
 			}
 		}
-		void Unregister(this_t* child) {
+		inline void Unregister(this_t* child) {
 			if (child) {
 				m_children.erase(child);
 			}
@@ -93,15 +93,15 @@ namespace gtl::seq::inline v01 {
 
 		//-----------------------------------
 		/// @brief Bind/Unbind sequence function with name
-		void Bind(seq_id_t const& id, handler_t handler) {
+		inline void Bind(seq_id_t const& id, handler_t handler) {
 			m_mapFuncs[id] = handler;
 		}
-		void Unbind(seq_id_t const& id) {
+		inline void Unbind(seq_id_t const& id) {
 			if (auto iter = m_mapFuncs.find(id); iter != m_mapFuncs.end())
 				m_mapFuncs.erase(iter);
 		}
 		template < typename tSelf, typename self_handler_t = std::function<xSequence(tSelf* self, std::shared_ptr<typename base_t::sParam>)> >
-		void Bind(seq_id_t const& id, tSelf* self, self_handler_t handler) {
+		inline void Bind(seq_id_t const& id, tSelf* self, self_handler_t handler) {
 			Bind(id, std::bind(handler, self, std::placeholders::_1));
 		}
 
@@ -115,7 +115,8 @@ namespace gtl::seq::inline v01 {
 
 		//-----------------------------------
 		// Find Map
-		inline auto FindUnitDFS(this auto&& self, seq_id_t const& unit) -> decltype(&self) {
+	#if __cpp_explicit_this_parameter
+		auto FindUnitDFS(this auto&& self, seq_id_t const& unit) -> decltype(&self) {
 			if (self.m_unit == unit)
 				return &self;
 			for (auto* child : self.m_children) {
@@ -124,7 +125,20 @@ namespace gtl::seq::inline v01 {
 			}
 			return nullptr;
 		}
-
+	#else
+		this_t const* FindUnitDFS(seq_id_t const& unit) const {
+			if (m_unit == unit)
+				return this;
+			for (auto* child : m_children) {
+				if (auto* unitTarget = child->FindUnitDFS(unit))
+					return unitTarget;
+			}
+			return nullptr;
+		}
+		inline this_t* FindUnitDFS(seq_id_t const& unit) {
+			return const_cast<this_t*>( (const_cast<this_t const*>(this))->FindUnitDFS(unit) );
+		}
+	#endif
 		//-----------------------------------
 		template < typename tSelf, typename self_handler_t = std::function<xSequence(tSelf* self, std::shared_ptr<sParam>)> >
 			requires std::is_base_of_v<this_t, tSelf>
@@ -166,6 +180,7 @@ namespace gtl::seq::inline v01 {
 				running.empty() ? std::move(name) : std::move(running), func, std::move(params));
 		}
 
+		// root sequence
 		inline xSequence& CreateRootSequence(unit_id_t const& unit, seq_id_t name, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
 			return CreateSequence(m_sequence_driver, unit, std::move(name), {}, std::move(params));
 		}
@@ -173,6 +188,7 @@ namespace gtl::seq::inline v01 {
 			return CreateSequence(m_sequence_driver, {}, std::move(name), {}, std::move(params));
 		}
 
+		// child sequence
 		inline xSequence& CreateChildSequence(xSequence* parent, unit_id_t const& unit, seq_id_t name, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
 			return CreateSequence(parent, unit, std::move(name), {}, std::move(params));
 		}
@@ -187,6 +203,7 @@ namespace gtl::seq::inline v01 {
 			throw std::exception("CreateChildSequence() must be called from sequence function");
 		}
 
+		// broadcast sequence
 		size_t BroadcastSequence(xSequence& parent, seq_id_t name, std::shared_ptr<sParam> params = std::make_shared<sParam>()) {
 			size_t count{};
 			if (auto handler = FindHandler(name)) {
