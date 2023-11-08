@@ -79,6 +79,13 @@ namespace gtl::seq::inline v01 {
 			void return_void() {}
 		};
 
+		struct suspend_or_not {
+			bool bAwaitReady{};
+			bool await_ready() const noexcept { return bAwaitReady; }
+			constexpr void await_suspend(std::coroutine_handle<>) const noexcept {}
+			constexpr void await_resume() const noexcept {}
+		};
+
 	protected:
 		this_t* m_parent{};
 		coroutine_handle_t m_handle;
@@ -356,12 +363,6 @@ namespace gtl::seq::inline v01 {
 		}
 		// co_await
 		auto WaitForChild() {
-			struct suspend_or_not {
-				bool bAwaitReady{};
-				bool await_ready() const noexcept { return bAwaitReady; }
-				constexpr void await_suspend(std::coroutine_handle<>) const noexcept {}
-				constexpr void await_resume() const noexcept {}
-			};
 			ReserveResume(clock_t::duration{});
 			return suspend_or_not{ .bAwaitReady = m_children.empty()};
 		}
