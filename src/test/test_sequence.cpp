@@ -15,7 +15,7 @@ namespace gtl::seq::test {
 	using seq_map_t = gtl::seq::TSequenceMap<std::string, std::string>;
 
 	seq_t Sequence1() {
-		auto* self = xSequence::GetCurrentSequence();
+		auto* self = seq_t::GetCurrentSequence();
 
 		namespace chrono = std::chrono;
 		auto t0 = chrono::steady_clock::now();
@@ -46,7 +46,7 @@ namespace gtl::seq::test {
 
 
 	seq_t TopSeq() {
-		auto* self = xSequence::GetCurrentSequence();
+		auto* self = seq_t::GetCurrentSequence();
 
 		auto sl = std::source_location::current();
 		auto funcname = sl.function_name();
@@ -72,7 +72,7 @@ namespace gtl::seq::test {
 	}
 
 	seq_t Child1() {
-		auto* self = xSequence::GetCurrentSequence();
+		auto* self = seq_t::GetCurrentSequence();
 
 		auto sl = std::source_location::current();
 		auto funcname = sl.function_name();
@@ -94,7 +94,7 @@ namespace gtl::seq::test {
 	}
 
 	seq_t Child1_1() {
-		auto* self = xSequence::GetCurrentSequence();
+		auto* self = seq_t::GetCurrentSequence();
 
 		auto sl = std::source_location::current();
 		auto funcname = sl.function_name();
@@ -112,7 +112,7 @@ namespace gtl::seq::test {
 	}
 
 	seq_t Child1_2() {
-		auto* self = xSequence::GetCurrentSequence();
+		auto* self = seq_t::GetCurrentSequence();
 
 		auto sl = std::source_location::current();
 		auto funcname = sl.function_name();
@@ -135,7 +135,7 @@ namespace gtl::seq::test {
 
 	TEST(gtl_sequence, normal) {
 
-		gtl::seq::xSequence driver;
+		seq_t driver;
 
 		fmt::print("Begin\n");
 
