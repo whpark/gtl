@@ -342,6 +342,13 @@ bool CtestwinView::WriteSampleImage(std::filesystem::path const& folder, cv::Mat
 	if (!palette.empty())
 		palette.back() = gtl::ColorBGRA(255, 255, 255, 0);
 
+	if (nBPP <= 8) {
+		for (size_t i{}; i < palette.size(); i++) {
+			palette[i].a = 0;
+			palette[i].b = palette[i].g = palette[i].r = (i*0xffu / (palette.size()-1));
+		}
+	}
+
 	auto path = folder / std::format(L"{}x{}-{}bpp.bmp", mat.cols, mat.rows, nBPP);
 	gtl::xSize2i pelsPerMeter{gtl::Round(360*1'000/25.4), gtl::Round(360*1'000/25.4)};
 	bool bResult = gtlw::SaveBitmapMatProgress(path, mat, nBPP, pelsPerMeter, palette, false);
