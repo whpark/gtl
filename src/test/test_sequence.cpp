@@ -206,7 +206,7 @@ namespace gtl::seq::test2 {
 
 	protected:
 		seq_t Task1(std::shared_ptr<seq_map_t::sParam> param) {
-			auto sl = std::source_location::current();
+			//auto sl = std::source_location::current();
 			auto funcname = "Task1";// sl.function_name();
 
 			fmt::print("{}: Begin\n", funcname);
@@ -221,7 +221,7 @@ namespace gtl::seq::test2 {
 			co_return;
 		}
 		seq_t Task2(std::shared_ptr<seq_map_t::sParam> param) {
-			auto sl = std::source_location::current();
+			//auto sl = std::source_location::current();
 			auto funcname = "Task2";// sl.function_name();
 
 			fmt::print("{}: Begin - {}\n", funcname, param->in);
@@ -254,7 +254,7 @@ namespace gtl::seq::test2 {
 
 	protected:
 		seq_t TaskA(std::shared_ptr<seq_map_t::sParam> param) {
-			auto sl = std::source_location::current();
+			//auto sl = std::source_location::current();
 			auto funcname = "TaskA";// sl.function_name();
 
 			fmt::print("{}: Begin - {}\n", funcname, param->in);
@@ -271,7 +271,7 @@ namespace gtl::seq::test2 {
 			co_return;
 		}
 		seq_t TaskB(std::shared_ptr<seq_map_t::sParam> param) {
-			auto sl = std::source_location::current();
+			//auto sl = std::source_location::current();
 			auto funcname = "TaskB";// sl.function_name();
 
 			fmt::print("{}: Begin - {}\n", funcname, param->in);
@@ -301,7 +301,7 @@ namespace gtl::seq::test2 {
 		C1 c1("c1", app);
 		C2 c2("c2", app);
 
-		c1.CreateRootSequence("task1");
+		c1.CreateRootSequence("task1");	// c1::task1 -> c1::task2 -> c2::taskA -> c2::taskB
 
 		app.Run();
 
