@@ -266,7 +266,7 @@ bool xMatView::SetImage(cv::Mat const& img, bool bCenter, eZOOM eZoomMode, bool 
 	if (m_option.bPyrImageDown) {
 		m_pyramid.threadPyramidMaker = std::jthread([this](std::stop_token stop) {
 			cv::Mat imgPyr = m_pyramid.imgs[0];
-			while (!stop.stop_requested() and (imgPyr.size().area() > 1'000*1'000) ) {
+			while (!stop.stop_requested() and ((uint64_t)imgPyr.cols*imgPyr.rows > 1'000ul*1'000ul) ) {
 				cv::pyrDown(imgPyr, imgPyr);
 				{
 					std::unique_lock lock{m_pyramid.mtx};

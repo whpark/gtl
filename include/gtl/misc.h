@@ -554,6 +554,26 @@ namespace gtl {
 	}
 
 	//-----------------------------------------------------------------------------
+	constexpr static inline color_rgba_t ColorRGBA(color_bgra_t cr) {
+		return color_rgba_t{ .r = cr.r, .g = cr.g, .b = cr.b, .a = cr.a };
+	}
+	constexpr static inline color_rgba_t ColorRGBA(color_abgr_t cr) {
+		return color_rgba_t{ .r = cr.r, .g = cr.g, .b = cr.b, .a = cr.a };
+	}
+	constexpr static inline color_bgra_t ColorBGRA(color_rgba_t cr) {
+		return color_bgra_t{ .b = cr.b, .g = cr.g, .r = cr.r, .a = cr.a };
+	}
+	constexpr static inline color_bgra_t ColorBGRA(color_abgr_t cr) {
+		return color_bgra_t{ .b = cr.b, .g = cr.g, .r = cr.r, .a = cr.a };
+	}
+	constexpr static inline color_abgr_t ColorABGR(color_rgba_t cr) {
+		return color_abgr_t{ .a = cr.a, .b = cr.b, .g = cr.g, .r = cr.r };
+	}
+	constexpr static inline color_abgr_t ColorABGR(color_bgra_t cr) {
+		return color_abgr_t{ .a = cr.a, .b = cr.b, .g = cr.g, .r = cr.r };
+	}
+
+	//-----------------------------------------------------------------------------
 	// enum helper
 	template < typename T, typename eT >		constexpr T& enum_as(eT& e)		{ static_assert(sizeof(eT) == sizeof(T)); return (T&)e; }
 	template < typename eT, typename T = int >	constexpr eT enum_inc(eT& e)	{ static_assert(sizeof(eT) == sizeof(T)); return (eT)++((T&)e); }
@@ -562,7 +582,7 @@ namespace gtl {
 	template < typename eT, typename T = int >	constexpr eT enum_prev(eT e)	{ static_assert(sizeof(eT) == sizeof(T)); return (eT)((T&)e-1); }
 
 
-	//-------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	// axis
 	enum class eAXIS : int {
 		//eAXIS::NW = -4, eAXIS::NZ, eAXIS::NY, eAXIS::NX, eAXIS::NONE = 0, eAXIS::X, eAXIS::Y, eAXIS::Z, eAXIS::W,

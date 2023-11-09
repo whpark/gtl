@@ -541,11 +541,11 @@ namespace gtl::qt {
 		}
 		m_pyramid.imgs.clear();
 		m_pyramid.imgs.push_front(m_img);
-		const int minArea = 1'000 * 1'000;
-		if (m_option.bPyrImageDown and m_option.eZoomOut == eZOOM_OUT::area and m_img.size().area() > minArea) {
+		const uint minArea = 1'000 * 1'000;
+		if (m_option.bPyrImageDown and m_option.eZoomOut == eZOOM_OUT::area and ((uint64_t)m_img.cols * m_img.rows) > minArea) {
 			m_pyramid.threadPyramidMaker = std::jthread([this](std::stop_token stop) {
 				cv::Mat imgPyr = m_pyramid.imgs[0];
-				while (!stop.stop_requested() and (imgPyr.size().area() > minArea)) {
+				while (!stop.stop_requested() and ((uint64_t)imgPyr.cols * imgPyr.rows) > minArea) {
 					cv::pyrDown(imgPyr, imgPyr);
 					{
 						std::unique_lock lock{ m_pyramid.mtx };
