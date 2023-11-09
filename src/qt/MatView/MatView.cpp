@@ -737,8 +737,10 @@ namespace gtl::qt {
 			}
 
 
-			if (auto str = ToQString(status); str != ui->edtInfo->text())
+			if (auto str = ToQString(status); str != ui->edtInfo->text()) {
 				ui->edtInfo->setText(str);
+				ui->edtInfo->setSelection(0, 0);
+			}
 		}
 	}
 
