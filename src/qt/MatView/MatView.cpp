@@ -104,10 +104,9 @@ namespace gtl::qt {
 		m_mouse.Clear();
 		m_smooth_scroll.Clear();
 
-		if (!img.empty() and !m_img.isContinuous()) {
-			assert(false);
-			return false;
-		}
+		//if (img.empty() and !m_img.isContinuous()) {
+		//	return false;
+		//}
 
 		if (eZoomMode != eZOOM::none) {
 			ui->cmbZoomMode->setCurrentIndex(std::to_underlying(eZoomMode));
@@ -701,10 +700,13 @@ namespace gtl::qt {
 				for (auto v = m_imgOriginal.rows; v; v/= 10, ny++);
 				ny = ny*4/3;
 				// print ptImage.x and ptImage.y with thousand comma separated
-				status += fmt::format(L"x{0:>{2}} y{1:>{3}}",
-					AddThousandCommaW((int)ptImage.x),
-					AddThousandCommaW((int)ptImage.y),
-					nx, ny);
+				if (!m_imgOriginal.empty())
+					status += fmt::format(L"(w{} h{}) ",
+										  AddThousandCommaW((int)m_imgOriginal.cols),
+										  AddThousandCommaW((int)m_imgOriginal.rows));
+				status += fmt::format(L"[x{:>{}} y{:>{}}]",
+									  AddThousandCommaW((int)ptImage.x), nx,
+									  AddThousandCommaW((int)ptImage.y), ny);
 			}
 
 			// image value

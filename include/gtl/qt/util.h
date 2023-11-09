@@ -92,7 +92,7 @@ namespace gtl::qt {
 		{ w->text() } -> std::convertible_to<QString>;
 		w->setText(QString{});
 	})
-		inline void UpdateWidgetValue(bool bSaveAndValidate, twidget_t* w, std::chrono::duration<trep_t, tperiod_t>& value) {
+	inline void UpdateWidgetValue(bool bSaveAndValidate, twidget_t* w, std::chrono::duration<trep_t, tperiod_t>& value) {
 		using duration_t = std::chrono::duration<trep_t, tperiod_t>;
 		if constexpr (std::is_floating_point_v<trep_t>) {
 			if (bSaveAndValidate) {
