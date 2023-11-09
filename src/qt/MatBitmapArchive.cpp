@@ -8,7 +8,7 @@
 
 namespace gtl::qt {
 
-	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, bool bBottom2Top) {
+	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t const> palette, bool bNoPaletteLookup, bool bBottom2Top) {
 		xProgressDlg dlgProgress(nullptr);
 		dlgProgress.m_message = std::format(L"Saving : {}", path.wstring());
 

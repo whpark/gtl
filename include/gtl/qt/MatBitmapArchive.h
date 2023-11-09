@@ -21,7 +21,7 @@ namespace gtl::qt {
 
 	GTL__QT_API bool SaveBitmapMatProgress(
 		std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter,
-		std::span<gtl::color_bgra_t> palette = {}, bool bNoPaletteLookup = false, bool bBottom2Top = false);
+		std::span<gtl::color_bgra_t const> palette = {}, bool bNoPaletteLookup = false, bool bBottom2Top = false);
 
 	GTL__QT_API sLoadBitmapMatResult LoadBitmapMatProgress(std::filesystem::path const& path);
 	GTL__QT_API sLoadBitmapMatPixelArrayResult LoadBitmapMatPixelArrayProgress(std::filesystem::path const& path);
