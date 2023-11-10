@@ -6,15 +6,16 @@
 #include "gtl/sequence_map.h"
 #include "glaze/glaze.hpp"
 
-using seq_t = gtl::seq::xSequence;
 
-class xTestSeqDlg : public QDialog, public gtl::seq::v01::TSequenceMap<glz::json_t> {
+class xTestSeqDlg : public QDialog, public gtl::seq::TSequenceMap<glz::json_t> {
 	Q_OBJECT
 public:
 	using this_t = xTestSeqDlg;
-	using seq_map_t = gtl::seq::v01::TSequenceMap<glz::json_t>;
 	using base_t = QDialog;
-	using seq_param_t = std::shared_ptr<seq_map_t::sParam>;
+	using seq_map_t = gtl::seq::TSequenceMap<glz::json_t>;
+	using seq_t = seq_map_t::seq_t;
+	using seq_result_t = seq_t::result_t;
+	using seq_param_t = seq_map_t::param_t;
 
 public:
 	xTestSeqDlg(QWidget* parent = nullptr);

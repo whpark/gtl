@@ -11,8 +11,8 @@ namespace chrono = std::chrono;
 
 namespace gtl::seq::test {
 
-	using seq_t = gtl::seq::xSequence;
-	using seq_map_t = gtl::seq::TSequenceMap<std::string, std::string>;
+	using seq_map_t = gtl::seq::TSequenceMap<std::string>;
+	using seq_t = seq_map_t::seq_t;
 
 	seq_t Sequence1() {
 		auto* self = seq_t::GetCurrentSequence();
@@ -35,7 +35,7 @@ namespace gtl::seq::test {
 		auto t2 = chrono::steady_clock::now();
 		fmt::print("step3 : {:>8}\n", chrono::duration_cast<chrono::milliseconds>(t2 - t1));
 
-		co_return;
+		co_return "";
 	}
 
 	seq_t TopSeq();
@@ -69,6 +69,8 @@ namespace gtl::seq::test {
 
 		// step 3
 		fmt::print("{}: End\n", funcname);
+
+		co_return "";
 	}
 
 	seq_t Child1() {
@@ -91,6 +93,8 @@ namespace gtl::seq::test {
 
 		// step 3
 		fmt::print("{}: End\n", funcname);
+	
+		co_return "";
 	}
 
 	seq_t Child1_1() {
@@ -109,6 +113,8 @@ namespace gtl::seq::test {
 			co_await self->WaitFor(200ms);
 		}
 		fmt::print("{}: End. Creating Child1_1, Child1_2\n", funcname);
+	
+		co_return "";
 	}
 
 	seq_t Child1_2() {
@@ -127,10 +133,12 @@ namespace gtl::seq::test {
 			co_await self->WaitFor(200ms);
 		}
 		fmt::print("{}: End. Creating Child1_1, Child1_2\n", funcname);
+	
+		co_return "";
 	}
 
 	seq_t Child2() {
-		co_return;
+		co_return "";
 	}
 
 	TEST(gtl_sequence, normal) {
@@ -171,8 +179,8 @@ namespace gtl::seq::test {
 
 namespace gtl::seq::test2 {
 
-	using seq_t = gtl::seq::xSequence;
 	using seq_map_t = gtl::seq::TSequenceMap<std::string, std::string>;
+	using seq_t = seq_map_t::seq_t;
 
 	//-----
 	class CApp : public seq_map_t {
@@ -192,6 +200,9 @@ namespace gtl::seq::test2 {
 		}
 	};
 
+	auto ms(auto dur) {
+		return std::chrono::duration_cast<std::chrono::milliseconds>(dur);
+	}
 
 	//-----
 	class C1 : public seq_map_t {
@@ -205,37 +216,37 @@ namespace gtl::seq::test2 {
 		}
 
 	protected:
-		seq_t Task1(std::shared_ptr<seq_map_t::sParam> param) {
-			//auto sl = std::source_location::current();
-			auto funcname = "Task1";// sl.function_name();
+
+		seq_t Task1(param_t param) {
+			auto t0 = clock_t::now();
+			auto funcname = "C1::Task1"; //std::source_location::current().function_name();
 
 			fmt::print("{}: Begin\n", funcname);
 
-			auto param2 = std::make_shared<seq_map_t::sParam>();
-			param2->in = "Greeting from c1::Task1 ==> c1::Task2";
-			CreateChildSequence("task2", param2);
+			// call this->task2
+			auto future = CreateChildSequence("task2", fmt::format("Greeting from {}", funcname));
 			co_await WaitForChild();
+			fmt::print("{}: child done: {}\n", funcname, future.get());
 
-			fmt::print("{}: End. {}\n", funcname, param2->out);
+			fmt::print("{}: End {}\n", funcname, ms(t0-clock_t::now()));
 
-			co_return;
+			co_return "";
 		}
-		seq_t Task2(std::shared_ptr<seq_map_t::sParam> param) {
-			//auto sl = std::source_location::current();
-			auto funcname = "Task2";// sl.function_name();
+		seq_t Task2(param_t param) {
+			auto t0 = clock_t::now();
+			auto funcname = "C1::Task2"; //std::source_location::current().function_name();
 
-			fmt::print("{}: Begin - {}\n", funcname, param->in);
+			fmt::print("{}: Begin param: {}\n", funcname, param);
 
-			auto param2 = std::make_shared<seq_map_t::sParam>();
-			param2->in = "Greeting from c1::Task2 ==> c2::TaskA";
-			CreateChildSequence("c2", "taskA", param2);
+			// call c2::taskA
+			auto future = CreateChildSequence("c2", "taskA", fmt::format("Greeting from {}", funcname));
 			co_await WaitForChild();
+			fmt::print("{}: child done: {}\n", funcname, future.get());
 
-			fmt::print("{}: End\n", funcname);
+			auto str = fmt::format("{}: End - {}\n", funcname, ms(t0 - clock_t::now()));
+			fmt::print("{}", str);
 
-			param->out = "OK";
-
-			co_return;
+			co_return std::move(str);
 		}
 
 	};
@@ -253,38 +264,34 @@ namespace gtl::seq::test2 {
 		}
 
 	protected:
-		seq_t TaskA(std::shared_ptr<seq_map_t::sParam> param) {
-			//auto sl = std::source_location::current();
-			auto funcname = "TaskA";// sl.function_name();
+		seq_t TaskA(param_t param) {
+			auto t0 = clock_t::now();
+			auto funcname = "C2::TaskA"; //std::source_location::current().function_name();
 
-			fmt::print("{}: Begin - {}\n", funcname, param->in);
+			fmt::print("{}: Begin param: {}\n", funcname, param);
 
-			auto param2 = std::make_shared<seq_map_t::sParam>();
-			param2->in = "Greeting from c2::TaskA ==> c2::TaskB";
-			CreateChildSequence("c2", "taskB", param2);
+			// call c2::taskA
+			auto future = CreateChildSequence("taskB", fmt::format("Greeting from {}", funcname));
 			co_await WaitForChild();
+			fmt::print("{}: child done: {}\n", funcname, future.get());
 
-			fmt::print("{}: End\n", funcname);
+			auto str = fmt::format("{}: End - {}\n", funcname, ms(t0 - clock_t::now()));
+			fmt::print("{}", str);
 
-			//param->out = "OK";
-
-			co_return;
+			co_return std::move(str);
 		}
-		seq_t TaskB(std::shared_ptr<seq_map_t::sParam> param) {
-			//auto sl = std::source_location::current();
-			auto funcname = "TaskB";// sl.function_name();
+		seq_t TaskB(param_t param) {
+			auto t0 = clock_t::now();
+			auto funcname = "C2::TaskB"; //std::source_location::current().function_name();
 
-			fmt::print("{}: Begin - {}\n", funcname, param->in);
+			fmt::print("{}: Begin param: {}\n", funcname, param);
 
-			auto param2 = std::make_shared<seq_map_t::sParam>();
-			param2->in = "Greeting from c1::Task2 ==> c2::TaskA";
 			co_await WaitFor(100ms);
 
-			fmt::print("{}: End\n", funcname);
+			auto str = fmt::format("{}: End - {}\n", funcname, ms(t0 - clock_t::now()));
+			fmt::print("{}", str);
 
-			//param->out = "OK";
-
-			co_return;
+			co_return std::move(str);
 		}
 	};
 

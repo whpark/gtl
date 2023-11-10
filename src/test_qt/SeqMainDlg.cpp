@@ -3,26 +3,27 @@
 
 using namespace std::literals;
 
+using seq_t = xSeqMainDlg::seq_t;;
+
 xSeqMainDlg::xSeqMainDlg(QWidget* parent) : QDialog(parent), m_driver(""), seq_map_t("MainSeq", m_driver) {
 	ui.setupUi(this);
 
 	connect(ui.btnCreateSequence1, &QPushButton::clicked, [this] { CreateRootSequence("Seq1"); });
 	connect(ui.btnCreateSequence2, &QPushButton::clicked, [this] {
 		CreateRootSequence("Seq2");
-		m_driver.CreateChildSequence<std::shared_ptr<sParam>>(
+		m_driver.CreateChildSequence<seq_param_t>(
 			"Sequence2-1"s,
 			[this](auto p) { return this->Seq2(std::move(p)); },
-			std::make_shared<sParam>());
+			{});
 		using namespace std::placeholders;
-		m_driver.CreateChildSequence<std::shared_ptr<sParam>>(
+		m_driver.CreateChildSequence<seq_param_t>(
 			"Sequence2-2"s,
 			std::bind(&this_t::Seq2, this, _1),
-			std::make_shared<sParam>());
+			{});
 		//m_driver.CreateChildSequence("Sequence2-3"s, [this]() { return this->Seq2(std::make_shared<base_seq_t::sParam>()); });
-		m_driver.CreateChildSequence("Sequence2-3"s, std::bind(&this_t::Seq2, this, std::make_shared<sParam>()));
+		m_driver.CreateChildSequence("Sequence2-3"s, std::bind(&this_t::Seq2, this, seq_param_t{}));
 
-		CreateSequence(&m_driver, "Sequence2-4", "", this, &this_t::Seq2, std::make_shared<sParam>());
-
+		CreateSequence(&m_driver, "Sequence2-4", this, &this_t::Seq2, {});
 
 	});
 
@@ -46,29 +47,37 @@ xSeqMainDlg::xSeqMainDlg(QWidget* parent) : QDialog(parent), m_driver(""), seq_m
 xSeqMainDlg::~xSeqMainDlg() {
 }
 
-seq_t xSeqMainDlg::Seq1(std::shared_ptr<sParam> param) {
+seq_t xSeqMainDlg::Seq1(seq_param_t param) {
+	auto* seq = seq_t::GetCurrentSequence();
 
-	CreateChildSequence("ChildSeq", "SeqShowSomeText");
+	auto future = CreateChildSequence("ChildSeq", "SeqShowSomeText", {});
 	ui.txt1->setText("ChildSeq::SeqShowSomeText - Started");
-	co_yield{ 10ms };
-	ui.txt1->setText("ChildSeq::SeqShowSomeText - END");
+	co_await seq->WaitForChild();
 
-	co_return;
+	if (!future.valid()) {
+		QMessageBox::critical(this, "Error", "future is invalid");
+		co_return {};
+	}
+	ui.txt1->setText(gtl::qt::ToQString(fmt::format("ChildSeq::SeqShowSomeText - result : {}", future.get())));
+
+	co_return {};
 }
 
-seq_t xSeqMainDlg::Seq2(std::shared_ptr<sParam> param) {
+seq_t xSeqMainDlg::Seq2(seq_param_t param) {
 	auto t0 = std::chrono::steady_clock::now();
 
 	ui.txt2->setText(gtl::qt::ToQString(fmt::format("seq : {} STARTED", m_driver.GetCurrentSequence()->GetName())));
+
+	auto* seq = seq_t::GetCurrentSequence();
 
 	auto t1 = t0 + 1s;
 	auto counter = 0;
 	for (auto t = std::chrono::steady_clock::now(); t < t1; t = std::chrono::steady_clock::now()) {
 		ui.txt3->setText(gtl::qt::ToQString(fmt::format("seq : {} running {}", m_driver.GetCurrentSequence()->GetName(), counter++)));
-		co_yield { 1ms };
+		co_await seq->WaitFor(1ms);
 	}
 
 	ui.txt2->setText(gtl::qt::ToQString(fmt::format("seq : {} STOPPED", m_driver.GetCurrentSequence()->GetName())));
 
-	co_return;
+	co_return {};
 }

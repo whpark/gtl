@@ -144,6 +144,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 		if (!m_dlgSeqMain)
 			m_dlgSeqMain = std::make_unique<xSeqMainDlg>(this);
 		m_dlgSeqMain->show();
+		m_dlgSeqMain->move(m_dlgTestSeq->pos() + QPoint(m_dlgTestSeq->width()+10, 0));
 		m_dlgSeqMain->setFocus();
 		if (!m_dlgSeqChild)
 			m_dlgSeqChild = std::make_unique<xSeqChildDlg>(*m_dlgSeqMain.get(), this);
