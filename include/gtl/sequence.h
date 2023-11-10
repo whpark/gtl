@@ -10,6 +10,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <coroutine>
+#include <future>
 #include <vector>
 #include <concepts>
 #include <list>

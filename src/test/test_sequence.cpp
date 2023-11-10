@@ -11,8 +11,8 @@ namespace chrono = std::chrono;
 
 namespace gtl::seq::test {
 
-	using seq_map_t = gtl::seq::TSequenceMap<std::string>;
-	using seq_t = seq_map_t::seq_t;
+	using seq_t = gtl::seq::TSequence<std::string>;
+	using seq_map_t = gtl::seq::TSequenceMap<seq_t::result_t>;
 
 	seq_t Sequence1() {
 		auto* self = seq_t::GetCurrentSequence();
@@ -179,8 +179,8 @@ namespace gtl::seq::test {
 
 namespace gtl::seq::test2 {
 
-	using seq_map_t = gtl::seq::TSequenceMap<std::string, std::string>;
-	using seq_t = seq_map_t::seq_t;
+	using seq_t = gtl::seq::TSequence<std::string>;
+	using seq_map_t = gtl::seq::TSequenceMap<seq_t::result_t>;
 
 	//-----
 	class CApp : public seq_map_t {
@@ -243,7 +243,7 @@ namespace gtl::seq::test2 {
 			co_await WaitForChild();
 			fmt::print("{}: child done: {}\n", funcname, future.get());
 
-			auto str = fmt::format("{}: End - {}\n", funcname, ms(t0 - clock_t::now()));
+			auto str = fmt::format("{}: End - {}\n", funcname, ms(clock_t::now() - t0));
 			fmt::print("{}", str);
 
 			co_return std::move(str);
@@ -275,7 +275,7 @@ namespace gtl::seq::test2 {
 			co_await WaitForChild();
 			fmt::print("{}: child done: {}\n", funcname, future.get());
 
-			auto str = fmt::format("{}: End - {}\n", funcname, ms(t0 - clock_t::now()));
+			auto str = fmt::format("{}: End - {}\n", funcname, ms(clock_t::now() - t0));
 			fmt::print("{}", str);
 
 			co_return std::move(str);
@@ -288,7 +288,7 @@ namespace gtl::seq::test2 {
 
 			co_await WaitFor(100ms);
 
-			auto str = fmt::format("{}: End - {}\n", funcname, ms(t0 - clock_t::now()));
+			auto str = fmt::format("{}: End - {}\n", funcname, ms(clock_t::now() - t0));
 			fmt::print("{}", str);
 
 			co_return std::move(str);
