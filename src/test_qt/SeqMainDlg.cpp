@@ -38,8 +38,8 @@ xSeqMainDlg::xSeqMainDlg(QWidget* parent) : QDialog(parent), m_driver(""), seq_m
 		m_timer.start(dur);
 	});
 
-	Bind("Seq1", this, &xSeqMainDlg::Seq1);
-	Bind("Seq2", this, &xSeqMainDlg::Seq2);
+	Bind("Seq1", &xSeqMainDlg::Seq1);
+	Bind("Seq2", &xSeqMainDlg::Seq2);
 
 	m_timer.start(100ms);
 }

@@ -30,9 +30,9 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), seq_map_t("main", g
 	});
 	m_timer.start(1ms);
 
-	Bind("MainSequence"s, this, &this_t::Seq1);
-	Bind("SuspendHandler"s, this, &this_t::SuspendHandler);
-	Bind("Suspend"s, this, &this_t::Suspend);
+	Bind("MainSequence"s, &this_t::Seq1);
+	Bind("SuspendHandler"s, &this_t::SuspendHandler);
+	Bind("Suspend"s, &this_t::Suspend);
 
 	connect(ui.btnSeq1, &QPushButton::clicked, [this]() {
 		//m_top.AddSequence([this](Generator<int>& self) -> Generator<int> { return Seq1(self); });
@@ -219,7 +219,7 @@ seq_t xTestSeqDlg::Seq1(seq_param_t param) {
 		auto* box = new QMessageBox(this);
 		box->setText("OK, No Such Sequence...");
 		box->show();
-		int* p = new int [100] {0};
+		//int* p = new int [100] {0};
 		// of course, no modal dialog allowed in a coroutine
 		//QMessageBox::critical(this, "ok ok", "OK, No Such Sequence...");
 	}

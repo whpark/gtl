@@ -35,8 +35,8 @@ namespace gtl::seq::test {
 		auto t2 = chrono::steady_clock::now();
 		fmt::print("step3 : {:>8}\n", chrono::duration_cast<chrono::milliseconds>(t2 - t1));
 
-		co_return "";
-	}
+		co_return fmt::format("{} ended. take {}", self->GetName(), chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - t0));
+}
 
 	seq_t TopSeq();
 	seq_t Child1();
@@ -148,7 +148,7 @@ namespace gtl::seq::test {
 		fmt::print("Begin\n");
 
 		// start simple sequence
-		driver.CreateChildSequence("-------------\nSimpleSequence", &Sequence1);
+		auto future = driver.CreateChildSequence("SimpleSequence", &Sequence1);
 		do {
 			auto t = driver.Dispatch();
 			if (driver.IsDone())
@@ -157,11 +157,12 @@ namespace gtl::seq::test {
 				t = gtl::seq::clock_t::now() + 3s;
 			std::this_thread::sleep_until(t);
 		} while (!driver.IsDone());
+		fmt::print("Sequence1 result : {}\n", future.get());
 
 		fmt::print("\n");
 
 		// start tree sequence
-		driver.CreateChildSequence("-------------\nTreeSequence", &TopSeq);
+		driver.CreateChildSequence("TreeSequence", &TopSeq);
 		do {
 			auto t = driver.Dispatch();
 			if (driver.IsDone())
@@ -211,8 +212,8 @@ namespace gtl::seq::test2 {
 		using base_t = seq_map_t;
 
 		C1(unit_id_t const& id, seq_map_t& parent) : seq_map_t(id, parent) {
-			Bind("task1", this, &this_t::Task1);
-			Bind("task2", this, &this_t::Task2);
+			Bind("task1", &this_t::Task1);
+			Bind("task2", &this_t::Task2);
 		}
 
 	protected:
@@ -228,7 +229,7 @@ namespace gtl::seq::test2 {
 			co_await WaitForChild();
 			fmt::print("{}: child done: {}\n", funcname, future.get());
 
-			fmt::print("{}: End {}\n", funcname, ms(t0-clock_t::now()));
+			fmt::print("{}: End {}\n", funcname, ms(clock_t::now() - t0));
 
 			co_return "";
 		}
@@ -243,8 +244,8 @@ namespace gtl::seq::test2 {
 			co_await WaitForChild();
 			fmt::print("{}: child done: {}\n", funcname, future.get());
 
-			auto str = fmt::format("{}: End - {}\n", funcname, ms(clock_t::now() - t0));
-			fmt::print("{}", str);
+			auto str = fmt::format("{}: End - {}", funcname, ms(clock_t::now() - t0));
+			fmt::print("{}\n", str);
 
 			co_return std::move(str);
 		}
@@ -259,8 +260,8 @@ namespace gtl::seq::test2 {
 		using base_t = seq_map_t;
 
 		C2(unit_id_t const& id, seq_map_t& parent) : seq_map_t(id, parent) {
-			Bind("taskA", this, &this_t::TaskA);
-			Bind("taskB", this, &this_t::TaskB);
+			Bind("taskA", &this_t::TaskA);
+			Bind("taskB", &this_t::TaskB);
 		}
 
 	protected:
@@ -275,8 +276,8 @@ namespace gtl::seq::test2 {
 			co_await WaitForChild();
 			fmt::print("{}: child done: {}\n", funcname, future.get());
 
-			auto str = fmt::format("{}: End - {}\n", funcname, ms(clock_t::now() - t0));
-			fmt::print("{}", str);
+			auto str = fmt::format("{}: End - {}", funcname, ms(clock_t::now() - t0));
+			fmt::print("{}\n", str);
 
 			co_return std::move(str);
 		}
@@ -288,8 +289,8 @@ namespace gtl::seq::test2 {
 
 			co_await WaitFor(100ms);
 
-			auto str = fmt::format("{}: End - {}\n", funcname, ms(clock_t::now() - t0));
-			fmt::print("{}", str);
+			auto str = fmt::format("{}: End - {}", funcname, ms(clock_t::now() - t0));
+			fmt::print("{}\n", str);
 
 			co_return std::move(str);
 		}
