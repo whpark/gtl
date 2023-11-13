@@ -350,4 +350,3 @@ namespace gtl::seq::test2 {
 	}
 
 }	// namespace gtl::seq::test
-
