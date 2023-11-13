@@ -203,6 +203,9 @@
     <ClInclude Include="..\..\include\gtl\sequence_map.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\gtl\sequence_any.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">

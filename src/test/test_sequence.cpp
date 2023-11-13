@@ -112,8 +112,6 @@ namespace gtl::seq::test {
 	}
 
 	coro_t Child1_2(seq_t& seq) {
-		auto* self = seq_t::GetCurrentSequence();
-
 		auto sl = std::source_location::current();
 		auto funcname = seq.GetName();// sl.function_name();
 
@@ -124,7 +122,7 @@ namespace gtl::seq::test {
 		for (int i = 0; i < 5; i++) {
 			auto t1 = clock_t::now();
 			fmt::print("{}: doing some job... and wait for 200ms : {}\n", funcname, chrono::duration_cast<chrono::milliseconds>(t1 - t0));
-			co_await self->WaitFor(200ms);
+			co_await seq.WaitFor(200ms);
 		}
 		fmt::print("{}: End. Creating Child1_1, Child1_2\n", funcname);
 	
