@@ -3,6 +3,7 @@
 #include "gtl/gtl.h"
 #include "gtl/string.h"
 #include "gtl/sequence.h"
+#include "gtl/sequence_any.h"
 #include "gtl/sequence_map.h"
 
 using namespace std::literals;
@@ -13,7 +14,7 @@ namespace gtl::seq::test {
 
 	using seq_t = gtl::seq::TSequence<std::string>;
 	using seq_map_t = gtl::seq::TSequenceMap<seq_t::result_t>;
-	using coro_t = seq_t::sCoroutineHandle;
+	using coro_t = seq_t::coro_t;
 
 	coro_t Sequence1(seq_t& seq) {
 		namespace chrono = std::chrono;
@@ -46,7 +47,7 @@ namespace gtl::seq::test {
 
 	coro_t TopSeq(seq_t& seq) {
 		auto sl = std::source_location::current();
-		auto funcname = sl.function_name();
+		auto funcname = seq.GetName();// sl.function_name();
 
 		// step 1
 		fmt::print("{}: Begin\n", funcname);
@@ -72,7 +73,7 @@ namespace gtl::seq::test {
 
 	coro_t Child1(seq_t& seq) {
 		auto sl = std::source_location::current();
-		auto funcname = sl.function_name();
+		auto funcname = seq.GetName();// sl.function_name();
 
 		// step 1
 		fmt::print("{}: Begin\n", funcname);
@@ -94,7 +95,7 @@ namespace gtl::seq::test {
 
 	coro_t Child1_1(seq_t& seq) {
 		auto sl = std::source_location::current();
-		auto funcname = sl.function_name();
+		auto funcname = seq.GetName();// sl.function_name();
 
 		auto t0 = clock_t::now();
 
@@ -114,7 +115,7 @@ namespace gtl::seq::test {
 		auto* self = seq_t::GetCurrentSequence();
 
 		auto sl = std::source_location::current();
-		auto funcname = sl.function_name();
+		auto funcname = seq.GetName();// sl.function_name();
 
 		auto t0 = clock_t::now();
 
@@ -175,7 +176,7 @@ namespace gtl::seq::test2 {
 
 	using seq_t = gtl::seq::TSequence<std::string>;
 	using seq_map_t = gtl::seq::TSequenceMap<seq_t::result_t>;
-	using coro_t = seq_t::sCoroutineHandle;
+	using coro_t = seq_t::coro_t;
 
 	//-----
 	class CApp : public seq_map_t {
@@ -310,6 +311,38 @@ namespace gtl::seq::test2 {
 		fmt::print("done\n");
 
 
+	}
+
+
+	gtl::seq::v01::TCoroutineHandle<std::string> SeqReturningString(gtl::seq::v01::xSequenceAny& seq) {
+		auto t0 = chrono::steady_clock::now();
+		auto str = fmt::format("{} ended. take {}", seq.GetName(), chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - t0));
+
+		co_return std::move(str);
+	}
+
+	gtl::seq::v01::TCoroutineHandle<int> SeqReturningInt(gtl::seq::v01::xSequenceAny& seq) {
+
+		co_return 3141592;
+	}
+
+	TEST(gtl_sequence, any_return_type) {
+		gtl::seq::v01::xSequenceAny driver;
+
+		auto f1 = driver.CreateChildSequence("SeqReturningString", &SeqReturningString);
+		auto f2 = driver.CreateChildSequence("SeqReturningInt", &SeqReturningInt);
+
+		do {
+			auto t = driver.Dispatch();
+			if (driver.IsDone())
+				break;
+			if (auto ts = t - gtl::seq::clock_t::now(); ts > 3s)
+				t = gtl::seq::clock_t::now() + 3s;
+			std::this_thread::sleep_until(t);
+		} while (!driver.IsDone());
+
+		fmt::print("Result of SeqReturningString : {}\n", f1.get());
+		fmt::print("Result of SeqReturningInt : {}\n", f2.get());
 	}
 
 }	// namespace gtl::seq::test
