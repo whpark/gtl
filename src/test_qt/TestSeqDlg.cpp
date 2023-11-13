@@ -6,8 +6,8 @@ using gtl::qt::ToQString;
 using gtl::qt::ToString;
 using namespace std::literals;
 
-using seq_t = xTestSeqDlg::seq_map_t::seq_t;
-
+using seq_t = xTestSeqDlg::seq_t;
+using coro_t = xTestSeqDlg::coro_t;
 seq_t g_driver("");
 
 template < typename ... TArgs>
@@ -89,7 +89,7 @@ void xTestSeqDlg::Dispatch() {
 	//}
 }
 
-seq_t Suspend3(std::string const&) {
+coro_t Suspend3(seq_t&, std::string const&) {
 	auto sl = std::source_location::current();
 
 	//static std::atomic<int>	counter{};
@@ -106,7 +106,7 @@ seq_t Suspend3(std::string const&) {
 	co_await seq_t::GetCurrentSequence()->WaitFor(10ms);
 }
 
-seq_t xTestSeqDlg::Suspend(seq_param_t param) {
+coro_t xTestSeqDlg::Suspend(seq_t&, seq_param_t param) {
 	auto* seq = seq_t::GetCurrentSequence();
 	auto sl = std::source_location::current();
 
@@ -128,7 +128,7 @@ seq_t xTestSeqDlg::Suspend(seq_param_t param) {
 	co_return "test string"s;
 }
 
-seq_t xTestSeqDlg::SuspendAny(int) {
+coro_t xTestSeqDlg::SuspendAny(seq_t&, int) {
 	auto* seq = seq_t::GetCurrentSequence();
 	auto sl = std::source_location::current();
 
@@ -148,7 +148,7 @@ seq_t xTestSeqDlg::SuspendAny(int) {
 	co_await seq->WaitFor(0ms);
 }
 
-seq_t xTestSeqDlg::SuspendHandler(seq_param_t param) {
+coro_t xTestSeqDlg::SuspendHandler(seq_t&, seq_param_t param) {
 	auto* seq = seq_t::GetCurrentSequence();
 
 	auto sl = std::source_location::current();
@@ -174,9 +174,7 @@ seq_t xTestSeqDlg::SuspendHandler(seq_param_t param) {
 	co_return std::move(result);
 }
 
-seq_t xTestSeqDlg::Seq1(seq_param_t param) {
-	auto* seq = seq_t::GetCurrentSequence();
-
+coro_t xTestSeqDlg::Seq1(seq_t& seq, seq_param_t param) {
 	static std::atomic<int> counter_{};
 	int counter = (counter_ += 3)-3;
 	Log("Seq1 Begin\n");
@@ -187,19 +185,19 @@ seq_t xTestSeqDlg::Seq1(seq_param_t param) {
 	// Call SuspendHandler
 	{
 		auto future = CreateChildSequence("SuspendHandler", glz::json_t{ {"duration", 1500} });
-		co_await seq->WaitForChild();
+		co_await WaitForChild();
 		auto r = future.get();
 		ui.txtMessage1->setText(ToQString(fmt::format("{}", gtl::ValueOr(r["result"], "no result"s))));
 	}
-	co_await seq->WaitFor(10ms);
+	co_await WaitFor(10ms);
 
 	//for (auto t0 = std::chrono::steady_clock::now(); std::chrono::steady_clock::now() - t0 < 1000ms; ) {
 	//	co_await std::suspend_always();
 	//}
 	ui.txtMessage2->setText(ToQString(fmt::format("{}", ++counter)));
 	
-	seq->CreateChildSequence<std::string>("SuspendString", Suspend3, "sdfasdf"s);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
-	co_await seq->WaitForChild();
+	seq.CreateChildSequence<std::string>("SuspendString", Suspend3, "sdfasdf"s);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
+	co_await seq.WaitForChild();
 
 	//co_await self.CreateSequenceParams<std::string>(Suspend3, std::string{});//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 
@@ -208,7 +206,7 @@ seq_t xTestSeqDlg::Seq1(seq_param_t param) {
 	//CreateSequence("child4", self, &this_t::Suspend);
 	//CreateSequence("child5", self, &this_t::Suspend);
 	//CreateSequence("child6", self, &this_t::Suspend);
-	co_await seq->WaitForChild();
+	co_await seq.WaitForChild();
 
 	ui.txtMessage3->setText(ToQString(fmt::format("{}", ++counter)));
 

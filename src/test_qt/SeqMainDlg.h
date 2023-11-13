@@ -27,8 +27,8 @@ public:
 	seq_t m_driver;
 
 public:
-	seq_t Seq1(seq_param_t param);
-	seq_t Seq2(seq_param_t param);
+	coro_t Seq1(seq_t&, seq_param_t param);
+	coro_t Seq2(seq_t&, seq_param_t param);
 
 private:
 	Ui::xSeqMainDlgClass ui;

@@ -22,7 +22,7 @@ public:
 	~xSeqChildDlg();
 
 public:
-	seq_t SeqShowSomeText(seq_param_t);
+	coro_t SeqShowSomeText(seq_t&, seq_param_t);
 
 private:
 	Ui::xSeqChildDlgClass ui;

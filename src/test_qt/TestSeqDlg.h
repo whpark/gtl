@@ -25,10 +25,10 @@ public:
 	std::jthread m_thread;
 	void Dispatch();
 
-	seq_t Seq1(seq_param_t param = {});
-	seq_t Suspend(seq_param_t param = {});
-	seq_t SuspendHandler(seq_param_t param = {});
-	seq_t SuspendAny(int);
+	coro_t Seq1(seq_t&, seq_param_t param = {});
+	coro_t Suspend(seq_t&, seq_param_t param = {});
+	coro_t SuspendHandler(seq_t&, seq_param_t param = {});
+	coro_t SuspendAny(seq_t&, int);
 
 Q_SIGNALS:
 	void sigSequence();
