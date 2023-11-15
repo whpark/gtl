@@ -10,6 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <set>
+#include <map>
 #include "sequence.h"
 
 namespace gtl::seq::inline v01 {
@@ -33,8 +35,8 @@ namespace gtl::seq::inline v01 {
 		using map_t = std::map<seq_id_t, handler_t>;
 
 	private:
-		seq_t* m_sequence_driver{};
-		this_t* m_top{};
+		mutable seq_t* m_sequence_driver{};	// cache m_top->m_sequence_driver
+		mutable this_t* m_top{};			// cache m_top = [] { for (auto* p = this; p->m_parent; p = p->m_parent); return p; }();
 	protected:
 		unit_id_t m_unit;
 		this_t* m_parent{};
@@ -43,14 +45,17 @@ namespace gtl::seq::inline v01 {
 
 	public:
 		// constructors and destructor
+		TSequenceMap(unit_id_t unit) : m_unit(std::move(unit)) {
+		}
 		TSequenceMap(unit_id_t unit, this_t& parent) : m_unit(std::move(unit)), m_parent(&parent), m_top(parent.m_top), m_sequence_driver(parent.m_sequence_driver) {
 			m_parent->Register(this);
 		}
 		TSequenceMap(unit_id_t unit, seq_t& driver) : m_unit(std::move(unit)), m_sequence_driver(&driver), m_top(this) {
 		}
 		~TSequenceMap() {
-			for (auto& child : m_mapChildren)	// children can outlive parents
-				child->m_parent = nullptr;
+			while (m_mapChildren.size()) {	// children can outlive parents
+				Unregister(*m_mapChildren.begin());
+			}
 			m_mapChildren.clear();
 			if (auto* parent = std::exchange(m_parent, nullptr))
 				parent->Unregister(this);
@@ -74,7 +79,18 @@ namespace gtl::seq::inline v01 {
 			if (m_parent)
 				m_parent->Register(this);
 		}
-		TSequenceMap& operator = (TSequenceMap&&) = delete;	// if has some children, no way to remove children from parent
+		TSequenceMap& operator = (TSequenceMap&&) = delete;	// if this has some children, no way to remove children from parent
+		//TSequenceMap& operator = (TSequenceMap&& b) {
+		//	m_unit = std::move(b.m_unit);
+		//	m_mapFuncs = std::move(b.m_mapFuncs);
+		//	
+		//	if (m_parent = std::exchange(b.m_parent, nullptr)) {
+		//		m_parent->Unregister(&b);
+		//		m_parent->Register(this);
+		//	}
+		// 
+		//	// for children, update m_top
+		//}
 
 		auto GetSequenceDriver() const { return m_sequence_driver; }
 		auto const& GetUnitName() const { return m_unit; }
@@ -84,11 +100,19 @@ namespace gtl::seq::inline v01 {
 		/// @brief Register/Unregister this unit
 		inline void Register(this_t* child) {
 			if (child) {
+				if (auto* p = std::exchange(child->m_parent, nullptr); p) {
+					p->Unregister(child);
+				}
+				child->m_parent = this;
+				child->m_top = m_top;
+				child->m_sequence_driver = m_sequence_driver;
 				m_mapChildren.insert(child);
 			}
 		}
 		inline void Unregister(this_t* child) {
 			if (child) {
+				child->m_parent = nullptr;
+				child->m_top = nullptr;
 				m_mapChildren.erase(child);
 			}
 		}
@@ -156,9 +180,9 @@ namespace gtl::seq::inline v01 {
 			if (!handler)
 				throw std::exception("no handler");
 			if (!parent)
-				parent = ((this_t*)self)->m_sequence_driver->GetCurrentSequence();
+				parent = ((this_t*)self)->m_sequence_driver->GetCurrentSequence();	// current sequence
 			if (!parent)
-				parent = ((this_t*)self)->m_sequence_driver;
+				parent = ((this_t*)self)->m_sequence_driver;	// top most
 			if (!parent)
 				throw std::exception("no parent seq");
 			return parent->CreateChildSequence<param_t>(
@@ -170,9 +194,9 @@ namespace gtl::seq::inline v01 {
 			if (!unitTarget)
 				throw std::exception("no unit");
 			if (!parent)
-				parent = unitTarget->m_sequence_driver->GetCurrentSequence();
+				parent = unitTarget->m_sequence_driver->GetCurrentSequence();	// current sequence
 			if (!parent)
-				parent = unitTarget->m_sequence_driver;
+				parent = unitTarget->m_sequence_driver;	// top most
 			if (!parent)
 				throw std::exception("no parent seq");
 			auto func = unitTarget->FindHandler(name);
@@ -184,10 +208,10 @@ namespace gtl::seq::inline v01 {
 
 		// root sequence
 		inline auto CreateRootSequence(unit_id_t const& unit, seq_id_t name, param_t params) {
-			return CreateSequence(m_sequence_driver, unit, std::move(name), {}, std::move(params));
+			return CreateSequence(GetSequenceDriver(), unit, std::move(name), {}, std::move(params));
 		}
 		inline auto CreateRootSequence(seq_id_t name, param_t params = {}) {
-			return CreateSequence(m_sequence_driver, {}, std::move(name), {}, std::move(params));
+			return CreateSequence(GetSequenceDriver(), {}, std::move(name), {}, std::move(params));
 		}
 
 		// child sequence
@@ -195,12 +219,12 @@ namespace gtl::seq::inline v01 {
 			return CreateSequence(parent, unit, std::move(name), {}, std::move(params));
 		}
 		inline auto CreateChildSequence(seq_id_t name, param_t params = {}) {
-			if (auto* parent = m_sequence_driver->GetCurrentSequence())
+			if (auto* parent = GetCurrentSequence())
 				return CreateSequence(parent, {}, std::move(name), {}, std::move(params));
 			throw std::exception("CreateChildSequence() must be called from sequence function");
 		}
 		inline auto CreateChildSequence(unit_id_t const& unit, seq_id_t name, param_t params) {
-			if (auto* parent = m_sequence_driver->GetCurrentSequence())
+			if (auto* parent = GetCurrentSequence())
 				return CreateSequence(parent, unit, std::move(name), {}, std::move(params));
 			throw std::exception("CreateChildSequence() must be called from sequence function");
 		}
@@ -220,19 +244,19 @@ namespace gtl::seq::inline v01 {
 
 		// co_await
 		auto WaitFor(clock_t::duration d) {
-			if (auto* cur = m_sequence_driver->GetCurrentSequence())
+			if (auto* cur = GetCurrentSequence())
 				return cur->WaitFor(d);
 			throw std::exception("WaitFor() must be called from sequence function");
 		}
 		// co_await
 		auto WaitUntil(clock_t::time_point t) {
-			if (auto* cur = m_sequence_driver->GetCurrentSequence())
+			if (auto* cur = GetCurrentSequence())
 				return cur->WaitUntil(t);
 			throw std::exception("WaitFor() must be called from sequence function");
 		}
 		// co_await
 		auto WaitForChild() {
-			if (auto* cur = m_sequence_driver->GetCurrentSequence())
+			if (auto* cur = GetCurrentSequence())
 				return cur->WaitForChild();
 			throw std::exception("WaitFor() must be called from sequence function");
 		}
