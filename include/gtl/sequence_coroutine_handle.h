@@ -63,6 +63,7 @@ namespace gtl::seq::inline v01 {
 	//-------------------------------------------------------------------------
 	template < typename tResult >
 	class TSimpleCoroutineHandle;
+	class ICoroutineHandle;
 	template < typename tResult >
 	class TCoroutineHandle;
 	template < typename tResult, template < typename tResult > typename tCoroutineHandle >
