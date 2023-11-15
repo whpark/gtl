@@ -35,8 +35,7 @@ namespace gtl::seq::inline v01 {
 		using map_t = std::map<seq_id_t, handler_t>;
 
 	private:
-		mutable seq_t* m_sequence_driver{};	// cache m_top->m_sequence_driver
-		mutable this_t* m_top{};			// cache m_top = [] { for (auto* p = this; p->m_parent; p = p->m_parent); return p; }();
+		mutable seq_t* m_sequence_driver{};	// only valid if (m_parent == nullptr). (std::variant<this_t*, seq_t*> : too verbose)
 	protected:
 		unit_id_t m_unit;
 		this_t* m_parent{};
@@ -47,10 +46,10 @@ namespace gtl::seq::inline v01 {
 		// constructors and destructor
 		TSequenceMap(unit_id_t unit) : m_unit(std::move(unit)) {
 		}
-		TSequenceMap(unit_id_t unit, this_t& parent) : m_unit(std::move(unit)), m_parent(&parent), m_top(parent.m_top), m_sequence_driver(parent.m_sequence_driver) {
+		TSequenceMap(unit_id_t unit, this_t& parent) : m_unit(std::move(unit)), m_parent(&parent) {
 			m_parent->Register(this);
 		}
-		TSequenceMap(unit_id_t unit, seq_t& driver) : m_unit(std::move(unit)), m_sequence_driver(&driver), m_top(this) {
+		TSequenceMap(unit_id_t unit, seq_t& driver) : m_unit(std::move(unit)), m_sequence_driver(&driver) {
 		}
 		~TSequenceMap() {
 			while (m_mapChildren.size()) {	// children can outlive parents
@@ -69,10 +68,8 @@ namespace gtl::seq::inline v01 {
 			if (auto* parent = std::exchange(b.m_parent, nullptr)) {
 				parent->Unregister(&b);
 				m_parent = parent;
-				m_top = parent->m_top;
 			}
 			m_unit = std::exchange(b.m_unit, {});
-			m_top = std::exchange(b.m_top, nullptr);
 			m_sequence_driver = std::exchange(b.m_sequence_driver, nullptr);
 			m_mapChildren.swap(b.m_mapChildren);
 
@@ -91,11 +88,12 @@ namespace gtl::seq::inline v01 {
 		// 
 		//	// for children, update m_top
 		//}
-
-		auto GetSequenceDriver() const { return m_sequence_driver; }
+		inline this_t* GetTopMost() { auto* p = this; while (p->m_parent) p = p->m_parent; return p; }
+		inline this_t const* GetTopMost() const { auto const* p = this; while (p->m_parent) p = p->m_parent; return p; }
+		seq_t* GetSequenceDriver() const { if (auto* top = GetTopMost()) return top->m_sequence_driver; return nullptr; }
 		auto const& GetUnitName() const { return m_unit; }
-		auto* GetCurrentSequence() { return m_sequence_driver->GetCurrentSequence(); }
-		auto const* GetCurrentSequence() const { return m_sequence_driver->GetCurrentSequence(); }
+		auto* GetCurrentSequence() { return GetSequenceDriver()->GetCurrentSequence(); }
+		auto const* GetCurrentSequence() const { return GetSequenceDriver()->GetCurrentSequence(); }
 		//-----------------------------------
 		/// @brief Register/Unregister this unit
 		inline void Register(this_t* child) {
@@ -104,15 +102,13 @@ namespace gtl::seq::inline v01 {
 					p->Unregister(child);
 				}
 				child->m_parent = this;
-				child->m_top = m_top;
-				child->m_sequence_driver = m_sequence_driver;
+				child->m_sequence_driver = nullptr;
 				m_mapChildren.insert(child);
 			}
 		}
 		inline void Unregister(this_t* child) {
 			if (child) {
 				child->m_parent = nullptr;
-				child->m_top = nullptr;
 				m_mapChildren.erase(child);
 			}
 		}
@@ -180,9 +176,9 @@ namespace gtl::seq::inline v01 {
 			if (!handler)
 				throw std::exception("no handler");
 			if (!parent)
-				parent = ((this_t*)self)->m_sequence_driver->GetCurrentSequence();	// current sequence
+				parent = self->GetCurrentSequence();	// current sequence
 			if (!parent)
-				parent = ((this_t*)self)->m_sequence_driver;	// top most
+				parent = self->GetSequenceDriver();		// top most
 			if (!parent)
 				throw std::exception("no parent seq");
 			return parent->CreateChildSequence<param_t>(
@@ -190,13 +186,13 @@ namespace gtl::seq::inline v01 {
 		}
 		//-----------------------------------
 		inline auto CreateSequence(seq_t* parent, unit_id_t unit, seq_id_t name, seq_id_t running, param_t params = {}) {
-			this_t* unitTarget = unit.empty() ? this : m_top->FindUnitDFS(unit);
+			this_t* unitTarget = unit.empty() ? this : GetTopMost()->FindUnitDFS(unit);
 			if (!unitTarget)
 				throw std::exception("no unit");
 			if (!parent)
-				parent = unitTarget->m_sequence_driver->GetCurrentSequence();	// current sequence
+				parent = unitTarget->GetCurrentSequence();	// current sequence
 			if (!parent)
-				parent = unitTarget->m_sequence_driver;	// top most
+				parent = unitTarget->GetSequenceDriver();	// top most
 			if (!parent)
 				throw std::exception("no parent seq");
 			auto func = unitTarget->FindHandler(name);
