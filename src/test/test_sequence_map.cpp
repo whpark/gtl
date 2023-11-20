@@ -8,7 +8,7 @@
 namespace gtl::seq::test {
 
 	using namespace std::literals;
-	using namespace gtl::literals;
+	//using namespace gtl::literals;
 	namespace chrono = std::chrono;
 
 	using seq_t = gtl::seq::TSequence<std::string>;
@@ -21,9 +21,9 @@ namespace gtl::seq::test {
 		CApp(seq_t& driver) : seq_map_t("top", driver) {
 		}
 		void Run() {
-			auto* driver = GetSequenceDriver();
+			seq_t* driver = GetSequenceDriver();
 			do {
-				auto t = driver->Dispatch();
+				gtl::seq::clock_t::time_point t = driver->Dispatch();
 				if (driver->IsDone())
 					break;
 				if (auto ts = t - gtl::seq::clock_t::now(); ts > 3s)
@@ -33,7 +33,7 @@ namespace gtl::seq::test {
 		}
 	};
 
-	auto ms(auto dur) {
+	std::chrono::milliseconds ms(auto dur) {
 		return std::chrono::duration_cast<std::chrono::milliseconds>(dur);
 	}
 
@@ -57,7 +57,7 @@ namespace gtl::seq::test {
 			fmt::print("{}: Begin\n", funcname);
 
 			// call this->task2
-			auto future = CreateChildSequence("task2", fmt::format("Greeting from {}", funcname));
+			std::future<seq_t::result_t> future = CreateChildSequence("task2", fmt::format("Greeting from {}", funcname));
 			co_await WaitForChild();
 			fmt::print("{}: child done: {}\n", funcname, future.get());
 
@@ -72,7 +72,7 @@ namespace gtl::seq::test {
 			fmt::print("{}: Begin param: {}\n", funcname, param);
 
 			// call c2::taskA
-			auto future = CreateChildSequence("c2", "taskA", fmt::format("Greeting from {}", funcname));
+			std::future<seq_t::result_t> future = CreateChildSequence("c2", "taskA", fmt::format("Greeting from {}", funcname));
 			co_await WaitForChild();
 			fmt::print("{}: child done: {}\n", funcname, future.get());
 
@@ -104,7 +104,7 @@ namespace gtl::seq::test {
 			fmt::print("{}: Begin param: {}\n", funcname, param);
 
 			// call c2::taskA
-			auto future = CreateChildSequence("taskB", fmt::format("Greeting from {}", funcname));
+			std::future<std::string> future = CreateChildSequence("taskB", fmt::format("Greeting from {}", funcname));
 			co_await WaitForChild();
 			fmt::print("{}: child done: {}\n", funcname, future.get());
 
@@ -147,8 +147,5 @@ namespace gtl::seq::test {
 
 		fmt::print("done\n");
 
-
 	}
-
-
 }	// namespace gtl::seq::test

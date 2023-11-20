@@ -9,7 +9,7 @@
 namespace gtl::seq::test {
 
 	using namespace std::literals;
-	using namespace gtl::literals;
+	//using namespace gtl::literals;
 	namespace chrono = std::chrono;
 
 	using seq_t = gtl::seq::xSequenceTReturn;
@@ -32,14 +32,14 @@ namespace gtl::seq::test {
 		co_return 3141592;
 	}
 
-	TEST(gtl_sequence, any_return_type) {
+	TEST(gtl_sequence, specify_return_type) {
 		if constexpr (true) {
 			gtl::seq::v01::xSequenceTReturn driver;
 
 			fmt::print("Creating 2 sequences returning string and int respectively\n");
 
-			auto f1 = driver.CreateChildSequence("SeqReturningString", &SeqReturningString);
-			auto f2 = driver.CreateChildSequence("SeqReturningInt", &SeqReturningInt);
+			std::future<std::string> f1 = driver.CreateChildSequence("SeqReturningString", &SeqReturningString);
+			std::future<int> f2 = driver.CreateChildSequence("SeqReturningInt", &SeqReturningInt);
 
 			do {
 				auto t = driver.Dispatch();

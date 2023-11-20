@@ -7,7 +7,7 @@
 namespace gtl::seq::test {
 
 	using namespace std::literals;
-	using namespace gtl::literals;
+	//using namespace gtl::literals;
 	namespace chrono = std::chrono;
 
 	using seq_t = gtl::seq::TSequence<std::string>;
@@ -159,7 +159,7 @@ namespace gtl::seq::test {
 			fmt::print("Begin : Simple\n");
 
 			// start simple sequence
-			auto future = driver.CreateChildSequence("SimpleSequence", &Sequence1);
+			std::future<seq_t::result_t> future = driver.CreateChildSequence("SimpleSequence", &Sequence1);
 			do {
 				auto t = driver.Dispatch();
 				if (driver.IsDone())
@@ -185,7 +185,7 @@ namespace gtl::seq::test {
 			// start tree sequence
 			driver.CreateChildSequence("TreeSequence", &TopSeq);
 			do {
-				auto t = driver.Dispatch();
+				gtl::seq::clock_t::time_point t = driver.Dispatch();
 				if (driver.IsDone())
 					break;
 				if (auto ts = t - gtl::seq::clock_t::now(); ts > 3s)
