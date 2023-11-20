@@ -203,10 +203,10 @@
     <ClInclude Include="..\..\include\gtl\sequence_map.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\sequence_any.h">
+    <ClInclude Include="..\..\include\gtl\sequence_coroutine_handle.h">
       <Filter>gtl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\sequence_coroutine_handle.h">
+    <ClInclude Include="..\..\include\gtl\sequence_tReturn.h">
       <Filter>gtl</Filter>
     </ClInclude>
   </ItemGroup>

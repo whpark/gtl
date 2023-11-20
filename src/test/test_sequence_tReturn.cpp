@@ -1,0 +1,60 @@
+#include "pch.h"
+
+#include "gtl/gtl.h"
+#include "gtl/string.h"
+#include "gtl/sequence.h"
+#include "gtl/sequence_tReturn.h"
+#include "gtl/sequence_map.h"
+
+namespace gtl::seq::test {
+
+	using namespace std::literals;
+	using namespace gtl::literals;
+	namespace chrono = std::chrono;
+
+	using seq_t = gtl::seq::xSequenceTReturn;
+	template < typename tReturn >
+	using tcoro_t = seq_t::tcoro_t<tReturn>;
+
+	tcoro_t<std::string> SeqReturningString(gtl::seq::v01::xSequenceTReturn& seq) {
+		auto t0 = chrono::steady_clock::now();
+		auto str = fmt::format("{} ended. take {}", seq.GetName(), chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - t0));
+
+		co_return std::move(str);
+	}
+
+	tcoro_t<int> SeqReturningInt(gtl::seq::v01::xSequenceTReturn& seq) {
+		bool bOK = co_await seq.Wait([t0 = gtl::seq::clock_t::now()] {
+			auto t = gtl::seq::clock_t::now();
+			fmt::print("SeqReturningInt : {}\n", chrono::duration_cast<chrono::milliseconds>(t - t0));
+			return t - t0 > 1s;
+		}, 100ms, 2s);
+		co_return 3141592;
+	}
+
+	TEST(gtl_sequence, any_return_type) {
+		if constexpr (true) {
+			gtl::seq::v01::xSequenceTReturn driver;
+
+			fmt::print("Creating 2 sequences returning string and int respectively\n");
+
+			auto f1 = driver.CreateChildSequence("SeqReturningString", &SeqReturningString);
+			auto f2 = driver.CreateChildSequence("SeqReturningInt", &SeqReturningInt);
+
+			do {
+				auto t = driver.Dispatch();
+				if (driver.IsDone())
+					break;
+				if (auto ts = t - gtl::seq::clock_t::now(); ts > 3s)
+					t = gtl::seq::clock_t::now() + 3s;
+				std::this_thread::sleep_until(t);
+			} while (!driver.IsDone());
+
+			fmt::print("Result of SeqReturningString : {}\n", f1.get());
+			fmt::print("Result of SeqReturningInt : {}\n", f2.get());
+
+			fmt::print("End\n");
+		}
+	}
+
+}	// namespace gtl::seq::test
