@@ -156,7 +156,7 @@ namespace gtl::seq::test {
 		try {
 			seq_t driver;
 
-			fmt::print("Begin : Simple\n");
+			fmt::print("\n\nBegin : Simple\n");
 
 			// start simple sequence
 			std::future<seq_t::result_t> future = driver.CreateChildSequence("SimpleSequence", &Sequence1);
@@ -180,7 +180,7 @@ namespace gtl::seq::test {
 		try {
 			seq_t driver;
 
-			fmt::print("Begin : Tree Sequence\n");
+			fmt::print("\n\nBegin : Tree Sequence\n");
 
 			// start tree sequence
 			driver.CreateChildSequence("TreeSequence", &TopSeq);
