@@ -41,9 +41,9 @@ echo installing glaze:x64
 vcpkg install --triplet=x64-windows --recurse glaze --overlay-ports=%SourceFolder%\ports\glaze\
 if %errorlevel% neq 0 set FAILED=%FAILED% glaze:x64,
 
-echo installing cppcoro:x64
-vcpkg install --triplet=x64-windows --recurse cppcoro --overlay-ports=%SourceFolder%\ports\cppcoro-andreasbuhr\
-if %errorlevel% neq 0 set FAILED=%FAILED% cppcoro:x64,
+rem echo installing cppcoro:x64
+rem vcpkg install --triplet=x64-windows --recurse cppcoro --overlay-ports=%SourceFolder%\ports\cppcoro-andreasbuhr\
+rem if %errorlevel% neq 0 set FAILED=%FAILED% cppcoro:x64,
 
 echo installing x64-windows...
 vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost 7zip bzip2 fmt imgui argparse spdlog scnlib ctre ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype nngpp grpc cpr nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut libxml2 libxmlmm libmodbus openssl exprtk eigen3 freeimage blend2d opencv[contrib,core,cuda,default-features,dnn,freetype,ipp,opengl,python,vtk] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp
