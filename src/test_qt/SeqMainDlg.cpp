@@ -8,22 +8,24 @@ using seq_t = xSeqMainDlg::seq_t;;
 xSeqMainDlg::xSeqMainDlg(QWidget* parent) : QDialog(parent), m_driver(""), seq_map_t("MainSeq", m_driver) {
 	ui.setupUi(this);
 
-	connect(ui.btnCreateSequence1, &QPushButton::clicked, [this] { CreateRootSequence("Seq1"); });
+	connect(ui.btnCreateSequence1, &QPushButton::clicked, [this] { try { CreateRootSequence("Seq1"); } catch (std::exception&) {} });
 	connect(ui.btnCreateSequence2, &QPushButton::clicked, [this] {
 		CreateRootSequence("Seq2");
 		m_driver.CreateChildSequence<seq_param_t>(
 			"Sequence2-1"s,
+			0,
 			[this](auto& seq, auto p) { return this->Seq2(seq, std::move(p)); },
 			{});
 		using namespace std::placeholders;
 		m_driver.CreateChildSequence<seq_param_t>(
 			"Sequence2-2"s,
+			0,
 			std::bind(&this_t::Seq2, this, _1, _2),
 			{});
 		//m_driver.CreateChildSequence("Sequence2-3"s, [this]() { return this->Seq2(std::make_shared<base_seq_t::sParam>()); });
-		m_driver.CreateChildSequence<seq_param_t>("Sequence2-3"s, std::bind(&this_t::Seq2, this, _1, _2), seq_param_t{});
+		m_driver.CreateChildSequence<seq_param_t>("Sequence2-3"s, 0, std::bind(&this_t::Seq2, this, _1, _2), seq_param_t{});
 
-		CreateSequence(&m_driver, "Sequence2-4", this, &this_t::Seq2, {});
+		//CreateSequence(&m_driver, "Sequence2-4", this, &this_t::Seq2, {});
 
 	});
 
@@ -38,8 +40,8 @@ xSeqMainDlg::xSeqMainDlg(QWidget* parent) : QDialog(parent), m_driver(""), seq_m
 		m_timer.start(dur);
 	});
 
-	Bind("Seq1", &xSeqMainDlg::Seq1);
-	Bind("Seq2", &xSeqMainDlg::Seq2);
+	Bind("Seq1", &xSeqMainDlg::Seq1, 1);
+	Bind("Seq2", &xSeqMainDlg::Seq2, 1);
 
 	m_timer.start(100ms);
 }

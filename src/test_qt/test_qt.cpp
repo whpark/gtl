@@ -46,9 +46,8 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 		glz::json_t j{};
 		sJsonTest test;
 		std::string str;
-		//auto j = glz::write_json(test);
 		glz::write<glz::opts{}>(test, str);
-		glz::read_json(j, str);
+		auto e = glz::read_json(j, str);
 		m_modelGlaze.SetJson(j);
 	}
 
@@ -69,7 +68,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 			if (str.isEmpty())
 				return false;
 			auto buffer = ToString(str);
-			glz::read_json(option, buffer);
+			auto e = glz::read_json(option, buffer);
 		}
 		return true;
 	};

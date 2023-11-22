@@ -104,6 +104,8 @@ coro_t Suspend3(seq_t&, std::string const&) {
 	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
 
 	co_await seq_t::GetCurrentSequence()->WaitFor(10ms);
+
+	co_return "";
 }
 
 coro_t xTestSeqDlg::Suspend(seq_t&, seq_param_t param) {
@@ -146,6 +148,8 @@ coro_t xTestSeqDlg::SuspendAny(seq_t&, int) {
 	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
 
 	co_await seq->WaitFor(0ms);
+
+	co_return "";
 }
 
 coro_t xTestSeqDlg::SuspendHandler(seq_t&, seq_param_t param) {
@@ -196,7 +200,7 @@ coro_t xTestSeqDlg::Seq1(seq_t& seq, seq_param_t param) {
 	//}
 	ui.txtMessage2->setText(ToQString(fmt::format("{}", ++counter)));
 	
-	seq.CreateChildSequence<std::string>("SuspendString", Suspend3, "sdfasdf"s);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
+	seq.CreateChildSequence<std::string>("SuspendString", 0, Suspend3, "sdfasdf"s);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 	co_await seq.WaitForChild();
 
 	//co_await self.CreateSequenceParams<std::string>(Suspend3, std::string{});//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
@@ -223,5 +227,5 @@ coro_t xTestSeqDlg::Seq1(seq_t& seq, seq_param_t param) {
 	}
 
 	Log("Seq1 END\n");
-	co_return ;
+	co_return "";
 }
