@@ -20,11 +20,11 @@
 
 namespace gtl {
 
-	template <template <typename ...TArg> typename TContainer, class TKey, class T, class TKeyEq = std::equal_to<TKey>, class TAlloc = std::allocator<std::pair<TKey const, T>> >
-	class TContainerMap : protected TContainer<std::pair<TKey const, T>, TAlloc> {
+	template <template <typename ...TArg> typename TContainer, class TKey, class T, class TKeyEq = std::equal_to<TKey>, class TAlloc = std::allocator<std::pair<TKey, T>> >
+	class TContainerMap : protected TContainer<std::pair<TKey, T>, TAlloc> {
 	public:
 		using this_t = TContainerMap;
-		using base_t = TContainer<std::pair<TKey const, T>/*, TAlloc*/>;
+		using base_t = TContainer<std::pair<TKey, T>/*, TAlloc*/>;
 
 	public:
 		using base_t::base_t;

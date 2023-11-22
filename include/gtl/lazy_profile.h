@@ -75,6 +75,9 @@ namespace gtl {
 		TLazyProfile& operator=(TLazyProfile const&) = default;
 		TLazyProfile& operator=(TLazyProfile&&) = default;
 
+		bool operator == (this_t const& ) const = default;
+		bool operator != (this_t const& ) const = default;
+
 		TLazyProfile& operator[](string_view_t key) {
 			return m_sections[key];
 		}
