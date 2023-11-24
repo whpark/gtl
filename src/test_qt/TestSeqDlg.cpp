@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "TestSeqDlg.h"
 #include "gtl/reflection_glaze.h"
 

@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "gtl/qt/QPathCompleter.h"
 #include "gtl/qt/util.h"
 

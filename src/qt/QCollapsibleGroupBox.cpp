@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "gtl/qt/QCollapsibleGroupBox.h"
 
 using namespace std::literals;
