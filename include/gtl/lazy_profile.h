@@ -88,13 +88,29 @@ namespace gtl {
 		void Clear() {
 			m_sections.clear();
 			m_items.clear();
+			m_line.clear();
 		}
 
-		auto& GetSection(string_view_t key) {
-			return m_sections[key];
-		}
-		auto const& GetSection(string_view_t key) const {
-			return m_sections[key];
+		auto& GetSection(string_view_t key) { return m_sections[key]; }
+		auto const& GetSection(string_view_t key) const { return m_sections[key]; }
+
+		auto& GetSections() { return m_sections; }
+		auto const& GetSections() const { return m_sections; }
+
+		auto& GetRawItems() { return m_items; }
+		auto const& GetRawItems() const { return m_items; }
+
+		auto GetItemsView() const {
+			struct sItem { string_view_t key, value; };
+			std::vector<sItem> items;
+			items.reserve(m_items.size());
+			for (auto const& item : m_items) {
+				auto [whole, key1, eq1, value1, comment1] = s_reItem(item);
+				if (!whole)
+					continue;
+				items.push_back({key1, value1});
+			}
+			return items;
 		}
 
 		string_view_t GetItemValueRaw(string_view_t key) const {
@@ -168,7 +184,6 @@ namespace gtl {
 			SetItemValueRaw(key, value, comment);
 		}
 
-		template < typename tvalue >
 		auto HasItem(string_view_t key) const {
 			auto sv = GetItemValueRaw(key);
 			sv = gtl::TrimView(sv);

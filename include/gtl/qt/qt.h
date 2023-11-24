@@ -37,6 +37,15 @@ namespace gtl::qt {
 	inline QString ToQString(std::u32string const& str) { return QString::fromStdU32String(str); }
 	inline QString ToQString(std::filesystem::path const& path) { return ToQString(path.wstring()); }
 
+	template < typename tcontainer, typename tstring = tcontainer::value_type >
+	inline QStringList ToQStrings(tcontainer const& lst) {
+		QStringList qlst;
+		qlst.reserve(lst.size());
+		for (auto const& str : lst)
+			qlst.push_back(ToQString(str));
+		return qlst;
+	}
+
 	template < typename T > requires 
 		requires (T t) { {ToString(t)} -> std::convertible_to<std::string>; }
 	or  requires (T t) { {ToString(t)} -> std::convertible_to<std::wstring>; }
