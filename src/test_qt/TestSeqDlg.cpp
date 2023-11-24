@@ -219,7 +219,8 @@ coro_t xTestSeqDlg::Seq1(seq_t& seq, seq_param_t param) {
 	}
 	catch (std::exception &e) {
 		auto* box = new QMessageBox(this);
-		box->setText("OK, No Such Sequence...");
+		auto str = fmt::format("OK, No Such Sequence, \n\n{}", e.what());
+		box->setText(ToQString(str));
 		box->show();
 		//int* p = new int [100] {0};
 		// of course, no modal dialog allowed in a coroutine
