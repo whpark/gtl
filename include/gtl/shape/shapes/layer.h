@@ -48,7 +48,7 @@ namespace gtl::shape {
 		}
 
 		virtual eSHAPE GetShapeType() const { return eSHAPE::layer; }
-		//virtual point_t PointAt(double t) const override { throw std::exception{"not here."}; return point_t {}; }	// no PointAt();
+		//virtual point_t PointAt(double t) const override { throw std::exception{GTL__FUNCSIG "not here."}; return point_t {}; }	// no PointAt();
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
 			if (m_shapes.empty())
 				return{};

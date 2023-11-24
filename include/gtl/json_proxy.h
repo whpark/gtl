@@ -147,23 +147,23 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 			bjson operator [] (char8_t const (&sz)[n]) const { return operator [](std::u8string_view{sz}); }
 			bjson operator [] (std::string_view svKey) const {
 				if (j_.is_null())
-					throw std::invalid_argument{"empty"};
+					throw std::invalid_argument{GTL__FUNCSIG "empty"};
 				boost::json::object const* pObject = &j_.as_object();
 				return (const_cast<boost::json::object&>(*pObject))[std::string(svKey)];
 			}
 			bjson const operator [] (std::u8string_view svKey) const {
 				if (j_.is_null())
-					throw std::invalid_argument{"empty"};
+					throw std::invalid_argument{GTL__FUNCSIG "empty"};
 				boost::json::object const* pObject = &j_.as_object();
 				std::u8string strKey{svKey};
 				return (const_cast<boost::json::object&>(*pObject))[reinterpret_cast<std::string&>(strKey)];
 			}
 			bjson const operator [] (std::size_t index) const {
 				if (j_.is_null())
-					throw std::invalid_argument{"empty"};
+					throw std::invalid_argument{GTL__FUNCSIG "empty"};
 				boost::json::array const* pArray = &j_.as_array();
 				if (pArray->size() <= index)
-					throw std::invalid_argument{"size"};
+					throw std::invalid_argument{GTL__FUNCSIG "size"};
 	
 				return (const_cast<boost::json::array&>(*pArray))[index];
 			}
@@ -245,7 +245,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 					nLine++;
 					p.write(line, ec);
 					if (ec) {
-						throw std::ios_base::failure(std::format("line {}", nLine), ec);
+						throw std::ios_base::failure(GTL__FUNCSIG + std::format("line {}", nLine), ec);
 						return false;
 					}
 				}

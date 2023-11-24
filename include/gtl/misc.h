@@ -68,7 +68,7 @@ namespace gtl {
 			for (size_t i{}; i < std::size(literal.str); i++) {
 				//static_assert(literal.str[i] > 0 and literal.str[i] < 127);
 				if (literal.str[i] < 0 or literal.str[i] > 127)
-					throw std::exception("invalid charactor");
+					throw std::logic_error("invalid character");
 				value[i] = static_cast<tchar_to>(literal.str[i]);
 			}
 		}

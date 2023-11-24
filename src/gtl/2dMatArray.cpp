@@ -251,7 +251,7 @@ namespace gtl {
 	C2dMatArray::T_ITEM& C2dMatArray::GetItem(const xPoint2i& pos) {
 		int iIndex = pos.x + m_sizeArray.cx * pos.y;
 		if ( (iIndex < 0) || (iIndex >= m_set.size()) || (pos.x >= m_sizeArray.cx) || (pos.y >= m_sizeArray.cy) ) {
-			throw std::exception("Index Out of Position");
+			throw std::range_error(GTL__FUNCSIG "Index Out of Position");
 		}
 		return m_set[iIndex];
 	}
@@ -259,7 +259,7 @@ namespace gtl {
 	const C2dMatArray::T_ITEM& C2dMatArray::GetItem(const xPoint2i& pos) const {
 		int iIndex = pos.x + m_sizeArray.cx * pos.y;
 		if ( (iIndex < 0) || (iIndex >= m_set.size()) || (pos.x >= m_sizeArray.cx) || (pos.y >= m_sizeArray.cy) ) {
-			throw std::exception("Index Out of Position");
+			throw std::range_error(GTL__FUNCSIG "Index Out of Position");
 		}
 		return m_set[iIndex];
 	}
@@ -412,13 +412,13 @@ namespace gtl {
 								if ( IsROI_Valid(rcSource, m.size()) && IsROI_Valid(rcTarget, imgTarget.size()) )
 									m(rcSource).copyTo(imgTarget(rcTarget));
 								else
-									throw std::exception("Unknown Internal Error");
+									throw std::logic_error(GTL__FUNCSIG "Unknown Internal Error");
 							} catch (cv::Exception& ) {
 								return;
 							}
 						} else {
 							if (cx < 0 || cy < 0)
-								throw std::exception("Unknown Internal Error");
+								throw std::logic_error(GTL__FUNCSIG "Unknown Internal Error");
 						}
 
 						iColStart = 0;

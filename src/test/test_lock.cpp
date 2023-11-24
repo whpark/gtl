@@ -60,7 +60,7 @@ namespace gtl::test::lock {
 					if (nMaxReader < nReader) nMaxReader = nReader;
 
 					if (nWriter)
-						throw std::runtime_error("failed");
+						throw std::runtime_error(GTL__FUNCSIG "failed");
 
 					for (int i = 0; i < vecP.size(); i++) {
 						dSum += vecP[i].second;
