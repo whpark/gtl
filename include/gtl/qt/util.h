@@ -16,17 +16,53 @@
 
 namespace gtl::qt {
 
+	//=============================================================================================================================
+	/// @brief Wait Cursor
 	class xWaitCursor {
+	protected:
+		inline thread_local static int m_nCount;
 	public:
 		xWaitCursor() {
+			m_nCount++;	// 걸 때마다 호출. 처음 걸었어도 다른 곳에서 풀었을 수 있으므로, 무조건 호출 함.
 			QApplication::setOverrideCursor(Qt::WaitCursor);
 		}
 		~xWaitCursor() {
-			QApplication::restoreOverrideCursor();
+			if (--m_nCount == 0)	// 끄는거는, 0이 되었을 때만.
+				QApplication::restoreOverrideCursor();
 		}
 	};
 
-	GTL__QT_API QImage::Format GetImageFormatType(int type);
+	//=============================================================================================================================
+	/// @brief QCustomEventFilter
+	/// @details filters out events in m_lstEventTypesToFilter
+	class QCustomEventFilter  : public QObject {
+		//Q_OBJECT
+	public:
+		using this_t = QCustomEventFilter;
+		using base_t = QObject;
+
+	public:
+		std::vector<QEvent::Type> m_lstEventTypesToFilter;
+
+		QCustomEventFilter(std::initializer_list<QEvent::Type> lst) : m_lstEventTypesToFilter(lst), QObject(nullptr) { }
+		~QCustomEventFilter() {}
+
+		bool eventFilter(QObject* obj, QEvent* event) override {
+			if (auto iter = std::ranges::find(m_lstEventTypesToFilter, event->type());
+				iter != m_lstEventTypesToFilter.end())
+			{
+				return true;
+			}
+			return QObject::eventFilter(obj, event);
+		}
+
+	};
+
+
+	/// @brief cv::Mat::type() -> QImage::Format
+	/// @param cv::Mat::type() (CV8UC1 ...)
+	/// @return  QImage::Format
+	GTL__QT_API QImage::Format GetImageFormatType(int cv_type);
 
 	//=============================================================================================================================
 	// Dynamic Data Exchange
