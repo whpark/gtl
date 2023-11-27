@@ -27,7 +27,6 @@
 
 namespace gtl {
 
-
 	// utf-8 string
 
 	//=============================================================================================================================
@@ -56,6 +55,16 @@ namespace gtl {
 		// comment : any string after ';', including space.
 		static constexpr inline auto s_reItem = ctre::match<R"xxx(\s*([\w\s]*\w+)\s*(=)\s*("(?:[^\\"]|\\.)*"|[^;\n]*)\s*[^;]*(;.*)?)xxx">;
 
+		struct TLazyProfileValue {
+			this_t& rThis;
+			string_view_t key;
+
+			template < typename tvalue >
+			TLazyProfileValue& operator = (tvalue&& v) {
+				rThis.SetItemValue(key, std::forward<tvalue>(v));
+				return *this;
+			}
+		};
 	protected:
 		//string_t m_key;
 		map_t m_sections;	// child sections
@@ -78,11 +87,28 @@ namespace gtl {
 		bool operator == (this_t const& ) const = default;
 		bool operator != (this_t const& ) const = default;
 
+		// section
 		TLazyProfile& operator[](string_view_t key) {
 			return m_sections[key];
 		}
+		// section
 		TLazyProfile const& operator[](string_view_t key) const {
 			return m_sections[key];
+		}
+
+		// getter
+		template < typename tvalue >
+		auto operator()(string_view_t key, tvalue&& vDefault = tvalue{}) const {
+			return GetItemValue(key, std::forward<tvalue>(vDefault));
+		}
+		// getter
+		string_view_t operator()(string_view_t key) const {
+			return GetItemValueRaw(key);
+		}
+		// setter
+		auto operator()(string_view_t key) {
+			TLazyProfileValue valueProxy{*this, key};
+			return valueProxy;
 		}
 
 		void Clear() {
@@ -91,8 +117,13 @@ namespace gtl {
 			m_line.clear();
 		}
 
-		auto& GetSection(string_view_t key) { return m_sections[key]; }
-		auto const& GetSection(string_view_t key) const { return m_sections[key]; }
+		this_t& GetSection(string_view_t key) { return m_sections[key]; }
+		this_t const& GetSection(string_view_t key) const {
+			if (auto iter = m_sections.find(key); iter != m_sections.end())
+				return iter->second;
+			static this_t const dummy;
+			return dummy;
+		}
 
 		auto& GetSections() { return m_sections; }
 		auto const& GetSections() const { return m_sections; }
@@ -198,7 +229,7 @@ namespace gtl {
 			if constexpr (std::is_same_v<tvalue, bool>) {
 				if (std::isdigit(sv[0]))
 					return (gtl::tsztod(sv) == 0.0) ? false : true;
-				return gtl::tszicmp(sv, ToTStringLiteral<tchar, "true">()) == 0;
+				return gtl::tszicmp(sv, string_view_t{gtl::TStringLiteral<char_type, "true">().value}) == 0;
 			}
 			else if constexpr (std::is_integral_v<tvalue>) {
 				return gtl::tsztoi<tvalue>(sv);
@@ -206,8 +237,11 @@ namespace gtl {
 			else if constexpr (std::is_floating_point_v<tvalue>) {
 				return gtl::tsztod<tvalue>(sv);
 			}
-			else if constexpr (std::is_convertible_v<tvalue, string_view_t>) {
+			else if constexpr (std::is_same_v<tvalue, string_view_t>) {
 				return sv;
+			}
+			else if constexpr (std::is_convertible_v<tvalue, string_view_t>) {
+				return tvalue{sv};
 			}
 			else {
 				static_assert(gtlc::dependent_false_v<tvalue>);

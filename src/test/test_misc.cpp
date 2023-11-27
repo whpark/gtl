@@ -93,12 +93,12 @@ doubleVar                = 3.1415926535897932384626433832795028 ; pi
 			auto t0 = std::chrono::steady_clock::now();
 			profile.Load(stream);
 			auto t1 = std::chrono::steady_clock::now();
-			profile["Test"].SetItemValue("path", 2);
-			profile["Test"].SetItemValue("LogTranslatorEvents", false);
+			profile["Test"]("path") = 2;
+			profile["Test"]("LogTranslatorEvents") = false;
 			//profile[u8"Test"].SetItemValue(u8"String", u8"\" 바바바바바");	// error.
 			profile["Test"].SetItemValue("newValue", 3.1415, "comment ___ new");
 
-			profile["key having punctuation()- and spaces"].SetItemValue("path", "");
+			profile["key having punctuation()- and spaces"]("path") = "";
 
 			auto t2 = std::chrono::steady_clock::now();
 
