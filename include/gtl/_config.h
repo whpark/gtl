@@ -5,7 +5,7 @@
 #define GTL__STRING_SUPPORT_CODEPAGE_KSSM_LIBICONV true
 #define GTL__USE_WINDOWS_API true
 
-#define GTL__DEFAULT_CODEPAGE 949	// 65001 : UTF8
+#define GTL__DEFAULT_CODEPAGE 65001	// 65001 : UTF8
 									//   949 : Korean (KSC5601, CP949 ...)
 
 // for boost json, you can set only one or none to 'true'

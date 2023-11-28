@@ -24,7 +24,6 @@
 namespace gtl {
 
 	GTL__DATA eCODEPAGE g_eCodepageMBCS = static_cast<eCODEPAGE>(GTL__DEFAULT_CODEPAGE);
-	GTL__DATA eCODEPAGE const g_eCodepageHost = GetHostCodepage();
 
 //	//-----------------------------------------------------------------------------
 //	bool IsUTF8String(std::string_view sv, size_t* pOutputBufferCount, bool* pbIsMSBSet) {

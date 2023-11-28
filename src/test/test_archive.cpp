@@ -19,8 +19,7 @@ std::vector<gtl::TString<tchar>> ReadFile(tarchive& ar) {
 };
 
 TEST(gtl_archive, ReadLine) {
-	gtl::g_eCodepageMBCS = gtl::GetHostCodepage();
-	
+
 	using namespace gtl;
 
 	std::vector<std::u8string> const strs {
