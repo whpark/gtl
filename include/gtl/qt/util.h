@@ -44,7 +44,7 @@ namespace gtl::qt {
 	public:
 		std::vector<QEvent::Type> m_lstEventTypesToFilter;
 
-		QCustomEventFilter(std::initializer_list<QEvent::Type> lst) : m_lstEventTypesToFilter(lst), QObject(nullptr) { }
+		QCustomEventFilter(QObject* parent, std::initializer_list<QEvent::Type> lst) : QObject(parent), m_lstEventTypesToFilter(std::move(lst)) { }
 		~QCustomEventFilter() {}
 
 		bool eventFilter(QObject* obj, QEvent* event) override {
