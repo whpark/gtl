@@ -284,9 +284,9 @@ namespace gtl {
 			if (cSplitter == 0) {
 				// 주의!!!!!!! cSplitter 가 0일 경우에만..
 				tvalue value;
-				auto [ptr, ec] = std::from_chars(sv.data(), sv.data()+sv.size(), value, std::chars_format::general);
+				auto [ptr, ec] = std::from_chars((char const*)sv.data(), (char const*)sv.data()+sv.size(), value, std::chars_format::general);
 				if (ppszStopped)
-					*ppszStopped = ptr;
+					*ppszStopped = (tchar const*)ptr;
 				return value;
 			}
 		}

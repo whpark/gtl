@@ -65,12 +65,14 @@ doubleVar                = 3.1415926535897932384626433832795028 ; pi
 			auto t0 = std::chrono::steady_clock::now();
 			profile.Load(stream);
 			auto t1 = std::chrono::steady_clock::now();
+			auto v = profile[u8"Test"](u8"LogTranslatorEvents", false);
+			EXPECT_EQ(v, true);
 			profile[u8"Test"].SetItemValue(u8"path", 2);
 			profile[u8"Test"].SetItemValue(u8"LogTranslatorEvents", false);
 			//profile[u8"Test"].SetItemValue(u8"String", u8"\" 바바바바바");	// error.
 			profile[u8"Test"].SetItemValue(u8"newValue", 3.1415, u8"comment ___ new");
 
-			profile[u8"key having punctuation()- and spaces"].SetItemValue(u8"path", u8"");
+			profile[u8"key having punctuation()- and spaces"].SetItemValue(u8"path", u8"C:\\ABC\\DEF\\가나다라.txt");
 
 			auto t2 = std::chrono::steady_clock::now();
 
@@ -98,7 +100,7 @@ doubleVar                = 3.1415926535897932384626433832795028 ; pi
 			//profile[u8"Test"].SetItemValue(u8"String", u8"\" 바바바바바");	// error.
 			profile["Test"].SetItemValue("newValue", 3.1415, "comment ___ new");
 
-			profile["key having punctuation()- and spaces"]("path") = "";
+			profile["key having punctuation()- and spaces"]("path") = (char const*)u8"C:\\ABC\\DEF\\가나다라.txt";
 
 			auto t2 = std::chrono::steady_clock::now();
 
