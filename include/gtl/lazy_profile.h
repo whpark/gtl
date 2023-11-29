@@ -125,9 +125,8 @@ namespace gtl {
 			return GetItemValueRaw(key);
 		}
 		// setter
-		template < bool bDO_NOT_QUOTE_STRING = false >
 		auto operator()(string_view_t key) {
-			TLazyProfileValue<bDO_NOT_QUOTE_STRING> valueProxy{*this, key};
+			TLazyProfileValue<false> valueProxy{*this, key};
 			return valueProxy;
 		}
 
