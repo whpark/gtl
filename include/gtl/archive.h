@@ -1048,7 +1048,7 @@ namespace gtl {
 
 	using xIFArchive = TArchive<std::ifstream>;
 	using xOFArchive = TArchive<std::ofstream>;
-	using xArchive = TArchive<std::fstream, true, true>;
+	using xArchive = TArchive<std::fstream, false, true, true>;
 
 	/// @brief file to std-container
 	/// @tparam TContainer : such as std::vector<char> or std::string

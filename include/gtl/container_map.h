@@ -53,6 +53,8 @@ namespace gtl {
 			return base_t::data();
 		}
 
+		using base_t::erase;
+
 		using base_t::empty;
 		using base_t::size;
 		using base_t::max_size;

@@ -173,7 +173,7 @@ namespace gtl {
 				auto [whole, key1, eq1, value1, comment1] = s_reItem(item);
 				if (!whole)
 					continue;
-				if (sCompareString{}(string_view_t{key1.begin(), key1.end()}, key) == 0)
+				if (sCompareString{}(string_view_t{key1.begin(), key1.end()}, key))
 					return string_view_t{value1.begin(), value1.end()};
 				//return {};
 			}
@@ -198,7 +198,7 @@ namespace gtl {
 					continue;
 				posEQ = std::max(posEQ, (int)(eq1.begin() - whole.begin()));
 				posComment = std::max(posComment, comment1 ? (int)(comment1.begin() - whole.begin()) : 0);
-				if (sCompareString{}(string_view_t{key1}, key) != 0)
+				if (!sCompareString{}(string_view_t{key1}, key))
 					continue;
 				if (comment.empty() and comment1)
 					comment = comment1;
@@ -244,6 +244,10 @@ namespace gtl {
 			auto sv = GetItemValueRaw(key);
 			sv = gtl::TrimView(sv);
 			return !sv.empty();
+		}
+
+		auto HasSection(string_view_t key) const {
+			return m_sections.find(key) != m_sections.end();
 		}
 
 		/// @brief Get Item Value
@@ -329,9 +333,13 @@ namespace gtl {
 			auto iter = std::remove_if(m_items.begin(), m_items.end(), Check);
 			m_items.erase(iter, m_items.end());
 		}
-		void DeleteSectionsIf(std::function<bool(section_t& /*section*/)> funcIsSectionDeprecated) {
-			auto iter = std::remove_if(m_sections.begin(), m_sections.end(), funcIsSectionDeprecated);
-			m_items.erase(iter, m_items.end());
+		void DeleteSectionsIf(std::function<bool(string_view_t /*key*/, section_t const& /*section*/)> funcIsSectionDeprecated) {
+			auto Check = [&](auto & v) -> bool {
+				auto const& [key, section] = v;
+				return funcIsSectionDeprecated(key, section);
+			};
+			auto iter = std::remove_if(m_sections.begin(), m_sections.end(), Check);
+			m_sections.erase(iter, m_sections.end());
 		}
 
 	public:
