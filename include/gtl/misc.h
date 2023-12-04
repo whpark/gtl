@@ -661,6 +661,9 @@ namespace gtl {
 			std::vector<std::wstring> folders;
 			#ifdef _DEBUG
 				folders.push_back(L"Debug");
+				folders.push_back(L"Debug64");
+				folders.push_back(L"Debug.v142");
+				folders.push_back(L"Debug.v143");
 			#else
 				folders.push_back(L"Release");
 			#endif
