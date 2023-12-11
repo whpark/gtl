@@ -78,6 +78,7 @@ namespace gtl::qt {
 		connect(ui->sbVert, &QScrollBar::sliderMoved, this, &this_t::OnSbVert_valueChanged);
 		connect(&m_smooth_scroll.timer, &QTimer::timeout, this, &this_t::OnSmoothScroll_timeout);
 		connect(ui->view, &QOpenGLWidget::resized, this, &this_t::OnView_resized);
+		//connect(ui->btnCountColor, &QPushButton::clicked, this, &this_t::OnBtnCountColor_clicked);
 	}
 
 	xMatView::~xMatView() {
@@ -815,6 +816,28 @@ namespace gtl::qt {
 		UpdateScrollBars();
 		if (ui->view)
 			ui->view->update();
+	}
+
+	void xMatView::OnBtnCountColor_clicked() {
+		if (m_imgOriginal.empty() or m_imgOriginal.channels() != 1)
+			return;
+
+		int channels[] = {0};
+		int histSize[] = {256};
+		cv::MatND matHist;
+		float sranges[] = { 0, 256 };
+		const float* ranges[] = { sranges };
+		cv::calcHist(&m_imgOriginal, 1, channels, cv::Mat(), matHist, 1, histSize, ranges);
+		std::wstring str;
+		for (int i{}; i < matHist.rows; i++) {
+			if (matHist.at<float>(i, 0) > 0) {
+				// add locale en_US.utf8
+				str += fmt::format(L"Value {} : ", i);
+				str += gtl::AddThousandComma<wchar_t>(std::format(L"{}", (int)matHist.at<float>(i, 0)));
+				str += L"\n";
+			}
+		}
+		QMessageBox::information(this, "Color Count", ToQString(str));
 	}
 
 	void xMatView::OnBtnSettings_clicked() {

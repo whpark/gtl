@@ -193,6 +193,7 @@ protected:
 	void OnBtnZoomIn_clicked();
 	void OnBtnZoomOut_clicked();
 	void OnBtnZoomFit_clicked();
+	void OnBtnCountColor_clicked();	// NOT Connected with button
 	void OnBtnSettings_clicked();
 	void OnSmoothScroll_timeout();
 	void OnView_resized();

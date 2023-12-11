@@ -42,7 +42,7 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>409</width>
+       <width>451</width>
        <height>26</height>
       </size>
      </property>
@@ -228,6 +228,10 @@
          <property name="text">
           <string>Fit</string>
          </property>
+         <property name="icon">
+          <iconset theme="accessories-calculator">
+           <normaloff>.</normaloff>.</iconset>
+         </property>
         </widget>
        </item>
        <item>
@@ -254,6 +258,7 @@
          <property name="font">
           <font>
            <family>Lucida Console</family>
+           <pointsize>10</pointsize>
           </font>
          </property>
          <property name="readOnly">
@@ -329,13 +334,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>cmbZoomMode</tabstop>
   <tabstop>spinZoom</tabstop>
   <tabstop>btnZoomIn</tabstop>
   <tabstop>btnZoomOut</tabstop>
   <tabstop>btnZoomFit</tabstop>
   <tabstop>btnSettings</tabstop>
   <tabstop>edtInfo</tabstop>
+  <tabstop>view</tabstop>
  </tabstops>
  <resources/>
  <connections/>
