@@ -20,15 +20,15 @@ namespace gtl::qt {
 	/// @brief Wait Cursor
 	class xWaitCursor {
 	protected:
-		inline thread_local static int m_nCount;
+		//inline thread_local static int m_nCount;
 	public:
 		xWaitCursor() {
-			m_nCount++;	// 걸 때마다 호출. 처음 걸었어도 다른 곳에서 풀었을 수 있으므로, 무조건 호출 함.
+			//m_nCount++;	// 걸 때마다 호출. 처음 걸었어도 다른 곳에서 풀었을 수 있으므로, 무조건 호출 함.
 			QApplication::setOverrideCursor(Qt::WaitCursor);
 		}
 		~xWaitCursor() {
-			if (--m_nCount == 0)	// 끄는거는, 0이 되었을 때만.
-				QApplication::restoreOverrideCursor();
+			//if (--m_nCount == 0)	// 끄는거는, 0이 되었을 때만.
+			QApplication::restoreOverrideCursor();
 		}
 	};
 
