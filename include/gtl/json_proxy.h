@@ -64,17 +64,17 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 	#	define BOOST_JSON_CLASS_DECL __declspec(dllimport)
 	//#	pragma comment(lib, "boost.json.lib")
 	#endif
-	
-	
+
+
 	#pragma warning(push)
 	#pragma warning(disable: 5104 5105)
 	// https://www.boost.org/doc/libs/1_75_0/libs/json/doc/html/json/quick_look.html
 	#include "boost/json.hpp"       // decl
 	#pragma warning(pop)
-	
+
 	namespace gtl {
 	#pragma pack(push, 8)
-	
+
 	    /// @brief json proxy for boost:json
 		/// for string, converts to utf-8.
 		template < typename json_t = boost::json::value >
@@ -87,16 +87,16 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 			bjson(bjson &&) = default;
 			bjson& operator = (bjson const&) = default;
 			bjson& operator = (bjson &&) = default;
-	
+
 			bjson(json_t& b) : j_(b) {}
-	
+
 			json_t& json() {
 				return j_;
 			}
 			json_t const& json() const {
 				return j_;
 			}
-	
+
 			template < typename T > requires (requires (json_t j, T v) { j = v; })
 			bjson& operator = (T const& b) {
 				j_ = b;
@@ -112,14 +112,14 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 			bjson& operator = (std::u8string const& str) { j_ = reinterpret_cast<std::string const&>(str); return *this; }
 			bjson& operator = (std::u16string const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
 			bjson& operator = (std::u32string const& str) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(str)); return *this; }
-	
+
 			bjson& operator = (std::string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 			bjson& operator = (std::wstring_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 			bjson& operator = (std::u8string_view sv) { j_ = reinterpret_cast<std::string_view&>(sv); return *this; }
 			bjson& operator = (std::u16string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
 			bjson& operator = (std::u32string_view sv) { j_ = reinterpret_cast<std::string&&>(gtl::ToStringU8(sv)); return *this; }
-	
-	
+
+
 			template < size_t n >
 			bjson operator [] (char const (&sz)[n]) { return operator [](std::string_view{sz}); }
 			template < size_t n >
@@ -137,10 +137,10 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 				boost::json::array* pArray = j_.is_null() ? &j_.emplace_array() : &j_.as_array();
 				if (pArray->size() <= index)
 					pArray->resize(index + 1);
-	
+
 				return (*pArray)[index];
 			}
-	
+
 			template < size_t n >
 			bjson operator [] (char const (&sz)[n]) const { return operator [](std::string_view{sz}); }
 			template < size_t n >
@@ -164,15 +164,15 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 				boost::json::array const* pArray = &j_.as_array();
 				if (pArray->size() <= index)
 					throw std::invalid_argument{GTL__FUNCSIG "size"};
-	
+
 				return (const_cast<boost::json::array&>(*pArray))[index];
 			}
-	
+
 			operator bool() const { if (j_.is_bool()) return j_.as_bool(); else if (j_.is_int64()) return (bool)j_.as_int64(); return false; }
 			operator int() const { return (int)j_.as_int64(); }
 			operator int64_t() const { return j_.as_int64(); }
 			operator double() const { return j_.is_double() ? j_.as_double() : (j_.is_int64() ? (double)j_.as_int64() : 0.0); }
-	
+
 			template < typename T >
 			T value_or(T const& default_value) {
 				if constexpr (std::is_same_v<T, bool>) {
@@ -188,7 +188,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 					static_assert(gtlc::dependent_false_v);
 				}
 			}
-	
+
 			template < gtlc::string_elem tchar_t >
 			operator std::basic_string<tchar_t> () const {
 				if (!j_.is_string())
@@ -216,7 +216,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 			//std::u8string u8string() const { return as_basic_string<char8_t>(); }
 			//std::u16string u16string() const { return as_basic_string<char16_t>(); }
 			//std::u32string u32string() const { return as_basic_string<char32_t>(); }
-	
+
 			template < typename T >
 				requires (
 					std::is_class_v<T>
@@ -230,7 +230,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 				from_json(*this, a);
 				return a;
 			}
-	
+
 			auto read(std::filesystem::path const& path) {
 				std::ifstream stream(path, std::ios_base::binary);
 				return read(stream);
@@ -256,7 +256,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 				j_ = p.release();
 				return true;
 			}
-	
+
 			auto write(std::filesystem::path const& path) {
 				std::ofstream stream(path, std::ios_base::binary);
 				return write(stream);
@@ -270,7 +270,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 					return false;
 				}
 			}
-	
+
 			////
 			//template < typename T > 
 			//friend void from_json(bjson const& j, std::vector<T>& container) {
@@ -280,11 +280,11 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 			//friend void to_json(bjson&& j, std::vector<T> const& container) {
 			//	j.json() = boost::json::value_from(container);
 			//}
-	
+
 		};
 	#pragma pack(pop)
 	} // namespace gtl;
-	
+
 #endif	// GTL__USE_BOOST_JSON
 
 
