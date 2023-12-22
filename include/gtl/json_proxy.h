@@ -168,7 +168,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 				return (const_cast<boost::json::array&>(*pArray))[index];
 			}
 	
-			operator bool() const { return j_.as_bool(); }
+			operator bool() const { if (j_.is_bool()) return j_.as_bool(); else if (j_.is_int64()) return (bool)j_.as_int64(); return false; }
 			operator int() const { return (int)j_.as_int64(); }
 			operator int64_t() const { return j_.as_int64(); }
 			operator double() const { return j_.is_double() ? j_.as_double() : (j_.is_int64() ? (double)j_.as_int64() : 0.0); }
