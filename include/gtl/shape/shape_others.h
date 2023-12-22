@@ -182,7 +182,7 @@ namespace gtl::shape {
 		double m_xscale{1};
 		double m_yscale{1};
 		double m_zscale{1};
-		rad_t m_angle{};
+		deg_t m_angle{};
 		int m_nCol{1};
 		int m_nRow{1};
 		double m_spacingCol{};
@@ -215,7 +215,7 @@ namespace gtl::shape {
 			m_xscale = j["xscale"];
 			m_yscale = j["yscale"];
 			m_zscale = j["zscale"];
-			m_angle = rad_t{(double)j["angle"]};
+			m_angle = deg_t{(double)j["angle"]};
 			m_nCol = j["colcount"];
 			m_nRow = j["rowcount"];
 			m_spacingCol = j["colspace"];
