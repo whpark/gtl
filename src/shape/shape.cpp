@@ -581,7 +581,7 @@ namespace gtl::shape {
 		// block
 		boost::ptr_deque<xBlock> blocks;
 		std::map<string_t, xBlock*> mapBlocks;
-		{
+		try {
 			blocks.clear();
 			auto jBlocks = jTOP["blocks"].json().as_array();
 			for (auto& item : jBlocks) {
@@ -626,6 +626,7 @@ namespace gtl::shape {
 
 					switch (rShape->GetShapeType()) {
 					case eSHAPE::insert :
+						DEBUG_PRINT("insert\n");
 						break;
 					}
 
@@ -635,6 +636,12 @@ namespace gtl::shape {
 				mapBlocks[rBlock->m_name] = rBlock.get();
 				blocks.push_back(std::move(rBlock));
 			}
+		}
+		catch (std::exception& e) {
+			DEBUG_PRINT("{}\n", e.what());
+		}
+		catch (...) {
+			DEBUG_PRINT("unknown\n");
 		}
 
 
@@ -706,7 +713,7 @@ namespace gtl::shape {
 					ct.m_mat(2, 2) *= pInsert->m_zscale;
 				}
 
-				if (pInsert->m_angle != 0.0_rad) {
+				if (pInsert->m_angle != 0.0_deg) {
 					ct.m_mat = ct.GetRotatingMatrixXY(pInsert->m_angle) * ct.m_mat;
 				}
 
