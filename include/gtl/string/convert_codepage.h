@@ -542,7 +542,8 @@ namespace gtl {
 		str.reserve(nOutputLen);
 		pos = svFrom.data();
 		while (pos < end) {
-			internal::UTFCharConverter<tchar_to, tchar_from, true, false, true>(pos, end, str);
+			if (!internal::UTFCharConverter<tchar_to, tchar_from, true, true, true>(pos, end, str))
+				break;
 		}
 
 		// check endian, Convert

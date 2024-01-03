@@ -394,7 +394,7 @@ namespace gtl {
 
 			static_assert(gtlc::is_one_of<tstream::char_type, char, char8_t>);
 
-			if (!stream_)
+			if (!stream_ or stream_.eof())
 				return {};
 
 			for (tchar c{}; stream_.read((char*)&c, sizeof(c)); ) {
