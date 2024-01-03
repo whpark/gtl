@@ -86,6 +86,9 @@
     <ClInclude Include="..\..\include\gtl\shape\_lib_gtl_shape.h">
       <Filter>framework</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>shape</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -114,5 +117,10 @@
     <None Include="..\..\3rdparty\tinyspline\LICENSE">
       <Filter>tinyspline</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gtl.shape.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

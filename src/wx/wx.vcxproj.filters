@@ -47,6 +47,9 @@
     <ClInclude Include="..\..\include\gtl\wx\util.h">
       <Filter>wx</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>[ framework ]</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MatView\DlgMatViewOption.cpp">
@@ -78,5 +81,10 @@
     <None Include="MatView\wxMatView.fbp">
       <Filter>wx\MatView</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gtl.wx.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

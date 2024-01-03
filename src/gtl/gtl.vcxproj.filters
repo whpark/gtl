@@ -209,6 +209,9 @@
     <ClInclude Include="..\..\include\gtl\sequence_tReturn.h">
       <Filter>gtl</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>gtl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HangeulCodeMapUTF16_KSSM.cpp">
@@ -252,5 +255,8 @@
     <None Include="..\..\etc\vcpkg\install-vcpkg.bat">
       <Filter>etc\vcpkg</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gtl.rc" />
   </ItemGroup>
 </Project>

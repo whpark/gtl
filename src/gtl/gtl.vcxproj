@@ -529,6 +529,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\_lib_gtl.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2dMatArray.cpp" />
@@ -557,6 +558,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\etc\vcpkg\install-vcpkg.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gtl.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

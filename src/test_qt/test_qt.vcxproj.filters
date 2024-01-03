@@ -52,6 +52,9 @@
     <ClInclude Include="framework.h">
       <Filter>code</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="test_qt.h">

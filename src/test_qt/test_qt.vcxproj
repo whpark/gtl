@@ -245,6 +245,7 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <QtMoc Include="SeqChildDlg.h" />
     <QtMoc Include="SeqMainDlg.h" />
     <QtMoc Include="TestSeqDlg.h" />

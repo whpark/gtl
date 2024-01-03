@@ -306,6 +306,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClCompile Include="QGlazeModel.cpp" />
     <ClCompile Include="QPathCompleter.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClInclude Include="resource.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVCanvas.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVDlg.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGV.h" />
@@ -363,6 +364,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gtl.qt.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

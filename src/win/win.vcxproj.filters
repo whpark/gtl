@@ -34,6 +34,9 @@
     <ClInclude Include="..\..\include\gtl\win\_lib_gtl_win.h">
       <Filter>[ Framework ]</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -51,5 +54,10 @@
     <ClCompile Include="win.cpp">
       <Filter>code</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gtl.win.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
