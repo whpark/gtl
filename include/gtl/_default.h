@@ -164,7 +164,12 @@
 #ifdef __cpp_size_t_suffix
 #else
 #pragma warning(disable: 4455)
+namespace std {
+	using ssize_t = ptrdiff_t;
+}
+using std::ssize_t;
 namespace std::inline literals {
+	constexpr std::ssize_t operator "" z ( unsigned long long n ) { return n; }
 	constexpr std::size_t operator "" uz ( unsigned long long n ) { return n; }
 }
 #endif
