@@ -71,7 +71,7 @@ namespace gtl {
 		// value : 1. any string except ';'.
 		//         2. if value starts with '"', it can contain any character except '"'.
 		// comment : any string after ';', including space.
-		static constexpr inline auto s_reItem = ctre::match<R"xxx(\s*([\w\s]*\w+)\s*(=)\s*("(?:[^\\"]|\\.)*"|[^;\n]*)\s*[^;]*(;.*)?)xxx">;
+		static constexpr inline auto s_reItem = ctre::match<R"xxx(\s*([\w\s]*\w+)\s*(=)\s*("(?:[^\"]|\.)*"|[^;\n]*)\s*[^;]*(;.*)?)xxx">;
 
 		template < bool bDO_NOT_QUOTE_STRING = false >
 		struct TLazyProfileValue {
