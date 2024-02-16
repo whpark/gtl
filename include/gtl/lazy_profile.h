@@ -216,14 +216,14 @@ namespace gtl {
 				string_view_t(value));
 			if (!comment.empty()) {
 				str += FormatToTString<tchar, "{:{}}{}">(
-					tchar(';'), std::max(0, posComment - (int)str.size()),
+					tchar(' '), std::max(0, posComment - (int)str.size()),
 					comment);
 			}
 			if (m_items.empty()) {
 				m_items.push_back(std::move(str));
 			}
 			else {
-				// let empty lines behinde.
+				// let empty lines behind.
 				for (auto iter = m_items.rbegin(); iter != m_items.rend(); iter++) {
 					auto const& cur = *iter;
 					if (gtl::TrimView<tchar>(cur).empty())
