@@ -1491,7 +1491,7 @@ namespace gtl {
 			case 2:	// probably there might not be 2bpp image
 			case 4:
 			case 8: type = CV_8UC1; break;	// To Be Determined
-			case 16: type = CV_8UC2; break;	// To Be Determined
+			case 16: type = CV_16UC1; break;	// To Be Determined
 			case 24: type = CV_8UC3; break;
 			case 32: type = CV_8UC4; break;
 			}
