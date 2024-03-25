@@ -375,7 +375,7 @@ namespace gtl {
 	// Word Align Position
 	template < std::integral T > constexpr inline T AdjustAlign128(T w) { return ((w+15)/16*16); }	//	((w+15)>>4)<<4
 	template < std::integral T > constexpr inline T AdjustAlign64(T w) { return ((w+7)/8*8); }		//	((w+ 7)>>3)<<3
-	template < std::integral T > constexpr inline T AdjustAlign32(T w) { return ((w+3)/4*4); }		//	((w+ 3)>>2)<<1
+	template < std::integral T > constexpr inline T AdjustAlign32(T w) { return ((w+3)/4*4); }		//	((w+ 3)>>2)<<2
 	template < std::integral T > constexpr inline T AdjustAlign16(T w) { return ((w+1)/2*2); }		//	((w+ 1)>>1)<<1
 
 
