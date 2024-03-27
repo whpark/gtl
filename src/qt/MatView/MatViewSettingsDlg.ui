@@ -70,7 +70,7 @@
        <item>
         <widget class="QCheckBox" name="chkKeyboardNavigation">
          <property name="text">
-          <string>Keyboard nNavigation</string>
+          <string>Keyboard Navigation</string>
          </property>
         </widget>
        </item>
