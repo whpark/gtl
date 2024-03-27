@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>266</width>
-    <height>384</height>
+    <width>285</width>
+    <height>417</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,9 +19,12 @@
   <property name="windowTitle">
    <string notr="true">MatView Settings</string>
   </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0">
    <property name="sizeConstraint">
-    <enum>QLayout::SetFixedSize</enum>
+    <enum>QLayout::SetDefaultConstraint</enum>
    </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -46,7 +49,7 @@
        <item>
         <widget class="QCheckBox" name="chkZoomLock">
          <property name="text">
-          <string>Zoom Lock</string>
+          <string>Zoom Lock (No Mouse Wheel)</string>
          </property>
         </widget>
        </item>
@@ -74,14 +77,14 @@
        <item>
         <widget class="QCheckBox" name="chkDrawPixelValue">
          <property name="text">
-          <string notr="true">Pixel Value</string>
+          <string notr="true">Show Pixel Value (when Magnified)</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="chkBuildPyramidImage">
          <property name="text">
-          <string notr="true">Build image pyramid (for down sampling)</string>
+          <string notr="true">Build Image Pyramid (fast resizing)</string>
          </property>
         </widget>
        </item>

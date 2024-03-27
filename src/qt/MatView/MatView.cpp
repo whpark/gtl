@@ -798,20 +798,20 @@ namespace gtl::qt {
 	}
 
 	void xMatView::OnBtnZoomIn_clicked() {
-		if ( m_option.bZoomLock and gtl::IsValueNoneOf(m_eZoom, eZOOM::free, eZOOM::mouse_wheel_locked) )
-			return;
+		//if ( m_option.bZoomLock and gtl::IsValueNoneOf(m_eZoom, eZOOM::free, eZOOM::mouse_wheel_locked) )
+		//	return;
 		ZoomInOut(100, GetViewRect().CenterPoint(), false);
 	}
 
 	void xMatView::OnBtnZoomOut_clicked() {
-		if ( m_option.bZoomLock and gtl::IsValueNoneOf(m_eZoom, eZOOM::free, eZOOM::mouse_wheel_locked) )
-			return;
+		//if ( m_option.bZoomLock and gtl::IsValueNoneOf(m_eZoom, eZOOM::free, eZOOM::mouse_wheel_locked) )
+		//	return;
 		ZoomInOut(-100, GetViewRect().CenterPoint(), false);
 	}
 
 	void xMatView::OnBtnZoomFit_clicked() {
-		if ( m_option.bZoomLock and gtl::IsValueNoneOf(m_eZoom, eZOOM::free, eZOOM::mouse_wheel_locked) )
-			return;
+		//if ( m_option.bZoomLock and gtl::IsValueNoneOf(m_eZoom, eZOOM::free, eZOOM::mouse_wheel_locked) )
+		//	return;
 		UpdateCT(true, eZOOM::fit2window);
 		UpdateScrollBars();
 		if (ui->view)
