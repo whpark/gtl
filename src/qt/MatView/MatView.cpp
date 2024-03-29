@@ -120,6 +120,26 @@ namespace gtl::qt {
 		return true;
 	}
 
+	bool xMatView::SetPalette(cv::Mat const& palette, bool bUpdateView) {
+		bool bCopied{};
+		if (true
+			&& (palette.type() == CV_8UC1 || palette.type() == CV_8UC3)
+			&& palette.size() == cv::Size(1, 256)
+			)
+		{
+			palette.copyTo(m_palette);
+			bCopied = true;
+		}
+		else {
+			m_palette.release();
+		}
+
+		if (bUpdateView and ui->view)
+			ui->view->update();
+
+		return bCopied;
+	}
+
 	bool xMatView::SetZoomMode(eZOOM eZoomMode, bool bCenter) {
 		ui->cmbZoomMode->setCurrentIndex(std::to_underlying(eZoomMode));
 		m_eZoom = eZoomMode;
@@ -1250,6 +1270,11 @@ R"(
 		}
 
 		if (!img.empty()) {
+			if (m_img.type() == CV_8UC1 and !m_palette.empty()) {
+				cv::Mat imgC;
+				cv::applyColorMap(img, imgC, m_palette);
+				img = imgC;
+			}
 			if (m_option.bDrawPixelValue) {
 				auto ctCanvas = m_ctScreenFromImage;
 				ctCanvas.m_offset -= m_ctScreenFromImage(roi.tl());

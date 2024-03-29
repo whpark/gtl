@@ -76,33 +76,35 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	// Color Bar
 	//cv::Mat img = cv::Mat::zeros(1080*2, 1920*2, CV_8UC3);
-	cv::Mat img = cv::Mat::zeros(1800, 600, CV_8UC3);
-	{
-		auto cy = img.rows/3;
-		auto cy2 = cy*2;
-		auto v = (img.depth() == CV_8U) ? 255. : 1.;
-		auto a = v / cy;
-		for (int y{}; y < cy; y++) {
-			double v = a*(y+1.);
-			//if (y&1)
-			//	continue;
-			img.row(y) = cv::Scalar(v, 0, 0, 0);
-			img.row(y+cy) = cv::Scalar(0, v, 0, 255);
-			img.row(y+cy2) = cv::Scalar(0, 0, v, 255);
-		}
-		for (int x{}; x < img.cols; x++) {
-			double v = (x+1.)/img.cols;
-			img.col(x) *= (x+1.)/img.cols;
-		}
-		img.col(0) = cv::Scalar(v, v, v);
-		img.col(img.cols-1) = cv::Scalar(v, v, v);
-		img.row(0) = cv::Scalar(v, v, v);
-		img.row(img.rows-1) = cv::Scalar(v, v, v);
 
-		if (CheckGPU(true)) {
-			gtl::ResizeImage(img, img, 2.0);
-		}
-	}
+	//cv::Mat img = cv::Mat::zeros(1800, 600, CV_8UC3);
+	//{
+	//	auto cy = img.rows/3;
+	//	auto cy2 = cy*2;
+	//	auto v = (img.depth() == CV_8U) ? 255. : 1.;
+	//	auto a = v / cy;
+	//	for (int y{}; y < cy; y++) {
+	//		double v = a*(y+1.);
+	//		//if (y&1)
+	//		//	continue;
+	//		img.row(y) = cv::Scalar(v, 0, 0, 0);
+	//		img.row(y+cy) = cv::Scalar(0, v, 0, 255);
+	//		img.row(y+cy2) = cv::Scalar(0, 0, v, 255);
+	//	}
+	//	for (int x{}; x < img.cols; x++) {
+	//		double v = (x+1.)/img.cols;
+	//		img.col(x) *= (x+1.)/img.cols;
+	//	}
+	//	img.col(0) = cv::Scalar(v, v, v);
+	//	img.col(img.cols-1) = cv::Scalar(v, v, v);
+	//	img.row(0) = cv::Scalar(v, v, v);
+	//	img.row(img.rows-1) = cv::Scalar(v, v, v);
+
+	//	if (CheckGPU(true)) {
+	//		gtl::ResizeImage(img, img, 2.0);
+	//	}
+	//}
+
 	// Color Bar
 	//img = cv::Mat::zeros(1080*2, 1920*2, CV_32SC3);
 	//{
@@ -118,8 +120,19 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	//m_option.bGLonly = false;
 	//m_option.bSkia = true;
 
+	// Palette Image;
+	cv::Mat img = cv::Mat::zeros(256, 256, CV_8UC1);
+	for (int i{}; i < 256; i++) {
+		img.row(i) = cv::Scalar(i);
+	}
+	cv::Mat palette(256, 1, CV_8UC3);
+	for (int i{}; i < 256; i++) {
+		palette.at<cv::Vec3b>(i, 0) = cv::Vec3b(i, i, 0);
+	}
+	m_dlgMatView->GetView().SetPalette(palette, false);
 	m_dlgMatView->GetView().SetImage(img, false);
 	//m_dlgMatViewGV->SetImage(img, false);
+	ui.view->SetPalette(palette, false);
 	ui.view->SetImage(img, false);
 	//ui.view->SetImage({});
 

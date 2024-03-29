@@ -88,7 +88,8 @@ protected:
 		}
 	} m_gl;
 
-	mutable cv::Mat m_img;	// original image
+	cv::Mat m_img;	// original image
+	cv::Mat m_palette;	// palette. CV_8UC1 or CV_8UC3, 1 row 256 cols
 	mutable struct {
 		std::mutex mtx;
 		std::deque<cv::Mat> imgs;
@@ -134,6 +135,8 @@ public:
 	cv::Mat GetImage() { return m_img; }
 	cv::Mat const& GetImage() const { return m_img; }
 	bool SetImage(cv::Mat const& img, bool bCenter = true, eZOOM eZoomMode = eZOOM::none, bool bCopy = false);
+	cv::Mat GetPalette() { return m_palette; }
+	bool SetPalette(cv::Mat const& palette, bool bUpdateView);	// palette will be copied into m_palette
 	bool SetZoomMode(eZOOM eZoomMode, bool bCenter = true);
 	std::optional<xRect2i> GetSelectionRect() const {
 		if (!m_mouse.bRectSelected)
