@@ -88,8 +88,7 @@ protected:
 		}
 	} m_gl;
 
-	cv::Mat m_imgOriginal;	// original image
-	mutable cv::Mat m_img;	// image for screen
+	mutable cv::Mat m_img;	// original image
 	mutable struct {
 		std::mutex mtx;
 		std::deque<cv::Mat> imgs;
@@ -132,8 +131,8 @@ public:
 	~xMatView();
 
 public:
-	cv::Mat GetImage() { return m_imgOriginal; }
-	cv::Mat const& GetImage() const { return m_imgOriginal; }
+	cv::Mat GetImage() { return m_img; }
+	cv::Mat const& GetImage() const { return m_img; }
 	bool SetImage(cv::Mat const& img, bool bCenter = true, eZOOM eZoomMode = eZOOM::none, bool bCopy = false);
 	bool SetZoomMode(eZOOM eZoomMode, bool bCenter = true);
 	std::optional<xRect2i> GetSelectionRect() const {

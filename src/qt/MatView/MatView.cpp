@@ -90,11 +90,11 @@ namespace gtl::qt {
 
 		// original image
 		if (bCopy)
-			img.copyTo(m_imgOriginal);
+			img.copyTo(m_img);
 		else
-			m_imgOriginal = img;
+			m_img = img;
 
-		m_img = m_imgOriginal;
+		m_img = m_img;
 		BuildPyramid();
 
 		// check (opengl) texture format
@@ -696,15 +696,15 @@ namespace gtl::qt {
 			// Current Position
 			int nx{}, ny{};
 			{
-				for (auto v = m_imgOriginal.cols; v; v/= 10, nx++);
+				for (auto v = m_img.cols; v; v/= 10, nx++);
 				nx = nx*4/3;
-				for (auto v = m_imgOriginal.rows; v; v/= 10, ny++);
+				for (auto v = m_img.rows; v; v/= 10, ny++);
 				ny = ny*4/3;
 				// print ptImage.x and ptImage.y with thousand comma separated
-				if (!m_imgOriginal.empty())
+				if (!m_img.empty())
 					status += fmt::format(L"(w{} h{}) ",
-										  AddThousandCommaW((int)m_imgOriginal.cols),
-										  AddThousandCommaW((int)m_imgOriginal.rows));
+										  AddThousandCommaW((int)m_img.cols),
+										  AddThousandCommaW((int)m_img.rows));
 				status += fmt::format(L"[x{:>{}} y{:>{}}]",
 									  AddThousandCommaW((int)ptImage.x), nx,
 									  AddThousandCommaW((int)ptImage.y), ny);
@@ -712,10 +712,10 @@ namespace gtl::qt {
 
 			// image value
 			{
-				int n = m_imgOriginal.channels();
+				int n = m_img.channels();
 				if (xRect2i(0, 0, m_img.cols, m_img.rows).PtInRect(ptImage)) {
-					int depth = m_imgOriginal.depth();
-					auto cr = GetMatValue(m_imgOriginal.ptr(ptImage.y), depth, n, ptImage.y, ptImage.x);
+					int depth = m_img.depth();
+					auto cr = GetMatValue(m_img.ptr(ptImage.y), depth, n, ptImage.y, ptImage.x);
 					auto strValue = std::format(L" [{:3}", cr[0]);
 					for (int i{1}; i < n; i++)
 						strValue += std::format(L",{:3}", cr[i]);
@@ -819,7 +819,7 @@ namespace gtl::qt {
 	}
 
 	void xMatView::OnBtnCountColor_clicked() {
-		if (m_imgOriginal.empty() or m_imgOriginal.channels() != 1)
+		if (m_img.empty() or m_img.channels() != 1)
 			return;
 
 		int channels[] = {0};
@@ -827,7 +827,7 @@ namespace gtl::qt {
 		cv::MatND matHist;
 		float sranges[] = { 0, 256 };
 		const float* ranges[] = { sranges };
-		cv::calcHist(&m_imgOriginal, 1, channels, cv::Mat(), matHist, 1, histSize, ranges);
+		cv::calcHist(&m_img, 1, channels, cv::Mat(), matHist, 1, histSize, ranges);
 		std::wstring str;
 		for (int i{}; i < matHist.rows; i++) {
 			if (matHist.at<float>(i, 0) > 0) {
@@ -1253,7 +1253,7 @@ R"(
 			if (m_option.bDrawPixelValue) {
 				auto ctCanvas = m_ctScreenFromImage;
 				ctCanvas.m_offset -= m_ctScreenFromImage(roi.tl());
-				DrawPixelValue(img, m_imgOriginal, roi, ctCanvas, 8*devicePixelRatio());
+				DrawPixelValue(img, m_img, roi, ctCanvas, 8*devicePixelRatio());
 			}
 
 			glEnable(GL_BLEND);
