@@ -114,11 +114,11 @@
 #else
 #	define GTL__PLATFORM_CONFIGURE_ "r"
 #endif
-#ifdef _UNICODE
-#	define GTL__PLATFORM_CHARSET_ ""
-#else
-#	define GTL__PLATFORM_CHARSET_ "A"
-#endif
+//#ifdef _UNICODE
+//#	define GTL__PLATFORM_CHARSET_ ""
+//#else
+//#	define GTL__PLATFORM_CHARSET_ "A"
+//#endif
 
 #define GTL__IMPORT_LIB(name) \
 	__pragma(comment(lib, #name "." GTL__PLATFORM_MACHINE_ GTL__PLATFORM_CHARSET_ GTL__PLATFORM_CONFIGURE_ ".lib" ))
