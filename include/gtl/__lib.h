@@ -121,9 +121,9 @@
 //#endif
 
 #define GTL__IMPORT_LIB(name) \
-	__pragma(comment(lib, #name "." GTL__PLATFORM_MACHINE_ GTL__PLATFORM_CHARSET_ GTL__PLATFORM_CONFIGURE_ ".lib" ))
+	__pragma(comment(lib, #name "." GTL__PLATFORM_MACHINE_ GTL__PLATFORM_CONFIGURE_ ".lib" ))
 #define GTL__IMPORT_LIB__TOOLSET(name) \
-	__pragma(comment(lib, #name "." GTL__PLATFORM_TOOLSET_VER_ "." GTL__PLATFORM_MACHINE_  GTL__PLATFORM_CHARSET_ GTL__PLATFORM_CONFIGURE_ ".lib" ))
+	__pragma(comment(lib, #name "." GTL__PLATFORM_TOOLSET_VER_ "." GTL__PLATFORM_MACHINE_ GTL__PLATFORM_CONFIGURE_ ".lib" ))
 
 //-----------------------------------------------------------------------------
 
