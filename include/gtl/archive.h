@@ -392,7 +392,7 @@ namespace gtl {
 		std::optional<std::basic_string<tchar>> GetLine(tchar cDelimiter, tchar cDelimiter2 = 0) {
 			std::basic_string<tchar> str;
 
-			static_assert(gtlc::is_one_of<tstream::char_type, char, char8_t>);
+			static_assert(gtlc::is_one_of<typename tstream::char_type, char, char8_t>);
 
 			if (!stream_ or stream_.eof())
 				return {};
