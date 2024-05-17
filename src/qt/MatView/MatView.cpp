@@ -589,7 +589,7 @@ namespace gtl::qt {
 	void xMatView::keyPressEvent(QKeyEvent* event) {
 		// Print Char Pressed
 		auto l = std::source_location::current();
-		OutputDebugString(std::format(L"{}: {}\n", gtl::ToStringW(l.function_name()), event->key()).c_str());
+		OutputDebugStringW(std::format(L"{}: {}\n", gtl::ToStringW(l.function_name()), event->key()).c_str());
 		auto bControl = event->modifiers() & Qt::ControlModifier;
 		auto bAlt =	event->modifiers() & Qt::AltModifier;
 		auto bShift = event->modifiers() & Qt::ShiftModifier;

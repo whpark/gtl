@@ -1105,7 +1105,7 @@ void xMatView::OnPaint_View( wxPaintEvent& event ) {
 			m_skContext->flush();
 		}
 	} catch (...) {
-		OutputDebugString(L"cv::.......\n");
+		OutputDebugStringW(L"cv::.......\n");
 	}
 #endif
 
