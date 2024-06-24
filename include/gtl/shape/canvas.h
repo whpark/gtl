@@ -56,7 +56,6 @@ namespace gtl::shape {
 		point_t m_ptLast{};
 
 	public:
-
 		/// @brief for laser on/off
 		double m_min_jump_length = 0.0;
 
@@ -89,7 +88,9 @@ namespace gtl::shape {
 			} else {
 				m_ct.clear();
 				m_ct *= ct;
-
+				m_ctI.clear();
+				if (auto ctI = ct.GetInverse())
+					m_ctI *= *ctI;
 			}
 		}
 
@@ -160,6 +161,10 @@ namespace gtl::shape {
 		virtual void Text(xMText const& text) {
 		}
 
+		virtual std::optional<xRect2d> GetClippingRect() {
+			return std::nullopt;
+		}
+
 	//public:
 	//	virtual rad_t CalcArcInterval(double radius, double target_resolution) {
 	//		auto scale = m_ct(point_t::All(0)).Distance(m_ct(point_t::All(1.)));
@@ -228,6 +233,14 @@ namespace gtl::shape {
 		//virtual void MoveRelTo(const point_t& pt) { MoveTo(m_ptLast+pt); }
 		//virtual void LineRelTo(const point_t& pt, bool bShowDirection = false) { LineTo(m_ptLast + pt, bShowDirection); }
 		//virtual void ArcRelTo(const point_t& ptCenter, deg_t dTLength) { ArcTo(m_ptLast + ptCenter, dTLength); }
+	
+		std::optional<xRect2d> GetClippingRect() override {
+			xRect2d rc;
+			rc.pt0() = m_ctI(xPoint2d(0, 0));
+			rc.pt1() = m_ctI(xPoint2d(m_img.cols, m_img.rows));
+			rc.NormalizeRect();
+			return rc;
+		}
 	};
 
 

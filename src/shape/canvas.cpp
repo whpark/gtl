@@ -9,6 +9,21 @@ namespace gtl::shape {
 		if (pts.size() < 2)
 			return;
 
+		if (auto rectClipping = canvas.GetClippingRect()) {
+			// todo: has bugs.
+			auto rc = *rectClipping;
+			rc.InflateRect(rc.Width(), rc.Height());
+			bool bIn{false};
+			for (auto const& pt : pts) {
+				if (rc.PtInRect(pt)) {
+					bIn = true;
+					break;
+				}
+			}
+			if (!bIn)
+				return;
+		}
+
 		double len{};
 		for (size_t i{1}; i < pts.size(); i++) {
 			len += pts[i].Distance(pts[i-1]);
