@@ -174,6 +174,9 @@ namespace gtl::shape {
 					pts.back().Bulge() = gtl::rad_t(arc.m_angle_length)/4.;
 					pts.push_back(polypoint_t(pt1));
 				}
+				else {
+					return {};	// if the source object includes not an line nor arc, cannot be reduced to polyline.
+				}
 			}
 			if ( (pts.size() > 1) and xPoint3d(pts.front()) == xPoint3d(pts.back())) {
 				pts.pop_back();
