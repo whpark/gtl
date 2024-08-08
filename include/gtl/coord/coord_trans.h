@@ -592,7 +592,7 @@ namespace gtl {
 			return mat_t{c, 0, s, 0, 1, 0, -s, 0, c};
 		}
 
-		void SetMatrixRotaional(rad_t angle) requires (dim == 2) {
+		void SetMatrixRotational(rad_t angle) requires (dim == 2) {
 			m_mat = GetRotatingMatrix(angle);
 		}
 		void RotateMatrix(rad_t angle) requires (dim == 2) {
