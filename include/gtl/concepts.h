@@ -159,6 +159,13 @@ namespace gtl::concepts {
 		contiguous_string_container<tcontainer>;
 
 
+	template < template < typename tchar > typename tstring_or_view, typename tchar >
+	concept string_like = std::ranges::contiguous_range<tstring_or_view<tchar>> && string_elem<tchar>;
+
+	template < typename tstring_or_view >
+	concept tchar_string_like = std::ranges::contiguous_range<tstring_or_view> && string_elem<std::ranges::range_value_t<tstring_or_view>>;
+
+
 	/// @brief json container. not completed.
 	template < typename tjson >
 	concept json_like_container = requires (tjson j, char const* psz, int index) {
