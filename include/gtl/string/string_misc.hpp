@@ -386,6 +386,7 @@ namespace gtl {
 						tchar cEscape;
 						tchar cValue;
 					} escapes[] = {
+						{ (tchar)'0', (tchar)'\0' },
 						{ (tchar)'a', (tchar)'\a' },
 						{ (tchar)'b', (tchar)'\b' },
 						{ (tchar)'f', (tchar)'\f' },
