@@ -42,6 +42,7 @@ BEGIN_MESSAGE_MAP(CtestwinView, CFormView)
 	ON_BN_CLICKED(IDC_TEST_SAVE_BMP_24BPP, &CtestwinView::OnBnClickedTestSaveBMP_24BPP)
 	ON_BN_CLICKED(IDC_TEST_SAVE_BMP_nBPP, &CtestwinView::OnBnClickedTestSaveBMP_nBPP)
 	ON_BN_CLICKED(IDC_TEST_LOAD_BMP, &CtestwinView::OnBnClickedTestLoadBMP)
+	ON_BN_CLICKED(IDC_TEST_RECT, &CtestwinView::OnBnClickedTestRect)
 END_MESSAGE_MAP()
 
 // CtestwinView construction/destruction
@@ -440,5 +441,24 @@ void CtestwinView::OnBnClickedTestLoadBMP() {
 
 	m_bitmap = img;
 	Invalidate(false);
+
+}
+
+
+void CtestwinView::OnBnClickedTestRect() {
+	CImage img;
+	img.Create(1024, 1024, 24);
+	CDC dc;
+	dc.Attach(img.GetDC());
+
+	//CRect rect(100, 100, 200, 300);
+	CRect rect(200, 300, 100, 100);
+	dc.SelectStockObject(WHITE_PEN);
+	dc.SelectStockObject(GRAY_BRUSH);
+	dc.Rectangle(rect);
+
+	dc.Detach();
+
+	//img.Save(L"z:\\Downloads\\a.bmp");
 
 }

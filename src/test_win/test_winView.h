@@ -87,6 +87,7 @@ public:
 	afx_msg void OnBnClickedTestSaveBMP_24BPP();
 	afx_msg void OnBnClickedTestSaveBMP_nBPP();
 	afx_msg void OnBnClickedTestLoadBMP();
+	afx_msg void OnBnClickedTestRect();
 };
 
 #ifndef _DEBUG  // debug version in test_winView.cpp
