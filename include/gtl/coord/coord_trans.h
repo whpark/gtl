@@ -498,14 +498,14 @@ namespace gtl {
 
 			// Check.
 			double d = cv::determinant(matS);
-			if (fabs(d) <= dMinDeterminant)
+			if (std::abs(d) <= dMinDeterminant)
 				return false;
 
 			mat_t matT { v1t.x, v2t.x, v1t.y, v2t.y };
 
 			m_mat = matT * matS.inv();
 
-			m_scale = fabs(cv::determinant(m_mat));
+			m_scale = std::abs(cv::determinant(m_mat));
 			m_mat /= m_scale;
 
 			if (!bCalcScale)
