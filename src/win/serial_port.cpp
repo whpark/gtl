@@ -80,7 +80,7 @@ namespace gtl::win {
 		to.ReadTotalTimeoutConstant = m_dwTimeoutRX;//INFINITE;
 		to.WriteTotalTimeoutMultiplier = 1;
 		//to.WriteTotalTimeoutConstant = (DWORD)std::chrono::milliseconds(m_durTimeoutRX).count();//INFINITE;
-		to.WriteTotalTimeoutConstant = m_dwTimeoutRX;
+		to.WriteTotalTimeoutConstant = m_dwTimeoutTX;
 		SetCommTimeouts(m_hComm, &to);
 
 		return true;
