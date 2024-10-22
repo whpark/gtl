@@ -7,7 +7,7 @@
 namespace gtl::qt {
 
 	/// @brief returns QImage::Format
-	QImage::Format GetImageFormatType(int type) {
+	QImage::Format GetImageFormatType(int cv_type) {
 		static std::unordered_map<int, QImage::Format> const m {
 			{ CV_8UC1,	QImage::Format_Grayscale8 },
 			{ CV_8UC3,	QImage::Format_RGB888 },
@@ -25,7 +25,7 @@ namespace gtl::qt {
 			//{ CV_32FC3,	QImage:: },
 			{ CV_32FC4,	QImage::Format_RGBA32FPx4 },
 		};
-		if (auto iter = m.find(type); iter != m.end())
+		if (auto iter = m.find(cv_type); iter != m.end())
 			return iter->second;
 		return QImage::Format_Invalid;
 	}
