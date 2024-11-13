@@ -425,7 +425,7 @@ namespace gtl {
 		//
 		template < std::integral T_INT = std::int32_t >
 		[[nodiscard]] bool IsROI_Valid(TSize2<T_INT> const& sizeImage) const {
-			if constexpr (!std::is_integral_v(T)) {
+			if constexpr (!std::is_integral_v<T>) {
 				TRectT<T_INT, 2> rect(*this);
 				return rect.IsROI_Valid(sizeImage);
 			}
