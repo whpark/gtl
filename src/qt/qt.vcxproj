@@ -50,23 +50,23 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>QT_6.5.2</QtInstall>
-    <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
+    <QtModules>core;gui;qml;quick;quickcontrols2;quickdialogs2;quicklayouts;widgets;3dcore;3danimation;3dextras;3dinput;3dlogic;3drender;opengl;openglwidgets;quickwidgets;webchannel;webenginecore;websockets;webview;webenginewidgets;uitools</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug.v142|x64'" Label="QtSettings">
-    <QtInstall>QT_6.5.2</QtInstall>
-    <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
+    <QtModules>core;gui;qml;quick;quickcontrols2;quickdialogs2;quicklayouts;widgets;3dcore;3danimation;3dextras;3dinput;3dlogic;3drender;opengl;openglwidgets;quickwidgets;webchannel;webenginecore;websockets;webview;webenginewidgets;uitools</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>QT_6.5.2</QtInstall>
-    <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
+    <QtModules>core;gui;qml;quick;quickcontrols2;quickdialogs2;quicklayouts;widgets;3dcore;3danimation;3dextras;3dinput;3dlogic;3drender;opengl;openglwidgets;quickwidgets;webchannel;webenginecore;websockets;webview;webenginewidgets;uitools</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'" Label="QtSettings">
-    <QtInstall>QT_6.5.2</QtInstall>
-    <QtModules>core;gui;opengl;openglwidgets;qml;quick;3dquick;quickcontrols2;quickdialogs2;quicklayouts;quickwidgets;widgets</QtModules>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
+    <QtModules>core;gui;qml;quick;quickcontrols2;quickdialogs2;quicklayouts;widgets;3dcore;3danimation;3dextras;3dinput;3dlogic;3drender;opengl;openglwidgets;quickwidgets;webchannel;webenginecore;websockets;webview;webenginewidgets;uitools</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -145,6 +145,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
+    <QtMoc>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </QtMoc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug.v142|x64'">
     <ClCompile>
@@ -172,6 +175,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
+    <QtMoc>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </QtMoc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -199,6 +205,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
+    <QtMoc>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </QtMoc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release.v142|x64'">
     <ClCompile>
@@ -226,6 +235,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
+    <QtMoc>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </QtMoc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>

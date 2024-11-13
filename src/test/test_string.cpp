@@ -3,6 +3,8 @@
 #include "gtl/gtl.h"
 #include "gtl/string.h"
 
+#include <boost/locale.hpp>
+
 #pragma warning(disable:4566)	// character encoding
 
 using namespace std::literals;
@@ -78,6 +80,16 @@ TEST(gtl_string, TString_CodepageConversion) {
 	static_assert(gtl::tszlen(u"ABCDEF"sv) == 6);
 
 	gtl::xStringU8 strU8 (L"가다다라😊"sv);
+	//try {
+	//	std::string str949 = gtl::ToStringA(strU8, gtl::S_CODEPAGE_OPTION{.from = gtl::eCODEPAGE::UTF8, .to = gtl::eCODEPAGE::KO_KR_949});
+	//	std::locale loc("korean.949");
+	//	auto strW = boost::locale::conv::to_utf<wchar_t>(str949, loc);
+	//	EXPECT_TRUE(strW == L"가다다라😊"sv);
+	//	//std::string strU8A = 
+	//}
+	//catch (const std::exception&) {
+	//	EXPECT_TRUE(false);
+	//}
 
 	gtl::xStringU16 str;
 	str = u"가나다라😊";

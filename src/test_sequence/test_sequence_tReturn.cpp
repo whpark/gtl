@@ -81,29 +81,27 @@ namespace gtl::seq::test {
 		co_return 0;
 	}
 
-	TEST(gtl_sequence, specify_return_type) {
-		if constexpr (true) {
-			gtl::seq::v01::xSequenceTReturn driver;
+	TEST_CASE("specify_return_type", "[sequence]") {
+		gtl::seq::v01::xSequenceTReturn driver;
 
-			fmt::print("Creating 2 sequences returning string and int respectively\n");
+		fmt::print("Creating 2 sequences returning string and int respectively\n");
 
-			std::future<std::string> f1 = driver.CreateChildSequence("SeqReturningString", &SeqReturningString);
-			std::future<int> f2 = driver.CreateChildSequence("SeqReturningInt", &SeqReturningInt);
+		std::future<std::string> f1 = driver.CreateChildSequence("SeqReturningString", &SeqReturningString);
+		std::future<int> f2 = driver.CreateChildSequence("SeqReturningInt", &SeqReturningInt);
 
-			do {
-				auto t = driver.Dispatch();
-				if (driver.IsDone())
-					break;
-				if (auto ts = t - gtl::seq::clock_t::now(); ts > 3s)
-					t = gtl::seq::clock_t::now() + 3s;
-				std::this_thread::sleep_until(t);
-			} while (!driver.IsDone());
+		do {
+			auto t = driver.Dispatch();
+			if (driver.IsDone())
+				break;
+			if (auto ts = t - gtl::seq::clock_t::now(); ts > 3s)
+				t = gtl::seq::clock_t::now() + 3s;
+			std::this_thread::sleep_until(t);
+		} while (!driver.IsDone());
 
-			fmt::print("Result of SeqReturningString : {}\n", f1.get());
-			fmt::print("Result of SeqReturningInt : {}\n", f2.get());
+		fmt::print("Result of SeqReturningString : {}\n", f1.get());
+		fmt::print("Result of SeqReturningInt : {}\n", f2.get());
 
-			fmt::print("End\n");
-		}
+		fmt::print("End\n");
 	}
 
 }	// namespace gtl::seq::test

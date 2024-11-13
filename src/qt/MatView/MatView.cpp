@@ -365,8 +365,6 @@ namespace gtl::qt {
 	}
 
 	bool xMatView::SetZoom(double scale, xPoint2i ptAnchor, bool bCenter) {
-		if (m_img.empty())
-			return false;
 		// Backup Image Position
 		xPoint2d ptImage = m_ctScreenFromImage.TransI(xPoint2d(ptAnchor));
 		// Get Scroll Amount
@@ -374,6 +372,9 @@ namespace gtl::qt {
 			return true;
 		else
 			m_ctScreenFromImage.m_scale = scale;
+
+		if (m_img.empty())
+			return false;
 
 		auto rectClient = GetViewRect();
 		auto dMinZoom = std::min(rectClient.Width()/4. / m_img.cols, rectClient.Height()/4. / m_img.rows);

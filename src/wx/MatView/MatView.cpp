@@ -515,8 +515,6 @@ bool xMatView::ZoomInOut(double step, xPoint2i ptAnchor, bool bCenter) {
 }
 
 bool xMatView::SetZoom(double scale, xPoint2i ptAnchor, bool bCenter) {
-	if (m_img.empty())
-		return false;
 	// Backup Image Position
 	xPoint2d ptImage = m_ctScreenFromImage.TransI(xPoint2d(ptAnchor));
 	// Get Scroll Amount
@@ -524,6 +522,9 @@ bool xMatView::SetZoom(double scale, xPoint2i ptAnchor, bool bCenter) {
 		return true;
 	else
 		m_ctScreenFromImage.m_scale = scale;
+
+	if (m_img.empty())
+		return false;
 
 	auto rectClient = GetClientRect();
 	auto dMinZoom = std::max(4., rectClient.width/16.) / std::min(m_img.cols, m_img.rows);

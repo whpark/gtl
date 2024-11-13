@@ -119,6 +119,8 @@
 #define IDC_VIEW_BMP                    1008
 #define IDC_TEST_SAVE_BMP_4BPP          1009
 #define IDC_FOLDER_WORKING              1010
+#define IDC_TEST_SAVE_BMP_nBPP2         1011
+#define IDC_TEST_RECT                   1011
 #define IDC_TEST_SAVE_BMP_1BPP3         1013
 #define IDC_TEST_SAVE_BMP_8BPP          1013
 #define IDC_MAT_SIZE                    1014

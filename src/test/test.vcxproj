@@ -116,9 +116,6 @@
     <ClCompile Include="test_mutex.cpp" />
     <ClCompile Include="test_reflection.cpp" />
     <ClCompile Include="test_reflection_glaze.cpp" />
-    <ClCompile Include="test_sequence.cpp" />
-    <ClCompile Include="test_sequence_map.cpp" />
-    <ClCompile Include="test_sequence_tReturn.cpp" />
     <ClCompile Include="test_shape.cpp" />
     <ClCompile Include="test_string.cpp" />
     <ClCompile Include="test_string_codepage.cpp" />

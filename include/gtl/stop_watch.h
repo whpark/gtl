@@ -93,5 +93,32 @@ namespace gtl {
 	};
 
 
+	//-------------------------------------------------------------------------
+	/// @brief DurationReport
+	class xDurationWatch {
+	public:
+		std::source_location m_loc;
+		std::chrono::duration<double> m_durMin;
+		std::chrono::steady_clock::time_point m_t0 = std::chrono::steady_clock::now();
+	public:
+		xDurationWatch(std::chrono::duration<double> durMin = std::chrono::milliseconds(100), std::source_location loc = std::source_location::current()) : m_durMin(durMin), m_loc(loc) {
+		}
+	#ifdef _DEBUG
+		~xDurationWatch() {
+			auto t1 = std::chrono::steady_clock::now();
+			auto d = std::chrono::duration_cast<std::chrono::microseconds>(t1 - m_t0);
+			if (d < m_durMin)
+				return;
+			std::string msg = fmt::format("Duration: {} ({})\n", d, m_loc.function_name());
+		#ifdef _WINDOWS
+			OutputDebugStringA(msg.c_str());
+		#else
+			fmt::print("{}", msg);
+		#endif
+		}
+	#endif
+	};
+
+
 #pragma pack(pop)
 }	// namespac gtl

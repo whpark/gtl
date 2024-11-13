@@ -152,7 +152,7 @@ namespace gtl::seq::test {
 		co_return "";
 	}
 
-	TEST(gtl_sequence, simple) {
+	TEST_CASE("simple", "[sequence]") {
 		try {
 			seq_t driver;
 
@@ -171,12 +171,13 @@ namespace gtl::seq::test {
 			fmt::print("Sequence1 result : {}\n", future.get());
 
 			fmt::print("End : Simple\n");
-		} catch (std::exception& e) {
+		}
+		catch (std::exception& e) {
 			fmt::print("Exception : {}\n", e.what());
 		}
 	}
 
-	TEST(gtl_sequence, tree) {
+	TEST_CASE("tree", "[sequence]") {
 		try {
 			seq_t driver;
 
@@ -194,7 +195,8 @@ namespace gtl::seq::test {
 			} while (!driver.IsDone());
 
 			fmt::print("End : Tree Sequence\n");
-		} catch (std::exception& e) {
+		}
+		catch (std::exception& e) {
 			fmt::print("Exception : {}\n", e.what());
 		}
 	}

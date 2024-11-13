@@ -148,8 +148,7 @@ namespace gtl::seq::test {
 	};
 
 
-	TEST(gtl_sequence_map, normal) {
-
+	TEST_CASE("map", "[sequence_map]"){
 
 		fmt::print("start\n");
 
