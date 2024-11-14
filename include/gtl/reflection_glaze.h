@@ -7,7 +7,56 @@
 #include "opencv2/opencv.hpp"
 
 #include "glaze/glaze.hpp"
-#include "glaze/core/macros.hpp"
+#include "glaze/core/opts.hpp"
+#include "glaze/core/custom.hpp"
+//#include "glaze/core/macros.hpp"
+
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//<< from glaze/core/macros.h          [Glaze 1.3.2]
+// Glaze Library
+// For the license information refer to glaze.hpp
+
+#pragma once
+
+// utility macros
+
+// https://www.scs.stanford.edu/~dm/blog/va-opt.html
+
+#define GLZ_PARENS ()
+
+//#define GLZ_EXPAND(...) GLZ_EXPAND4(GLZ_EXPAND4(GLZ_EXPAND4(GLZ_EXPAND4(__VA_ARGS__))))
+//#define GLZ_EXPAND4(...) GLZ_EXPAND3(GLZ_EXPAND3(GLZ_EXPAND3(GLZ_EXPAND3(__VA_ARGS__))))
+//#define GLZ_EXPAND3(...) GLZ_EXPAND2(GLZ_EXPAND2(GLZ_EXPAND2(GLZ_EXPAND2(__VA_ARGS__))))
+//#define GLZ_EXPAND2(...) GLZ_EXPAND1(GLZ_EXPAND1(GLZ_EXPAND1(GLZ_EXPAND1(__VA_ARGS__))))
+//#define GLZ_EXPAND1(...) __VA_ARGS__
+
+#define GLZ_FOR_EACH(macro, ...) __VA_OPT__(GLZ_EXPAND(GLZ_FOR_EACH_HELPER(macro, __VA_ARGS__)))
+#define GLZ_FOR_EACH_HELPER(macro, a, ...) \
+   macro(a) __VA_OPT__(, ) __VA_OPT__(GLZ_FOR_EACH_AGAIN GLZ_PARENS(macro, __VA_ARGS__))
+#define GLZ_FOR_EACH_AGAIN() GLZ_FOR_EACH_HELPER
+
+// Glaze specific macros
+
+#define GLZ_X(a) #a, &T::a
+#define GLZ_QUOTED_X(a) #a, glz::quoted < &T::a>()
+
+#define GLZ_META(C, ...)                                                      \
+   template <>                                                                \
+   struct glz::meta<C>                                                        \
+   {                                                                          \
+      using T = C;                                                            \
+      static constexpr auto value = object(GLZ_FOR_EACH(GLZ_X, __VA_ARGS__)); \
+   }
+
+#define GLZ_LOCAL_META(C, ...)                                                     \
+   struct glaze                                                                    \
+   {                                                                               \
+      using T = C;                                                                 \
+      static constexpr auto value = glz::object(GLZ_FOR_EACH(GLZ_X, __VA_ARGS__)); \
+   }
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
 
 // macro for derived classes
@@ -141,23 +190,24 @@ namespace gtl {
 }	// namespace gtl;
 
 
-template <>
-struct glz::detail::to_json<cv::Mat> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		to_json<gtl::cvMat>::op<Opts>(gtl::cvMat(value), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
-
-template <>
-struct glz::detail::from_json<cv::Mat> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		gtl::cvMat m;
-		from_json<gtl::cvMat>::op<Opts>(m, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-		value = m;
-	}
-};
+namespace glz::detail {
+	template <>
+	struct from<JSON, cv::Mat> {
+		template <auto Opts>
+		static void op(cv::Mat& value, auto&&... args) {
+			gtl::cvMat m;
+			read<JSON>::op<Opts>(m, args...);
+			value = m;
+		}
+	};
+	template <>
+	struct to<JSON, cv::Mat> {
+		template <auto Opts>
+		static void op(cv::Mat& value, auto&&... args) noexcept {
+			write<JSON>::op<Opts>(gtl::cvMat(value), args...);
+		}
+	};
+}
 
 // cv::Matx<...>
 template <typename _Tp, int m, int n>
@@ -183,136 +233,132 @@ struct glz::meta<cv::Scalar_<_Tp>> {
 	static constexpr auto value = [](auto&& self)->auto&{ return *(array_t*)&self.val; };
 };
 
-// std::basic_string
-// std::u8string
-template <>
-struct glz::detail::to_json<std::u8string> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		to_json<std::string>::op<Opts>((std::string const&)value, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
+namespace glz::detail {
+
+	// std::u8string
+	template <>
+	struct from<JSON, std::u8string> {
+		template <auto Opts>
+		static void op(std::u8string& value, auto&&... args) {
+			read<JSON>::op<Opts>((std::string&)value, args...);
+		};
+	};
+	template <>
+	struct to<JSON, std::u8string> {
+		template <auto Opts>
+		static void op(std::u8string& value, auto&&... args) noexcept {
+			write<JSON>::op<Opts>((std::string&)value, args...);
+		};
+	};
+
+	// std::wstring
+	template <>
+	struct from<JSON, std::wstring> {
+		template <auto Opts>
+		static void op(std::wstring& value, auto&&... args) {
+			std::string str;
+			read<JSON>::op<Opts>(str, args...);
+			value = gtl::U8toW(str);
+		};
+	};
+	template <>
+	struct to<JSON, std::wstring> {
+		template <auto Opts>
+		static void op(std::wstring& value, auto&&... args) noexcept {
+			write<JSON>::op<Opts>(gtl::WtoU8A(value), args...);
+		};
+	};
+
+	// std::u16string
+	template <>
+	struct from<JSON, std::u16string> {
+		template <auto Opts>
+		static void op(std::u16string& value, auto&&... args) {
+			std::string str;
+			read<JSON>::op<Opts>(str, args...);
+			value = gtl::ToStringU16((std::u8string&)str);
+		};
+	};
+	template <>
+	struct to<JSON, std::u16string> {
+		template <auto Opts>
+		static void op(std::u16string& value, auto&&... args) noexcept {
+			write<JSON>::op<Opts>(gtl::WtoU8A((std::wstring&)value), args...);
+		};
+	};
+
+	// std::u32string
+	template <>
+	struct from<JSON, std::u32string> {
+		template <auto Opts>
+		static void op(std::u32string& value, auto&&... args) {
+			std::string str;
+			read<JSON>::op<Opts>(str, args...);
+			value = gtl::ToStringU32((std::u8string&)str);
+		};
+	};
+	template <>
+	struct to<JSON, std::u32string> {
+		template <auto Opts>
+		static void op(std::u32string& value, auto&&... args) noexcept {
+			write<JSON>::op<Opts>((std::string&)gtl::ToStringU8((std::wstring&)value), args...);
+		};
+	};
+
+	// std::filesystem::path
+	template <>
+	struct from<JSON, std::filesystem::path> {
+		template <auto Opts>
+		static void op(auto&& value, auto&&... args) {
+			std::wstring str;
+			read<JSON>::op<Opts>(str, args ...);
+			value = str;
+		}
+	};
+	template <>
+	struct to<JSON, std::filesystem::path> {
+		template <auto Opts>
+		static void op(auto&& value, auto&& ... args) noexcept {
+			write<JSON>::op<Opts>(value.wstring(), args ...);
+		}
+	};
+
+	// std::chrono::duration
+	template <class tRep, class tPeriod>
+	struct from<JSON, std::chrono::duration<tRep, tPeriod>> {
+		template <auto Opts>
+		static void op(auto&& value, auto&&... args) {
+			tRep rep;
+			read<JSON>::op<Opts>(rep, args...);
+			value = std::chrono::duration<tRep, tPeriod>(rep);
+		}
+	};
+	template <class tRep, class tPeriod>
+	struct to<JSON, std::chrono::duration<tRep, tPeriod>> {
+		template <auto Opts>
+		static void op(auto&& value, auto&&... args) noexcept {
+			write<JSON>::op<Opts>(value.count(), args...);
+		}
+	};
+
+	// std::chrono::time_point
+	template <class tClock, class tDuration>
+	struct from<JSON, std::chrono::time_point<tClock, tDuration>> {
+		template <auto Opts>
+		static void op(auto&& value, auto&&... args) {
+			tDuration duration;
+			read<JSON>::op<Opts>(duration, args...);
+			value = std::chrono::time_point<tClock, tDuration>(duration);
+		}
+	};
+	template <class tClock, class tDuration>
+	struct to<JSON, std::chrono::time_point<tClock, tDuration>> {
+		template <auto Opts>
+		static void op(auto&& value, auto&&... args) noexcept {
+			write<JSON>::op<Opts>(value.time_since_epoch(), args...);
+		}
+	};
+
 };
 
-template <>
-struct glz::detail::from_json<std::u8string> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	GLZ_ALWAYS_INLINE static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		from_json<std::string>::op<Opts>((std::string&)value, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
 
-
-// std::wstring
-template <>
-struct glz::detail::to_json<std::wstring> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		to_json<std::string>::op<Opts>(gtl::WtoU8A(value), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
-
-template <>
-struct glz::detail::from_json<std::wstring> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	GLZ_ALWAYS_INLINE static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		std::string str;
-		from_json<std::string>::op<Opts>(str, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-		value = gtl::U8toW(str);
-	}
-};
-
-
-// std::u16string
-template <>
-struct glz::detail::to_json<std::u16string> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		to_json<std::wstring>::op<Opts>((std::wstring&)value, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
-
-template <>
-struct glz::detail::from_json<std::u16string> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	GLZ_ALWAYS_INLINE static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		from_json<std::wstring>::op<Opts>((std::wstring&)value, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
-
-
-// std::u32string
-template <>
-struct glz::detail::to_json<std::u32string> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		to_json<std::u8string>::op<Opts>(gtl::ToStringU8(value), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
-
-template <>
-struct glz::detail::from_json<std::u32string> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	GLZ_ALWAYS_INLINE static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		std::u8string str;
-		from_json<std::u8string>::op<Opts>(str, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-		value = gtl::ToStringU32(str);
-	}
-};
-
-
-// std::filesystem::path
-template <>
-struct glz::detail::to_json<std::filesystem::path> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		to_json<std::wstring>::op<Opts>(value.wstring(), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
-
-template <>
-struct glz::detail::from_json<std::filesystem::path> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	GLZ_ALWAYS_INLINE static void op(auto&& value, Ctx&& ctx, B&& b, IX&& ix) {
-		std::wstring str;
-		from_json<std::wstring>::op<Opts>(str, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-		value = str;
-	}
-};
-
-// std::chrono::duration
-template <class _Rep, class _Period>
-struct glz::detail::to_json<std::chrono::duration<_Rep, _Period>> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(std::chrono::duration<_Rep, _Period> const& value, Ctx&& ctx, B&& b, IX&& ix) {
-		to_json<_Rep>::op<Opts>(value.count(), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
-
-template <class _Rep, class _Period>
-struct glz::detail::from_json<std::chrono::duration<_Rep, _Period>> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	GLZ_ALWAYS_INLINE static void op(std::chrono::duration<_Rep, _Period>& value, Ctx&& ctx, B&& b, IX&& ix) {
-		_Rep rep;
-		from_json<_Rep>::op<Opts>(rep, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-		value = std::chrono::duration<_Rep, _Period>(rep);
-	}
-};
-
-// std::chrono::time_point
-template <class _Clock, class _Duration>
-struct glz::detail::to_json<std::chrono::time_point<_Clock, _Duration>> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	inline static void op(std::chrono::time_point<_Clock, _Duration> const& value, Ctx&& ctx, B&& b, IX&& ix) {
-		to_json<_Duration>::op<Opts>(value.time_since_epoch(), std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-	}
-};
-
-template <class _Clock, class _Duration>
-struct glz::detail::from_json<std::chrono::time_point<_Clock, _Duration>> {
-	template <auto Opts, is_context Ctx, class B, class IX>
-	GLZ_ALWAYS_INLINE static void op(std::chrono::time_point<_Clock, _Duration>& value, Ctx&& ctx, B&& b, IX&& ix) {
-		_Duration duration;
-		from_json<_Duration>::op<Opts>(duration, std::forward<Ctx>(ctx), std::forward<B>(b), std::forward<IX>(ix));
-		value = std::chrono::time_point<_Clock, _Duration>(duration);
-	}
-};

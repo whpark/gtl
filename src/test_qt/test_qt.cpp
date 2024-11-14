@@ -60,7 +60,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	//m_dlgMatView->show();
 	m_dlgMatView->GetView().m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
 		if (bStore) {
-			std::string buffer = glz::write_json(option);
+			std::string buffer = glz::write_json(option).value_or("");;
 			reg.setValue("misc/viewOption", ToQString(buffer));
 		}
 		else {

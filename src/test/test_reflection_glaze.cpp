@@ -59,7 +59,7 @@ namespace gtl::test::reflection_glaze {
 
 		auto operator <=> (this_t const& ) const = default;
 
-		GLZ_LOCAL_META(this_t, dd, str, dValue, iValue, on_off, values, m, stru8, strw, stru16, stru32, len, td1, td2, tr1, tr2, arr);
+		GLZ_LOCAL_META(parent, dd, str, dValue, iValue, on_off, values, m, stru8, strw, stru16, stru32, len, td1, td2, tr1, tr2, arr);
 		//struct glaze {
 		//	static constexpr auto value = glz::object(
 		//		"str", &this_t::str,
@@ -100,9 +100,9 @@ namespace gtl::test::reflection_glaze {
 
 		std::string a;
 
-		auto operator <=> (this_t const& ) const = default;
-
 		GLZ_LOCAL_META_DERIVED(derived1, parent, a);
+
+		auto operator <=> (this_t const& ) const = default;
 
 		virtual void Purturb() override {
 			base_t::Purturb();
@@ -121,9 +121,9 @@ namespace gtl::test::reflection_glaze {
 		gtl::xRect3d rc { 0, 0, 0, 0};
 		gtl::xCoordTrans3d ct{0, {1, 0, 0, 0, 1, 0, 0, 0, 1}, {0, 0}, {0, 0}};
 
-		auto operator <=> (this_t const& ) const = default;
+		GLZ_LOCAL_META_DERIVED(derived2, derived1, str2, pt, rc, ct);
 
-		GLZ_LOCAL_META_DERIVED(this_t, base_t, str2, pt, rc, ct);
+		auto operator <=> (this_t const& ) const = default;
 
 		virtual void Purturb() override {
 			base_t::Purturb();
@@ -148,10 +148,19 @@ namespace gtl::test::reflection_glaze {
 
 		std::vector<derived2> d{{}, {}, {}, {}};
 
+		GLZ_LOCAL_META(second, d);
+
 		auto operator <=> (this_t const& ) const = default;
 
-		GLZ_LOCAL_META(second, d);
 	};
+}	// namespace gtl::test::reflection_glaze
+
+//GLZ_META(gtl::test::reflection_glaze::parent, dd, str, dValue, iValue, on_off, values, m, stru8, strw, stru16, stru32, len, td1, td2, tr1, tr2, arr);
+//GLZ_META_DERIVED(gtl::test::reflection_glaze::derived1, gtl::test::reflection_glaze::parent, a);
+//GLZ_META_DERIVED(gtl::test::reflection_glaze::derived2, gtl::test::reflection_glaze::derived1, str2, pt, rc, ct);
+//GLZ_META(gtl::test::reflection_glaze::second, d);
+
+namespace gtl::test::reflection_glaze {
 	TEST(test, reflection_glaze_1) {
 		constexpr glz::opts op{.error_on_unknown_keys = false, .prettify=true};
 
