@@ -1,6 +1,8 @@
 #pragma once
 
 #include "gtl/qt/_lib_gtl_qt.h"
+#include <QPropertyAnimation>
+#include <QSequentialAnimationGroup>
 #include <QGroupBox>
 
 namespace gtl::qt { class GTL__QT_CLASS QCollapsibleGroupBox; }
