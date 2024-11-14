@@ -194,7 +194,7 @@ namespace glz::detail {
 	template <>
 	struct from<JSON, cv::Mat> {
 		template <auto Opts>
-		static void op(cv::Mat& value, auto&&... args) {
+		static void op(auto&& value, auto&&... args) {
 			gtl::cvMat m;
 			read<JSON>::op<Opts>(m, args...);
 			value = m;
@@ -203,7 +203,7 @@ namespace glz::detail {
 	template <>
 	struct to<JSON, cv::Mat> {
 		template <auto Opts>
-		static void op(cv::Mat& value, auto&&... args) noexcept {
+		static void op(auto&& value, auto&&... args) noexcept {
 			write<JSON>::op<Opts>(gtl::cvMat(value), args...);
 		}
 	};
@@ -239,14 +239,14 @@ namespace glz::detail {
 	template <>
 	struct from<JSON, std::u8string> {
 		template <auto Opts>
-		static void op(std::u8string& value, auto&&... args) {
+		static void op(auto&& value, auto&&... args) {
 			read<JSON>::op<Opts>((std::string&)value, args...);
 		};
 	};
 	template <>
 	struct to<JSON, std::u8string> {
 		template <auto Opts>
-		static void op(std::u8string& value, auto&&... args) noexcept {
+		static void op(auto&& value, auto&&... args) noexcept {
 			write<JSON>::op<Opts>((std::string&)value, args...);
 		};
 	};
@@ -255,7 +255,7 @@ namespace glz::detail {
 	template <>
 	struct from<JSON, std::wstring> {
 		template <auto Opts>
-		static void op(std::wstring& value, auto&&... args) {
+		static void op(auto&& value, auto&&... args) {
 			std::string str;
 			read<JSON>::op<Opts>(str, args...);
 			value = gtl::U8toW(str);
@@ -264,8 +264,9 @@ namespace glz::detail {
 	template <>
 	struct to<JSON, std::wstring> {
 		template <auto Opts>
-		static void op(std::wstring& value, auto&&... args) noexcept {
-			write<JSON>::op<Opts>(gtl::WtoU8A(value), args...);
+		static void op(auto&& value, auto&&... args) noexcept {
+			auto str = gtl::WtoU8A(value);
+			write<JSON>::op<Opts>(str, args...);
 		};
 	};
 
@@ -273,7 +274,7 @@ namespace glz::detail {
 	template <>
 	struct from<JSON, std::u16string> {
 		template <auto Opts>
-		static void op(std::u16string& value, auto&&... args) {
+		static void op(auto&& value, auto&&... args) {
 			std::string str;
 			read<JSON>::op<Opts>(str, args...);
 			value = gtl::ToStringU16((std::u8string&)str);
@@ -282,7 +283,7 @@ namespace glz::detail {
 	template <>
 	struct to<JSON, std::u16string> {
 		template <auto Opts>
-		static void op(std::u16string& value, auto&&... args) noexcept {
+		static void op(auto& value, auto&&... args) noexcept {
 			write<JSON>::op<Opts>(gtl::WtoU8A((std::wstring&)value), args...);
 		};
 	};
@@ -291,7 +292,7 @@ namespace glz::detail {
 	template <>
 	struct from<JSON, std::u32string> {
 		template <auto Opts>
-		static void op(std::u32string& value, auto&&... args) {
+		static void op(auto&& value, auto&&... args) {
 			std::string str;
 			read<JSON>::op<Opts>(str, args...);
 			value = gtl::ToStringU32((std::u8string&)str);
@@ -300,7 +301,7 @@ namespace glz::detail {
 	template <>
 	struct to<JSON, std::u32string> {
 		template <auto Opts>
-		static void op(std::u32string& value, auto&&... args) noexcept {
+		static void op(auto&& value, auto&&... args) noexcept {
 			write<JSON>::op<Opts>((std::string&)gtl::ToStringU8((std::wstring&)value), args...);
 		};
 	};
