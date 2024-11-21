@@ -551,7 +551,7 @@ namespace gtl {
 			}
 			// Check.
 			double d = cv::determinant(matS);
-			if (fabs(d) <= dMinDeterminant)
+			if (dMinDeterminant > 0 and std::abs(d) <= dMinDeterminant)
 				return false;
 
 			mat_t matT;
