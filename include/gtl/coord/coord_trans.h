@@ -505,7 +505,7 @@ namespace gtl {
 
 			m_mat = matT * matS.inv();
 
-			m_scale = std::abs(cv::determinant(m_mat));
+			m_scale = std::sqrt(std::abs(cv::determinant(m_mat)));
 			m_mat /= m_scale;
 
 			if (!bCalcScale)
@@ -563,7 +563,7 @@ namespace gtl {
 
 			m_mat = matT * matS.inv();
 
-			m_scale = cv::determinant(m_mat);
+			m_scale = std::pow(cv::determinant(m_mat), 1./3.);
 			m_mat /= m_scale;
 
 			if (!bCalcScale)
