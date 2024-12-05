@@ -81,6 +81,9 @@
     <ClCompile Include="QCollapsibleGroupBox.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="QFileFolderBrowser.cpp">
+      <Filter>code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qt_global.h">
@@ -159,6 +162,9 @@
     <QtMoc Include="..\..\include\gtl\qt\QCollapsibleGroupBox.h">
       <Filter>code</Filter>
     </QtMoc>
+    <QtMoc Include="..\..\include\gtl\qt\QFileFolderBrowser.h">
+      <Filter>code</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MatView\MatViewGV.ui">
@@ -183,6 +189,9 @@
       <Filter>MatView</Filter>
     </QtUic>
     <QtUic Include="ProgressDlg.ui">
+      <Filter>code</Filter>
+    </QtUic>
+    <QtUic Include="QFileFolderBrowser.ui">
       <Filter>code</Filter>
     </QtUic>
   </ItemGroup>

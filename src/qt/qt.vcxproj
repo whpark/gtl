@@ -170,9 +170,11 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClCompile Include="MatBitmapArchive.cpp" />
     <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="QCollapsibleGroupBox.cpp" />
+    <ClCompile Include="QFileFolderBrowser.cpp" />
     <ClCompile Include="QGlazeModel.cpp" />
     <ClCompile Include="QPathCompleter.cpp" />
     <ClCompile Include="util.cpp" />
+    <QtMoc Include="..\..\include\gtl\qt\QFileFolderBrowser.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVCanvas.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVDlg.h" />
@@ -221,6 +223,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <QtUic Include="MatView\MatViewGVToolbar.ui" />
     <QtUic Include="MatView\MatViewSettingsDlg.ui" />
     <QtUic Include="ProgressDlg.ui" />
+    <QtUic Include="QFileFolderBrowser.ui" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Readme.md" />
