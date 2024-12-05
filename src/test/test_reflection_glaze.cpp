@@ -180,7 +180,7 @@ namespace gtl::test::reflection_glaze {
 		gtl::ContainerToFile(buf, folder / "1.json");
 
 		derived2 d2;
-		EXPECT_FALSE(glz::read<op>(d2, buf));
+		EXPECT_TRUE(!glz::read<op>(d2, buf));
 
 		EXPECT_EQ((topmost&)d, (topmost&)d2);
 		EXPECT_EQ((parent&)d, (parent&)d2);
@@ -189,7 +189,7 @@ namespace gtl::test::reflection_glaze {
 
 		d.Purturb();
 		glz::write<op>(d, buf);
-		EXPECT_FALSE(glz::read<op>(d2, buf));
+		EXPECT_TRUE(!glz::read<op>(d2, buf));
 		EXPECT_EQ((topmost&)d, (topmost&)d2);
 		EXPECT_EQ((parent&)d, (parent&)d2);
 		EXPECT_EQ((derived1&)d, (derived1&)d2);

@@ -302,7 +302,7 @@ namespace glz::detail {
 	struct to<JSON, std::u32string> {
 		template <auto Opts>
 		static void op(auto&& value, auto&&... args) noexcept {
-			write<JSON>::op<Opts>((std::string&)gtl::ToStringU8((std::wstring&)value), args...);
+			write<JSON>::op<Opts>((std::string&)gtl::ToStringU8(value), args...);
 		};
 	};
 
