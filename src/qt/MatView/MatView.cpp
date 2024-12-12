@@ -88,13 +88,14 @@ namespace gtl::qt {
 	bool xMatView::SetImage(cv::Mat const& img, bool bCenter, eZOOM eZoomMode, bool bCopy) {
 		xWaitCursor wc;
 
+		StopPyramidMaker();
+
 		// original image
 		if (bCopy)
 			img.copyTo(m_img);
 		else
 			m_img = img;
 
-		m_img = m_img;
 		BuildPyramid();
 
 		// check (opengl) texture format
@@ -118,6 +119,16 @@ namespace gtl::qt {
 		if (ui->view)
 			ui->view->update();
 		return true;
+	}
+
+	void xMatView::Reset() {
+		m_mouse.Clear();
+		m_smooth_scroll.Clear();
+		m_ctScreenFromImage = {};
+		StopPyramidMaker();
+		m_img.release();
+		m_pyramid.imgs.clear();
+
 	}
 
 	bool xMatView::SetPalette(cv::Mat const& palette, bool bUpdateView) {
@@ -165,15 +176,17 @@ namespace gtl::qt {
 		if (&m_option != &option)
 			m_option = option;
 
-		BuildPyramid();
+		if (!m_img.empty()) {
+			BuildPyramid();
 
-		UpdateCT(false, eZOOM::none);
-		UpdateScrollBars();
-		if (ui->view)
-			ui->view->update();
+			UpdateCT(false, eZOOM::none);
+			UpdateScrollBars();
+			if (ui->view)
+				ui->view->update();
+		}
 
-		if (bStore) {
-			return m_fnSyncSetting and m_fnSyncSetting(true, m_strCookie, m_option);
+		if (bStore and m_fnSyncSetting) {
+			return m_fnSyncSetting(true, m_strCookie, m_option);
 		}
 		return true;
 	}
@@ -556,11 +569,10 @@ namespace gtl::qt {
 
 	void xMatView::BuildPyramid() {
 		// Build Pyramid Image for down sampling { cv::InterpolationFlags::INTER_AREA }
-		if (m_pyramid.threadPyramidMaker.joinable()) {
-			m_pyramid.threadPyramidMaker.request_stop();
-			m_pyramid.threadPyramidMaker.join();
-		}
+		StopPyramidMaker();
 		m_pyramid.imgs.clear();
+		if (m_img.empty())
+			return;
 		m_pyramid.imgs.push_front(m_img);
 		const uint minArea = 1'000 * 1'000;
 		if (m_option.bPyrImageDown and m_option.eZoomOut == eZOOM_OUT::area and ((uint64_t)m_img.cols * m_img.rows) > minArea) {
@@ -574,6 +586,13 @@ namespace gtl::qt {
 					}
 				}
 			});
+		}
+	}
+
+	void xMatView::StopPyramidMaker() {
+		if (m_pyramid.threadPyramidMaker.joinable()) {
+			m_pyramid.threadPyramidMaker.request_stop();
+			m_pyramid.threadPyramidMaker.join();
 		}
 	}
 

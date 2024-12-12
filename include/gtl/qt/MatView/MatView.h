@@ -135,6 +135,7 @@ public:
 	cv::Mat GetImage() { return m_img; }
 	cv::Mat const& GetImage() const { return m_img; }
 	bool SetImage(cv::Mat const& img, bool bCenter = true, eZOOM eZoomMode = eZOOM::none, bool bCopy = false);
+	void Reset();
 	cv::Mat GetPalette() { return m_palette; }
 	bool SetPalette(cv::Mat const& palette, bool bUpdateView);	// palette will be copied into m_palette
 	bool SetZoomMode(eZOOM eZoomMode, bool bCenter = true);
@@ -176,6 +177,7 @@ public:
 
 protected:
 	void BuildPyramid();
+	void StopPyramidMaker();
 	xRect2i GetViewRect();
 	void InitializeGL(xMatViewCanvas* view);
 	void PaintGL(xMatViewCanvas* view);
