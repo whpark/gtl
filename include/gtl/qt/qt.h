@@ -58,6 +58,10 @@ namespace gtl::qt {
 
 	inline std::string ToString(QColor cr) { return ToString(cr.name()); }
 	inline std::wstring ToWString(QColor cr) { return ToWString(cr.name()); }
+	inline std::string ToString(QVariant const& var) {
+		return var.toString().toStdString();
+	}
+
 
 	template < gtlc::string_elem tchar_t >
 	std::basic_string<tchar_t> ToTString(QString const& str) {
