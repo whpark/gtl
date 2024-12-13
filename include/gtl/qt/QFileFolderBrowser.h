@@ -110,8 +110,8 @@ namespace gtl::qt {
 		std::filesystem::path GetPath() {
 			return ui.cmbPath->currentText().toStdWString();
 		}
-		void SetPath(const std::filesystem::path& path) {
-			ui.cmbPath->setCurrentText(QString::fromStdWString(path.wstring()));
+		void SetPath(QString const& str) {
+			ui.cmbPath->setCurrentText(str);
 		}
 
 	private:
