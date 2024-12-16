@@ -193,7 +193,7 @@ namespace gtl::wx {
 		bool SetOption(S_OPTION const& option, bool bStore = true);
 
 		bool ShowToolBar(bool bShow);
-		bool IsToolBarShown() const { return m_toolBar->IsShown(); }
+		bool IsToolBarVisible() const { return m_toolBar->IsShown(); }
 
 		//virtual void OnClose(wxCloseEvent& event) override;
 

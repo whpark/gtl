@@ -95,6 +95,27 @@ protected:
 		std::deque<cv::Mat> imgs;
 		std::jthread threadPyramidMaker;
 	} m_pyramid;
+
+	// Mouse Action
+public:
+	enum class eMOUSE_ACTION : uint8_t { none, pan, select, };
+	enum class eWHEEL_ACTION : uint8_t { none, zoom, scroll, };
+	auto& MouseAction() { return m_mapMouseAction; };
+	auto& WheelAction() { return m_mapWheelAction; };
+protected:
+	std::map<std::pair<Qt::MouseButton, Qt::KeyboardModifiers>, eMOUSE_ACTION> m_mapMouseAction{
+		{ {Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier},		eMOUSE_ACTION::pan },
+		{ {Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ControlModifier},	eMOUSE_ACTION::pan },
+		{ {Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier},	eMOUSE_ACTION::select },
+		{ {Qt::MouseButton::RightButton, Qt::KeyboardModifier::NoModifier},		eMOUSE_ACTION::select },
+	};
+	std::map<Qt::KeyboardModifiers, eWHEEL_ACTION> m_mapWheelAction{
+		{ Qt::KeyboardModifier::NoModifier,			eWHEEL_ACTION::zoom },
+		{ Qt::KeyboardModifier::ControlModifier,	eWHEEL_ACTION::scroll },
+	};
+public:
+	std::map<Qt::MouseButton, eMOUSE_ACTION> m_current_mouse_action;
+
 	mutable struct {
 		bool bInSelectionMode{};
 		bool bRectSelected{};
@@ -119,8 +140,6 @@ protected:
 			timer.stop();
 		}
 	} m_smooth_scroll;
-
-	//xMatViewCanvas* m_view{};
 
 	S_OPTION m_option;
 	eZOOM m_eZoom{eZOOM::fit2window};
@@ -160,7 +179,7 @@ public:
 	bool SetOption(S_OPTION const& option, bool bStore = true);
 
 	bool ShowToolBar(bool bShow);
-	bool IsToolBarShown() const;
+	bool IsToolBarVisible() const;
 
 	//virtual void OnClose(wxCloseEvent& event) override;
 
@@ -175,20 +194,26 @@ public:
 	void PurgeScroll(bool bUpdate = true);
 	bool KeyboardNavigate(int key, bool ctrl = false, bool alt = false, bool shift = false);
 
+signals:
+	bool SigMousePressed(xMatViewCanvas* canvas, QMouseEvent* event);
+	bool SigMouseReleased(xMatViewCanvas* canvas, QMouseEvent* event);
+	bool SigMouseMoved(xMatViewCanvas* canvas, QMouseEvent* event);
+	bool SigMouseWheelMoved(xMatViewCanvas* canvas, QWheelEvent* event);
+
 protected:
 	void BuildPyramid();
 	void StopPyramidMaker();
 	xRect2i GetViewRect();
-	void InitializeGL(xMatViewCanvas* view);
-	void PaintGL(xMatViewCanvas* view);
+	void InitializeGL(xMatViewCanvas* canvas);
+	void PaintGL(xMatViewCanvas* canvas);
 	bool PutMatAsTexture(GLuint textureID, cv::Mat const& img, int width, gtl::xRect2i const& rect, gtl::xRect2i const& rectClient);
 
 protected:
 	virtual void keyPressEvent(QKeyEvent *event) override;
-	void OnView_mousePressEvent(xMatViewCanvas* view, QMouseEvent *event);
-	void OnView_mouseReleaseEvent(xMatViewCanvas* view, QMouseEvent *event);
-	void OnView_mouseMoveEvent(xMatViewCanvas* view, QMouseEvent *event);
-	void OnView_wheelEvent(xMatViewCanvas* view, QWheelEvent* event);
+	void OnView_mousePressEvent(xMatViewCanvas* canvas, QMouseEvent *event);
+	void OnView_mouseReleaseEvent(xMatViewCanvas* canvas, QMouseEvent *event);
+	void OnView_mouseMoveEvent(xMatViewCanvas* canvas, QMouseEvent *event);
+	void OnView_wheelEvent(xMatViewCanvas* canvas, QWheelEvent* event);
 
 protected:
 	// slots
