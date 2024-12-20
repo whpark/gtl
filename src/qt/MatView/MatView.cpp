@@ -720,6 +720,11 @@ namespace gtl::qt {
 				auto pt = m_ctScreenFromImage.TransI(ptView);
 				m_mouse.ptSel1.x = std::clamp<int>(pt.x, 0, m_img.cols);
 				m_mouse.ptSel1.y = std::clamp<int>(pt.y, 0, m_img.rows);
+				{
+					xRect2i rect(m_mouse.ptSel0, m_mouse.ptSel1);
+					rect.NormalizeRect();
+					emit SigSelectionChanged(rect);
+				}
 			}
 			break;
 		}

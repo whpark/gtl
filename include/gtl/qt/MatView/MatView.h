@@ -199,6 +199,7 @@ signals:
 	bool SigMouseReleased(xMatViewCanvas* canvas, QMouseEvent* event);
 	bool SigMouseMoved(xMatViewCanvas* canvas, QMouseEvent* event);
 	bool SigMouseWheelMoved(xMatViewCanvas* canvas, QWheelEvent* event);
+	bool SigSelectionChanged(xRect2i const& rect);
 
 protected:
 	void BuildPyramid();
