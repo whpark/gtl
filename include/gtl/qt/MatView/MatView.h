@@ -170,6 +170,7 @@ public:
 			return {};
 		return std::pair<xPoint2d, xPoint2d>{m_mouse.ptSel0, m_mouse.ptSel1};
 	}
+	void UpdateCanvas();
 	void SetSelectionRect(xRect2i const& rect);
 	void ClearSelectionRect();
 

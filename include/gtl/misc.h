@@ -461,7 +461,7 @@ namespace gtl {
 
 		using this_t = color_rgba_t;
 
-		this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
+		constexpr this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
 		bool operator == (this_t const& B) const { return cr == B.cr; }
 		auto operator <=> (this_t const& B) const { return cr <=> B.cr; }
 		template < typename tjson >
@@ -494,7 +494,7 @@ namespace gtl {
 
 		using this_t = color_bgra_t;
 
-		this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
+		constexpr this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
 		bool operator == (this_t const& B) const { return cr == B.cr; }
 		auto operator <=> (this_t const& B) const { return cr <=> B.cr; }
 		template < typename tjson >
@@ -527,7 +527,7 @@ namespace gtl {
 
 		using this_t = color_abgr_t;
 
-		this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
+		constexpr this_t& operator = (this_t const& b) { cr = b.cr; return *this; }
 		bool operator == (this_t const& B) const { return cr == B.cr; }
 		auto operator <=> (this_t const& B) const { return cr <=> B.cr; }
 		template < typename tjson >
