@@ -571,9 +571,11 @@ namespace gtl::qt {
 		m_pyramid.imgs.clear();
 		if (m_img.empty())
 			return;
-		m_pyramid.imgs.push_front(m_img);
+		cv::Mat img;
+		ApplyPalette(m_img, img);
+		m_pyramid.imgs.push_front(img);
 		const uint minArea = 1'000 * 1'000;
-		if (m_option.bPyrImageDown and m_option.eZoomOut == eZOOM_OUT::area and ((uint64_t)m_img.cols * m_img.rows) > minArea) {
+		if (m_option.bPyrImageDown and m_option.eZoomOut == eZOOM_OUT::area and ((uint64_t)img.cols * img.rows) > minArea) {
 			m_pyramid.threadPyramidMaker = std::jthread([this](std::stop_token stop) {
 				cv::Mat imgPyr = m_pyramid.imgs[0];
 				while (!stop.stop_requested() and ((uint64_t)imgPyr.cols * imgPyr.rows) > minArea) {
@@ -1254,7 +1256,8 @@ R"(
 		if ((uint64_t)rcTargetC.width * rcTargetC.height > 1ull *1024*1024*1024)
 			return;
 
-		cv::Mat img(rcTargetC.size(), m_img.type());
+		int imgType = (m_img.type() == CV_8UC1 and !m_palette.empty()) ? m_palette.type() : m_img.type();
+		cv::Mat img(rcTargetC.size(), imgType);
 		//img = m_option.crBackground;
 		int eInterpolation = cv::INTER_LINEAR;
 		try {
@@ -1337,10 +1340,15 @@ R"(
 				};
 				if (auto pos = mapInterpolation.find(m_option.eZoomIn); pos != mapInterpolation.end())
 					eInterpolation = pos->second;
-				cv::resize(m_img(roi), img(rcTarget), rcTarget.size(), 0., 0., eInterpolation);
+				// ApplyColorMap
+				cv::Mat imgC;
+				ApplyPalette(m_img(roi), imgC);
+				cv::resize(imgC, img(rcTarget), rcTarget.size(), 0., 0., eInterpolation);
 			}
 			else {
-				m_img(roi).copyTo(img(rcTarget));
+				cv::Mat imgC;
+				ApplyPalette(m_img(roi), imgC);
+				imgC.copyTo(img(rcTarget));
 			}
 		} catch (std::exception& e) {
 			//OutputDebugStringA(std::format("cv::{}.......\n", e.what()).c_str());
@@ -1349,11 +1357,11 @@ R"(
 		}
 
 		if (!img.empty()) {
-			if (m_img.type() == CV_8UC1 and !m_palette.empty()) {
-				cv::Mat imgC;
-				cv::applyColorMap(img, imgC, m_palette);
-				img = imgC;
-			}
+			//if (m_img.type() == CV_8UC1 and !m_palette.empty()) {
+			//	cv::Mat imgC;
+			//	cv::applyColorMap(img, imgC, m_palette);
+			//	img = imgC;
+			//}
 			if (m_option.bDrawPixelValue) {
 				auto ctCanvas = m_ctScreenFromImage;
 				ctCanvas.m_offset -= m_ctScreenFromImage(roi.tl());

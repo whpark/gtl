@@ -157,6 +157,14 @@ public:
 	void Reset();
 	cv::Mat GetPalette() { return m_palette; }
 	bool SetPalette(cv::Mat const& palette, bool bUpdateView);	// palette will be copied into m_palette
+protected:
+	void ApplyPalette(cv::Mat const& imgSrc, cv::Mat& imgDst) {
+		if (m_img.type() == CV_8UC1 and !m_palette.empty())
+			cv::applyColorMap(imgSrc, imgDst, m_palette);
+		else
+			imgDst = imgSrc;
+	}
+public:
 	bool SetZoomMode(eZOOM eZoomMode, bool bCenter = true);
 	std::optional<xRect2i> GetSelectionRect() const {
 		if (!m_mouse.bRectSelected)
