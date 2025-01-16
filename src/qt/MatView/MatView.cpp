@@ -44,12 +44,13 @@ namespace gtl::qt {
 		// openGL object
 		//ui->canvas = std::make_unique<xMatViewCanvas>(this);
 		if (auto* canvas = ui->canvas) {
-			canvas->m_fnInitializeGL	= [this](auto* p) { this->InitializeGL(p); };
-			canvas->m_fnPaintGL			= [this](auto* p) { this->PaintGL(p); };
-			canvas->m_fnMousePress		= [this](auto* p, auto* e) { this->OnView_mousePressEvent(p, e); };
-			canvas->m_fnMouseRelease	= [this](auto* p, auto* e) { this->OnView_mouseReleaseEvent(p, e); };
-			canvas->m_fnMouseMove		= [this](auto* p, auto* e) { this->OnView_mouseMoveEvent(p, e); };
-			canvas->m_fnWheel			= [this](auto* p, auto* e) { this->OnView_wheelEvent(p, e); };
+			canvas->m_fnInitializeGL		= [this](auto* p) { this->InitializeGL(p); };
+			canvas->m_fnPaintGL				= [this](auto* p) { this->PaintGL(p); };
+			canvas->m_fnMousePress			= [this](auto* p, auto* e) { this->OnView_mousePressEvent(p, e); };
+			canvas->m_fnMouseRelease		= [this](auto* p, auto* e) { this->OnView_mouseReleaseEvent(p, e); };
+			canvas->m_fnMouseDoubleClick	= [this](auto* p, auto* e) { this->OnView_mouseDoubleClickEvent(p, e); };
+			canvas->m_fnMouseMove			= [this](auto* p, auto* e) { this->OnView_mouseMoveEvent(p, e); };
+			canvas->m_fnWheel				= [this](auto* p, auto* e) { this->OnView_wheelEvent(p, e); };
 			canvas->setMouseTracking(true);
 		}
 		//ui->canvas->setObjectName("view");
@@ -675,6 +676,7 @@ namespace gtl::qt {
 
 		case eMOUSE_ACTION::select:
 			{
+				event->accept();
 				m_mouse.bRectSelected = false;
 				m_mouse.bInSelectionMode = true;
 				auto pt = m_ctScreenFromImage.TransI(ptView);
@@ -712,6 +714,7 @@ namespace gtl::qt {
 			break;
 		case eMOUSE_ACTION::select:
 			if (m_mouse.bInSelectionMode) {
+				event->accept();
 				m_mouse.bInSelectionMode = false;
 				m_mouse.bRectSelected = true;
 				xPoint2i ptView = ToCoord(event->pos() * devicePixelRatio());
@@ -725,6 +728,13 @@ namespace gtl::qt {
 				}
 			}
 			break;
+		}
+	}
+
+	void xMatView::OnView_mouseDoubleClickEvent(xMatViewCanvas* canvas, QMouseEvent* event) {
+		if (emit SigMouseDoubleClicked(canvas, event)) {
+			event->accept();
+			return;
 		}
 	}
 

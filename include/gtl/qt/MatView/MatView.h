@@ -206,6 +206,7 @@ public:
 signals:
 	bool SigMousePressed(xMatViewCanvas* canvas, QMouseEvent* event);
 	bool SigMouseReleased(xMatViewCanvas* canvas, QMouseEvent* event);
+	bool SigMouseDoubleClicked(xMatViewCanvas* canvas, QMouseEvent* event);
 	bool SigMouseMoved(xMatViewCanvas* canvas, QMouseEvent* event);
 	bool SigMouseWheelMoved(xMatViewCanvas* canvas, QWheelEvent* event);
 	bool SigSelectionChanged(xRect2i const& rect);
@@ -222,6 +223,7 @@ protected:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	void OnView_mousePressEvent(xMatViewCanvas* canvas, QMouseEvent *event);
 	void OnView_mouseReleaseEvent(xMatViewCanvas* canvas, QMouseEvent *event);
+	void OnView_mouseDoubleClickEvent(xMatViewCanvas* canvas, QMouseEvent* event);
 	void OnView_mouseMoveEvent(xMatViewCanvas* canvas, QMouseEvent *event);
 	void OnView_wheelEvent(xMatViewCanvas* canvas, QWheelEvent* event);
 
