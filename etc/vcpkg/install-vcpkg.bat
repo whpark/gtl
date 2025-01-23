@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 goto start
 
 
@@ -46,7 +46,7 @@ rem vcpkg install --triplet=x64-windows --recurse cppcoro --overlay-ports=%Sourc
 rem if %errorlevel% neq 0 set FAILED=%FAILED% cppcoro:x64,
 
 echo installing x64-windows...
-vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 fmt imgui argparse spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype nngpp grpc cpr websocketpp glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut libxml2 libxmlmm libmodbus openssl exprtk eigen3 freeimage blend2d opencv[contrib,core,cuda,default-features,dnn,freetype,ipp,opengl,python,vtk] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt maddy
+vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 fmt imgui argparse spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cppzmq grpc cpr websocketpp glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut libxml2 libxmlmm libmodbus openssl exprtk eigen3 freeimage blend2d opencv[contrib,core,cuda,default-features,dnn,freetype,ipp,opengl,python,vtk] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt maddy
 if %errorlevel% neq 0 set FAILED=%FAILED% x64-windows,
 
 rem skip x86
@@ -58,7 +58,7 @@ vcpkg install --triplet=x86-windows --recurse glaze --overlay-ports=%SourceFolde
 if %errorlevel% neq 0 set FAILED=%FAILED% glaze:x86,
 
 echo installing x86-windows...
-vcpkg install --triplet=x86-windows --recurse gtest catch2 benchmark boost flux nngpp grpc 7zip bzip2 fmt imgui spdlog scnlib ms-gsl magic-enum libenvpp winreg tinyxml2 nlohmann-json tomlplusplus libxml2 libxmlmm libmodbus openssl opencv[core] wxwidgets[debug-support,fonts]
+vcpkg install --triplet=x86-windows --recurse gtest catch2 benchmark boost flux cppzmq grpc 7zip bzip2 fmt imgui spdlog scnlib ms-gsl magic-enum libenvpp winreg tinyxml2 nlohmann-json tomlplusplus libxml2 libxmlmm libmodbus openssl opencv[core] wxwidgets[debug-support,fonts]
 if %errorlevel% neq 0 set FAILED=%FAILED% x86-windows,
 
 :end
