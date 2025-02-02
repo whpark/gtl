@@ -52,7 +52,7 @@ namespace gtl {
 
 		// patch
 		glBegin(GL_QUADS);
-		double r = (float)width/img.cols;
+		auto r = (float)width/img.cols;
 		glTexCoord2f(0.f, 0.f);	glVertex2i(rect.left,   rect.top);
 		glTexCoord2f(0.f, 1.f);	glVertex2i(rect.left,   rect.bottom);
 		glTexCoord2f(r, 1.f);	glVertex2i(rect.right,  rect.bottom);
