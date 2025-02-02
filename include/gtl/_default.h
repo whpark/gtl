@@ -139,6 +139,14 @@
 #	include <windows.h>
 #	pragma warning(pop)
 #endif
+#ifndef NOMINMAX
+#	define NOMINMAX	// disable Windows::min/max
+#endif
+#if defined(min) || defined(max)
+//#	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
+#	undef min
+#	undef max
+#endif
 
 // until c++20 source_location
 #ifdef __cpp_lib_source_location
@@ -149,15 +157,6 @@
 	#else
 		#error ..... ????...
 	#endif
-#endif
-
-#ifndef NOMINMAX
-#	define NOMINMAX	// disable Windows::min/max
-#endif
-#if defined(min) || defined(max)
-//#	error min/max must not be defined. turn it off using '#define NOMINMAX' before '#include <Windows.h>''
-#	undef min
-#	undef max
 #endif
 
 
@@ -261,9 +260,8 @@ namespace gtl {
 #if (GTL__STRING_SUPPORT_CODEPAGE_KSSM)
 	using charKSSM_t = uint16_t;
 #endif
-
-
 }
+using gtl::ssize_t;
 
 //#	pragma warning(disable: 4455)
 #ifdef __cpp_size_t_suffix
