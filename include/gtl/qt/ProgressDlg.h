@@ -2,6 +2,7 @@
 
 #include "gtl/qt/_lib_gtl_qt.h"
 #include "gtl/misc.h"
+#include <QTimer>
 #include <QDialog>
 
 QT_BEGIN_NAMESPACE
