@@ -984,6 +984,8 @@ namespace gtl::qt {
 	}
 
 	void xMatView::OnSbHorz_valueChanged(int pos) {
+		if (m_eZoom == eZOOM::fit2window)	// todo: restore to original value
+			return;
 		auto [rectClient, rectImageScreen, rectScrollRange] = GetScrollGeometry();
 		int range = rectScrollRange.Width();
 		int page =  rectClient.Width();
@@ -995,6 +997,8 @@ namespace gtl::qt {
 		UpdateCanvas();
 	}
 	void xMatView::OnSbVert_valueChanged(int pos) {
+		if (m_eZoom == eZOOM::fit2window)	// todo: restore to original value
+			return;
 		auto [rectClient, rectImageScreen, rectScrollRange] = GetScrollGeometry();
 		int range = rectScrollRange.Height();
 		int page =  rectClient.Height();
