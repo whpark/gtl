@@ -93,8 +93,13 @@ namespace gtl {
 		//TCopyTransparent() : T() {}
 		TCopyTransparent(const TCopyTransparent& B) { }
 		TCopyTransparent(TCopyTransparent&& B) = default;
+		TCopyTransparent(T&& b) : T(std::move(b)) {}
 		TCopyTransparent& operator = (const TCopyTransparent& B) { return *this; }
 		TCopyTransparent& operator = (TCopyTransparent&& B) = default;
+		TCopyTransparent& operator = (T&& b) {
+			((T&)(*this)) = std::move(b);
+			return *this;
+		}
 	};
 
 
