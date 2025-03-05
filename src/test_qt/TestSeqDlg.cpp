@@ -20,7 +20,7 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), seq_map_t("main", g
 
 	ui.txtMainThreadID->setText(ToQString(fmt::format("{}", std::this_thread::get_id())));
 
-	connect(&m_timer, &QTimer::timeout, [this]() {
+	connect(&m_timer, &QTimer::timeout, this, [this]() {
 		try {
 			Dispatch();
 		}
@@ -34,7 +34,7 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), seq_map_t("main", g
 	Bind("SuspendHandler"s, &this_t::SuspendHandler);
 	Bind("Suspend"s, &this_t::Suspend);
 
-	connect(ui.btnSeq1, &QPushButton::clicked, [this]() {
+	connect(ui.btnSeq1, &QPushButton::clicked, this, [this]() {
 		//m_top.AddSequence([this](Generator<int>& self) -> Generator<int> { return Seq1(self); });
 		using namespace std::placeholders;
 		//m_driver.CreateChildSequence("ChildSequence"s, [this]{ return this->Seq1(); });
@@ -42,7 +42,7 @@ xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), seq_map_t("main", g
 		CreateRootSequence("MainSequence"s);
 	});
 
-	connect(ui.btnSeqContinue, &QPushButton::clicked, [this]() {
+	connect(ui.btnSeqContinue, &QPushButton::clicked, this, [this]() {
 		if (auto* seq = GetSequenceDriver()->FindChildDFS("SuspendString")) {
 			seq->ReserveResume();
 		}

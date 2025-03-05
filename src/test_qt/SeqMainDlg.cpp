@@ -8,8 +8,8 @@ using seq_t = xSeqMainDlg::seq_t;;
 xSeqMainDlg::xSeqMainDlg(QWidget* parent) : QDialog(parent), m_driver(""), seq_map_t("MainSeq", m_driver) {
 	ui.setupUi(this);
 
-	connect(ui.btnCreateSequence1, &QPushButton::clicked, [this] { try { CreateRootSequence("Seq1"); } catch (std::exception&) {} });
-	connect(ui.btnCreateSequence2, &QPushButton::clicked, [this] {
+	connect(ui.btnCreateSequence1, &QPushButton::clicked, this, [this] { try { CreateRootSequence("Seq1"); } catch (std::exception&) {} });
+	connect(ui.btnCreateSequence2, &QPushButton::clicked, this, [this] {
 		CreateRootSequence("Seq2");
 		m_driver.CreateChildSequence<seq_param_t>(
 			"Sequence2-1"s,
@@ -30,7 +30,7 @@ xSeqMainDlg::xSeqMainDlg(QWidget* parent) : QDialog(parent), m_driver(""), seq_m
 	});
 
 	// Dispatch
-	connect(&m_timer, &QTimer::timeout, [this] {
+	connect(&m_timer, &QTimer::timeout, this, [this] {
 		using namespace std::chrono;
 		m_timer.stop();
 		auto t0 = gtl::seq::clock_t::now();

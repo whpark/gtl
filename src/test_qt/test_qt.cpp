@@ -139,7 +139,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	connect(ui.btnOpenImage, &QPushButton::clicked, this, &this_t::OnLoadImage);
 	connect(ui.edtPath, &QLineEdit::returnPressed, this, &this_t::OnLoadImage);
 	connect(ui.btnSetEnvVar, &QPushButton::clicked, this, &this_t::OnSetEnvVar);
-	connect(ui.btnTestSeq, &QPushButton::clicked, [this]() {
+	connect(ui.btnTestSeq, &QPushButton::clicked, this, [this] {
 		if (!m_dlgTestSeq)
 			m_dlgTestSeq = std::make_unique<xTestSeqDlg>(this);
 		m_dlgTestSeq->show();

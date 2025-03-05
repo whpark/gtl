@@ -10,7 +10,7 @@ xSeqChildDlg::xSeqChildDlg(seq_map_t& parentSeqMap, QWidget* parent) : QDialog(p
 	Bind("SeqShowSomeText", &xSeqChildDlg::SeqShowSomeText);
 	//Connect("SeqShowSomeText", [this](auto&& param) { return SeqShowSomeText(std::move(param)); });
 
-	connect(ui.btnContinue, &QPushButton::clicked, [this] { if (auto* seq = GetSequenceDriver()->FindChildDFS("SeqShowSomeText")) seq->ReserveResume(); });
+	connect(ui.btnContinue, &QPushButton::clicked, this, [this] { if (auto* seq = GetSequenceDriver()->FindChildDFS("SeqShowSomeText")) seq->ReserveResume(); });
 }
 
 xSeqChildDlg::~xSeqChildDlg() {
