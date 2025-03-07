@@ -5,6 +5,7 @@
 #include "gtl/lazy_profile.h"
 
 #include "fmt/compile.h"
+#include "boost/lambda/lambda.hpp"
 
 #pragma warning(disable:4566)	// character encoding
 
@@ -14,6 +15,20 @@ using namespace gtl::literals;
 static_assert(std::is_convertible_v<std::unique_ptr<int>, std::shared_ptr<int>>);
 static_assert(!std::is_convertible_v<std::shared_ptr<int>, std::unique_ptr<int>>);
 static_assert(!std::is_same_v<std::unique_ptr<int>, std::shared_ptr<int>>);
+
+namespace gtl::test::bll {
+
+	TEST(misc, bll) {
+
+		using namespace boost::lambda;
+		std::vector lst{1, 2, 3, 4, 5, 6, 7, 8, 9};
+		//auto r = lst | std::ranges::filter(_1 % == 2);
+		std::for_each(lst.begin(), lst.end(), _1 = 2);
+		fmt::println("{}", lst);
+
+	}
+
+}
 
 namespace gtl::test::misc {
 	TEST(misc, TLazyProfile) {
