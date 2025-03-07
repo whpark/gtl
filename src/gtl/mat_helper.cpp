@@ -888,11 +888,12 @@ namespace gtl {
 				reader.join();
 				ss.request_stop();
 				cv.notify_all();
-				//while (finished < nThread) {
-				//	using namespace std::literals;
-				//	cv.notify_all();
-				//	std::this_thread::sleep_for(0ms);
-				//}
+
+				while (finished < nThread) {
+					using namespace std::literals;
+					cv.notify_all();
+					std::this_thread::sleep_for(0ms);
+				}
 
 				return !bError;
 
@@ -1057,14 +1058,17 @@ namespace gtl {
 				}
 			};
 
-			auto UnpackBuffer = [&q, &mtxQ, &cv, &UnPackSingleRow, &img](std::stop_token tk) {
+			std::atomic<int> finished{};
+			auto UnpackBuffer = [&q, &mtxQ, &cv, &UnPackSingleRow, &img, &finished](std::stop_token tk) {
 				do {
 					BUFFER* pBuf{};
 					while (!pBuf) {
 						std::unique_lock lock(mtxQ);
 						if (q.empty()) {
-							if (tk.stop_requested())
+							if (tk.stop_requested()) {
+								finished++;
 								return;
+							}
 							cv.wait(lock);
 						}
 						else {
@@ -1091,6 +1095,12 @@ namespace gtl {
 			reader.join();
 			ss.request_stop();
 			cv.notify_all();
+
+			while (finished < nThread) {
+				using namespace std::literals;
+				cv.notify_all();
+				std::this_thread::sleep_for(0ms);
+			}
 
 			return !bError;
 
