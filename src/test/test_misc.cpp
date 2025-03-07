@@ -22,7 +22,8 @@ namespace gtl::test::bll {
 
 		using namespace boost::lambda;
 		std::vector lst{1, 2, 3, 4, 5, 6, 7, 8, 9};
-		//auto r = lst | std::ranges::filter(_1 % == 2);
+		auto r = lst | std::ranges::views::filter(_1 % 2 == 0);
+		fmt::println("{}", r);
 		std::for_each(lst.begin(), lst.end(), _1 = 2);
 		fmt::println("{}", lst);
 
