@@ -1055,7 +1055,7 @@ namespace gtl {
 	/// @param path 
 	/// @return 
 	template < gtlc::contiguous_container TContainer = std::vector<char> >
-		requires (std::is_trivial_v<typename TContainer::value_type>)
+		requires (std::is_trivially_copyable_v<typename TContainer::value_type>)
 	std::optional<TContainer> FileToContainer(std::filesystem::path const& path) {
 		using T = typename TContainer::value_type;
 		std::optional<TContainer> r;
@@ -1076,19 +1076,19 @@ namespace gtl {
 		return r;
 	}
 
-	template < typename T = char > requires (std::is_trivial_v<T>)
+	template < typename T = char > requires (std::is_trivially_copyable_v<T>)
 	constexpr std::optional<std::vector<T>> FileToVector(std::filesystem::path const& path) {
 		return FileToContainer<std::vector<T>>(path);
 	}
 
-	template < typename T = char > requires (std::is_trivial_v<T>)
+	template < typename T = char > requires (std::is_trivially_copyable_v<T>)
 	constexpr std::optional<std::basic_string<T>> FileToString(std::filesystem::path const& path) {
 		return FileToContainer<std::basic_string<T>>(path);
 	}
 
 	// better use FileToContainer
 	template < typename T = char, gtlc::contiguous_type_container<T> TContainer = std::vector<T> >
-		requires (std::is_trivial_v<T>)
+		requires (std::is_trivially_copyable_v<T>)
 	[[deprecated("better use FileToContainer()")]] std::optional<TContainer> FileToBuffer(std::filesystem::path const& path) {
 		return FileToContainer<TContainer>(path);
 	}
@@ -1100,7 +1100,7 @@ namespace gtl {
 	/// @return 
 	template < gtlc::contiguous_container TContainer >
 	bool ContainerToFile(TContainer const& buf, std::filesystem::path const& path) {
-		static_assert(std::is_trivial_v<typename std::decay_t<decltype(buf)>::value_type>, "TContainer::value_type must be trivial");
+		static_assert(std::is_trivially_copyable_v<typename std::decay_t<decltype(buf)>::value_type>, "TContainer::value_type must be trivial");
 		std::ofstream f(path, std::ios_base::binary);
 		f.write((char const*)buf.data(), buf.size() * sizeof(typename TContainer::value_type));
 		return (bool)f;
