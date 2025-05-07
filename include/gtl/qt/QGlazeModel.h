@@ -17,7 +17,7 @@ public:
 	using decorator_t = std::function<std::optional<std::string>(glz::json_t const&)>;
 
 	enum class eCOLUMN : int { key, value, n, };
-	friend constexpr static std::string ToStringA(eCOLUMN e) {
+	friend constexpr std::string ToStringA(eCOLUMN e) {
 		switch (e) {
 		case eCOLUMN::key: return "key";
 		case eCOLUMN::value: return "value";
