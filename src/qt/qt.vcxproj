@@ -32,12 +32,12 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.8.2_msvc2022_64</QtInstall>
+    <QtInstall>6.8.3_msvc2022_64</QtInstall>
     <QtModules>core;gui;qml;quick;quickcontrols2;quickdialogs2;quicklayouts;widgets;3dcore;3danimation;3dextras;3dinput;3dlogic;3drender;opengl;openglwidgets;quickwidgets;webchannel;webenginecore;websockets;webview;webenginewidgets;uitools</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.8.2_msvc2022_64</QtInstall>
+    <QtInstall>6.8.3_msvc2022_64</QtInstall>
     <QtModules>core;gui;qml;quick;quickcontrols2;quickdialogs2;quicklayouts;widgets;3dcore;3danimation;3dextras;3dinput;3dlogic;3drender;opengl;openglwidgets;quickwidgets;webchannel;webenginecore;websockets;webview;webenginewidgets;uitools</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>

@@ -95,7 +95,7 @@
 /*export*/ template <> struct fmt::formatter<gtl::ui::unit::percent_t,	gtl::ui::char_type> : gtl::ui::unit::TFMTUnitFormatter<gtl::ui::unit::percent_t> {};
 /*export*/ template <> struct fmt::formatter<gtl::ui::unit::position_t, gtl::ui::char_type> : fmt::formatter<float, gtl::ui::char_type> {
 	using base_t = fmt::formatter<float, gtl::ui::char_type>;
-	template < typename context > auto format(gtl::ui::unit::position_t const& v, context& ctx) {
+	template < typename context > auto format(gtl::ui::unit::position_t const& v, context& ctx) const {
 		//gtl::ui::string_t str;
 		std::visit([&]<typename T>(T&& arg) {
 			base_t::format((float)arg.value, ctx);
@@ -117,7 +117,7 @@
 /*export*/ template <> struct std::formatter<gtl::ui::unit::percent_t,	gtl::ui::char_type> : gtl::ui::unit::TSTDUnitFormatter<gtl::ui::unit::percent_t> {};
 /*export*/ template <> struct std::formatter<gtl::ui::unit::position_t, gtl::ui::char_type> : std::formatter<float, gtl::ui::char_type> {
 	using base_t = std::formatter<float, gtl::ui::char_type>;
-	template < typename context > auto format(gtl::ui::unit::position_t const& v, context& ctx) {
+	template < typename context > auto format(gtl::ui::unit::position_t const& v, context& ctx) const {
 		//gtl::ui::string_t str;
 		std::visit([&]<typename T>(T&& arg) {
 			base_t::format((float)arg.value, ctx);

@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "wx/graphics.h"
 #include "gtl/wx/wxRoundButton.h"
-#include "wx/generic/private/markuptext.h"
+//#include "wx/generic/private/markuptext.h"
 
 namespace gtl::wx {
 
@@ -111,13 +111,13 @@ namespace gtl::wx {
 			dc.DrawRoundedRectangle(rectFocus, std::max(0, r-1));
 		}
 
-		if (this->m_markupText) {
-			m_markupText->Render(dc, rect, 0);
-		} else {
-			wxMarkupText markup(GetLabelText());
-			auto a = this->GetWindowStyleFlag() & wxBU_ALIGN_MASK;
-			markup.Render(dc, rect, wxAlignment::wxALIGN_RIGHT);
-		}
+		//if (this->m_markupText) {
+		//	m_markupText->Render(dc, rect, 0);
+		//} else {
+		//	wxMarkupText markup(GetLabelText());
+		//	auto a = this->GetWindowStyleFlag() & wxBU_ALIGN_MASK;
+		//	markup.Render(dc, rect, wxAlignment::wxALIGN_RIGHT);
+		//}
 
 		// disabled
 		if (!bEnabled and !rect.IsEmpty()) {

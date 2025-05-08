@@ -121,7 +121,10 @@ namespace gtl {
 	//-------------------------------------------------------------------------
 	// to Text, From Text
 	template < typename tchar, gtlc::coord T_COORD >
-	std::basic_string<tchar> ToString(T_COORD const& coord, fmt::basic_format_string<tchar, typename T_COORD::value_type> const& svFMT = GetDefaultFormatSpecifier<tchar, typename T_COORD::value_type>()) {
+	std::basic_string<tchar> ToString(
+		T_COORD const& coord,
+		fmt::basic_format_string<tchar, typename T_COORD::value_type> const& svFMT = GetDefaultFormatSpecifier<tchar, typename T_COORD::value_type>())
+	{
 		std::basic_string<tchar> str;
 		//if ( !(fmt::basic_string_view<tchar>(svFMT)).data() )
 		//	svFMT = GetDefaultFormatSpecifier<tchar, typename T_COORD::value_type>();
@@ -129,7 +132,12 @@ namespace gtl {
 		for (size_t i = 0; i < coord.size(); i++) {
 			if (i)
 				str += ',';
-			str += fmt::vformat((fmt::basic_string_view<tchar>)svFMT, fmt::make_format_args<fmt::buffer_context<tchar>>(coord.data()[i]));
+			if constexpr (gtlc::is_one_of<tchar, char, wchar_t>) {
+				str += fmt::format(fmt::runtime(svFMT), coord.member(i));
+			}
+			else {
+				str += fmt::format(svFMT, coord.member(i));
+			}
 		}
 		return str;
 	}

@@ -83,10 +83,10 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 			json_t& j_;
 		public:
 			bjson() : j__(json_t{}), j_(j__.value()) {};
-			bjson(bjson const&) = default;
-			bjson(bjson &&) = default;
-			bjson& operator = (bjson const&) = default;
-			bjson& operator = (bjson &&) = default;
+			bjson(bjson const&) = delete;
+			bjson(bjson &&) = delete;
+			bjson& operator = (bjson const&) = delete;
+			bjson& operator = (bjson &&) = delete;
 
 			bjson(json_t& b) : j_(b) {}
 
@@ -237,7 +237,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 			}
 			bool read(std::istream& is) {
 				// orinin : https://www.boost.org/doc/libs/1_75_0/libs/json/doc/html/json/input_output.html
-				boost::json::error_code ec;
+				std::error_code ec;
 				boost::json::stream_parser p;
 				std::string line;
 				size_t nLine{};
@@ -299,19 +299,24 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 	namespace gtl {
 	#pragma pack(push, 8)
 
+		template < typename json_t = nlohmann::json >
+		class njson;	// --> prevents compile error......?.... why?
+
 
 
 		/// @brief json proxy for nlohmann:json
-		template < typename json_t = nlohmann::json >
+		template < typename json_t >
 		class njson {
 			std::optional<json_t> j__;
 			json_t& j_;
 		public:
+			using string_t = std::string;
+		public:
 			njson() : j__(json_t{}), j_(j__.value()) {};
-			njson(njson const&) = default;
-			njson(njson &&) = default;
-			njson& operator = (njson const&) = default;
-			njson& operator = (njson &&) = default;
+			njson(njson const&) = delete;
+			njson(njson &&) = delete;
+			njson& operator = (njson const&) = delete;
+			njson& operator = (njson &&) = delete;
 
 			njson(json_t& b) : j_(b) {}
 
@@ -333,7 +338,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 				if constexpr (std::is_integral_v<value_type> or std::is_floating_point_v<value_type>) {
 					j_ = b;
 				} else {
-					to_json(*this, b);
+					to_json(j_, b);
 				}
 				return *this;
 			}
