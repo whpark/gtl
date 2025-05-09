@@ -124,7 +124,9 @@ namespace gtl {
 		friend void from_json(tjson const& j, this_t& object) {
 			tjson jb = j["base_t"sv];
 			from_json(jb, (base_t&)object);
-			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s);
+			std::apply([&j, &object](auto& ... pairs) {
+				((object.*(pairs.second) = j[pairs.first]), ...);
+			}, this_t::member_s);
 		}
 		template < typename tjson > //requires requires (this_t obj) { obj.base_t; }
 		friend void to_json(tjson& j, this_t const& object) {

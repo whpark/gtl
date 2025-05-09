@@ -176,8 +176,8 @@ namespace gtl::test::reflection_glaze {
 		d.str2 = "def";
 		d.m = cv::Mat::eye(3, 3, CV_32FC1);
 
-		auto r1 = glz::write<op>(d, buf);
-		EXPECT_TRUE(r1);
+		auto err1 = glz::write<op>(d, buf);
+		EXPECT_FALSE(err1);
 		gtl::ContainerToFile(buf, folder / "1.json");
 
 		derived2 d2;
@@ -189,10 +189,10 @@ namespace gtl::test::reflection_glaze {
 		EXPECT_EQ((derived2&)d, (derived2&)d2);
 
 		d.Purturb();
-		auto r2 = glz::write<op>(d, buf);
-		EXPECT_TRUE(r2);
+		auto err2 = glz::write<op>(d, buf);
+		EXPECT_FALSE(err2);
 
-		EXPECT_TRUE(!glz::read<op>(d2, buf));
+		EXPECT_FALSE(glz::read<op>(d2, buf));
 		EXPECT_EQ((topmost&)d, (topmost&)d2);
 		EXPECT_EQ((parent&)d, (parent&)d2);
 		EXPECT_EQ((derived1&)d, (derived1&)d2);
@@ -205,8 +205,8 @@ namespace gtl::test::reflection_glaze {
 		{
 			second s;
 			s.d[0].str2 = "ghi";
-			auto r3 = glz::write_json(s, buf);
-			EXPECT_TRUE(r3);
+			auto err = glz::write_json(s, buf);
+			EXPECT_FALSE(err);
 			gtl::ContainerToFile(std::span(buf), folder / "2.json");
 		}
 		if (auto r = gtl::FileToContainer<std::string>(folder / "2.json")) {
@@ -218,7 +218,7 @@ namespace gtl::test::reflection_glaze {
 			//glz::read_json(s, *r);
 
 			glz::context ctx{};
-			EXPECT_TRUE(!glz::read<op>(d, *r, ctx));
+			EXPECT_FALSE(glz::read<op>(d, *r, ctx));
 
 			EXPECT_EQ(d.d[0].str2, "ghi"s);
 		}
@@ -233,8 +233,8 @@ namespace gtl::test::reflection_glaze {
 				ptr[x] = float(f + x);
 			}
 		}
-		auto r4 = glz::write_json(m, buf);
-		EXPECT_TRUE(r4);
+		auto err4 = glz::write_json(m, buf);
+		EXPECT_FALSE(err4);
 		gtl::ContainerToFile(std::span(buf), folder / "3.json");
 		if (auto r = gtl::FileToContainer<std::string>(folder / "3.json")) {
 			cv::Mat m;
@@ -254,8 +254,8 @@ namespace gtl::test::reflection_glaze {
 		{
 			std::string str;
 			cv::Matx33d e{1., 2., 3., 4., 5., 6., 7., 8., 9.};
-			auto r = glz::write_json(e, str);
-			EXPECT_TRUE(r);
+			auto err = glz::write_json(e, str);
+			EXPECT_FALSE(err);
 			cv::Matx33d e2{};
 			EXPECT_FALSE(glz::read_json(e2, str));
 			EXPECT_EQ(e, e2);
@@ -263,8 +263,8 @@ namespace gtl::test::reflection_glaze {
 		{
 			std::string str;
 			cv::Vec3b cr{2, 3, 4};
-			auto r = glz::write_json(cr, str);
-			EXPECT_TRUE(r);
+			auto err = glz::write_json(cr, str);
+			EXPECT_FALSE(err);
 			cv::Vec3b cr2{};
 			EXPECT_FALSE(glz::read_json(cr2, str));
 			EXPECT_EQ(cr, cr2);
@@ -272,8 +272,8 @@ namespace gtl::test::reflection_glaze {
 		{
 			std::string str;
 			cv::Vec4d cr{1., 2., 3., 4.};
-			auto r = glz::write_json(cr, str);
-			EXPECT_TRUE(r);
+			auto err = glz::write_json(cr, str);
+			EXPECT_FALSE(err);
 			cv::Vec4d cr2{};
 			EXPECT_FALSE(glz::read_json(cr2, str));
 			EXPECT_EQ(cr, cr2);
@@ -290,8 +290,8 @@ namespace gtl::test::reflection_glaze {
 						ptr[x] = i++;
 					}
 				}
-				auto r = glz::write<op>(m, str);
-				EXPECT_TRUE(r);
+				auto err = glz::write<op>(m, str);
+				EXPECT_FALSE(err);
 				gtl::ContainerToFile(str, path);
 			}
 			if (auto str = gtl::FileToContainer<std::string>(path); str) {

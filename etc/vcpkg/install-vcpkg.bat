@@ -64,6 +64,8 @@ if %errorlevel% neq 0 set FAILED=%FAILED% x86-windows,
 
 :end
 
+call move_opencv4.bat
+
 set VCPKG_FOLDER=
 if %PopDirectory% neq 0 popd & set PopDirectory=
 
