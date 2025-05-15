@@ -53,16 +53,21 @@ _NON_MEMBER_CALL(_XTASK_DEDUCTION_GUIDE, X1, X2, X3)
 };
 
 
-double accum(double* beg, double* end, double init) {
-	return std::accumulate(&*beg, &*end, init);
+double accum(std::span<double>::iterator beg, std::span<double>::iterator end, double init) {
+	fmt::println("dist :{}", std::distance(beg, end));
+	auto sum = std::accumulate(beg, end, init);
+	return sum;
 }
 
-double comp2(std::vector<double>& v) {
+double comp2(std::span<double> v) {
 	gtl::xTask pt0{accum};
 	gtl::xTask pt1{accum};
-	double* first = &v[0];
-	pt0.Execute(first, first+v.size()/2, 0.0);
-	pt1.Execute(first+v.size()/2, first+v.size(), 0.0);
+	auto beg = v.begin();
+	auto mid = v.begin() + v.size()/2;
+	auto end = v.end();
+	fmt::println("v : count : {}", v.size());
+	pt0.Execute(beg, mid, 0.0);
+	pt1.Execute(mid, end, 0.0);
 
 	return pt0.get() + pt1.get();
 }
