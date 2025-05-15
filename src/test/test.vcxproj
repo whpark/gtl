@@ -97,7 +97,6 @@
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <BuildStlModules>false</BuildStlModules>
       <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
@@ -123,7 +122,6 @@
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <BuildStlModules>false</BuildStlModules>
       <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>

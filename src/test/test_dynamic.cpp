@@ -14,7 +14,7 @@ namespace gtl::test::reflection::MACRO {
 	public:
 		using this_t = CTestStruct;
 		using base_t = this_t;
-		GTL__REFLECTION_BASE(gtl::njson<>)
+		GTL__REFLECTION_BASE(gtl::njson)
 
 	public:
 		std::string str1{"str1"};

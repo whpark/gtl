@@ -15,7 +15,6 @@
 #include "benchmark/benchmark.h"
 
 #include "opencv2/opencv.hpp"
-#include "nlohmann/json.hpp"
 
 #include "boost/json.hpp"
 #include "boost/variant.hpp"

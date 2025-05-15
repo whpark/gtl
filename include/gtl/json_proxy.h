@@ -15,32 +15,32 @@
 #include "gtl/concepts.h"
 #include "gtl/string/convert_codepage.h"
 
-// from/to json
-template < typename tjson, typename T >
-void from_json(tjson const& j, T& object);
-template < typename tjson, typename T >
-void to_json(tjson&& j, T const& object);
+//// from/to json
+//template < typename tjson, typename T/*, typename n = typename tjson::json_t*/ >
+//void from_json(tjson const& j, T& object);
+//template < typename tjson, typename T/*, typename n = typename tjson::json_t*/ >
+//void to_json(tjson&& j, T const& object);
 
-template < typename tjson, gtlc::arithmetic T >
-void from_json(tjson const& j, T& value) {
-	value = j;
-}
-template < typename tjson, gtlc::arithmetic T >
-void to_json(tjson&& j, T const& value) {
-	j = value;
-}
-template < typename tjson, gtlc::string_elem tchar >
-void from_json(tjson const& j, std::basic_string<tchar>& str) {
-	str = j;
-}
-template < typename tjson, gtlc::string_elem tchar >
-void to_json(tjson&& j, std::basic_string<tchar> const& str) {
-	j = str;
-}
-template < typename tjson, gtlc::string_elem tchar >
-void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
-	j = sv;
-}
+//template < typename tjson, gtlc::arithmetic T, typename n = typename tjson::json_t >
+//void from_json(tjson const& j, T& value) {
+//	value = j;
+//}
+//template < typename tjson, gtlc::arithmetic T, typename n = typename tjson::json_t >
+//void to_json(tjson&& j, T const& value) {
+//	j = value;
+//}
+//template < typename tjson, gtlc::string_elem tchar, typename n = typename tjson::json_t >
+//void from_json(tjson const& j, std::basic_string<tchar>& str) {
+//	str = j;
+//}
+//template < typename tjson, gtlc::string_elem tchar, typename n = typename tjson::json_t >
+//void to_json(tjson&& j, std::basic_string<tchar> const& str) {
+//	j = str;
+//}
+//template < typename tjson, gtlc::string_elem tchar, typename n = typename tjson::json_t >
+//void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
+//	j = sv;
+//}
 
 
 #if (GTL__USE_BOOST_JSON)
@@ -77,8 +77,11 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 
 	    /// @brief json proxy for boost:json
 		/// for string, converts to utf-8.
-		template < typename json_t = boost::json::value >
+		template < typename tjson = boost::json::value >
 	    class bjson {
+		public:
+			using json_t = tjson;
+		private:
 			std::optional<json_t> j__;
 			json_t& j_;
 		public:
@@ -293,20 +296,43 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 
 #if (GTL__USE_NLOHMANN_JSON)
 
-	  // https://github.com/nlohmann/json
+	// https://github.com/nlohmann/json
 	#include "nlohmann/json.hpp"
+
+	//namespace std {
+	//	template < typename tjson, typename tchar, typename ... targs >
+	//		requires (!std::is_same_v<tchar, char>)
+	//	void from_json(tjson const& j, basic_string<tchar, targs...>& str) {
+	//		if constexpr (std::is_same_v<tchar, char8_t>) {
+	//			str = (u8string const&)(string)j;
+	//		}
+	//		else {
+	//			str = gtl::ToString<tchar>((u8string const&)(string)j);
+	//		}
+	//	}
+
+	//	template < typename tjson, typename tchar, typename ... targs >
+	//		requires (!std::is_same_v<tchar, char>)
+	//	void to_json(tjson& j, basic_string<tchar> const& str) {
+	//		if constexpr (std::is_same_v<tchar, char8_t>) {
+	//			j = (string const&)str;
+	//		}
+	//		else {
+	//			j = (string const&)gtl::ToStringU8(str);
+	//		}
+	//	}
+	//}
+
 
 	namespace gtl {
 	#pragma pack(push, 8)
 
-		template < typename json_t = nlohmann::json >
-		class njson;	// --> prevents compile error......?.... why?
-
-
-
 		/// @brief json proxy for nlohmann:json
-		template < typename json_t >
+		template < typename tjson = nlohmann::json >
 		class njson {
+		public:
+			using json_t = tjson;
+		private:
 			std::optional<json_t> j__;
 			json_t& j_;
 		public:
@@ -338,7 +364,7 @@ void to_json(tjson&& j, std::basic_string_view<tchar> const& sv) {
 				if constexpr (std::is_integral_v<value_type> or std::is_floating_point_v<value_type>) {
 					j_ = b;
 				} else {
-					to_json(j_, b);
+					to_json(*this, b);
 				}
 				return *this;
 			}

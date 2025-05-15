@@ -119,18 +119,15 @@ namespace gtl {
 
 	public:
 		// from/to json
-
 		template < typename tjson > //requires (std::is_base_of_v<base_t, this_t>)//requires (tjson j, this_t obj){ from_json(j, obj); }
 		friend void from_json(tjson const& j, this_t& object) {
-			tjson jb = j["base_t"sv];
+			tjson jb = j["base."sv];
 			from_json(jb, (base_t&)object);
-			std::apply([&j, &object](auto& ... pairs) {
-				((object.*(pairs.second) = j[pairs.first]), ...);
-			}, this_t::member_s);
+			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...);}, this_t::member_s);
 		}
 		template < typename tjson > //requires requires (this_t obj) { obj.base_t; }
 		friend void to_json(tjson& j, this_t const& object) {
-			tjson jb = j["base_t"sv];
+			tjson jb = j["base."sv];
 			to_json(jb, (base_t const&)object);
 			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s);
 		}
@@ -138,7 +135,6 @@ namespace gtl {
 	};
 
 }
-
 
 TEST(json_proxy, basic) {
 
@@ -156,11 +152,28 @@ TEST(json_proxy, basic) {
 	}
 
 	{
+		using namespace std::literals;
+		gtl::njson<nlohmann::ordered_json> j;
+		j["str"] = "abcd"s;
+		j["stru8"] = u8"string"s;
+
+		fmt::println("dump : {}", j.json().dump());
+
+		std::string str = j["str"];
+		str = j["str"];
+		std::u8string u8 = j["stru8"];
+		u8 = j["stru8"];
+
+	}
+
+#if 1
+	{
 		// nlohmann::ordered_json
 		gtl::njson<nlohmann::ordered_json> j;
 
 		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
 		j = a;
+		auto dump = j.json().dump();
 
 		std::cout << '\n\t\t' << std::setw(4) << j.json() << '\n';
 
@@ -171,11 +184,11 @@ TEST(json_proxy, basic) {
 	}
 
 	{
-		// nlohmann::json
 		gtl::njson j;
 
 		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
 		j = a;
+		auto dump = j.json().dump();
 
 		std::cout << '\n\t\t' << std::setw(4) << j.json() << '\n';
 
@@ -184,5 +197,5 @@ TEST(json_proxy, basic) {
 
 		EXPECT_TRUE(a == b);
 	}
-
+#endif
 }

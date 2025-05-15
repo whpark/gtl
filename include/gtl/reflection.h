@@ -62,16 +62,17 @@ namespace gtl {
 	//auto operator <=> (this_t const&) const = default;
 
 
+	// j["0.base"] — the prefix '0.' is used to distinguish it from general variable names while preserving compatibility with JSON and XML.
 #define GTL__REFLECTION_DERIVED()\
 	using reflection_base_t = base_t::reflection_base_t;\
 	template < typename tjson >\
 	friend void from_json(tjson const& j, this_t& var) {\
-		from_json(j, (base_t&)var);\
+		from_json(j["0.base"], (base_t&)var);\
 		std::apply([&j, &var](auto& ... args) { ((var.*(args.second) = j[args.first]), ...); }, this_t::s_member_tuple);\
 	}\
 	template < typename tjson >\
 	friend void to_json(tjson&& j, this_t const& var) {\
-		to_json(j, (base_t const&)var);\
+		to_json(j["0.base"], (base_t const&)var);\
 		std::apply([&j, &var](auto const& ... args) { ((j[args.first] = var.*(args.second)), ...); }, this_t::s_member_tuple);\
 	}\
 	template < typename tarchive >\
