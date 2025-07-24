@@ -2,8 +2,6 @@
 // by 하얀악마
 #include "pch.h"
 
-#include "windows.h"
-
 #include "gtl/win/EnvironmentVariable.h"
 
 namespace gtl::win {

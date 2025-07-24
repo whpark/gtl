@@ -8,8 +8,8 @@
 #pragma warning(push)
 #pragma warning(disable: 5104 5105)
 
-#define NOMINMAX
-#include <windows.h>
+//#define NOMINMAX
+//#include <windows.h>
 
 #include "gtest/gtest.h"
 #include "benchmark/benchmark.h"

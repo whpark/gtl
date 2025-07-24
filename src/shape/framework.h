@@ -6,12 +6,6 @@
 #include <deque>
 #include <optional>
 
-#define NOMINMAX
-#pragma warning(push)
-#pragma warning(disable: 5104 5105)
-//#include <windows.h>
-#pragma warning(pop)
-
 #include "gtl/_config.h"
 #include "gtl/concepts.h"
 #include "gtl/unit.h"

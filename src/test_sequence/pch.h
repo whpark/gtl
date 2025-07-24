@@ -8,9 +8,6 @@
 #pragma warning(push)
 #pragma warning(disable: 5104 5105)
 
-//#define NOMINMAX
-//#include <windows.h>
-
 #include <catch.hpp>
 
 

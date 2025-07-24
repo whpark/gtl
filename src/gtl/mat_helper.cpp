@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 
 #include <chrono>
-#include <windows.h>
 
 #include <opencv2/cvconfig.h>
 #ifdef HAVE_CUDA
