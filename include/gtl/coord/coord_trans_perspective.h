@@ -22,7 +22,7 @@ namespace gtl {
 		using mat_t = cv::Matx33d;
 		using point_t = ICoordTrans::point2_t;
 
-	protected:
+	public:
 		mat_t m_mat {mat_t::eye()};
 
 	public:
@@ -68,6 +68,14 @@ namespace gtl {
 		//	}
 		//	return newChain;
 		//}
+
+		void SetOffset(point2_t const& offset) {
+			m_mat(0, 2) = offset.x;
+			m_mat(1, 2) = offset.y;
+		}
+		point2_t GetOffset() const {
+			return point2_t{m_mat(0, 2), m_mat(1, 2)};
+		}
 
 		virtual std::unique_ptr<ICoordTrans> GetInverse() const override {
 			bool bOK{};
@@ -156,16 +164,16 @@ namespace gtl {
 
 		static inline [[nodiscard]] mat_t GetRotatingMatrixXY(rad_t angle) {
 			double c{cos(angle)}, s{sin(angle)};
-			//return mat_t{c, -s, 0., 0., /**/ s, c, 0., 0., /**/ 0., 0., 1., 0., /**/ 0., 0., 0., 1. };
+			return mat_t{c, -s, 0., 0., /**/ s, c, 0., 0., /**/ 0., 0., 1., 0., /**/ 0., 0., 0., 1. };
 		}
-		static inline [[nodiscard]] mat_t GetRotatingMatrixYZ(rad_t angle) {
-			double c{cos(angle)}, s{sin(angle)};
-			//return mat_t{1., 0., 0., 0., /**/ 0., c, -s, 0., /**/ 0., s, c, 0., /**/ 0., 0., 0., 1. };
-		}
-		static inline [[nodiscard]] mat_t GetRotatingMatrixZX(rad_t angle) {
-			double c{cos(angle)}, s{sin(angle)};
-			//return mat_t{c, 0., s, 0., /**/ 0., 1., 0., 0., /**/ -s, 0., c, 0., /**/ 0., 0., 0., 1., };
-		}
+		//static inline [[nodiscard]] mat_t GetRotatingMatrixYZ(rad_t angle) {
+		//	double c{cos(angle)}, s{sin(angle)};
+		//	//return mat_t{1., 0., 0., 0., /**/ 0., c, -s, 0., /**/ 0., s, c, 0., /**/ 0., 0., 0., 1. };
+		//}
+		//static inline [[nodiscard]] mat_t GetRotatingMatrixZX(rad_t angle) {
+		//	double c{cos(angle)}, s{sin(angle)};
+		//	//return mat_t{c, 0., s, 0., /**/ 0., 1., 0., 0., /**/ -s, 0., c, 0., /**/ 0., 0., 0., 1., };
+		//}
 
 	};
 
@@ -176,7 +184,7 @@ namespace gtl {
 		using base_t = ICoordTrans;
 		using mat_t = cv::Matx44d;
 
-	protected:
+	public:
 		mat_t m_mat {mat_t::eye()};
 
 	public:
@@ -222,6 +230,15 @@ namespace gtl {
 		//	}
 		//	return newChain;
 		//}
+
+		void SetOffset(point3_t const& offset) {
+			m_mat(0, 3) = offset.x;
+			m_mat(1, 3) = offset.y;
+			m_mat(2, 3) = offset.z;
+		}
+		point3_t GetOffset() const {
+			return point3_t{m_mat(0, 3), m_mat(1, 3), m_mat(2, 3)};
+		}
 
 		virtual std::unique_ptr<ICoordTrans> GetInverse() const override {
 			bool bOK{};
@@ -330,16 +347,16 @@ namespace gtl {
 
 		static inline [[nodiscard]] mat_t GetRotatingMatrixXY(rad_t angle) {
 			double c{cos(angle)}, s{sin(angle)};
-			//return mat_t{c, -s, 0., 0., /**/ s, c, 0., 0., /**/ 0., 0., 1., 0., /**/ 0., 0., 0., 1. };
+			return mat_t{c, -s, 0., 0., /**/ s, c, 0., 0., /**/ 0., 0., 1., 0., /**/ 0., 0., 0., 1. };
 		}
-		static inline [[nodiscard]] mat_t GetRotatingMatrixYZ(rad_t angle) {
-			double c{cos(angle)}, s{sin(angle)};
-			//return mat_t{1., 0., 0., 0., /**/ 0., c, -s, 0., /**/ 0., s, c, 0., /**/ 0., 0., 0., 1. };
-		}
-		static inline [[nodiscard]] mat_t GetRotatingMatrixZX(rad_t angle) {
-			double c{cos(angle)}, s{sin(angle)};
-			//return mat_t{c, 0., s, 0., /**/ 0., 1., 0., 0., /**/ -s, 0., c, 0., /**/ 0., 0., 0., 1., };
-		}
+		//static inline [[nodiscard]] mat_t GetRotatingMatrixYZ(rad_t angle) {
+		//	double c{cos(angle)}, s{sin(angle)};
+		//	//return mat_t{1., 0., 0., 0., /**/ 0., c, -s, 0., /**/ 0., s, c, 0., /**/ 0., 0., 0., 1. };
+		//}
+		//static inline [[nodiscard]] mat_t GetRotatingMatrixZX(rad_t angle) {
+		//	double c{cos(angle)}, s{sin(angle)};
+		//	//return mat_t{c, 0., s, 0., /**/ 0., 1., 0., 0., /**/ -s, 0., c, 0., /**/ 0., 0., 0., 1., };
+		//}
 
 	};
 

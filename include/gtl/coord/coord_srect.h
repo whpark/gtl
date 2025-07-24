@@ -60,6 +60,9 @@ namespace gtl {
 		constexpr value_type& member(size_t i) { return data()[i]; }
 		constexpr value_type const& member(size_t i) const { return data()[i]; }
 
+		constexpr value_type& operator [] (size_t i) { return arr()[i]; }
+		constexpr value_type  operator [] (size_t i) const { return arr()[i]; }
+
 		constexpr coord_point_t&		tl()				{ return *(coord_point_t*)(&this->x); }
 		constexpr coord_point_t&		coord_size()		{ return *(coord_point_t*)(&this->width); }
 		constexpr coord_point_t const&	tl() const			{ return *(coord_point_t*)(&this->x); }

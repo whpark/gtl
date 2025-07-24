@@ -52,8 +52,11 @@ namespace gtl {
 		constexpr auto* data() { return (reinterpret_cast<coord_t&>(*this)).data(); }
 		constexpr auto const* data() const { return (reinterpret_cast<coord_t const&>(*this)).data(); }
 		constexpr auto const size() const { return (reinterpret_cast<coord_t const&>(*this)).size(); }
-		constexpr value_type& member(size_t i) { return data()[i]; }
-		constexpr value_type const& member(size_t i) const { return data()[i]; }
+		constexpr value_type& member(size_t i) { return arr()[i]; }
+		constexpr value_type const& member(size_t i) const { return arr()[i]; }
+
+		constexpr value_type& operator [] (size_t i) { return arr()[i]; }
+		constexpr value_type  operator [] (size_t i) const { return arr()[i]; }
 
 		static_assert(2 <= dim and dim <= 4);
 		//static_assert(sizeof(TPointT<T, dim>) == sizeof(coord_t));
@@ -115,7 +118,6 @@ namespace gtl {
 				static_assert(gtlc::dependent_false_v);
 			return *this;
 		};
-
 
 		constexpr static inline this_t All(T v) {
 			if constexpr (dim == 2)

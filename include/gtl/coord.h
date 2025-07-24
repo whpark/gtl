@@ -21,6 +21,7 @@
 #include "gtl/coord/coord_rect.h"
 #include "gtl/coord/coord_srect.h"
 #include "gtl/coord/coord_trans.h"
+#include "gtl/coord/coord_trans_perspective.h"
 
 //=============================================================================
 //
