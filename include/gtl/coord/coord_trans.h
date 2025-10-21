@@ -228,7 +228,7 @@ namespace gtl {
 		auto operator <=> (xCoordTransChain const&) const = default;
 
 		xCoordTransChain& operator *= (xCoordTransChain const& B)	{
-			for (auto const& ct : chain_) 
+			for (auto const& ct : B.chain_)
 				chain_.push_back(std::move(ct.NewClone()));
 			return *this;
 		}
