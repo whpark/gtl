@@ -3,3 +3,4 @@ nlohmann json
 fmt/format
 libiconv
 openCV
+tinyspline

@@ -134,9 +134,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\3rdparty\tinyspline\parson.h" />
-    <ClInclude Include="..\..\3rdparty\tinyspline\tinyspline.h" />
-    <ClInclude Include="..\..\3rdparty\tinyspline\tinysplinecxx.h" />
     <ClInclude Include="..\..\include\gtl\shape\canvas.h" />
     <ClInclude Include="..\..\include\gtl\shape\color_table.h" />
     <ClInclude Include="..\..\include\gtl\shape\shape.h" />
@@ -159,18 +156,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\3rdparty\tinyspline\parson.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\3rdparty\tinyspline\tinyspline.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\3rdparty\tinyspline\tinysplinecxx.cxx">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">
@@ -178,9 +163,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="shape.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\3rdparty\tinyspline\LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\gtl\gtl.vcxproj">

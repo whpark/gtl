@@ -65,15 +65,15 @@ namespace gtl {
 
 
 		/// @brief pt -> pt2
-		/// @return 
+		/// @return
 		[[ nodiscard ]] point3_t operator () (point3_t const& pt) const {
 			return Trans(pt);
 		}
 
-		/// @brief 
+		/// @brief
 		/// @tparam tcoord3d : Not point3_t but one of 3d Coord.
-		/// @param pt 
-		/// @return 
+		/// @param pt
+		/// @return
 		template < typename tcoord3d > requires (gtlc::tcoord3<tcoord3d, double> and !std::is_same_v<point3_t, tcoord3d>)
 		[[ nodiscard ]] tcoord3d operator () (tcoord3d const& pt) const {
 			auto v{pt};
@@ -94,16 +94,16 @@ namespace gtl {
 
 
 		/// @brief pt -> pt2
-		/// @param pt 
-		/// @return 
+		/// @param pt
+		/// @return
 		[[ nodiscard ]] point2_t operator () (point2_t const& pt) const {
 			return Trans(pt);
 		}
 
 		/// @brief pt -> pt2
 		/// @tparam tcoord3d : Not point3_t but one of 3d Coord.
-		/// @param pt 
-		/// @return 
+		/// @param pt
+		/// @return
 		template < typename tcoord2d > requires (gtlc::tcoord2<tcoord2d, double> and !std::is_same_v<point2_t, tcoord2d>)
 		[[ nodiscard ]] tcoord2d operator () (tcoord2d const& pt) const {
 			auto v{pt};
@@ -123,21 +123,21 @@ namespace gtl {
 
 
 		/// @brief double -> double
-		/// @return 
+		/// @return
 		[[ nodiscard ]] double TransI(double length) const {
 			return TransInverse(length).value_or(0.0);
 		}
 
 		/// @brief pt -> pt2
-		/// @return 
+		/// @return
 		[[ nodiscard ]] point3_t TransI(point3_t const& pt) const {
 			return TransInverse(pt).value_or(point3_t{});
 		}
 
-		/// @brief 
+		/// @brief
 		/// @tparam tcoord3d : Not point3_t but one of 3d Coord.
-		/// @param pt 
-		/// @return 
+		/// @param pt
+		/// @return
 		template < typename tcoord3d > requires (gtlc::tcoord3<tcoord3d, double> and !std::is_same_v<point3_t, tcoord3d>)
 		[[ nodiscard ]] tcoord3d TransI(tcoord3d const& pt) const {
 			auto v{pt};
@@ -158,16 +158,16 @@ namespace gtl {
 
 
 		/// @brief pt -> pt2
-		/// @param pt 
-		/// @return 
+		/// @param pt
+		/// @return
 		[[ nodiscard ]] point2_t TransI(point2_t const& pt) const {
 			return TransInverse(pt).value_or(point2_t{});
 		}
 
 		/// @brief pt -> pt2
 		/// @tparam tcoord3d : Not point3_t but one of 3d Coord.
-		/// @param pt 
-		/// @return 
+		/// @param pt
+		/// @return
 		template < typename tcoord2d > requires (gtlc::tcoord2<tcoord2d, double> and !std::is_same_v<point2_t, tcoord2d>)
 		[[ nodiscard ]] tcoord2d TransI(tcoord2d const& pt) const {
 			auto v{pt};
@@ -335,7 +335,7 @@ namespace gtl {
 
 
 	//-----------------------------------------------------------------------------
-	/// @brief class TCoordTransDim 
+	/// @brief class TCoordTransDim
 	/// TARGET = scale * mat ( SOURCE - origin ) + offset
 	template < int dim = 2 >
 	class TCoordTransDim : public ICoordTrans {
@@ -460,7 +460,7 @@ namespace gtl {
 			m_offset = offset;
 		}
 
-		[[nodiscard]] bool SetFrom2Points(std::span<point_t const> ptsSource, std::span<point_t const> ptsTarget, bool bCalcScale = true, double dMinDeterminant = 0.0, bool bRightHanded = true) 
+		[[nodiscard]] bool SetFrom2Points(std::span<point_t const> ptsSource, std::span<point_t const> ptsTarget, bool bCalcScale = true, double dMinDeterminant = 0.0, bool bRightHanded = true)
 			requires (dim == 2)
 		{
 			if ( (ptsSource.size() < 2) or (ptsTarget.size() < 2) )

@@ -46,8 +46,8 @@ rem vcpkg install --triplet=x64-windows --recurse cppcoro --overlay-ports=%Sourc
 rem if %errorlevel% neq 0 set FAILED=%FAILED% cppcoro:x64,
 
 echo installing x64-windows...
-vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 fmt imgui argparse spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cppzmq grpc cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut libxml2 libxmlmm openssl exprtk eigen3 freeimage blend2d opencv[contrib,core,cuda,cudnn,dnn,ffmpeg,freetype,fs,ipp,opengl,python,vtk] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
-rem deleted : maddy, websocketpp, 
+vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 fmt imgui spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut tinyspline libxml2 libxmlmm openssl exprtk eigen3 freeimage blend2d opencv[contrib,core,cuda,cudnn,dnn,ffmpeg,freetype,fs,ipp,opengl,python,vtk] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
+rem deleted : maddy, websocketpp,
 if %errorlevel% neq 0 set FAILED=%FAILED% x64-windows,
 
 rem skip x86
@@ -70,7 +70,7 @@ set VCPKG_FOLDER=
 if %PopDirectory% neq 0 popd & set PopDirectory=
 
 if "%FAILED%" neq "" (
-	echo 
+	echo
 	echo !!======================================!!
 	echo !!                                      !!
 	echo !! FAILED:%FAILED%	!!

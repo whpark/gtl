@@ -12,9 +12,6 @@
       <UniqueIdentifier>{c878a5b0-8cbf-4d50-bb72-c9ae65485173}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="tinyspline">
-      <UniqueIdentifier>{976f6fca-ba13-4986-a064-066182868640}</UniqueIdentifier>
-    </Filter>
     <Filter Include="shape\shapes">
       <UniqueIdentifier>{6e6f11ea-9266-48bb-a460-1ac1ab53ef93}</UniqueIdentifier>
     </Filter>
@@ -31,15 +28,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\canvas.h">
       <Filter>shape</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\3rdparty\tinyspline\parson.h">
-      <Filter>tinyspline</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\3rdparty\tinyspline\tinyspline.h">
-      <Filter>tinyspline</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\3rdparty\tinyspline\tinysplinecxx.h">
-      <Filter>tinyspline</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\shape_others.h">
       <Filter>shape</Filter>
@@ -103,20 +91,6 @@
     <ClCompile Include="canvas.cpp">
       <Filter>shape</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rdparty\tinyspline\tinysplinecxx.cxx">
-      <Filter>tinyspline</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\3rdparty\tinyspline\parson.c">
-      <Filter>tinyspline</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\3rdparty\tinyspline\tinyspline.c">
-      <Filter>tinyspline</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\3rdparty\tinyspline\LICENSE">
-      <Filter>tinyspline</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="gtl.shape.rc">

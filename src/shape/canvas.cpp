@@ -1,7 +1,8 @@
 ﻿#include "pch.h"
 #include "gtl/shape/canvas.h"
 
-#include "../3rdparty/tinyspline/tinysplinecxx.h"
+//#include "../3rdparty/tinyspline/tinysplinecxx.h"
+#include <tinysplinecxx.h>
 
 namespace gtl::shape {
 
