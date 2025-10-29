@@ -66,11 +66,11 @@ namespace gtl {
 
 
 	template < std::floating_point T >
-	constexpr T rad2deg(T x) { 
+	constexpr T rad2deg(T x) {
 		return x * 180. / std::numbers::pi;
 	};
 	template < std::floating_point T >
-	constexpr T deg2rad(T x) { 
+	constexpr T deg2rad(T x) {
 		return x * std::numbers::pi / 180.;
 	};
 
