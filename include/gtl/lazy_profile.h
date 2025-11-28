@@ -223,15 +223,18 @@ namespace gtl {
 				m_items.push_back(std::move(str));
 			}
 			else {
+				bool bInserted{};
 				// let empty lines behind.
 				for (auto iter = m_items.rbegin(); iter != m_items.rend(); iter++) {
 					auto const& cur = *iter;
 					if (gtl::TrimView<tchar>(cur).empty())
 						continue;
-
+					bInserted = true;
 					m_items.insert(m_items.begin() + std::distance(iter, m_items.rend()), std::move(str));
 					break;
 				}
+				if (!bInserted)
+					m_items.insert(m_items.begin() + std::distance(iter, m_items.rend()), std::move(str));
 			}
 		}
 
