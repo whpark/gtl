@@ -234,7 +234,7 @@ namespace gtl {
 					break;
 				}
 				if (!bInserted)
-					m_items.insert(m_items.begin() + std::distance(iter, m_items.rend()), std::move(str));
+					m_items.push_back(std::move(str));
 			}
 		}
 
