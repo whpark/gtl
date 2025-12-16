@@ -404,24 +404,33 @@ TEST(gtl_archive, ZipFolder) {
 
 	// create some folders and files
 	{
-		std::wstring const folders[] = {L"sub1", L"sub2", L"sub3"};
+		std::wstring const folders[] = {L"서브1", L"sub2", L"sub3"};
 		for (auto const& name : folders) {
 			fs::path folder = path / name;
 			fs::create_directories(folder);
 			for (int i = 0; i < 10; i++) {
+				fs::path const p = folder / fmt::format(LR"x(file_{}_{}.txt)x", name, i);
+				if (fs::exists(p))
+					continue;
 				std::ofstream os(folder / fmt::format(LR"x(file_{}_{}.txt)x", name, i));
 				os << fmt::format("This is file number {}\n", i);
 			}
 		}
 	}
 
-	gtl::ZipFolder(root / "a.7z", path);
+	gtl::ZipFolder(root / L"가나다.7z", path);
+	gtl::ZipFolder(root / L"가나다.zip", path);
 
 	// unzip
 	{
-		auto result = gtl::UnzipFolder(root / "a.7z", root / "unzipped");
+		auto result = gtl::UnzipFolder(root / L"가나다.7z", root / L"가나다_7z");
 		EXPECT_TRUE(result.has_value());
-		EXPECT_TRUE(result.value() == true);
+		EXPECT_TRUE(result.value());
+	}
+	{
+		auto result = gtl::UnzipFolder(root / L"가나다.zip", root / L"가나다_zip");
+		EXPECT_TRUE(result.has_value());
+		EXPECT_TRUE(result.value());
 	}
 
 }

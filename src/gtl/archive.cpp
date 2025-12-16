@@ -26,10 +26,7 @@ namespace gtl {
 		throw std::runtime_error(e);
 	}
 
-	void add_file_to_zip(
-		struct archive* a,
-		const fs::path& filePath,
-		const fs::path& baseDir) {
+	void add_file_to_zip(struct archive* a, const fs::path& filePath, const fs::path& baseDir) {
 		// ZIP 내부 경로 (baseDir 기준 상대경로)
 		fs::path relative = fs::relative(filePath, baseDir);
 
@@ -38,7 +35,7 @@ namespace gtl {
 		std::chrono::system_clock::time_point sctp = std::chrono::clock_cast<std::chrono::system_clock>(tLastWriteTime);
 
 		struct archive_entry* entry = archive_entry_new();
-		archive_entry_set_pathname(entry, relative.generic_string().c_str());
+		archive_entry_set_pathname_utf8(entry, (char const*)relative.generic_u8string().c_str());
 		archive_entry_set_filetype(entry, AE_IFREG);
 		archive_entry_set_perm(entry, 0644);
 		archive_entry_set_size(entry, fs::file_size(filePath));
@@ -76,7 +73,7 @@ namespace gtl {
 		std::chrono::system_clock::time_point sctp = std::chrono::clock_cast<std::chrono::system_clock>(tLastWriteTime);
 
 		struct archive_entry* entry = archive_entry_new();
-		archive_entry_set_pathname(entry, (relative.generic_string() + "/").c_str());
+		archive_entry_set_pathname_utf8(entry, (char const*)(relative.generic_u8string() + u8"/").c_str());
 		archive_entry_set_filetype(entry, AE_IFDIR);
 		archive_entry_set_perm(entry, 0755);
 		archive_entry_set_mtime(entry, std::chrono::system_clock::to_time_t(sctp), 0);
@@ -85,38 +82,13 @@ namespace gtl {
 		archive_entry_free(entry);
 	}
 
-	void zip_directory(
-		const fs::path& folderSource,
-		const fs::path& pathZip) {
-		if (!fs::is_directory(folderSource))
-			throw std::runtime_error("folderSource is not a directory");
-
-		struct archive* a = archive_write_new();
-		if (!a) throw std::runtime_error("archive_write_new failed");
-
-		archive_write_set_format_zip(a);
-		archive_write_set_options(a, "compression=deflate");
-
-		if (archive_write_open_filename(a, pathZip.string().c_str()) != ARCHIVE_OK) {
-			archive_write_free(a);
-			throw_archive(a, "archive_write_open_filename failed");
-		}
-
-		for (auto& p : fs::recursive_directory_iterator(folderSource)) {
-			if (fs::is_directory(p)) {
-				add_directory_to_zip(a, p.path(), folderSource);
-			}
-			else if (fs::is_regular_file(p)) {
-				add_file_to_zip(a, p.path(), folderSource);
-			}
-		}
-
-		archive_write_close(a);
-		archive_write_free(a);
-	}
-
-
 	std::expected<bool, std::string> ZipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folderSource) try {
+		std::locale locOld;
+		std::setlocale(LC_ALL, "en_us.utf8");
+		gtl::xFinalAction onExit([&]() {
+			std::locale::global(locOld);
+		});
+
 		if (!fs::is_directory(folderSource))
 			throw std::runtime_error("folderSource is not a directory");
 
@@ -126,19 +98,21 @@ namespace gtl {
 		archive_write_set_format_filter_by_ext(a, pathZip.extension().string().c_str());
 		archive_write_set_options(a, "compression=deflate");
 
-		if (archive_write_open_filename(a, pathZip.string().c_str()) != ARCHIVE_OK) {
+		if (archive_write_open_filename_w(a, pathZip.wstring().c_str()) != ARCHIVE_OK) {
 			archive_write_free(a);
 			throw_archive(a, "archive_write_open_filename failed");
 		}
 
-		for (auto& p : fs::recursive_directory_iterator(folderSource)) {
-			if (fs::is_directory(p)) {
-				if (p.path() == folderSource)
-					continue;
-				add_directory_to_zip(a, p.path(), folderSource);
+		for (auto& entry : fs::recursive_directory_iterator(folderSource)) {
+			auto const& path = entry.path();
+			if (fs::is_directory(entry)) {
+				//auto const fname = path.filename();
+				//if (path == folderSource or fname == "." or fname == "..")
+				//	continue;
+				add_directory_to_zip(a, path, folderSource);
 			}
-			else if (fs::is_regular_file(p)) {
-				add_file_to_zip(a, p.path(), folderSource);
+			else if (fs::is_regular_file(entry)) {
+				add_file_to_zip(a, path, folderSource);
 			}
 		}
 
@@ -152,11 +126,15 @@ namespace gtl {
 	}
 
 	std::expected<bool, std::string> UnzipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder) try {
+		std::locale locOld;
+		std::setlocale(LC_ALL, "en_us.utf8");
+
 		struct archive* a = archive_read_new();
 		struct archive* ext = archive_write_disk_new();
 		struct archive_entry* entry{};
 
 		gtl::xFinalAction onExit([&]() {
+			std::locale::global(locOld);
 			if (a) {
 				archive_read_close(a);
 				archive_read_free(a);
@@ -185,7 +163,7 @@ namespace gtl {
 
 		archive_write_disk_set_standard_lookup(ext);
 
-		if (archive_read_open_filename(a, pathZip.string().c_str(), 10240) != ARCHIVE_OK)
+		if (archive_read_open_filename_w(a, pathZip.generic_wstring().c_str(), 10240) != ARCHIVE_OK)
 			throw_archive(a, "archive_read_open_filename failed");
 
 		while (true) {
@@ -196,9 +174,9 @@ namespace gtl {
 				throw_archive(a, "archive_read_next_header failed");
 
 			// 출력 경로 변경 (ZIP 내부 상대경로 유지)
-			const char* currentPath = archive_entry_pathname(entry);
+			const char* currentPath = archive_entry_pathname_utf8(entry);
 			fs::path fullPath = folder / currentPath;
-			archive_entry_set_pathname(entry, fullPath.string().c_str());
+			archive_entry_set_pathname(entry, (char const*)fullPath.generic_u8string().c_str());
 
 			r = archive_write_header(ext, entry);
 			if (r < ARCHIVE_OK)
