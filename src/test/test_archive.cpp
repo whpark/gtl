@@ -385,3 +385,43 @@ TEST(gtl_archive, WriteLine) {
 
 
 }
+
+TEST(gtl_archive, ZipFolder) {
+	namespace fs = std::filesystem;
+
+	fs::path const root = LR"x(.\zip_test)x";
+	// prepare
+	{
+		//if (fs::exists(root))
+		//	fs::remove_all(root);
+
+		fs::create_directories(root);
+		// .gitignore
+		std::ofstream f(root / ".gitignore");
+		f << ".gitignore\n" << "*\n";
+	}
+	fs::path const path = root / "test_folder";
+
+	// create some folders and files
+	{
+		std::wstring const folders[] = {L"sub1", L"sub2", L"sub3"};
+		for (auto const& name : folders) {
+			fs::path folder = path / name;
+			fs::create_directories(folder);
+			for (int i = 0; i < 10; i++) {
+				std::ofstream os(folder / fmt::format(LR"x(file_{}_{}.txt)x", name, i));
+				os << fmt::format("This is file number {}\n", i);
+			}
+		}
+	}
+
+	gtl::ZipFolder(root / "a.7z", path);
+
+	// unzip
+	{
+		auto result = gtl::UnzipFolder(root / "a.7z", root / "unzipped");
+		EXPECT_TRUE(result.has_value());
+		EXPECT_TRUE(result.value() == true);
+	}
+
+}

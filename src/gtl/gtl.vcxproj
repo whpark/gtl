@@ -193,6 +193,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="2dMatArray.cpp" />
+    <ClCompile Include="archive.cpp" />
     <ClCompile Include="cv_floodfill.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="HangeulCodeMapKSSM_UTF16.cpp" />

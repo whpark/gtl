@@ -78,11 +78,11 @@ namespace gtl {
 		eCODEPAGE SetCodepage(eCODEPAGE eCodepage) { return std::exchange(eCodepage_, eCodepage); }
 		eCODEPAGE GetCodepage() const { return eCodepage_; }
 
-		// 
+		//
 		constexpr bool IsSwapByteOrder() const { return bSWAP_BYTE_ORDER; }	// 'Get'SwapByteOrder  라고 이름을 바꾸면 안됨..... 헷갈림
 
 		/// @brief tells its loading or storing.
-		/// @return 
+		/// @return
 		bool IsStoring() const {
 			if constexpr (bSTORE && bLOAD) {
 				return m_bStore;
@@ -145,7 +145,7 @@ namespace gtl {
 
 
 	public:
-		
+
 		/// @brief Read byte buffer
 		template < typename T > requires (bLOAD)
 		inline std::streamsize Read(T* data, std::streamsize size) {
@@ -196,8 +196,8 @@ namespace gtl {
 
 	protected:
 		/// @brief Write Ints Swaps byte-order if (bSWAP_BYTE_ORDER)
-		/// @param container 
-		/// @param nCount 
+		/// @param container
+		/// @param nCount
 		template < std::integral T_INT, int PROCESSING_BUFFER_SIZE = 4096 > requires (bSTORE)
 		void WriteInts(T_INT const* data, std::streamsize nCount) {
 			CHECK_ARCHIVE_STORABLE;
@@ -242,8 +242,8 @@ namespace gtl {
 
 
 		/// @brief Write Ints Swaps byte-order
-		/// @param container 
-		/// @param nCount 
+		/// @param container
+		/// @param nCount
 		template < std::integral T_INT, int PROCESSING_BUFFER_SIZE = 4096 > requires (bSTORE)
 		void WriteIntsSwapByte(T_INT const* data, std::streamsize nCount) {
 			CHECK_ARCHIVE_STORABLE;
@@ -268,7 +268,7 @@ namespace gtl {
 		/// @brief Read Ints. Swaps byte-order
 		/// @param container ints.
 		/// @param nCount count. (NOT size in bytes but count in item)
-		/// @return 
+		/// @return
 		template < std::integral T_INT > requires (bLOAD)
 		std::streamsize ReadIntsSwapByte(T_INT* data, std::streamsize nCount) {
 			CHECK_ARCHIVE_LOADABLE;
@@ -1052,8 +1052,8 @@ namespace gtl {
 
 	/// @brief file to std-container
 	/// @tparam TContainer : such as std::vector<char> or std::string
-	/// @param path 
-	/// @return 
+	/// @param path
+	/// @return
 	template < gtlc::contiguous_container TContainer = std::vector<char> >
 		requires (std::is_trivially_copyable_v<typename TContainer::value_type>)
 	std::optional<TContainer> FileToContainer(std::filesystem::path const& path) {
@@ -1093,11 +1093,11 @@ namespace gtl {
 		return FileToContainer<TContainer>(path);
 	}
 
-	/// @brief 
-	/// @tparam TContainer 
-	/// @param  
-	/// @param path 
-	/// @return 
+	/// @brief
+	/// @tparam TContainer
+	/// @param
+	/// @param path
+	/// @return
 	template < gtlc::contiguous_container TContainer >
 	bool ContainerToFile(TContainer const& buf, std::filesystem::path const& path) {
 		static_assert(std::is_trivially_copyable_v<typename std::decay_t<decltype(buf)>::value_type>, "TContainer::value_type must be trivial");
@@ -1105,6 +1105,9 @@ namespace gtl {
 		f.write((char const*)buf.data(), buf.size() * sizeof(typename TContainer::value_type));
 		return (bool)f;
 	}
+
+	GTL__API std::expected<bool, std::string> ZipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder);
+	GTL__API std::expected<bool, std::string> UnzipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder);
 
 #pragma pack(pop)
 }	// namespace gtl;

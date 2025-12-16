@@ -46,7 +46,7 @@ rem vcpkg install --triplet=x64-windows --recurse cppcoro --overlay-ports=%Sourc
 rem if %errorlevel% neq 0 set FAILED=%FAILED% cppcoro:x64,
 
 echo installing x64-windows...
-vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 fmt imgui spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut tinyspline libxml2 libxmlmm openssl exprtk eigen3 freeimage blend2d opencv[contrib,core,cuda,cudnn,dnn,ffmpeg,freetype,fs,ipp,opengl,python,vtk] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
+vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 libarchive fmt imgui spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut tinyspline libxml2 libxmlmm openssl exprtk eigen3 freeimage blend2d opencv[contrib,core,cuda,cudnn,dnn,ffmpeg,freetype,fs,ipp,opengl,python,vtk] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
 rem deleted : maddy, websocketpp,
 if %errorlevel% neq 0 set FAILED=%FAILED% x64-windows,
 
@@ -59,7 +59,7 @@ vcpkg install --triplet=x86-windows --recurse glaze --overlay-ports=%SourceFolde
 if %errorlevel% neq 0 set FAILED=%FAILED% glaze:x86,
 
 echo installing x86-windows...
-vcpkg install --triplet=x86-windows --recurse gtest catch2 benchmark boost flux cppzmq grpc 7zip bzip2 fmt imgui spdlog scnlib ms-gsl magic-enum libenvpp winreg tinyxml2 nlohmann-json tomlplusplus libxml2 libxmlmm libmodbus openssl opencv[core] wxwidgets[debug-support,fonts]
+vcpkg install --triplet=x86-windows --recurse gtest catch2 benchmark boost flux cppzmq grpc 7zip bzip2 libarchive fmt imgui spdlog scnlib ms-gsl magic-enum libenvpp winreg tinyxml2 nlohmann-json tomlplusplus libxml2 libxmlmm libmodbus openssl opencv[core] wxwidgets[debug-support,fonts]
 if %errorlevel% neq 0 set FAILED=%FAILED% x86-windows,
 
 :end

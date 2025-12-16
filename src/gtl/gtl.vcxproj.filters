@@ -247,6 +247,9 @@
     <ClCompile Include="cv_floodfill.cpp">
       <Filter>gtl.impl</Filter>
     </ClCompile>
+    <ClCompile Include="archive.cpp">
+      <Filter>gtl.impl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\dependency.txt" />
