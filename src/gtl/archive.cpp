@@ -82,7 +82,7 @@ namespace gtl {
 		archive_entry_free(entry);
 	}
 
-	std::expected<bool, std::string> ZipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folderSource) try {
+	std::expected<bool, std::string> ZipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folderSource, std::string const& strFormat) try {
 		std::locale locOld;
 		std::setlocale(LC_ALL, "en_us.utf8");
 		gtl::xFinalAction onExit([&]() {
@@ -95,7 +95,7 @@ namespace gtl {
 		struct archive* a = archive_write_new();
 		if (!a) throw std::runtime_error("archive_write_new failed");
 
-		archive_write_set_format_filter_by_ext(a, pathZip.extension().string().c_str());
+		archive_write_set_format_filter_by_ext(a, strFormat.empty() ? pathZip.extension().string().c_str() : strFormat.c_str());
 		archive_write_set_options(a, "compression=deflate");
 
 		if (archive_write_open_filename_w(a, pathZip.wstring().c_str()) != ARCHIVE_OK) {
@@ -125,7 +125,7 @@ namespace gtl {
 		return std::unexpected{std::format("ZipFolder exception: {}", e.what())};
 	}
 
-	std::expected<bool, std::string> UnzipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder) try {
+	std::expected<bool, std::string> UnzipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder, std::string const& strFormat) try {
 		std::locale locOld;
 		std::setlocale(LC_ALL, "en_us.utf8");
 

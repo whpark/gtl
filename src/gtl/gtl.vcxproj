@@ -213,6 +213,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\etc\vcpkg\install-vcpkg.bat" />
+    <None Include="..\..\etc\vcpkg\move_opencv4.bat" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="gtl.rc" />

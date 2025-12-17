@@ -420,15 +420,31 @@ TEST(gtl_archive, ZipFolder) {
 
 	gtl::ZipFolder(root / L"가나다.7z", path);
 	gtl::ZipFolder(root / L"가나다.zip", path);
+	gtl::ZipFolder(root / L"가나다.7zdata", path, ".7z");
+	gtl::ZipFolder(root / L"가나다.zipdata", path, ".zip");
 
 	// unzip
 	{
+		fs::remove_all(root / L"가나다_7z");
 		auto result = gtl::UnzipFolder(root / L"가나다.7z", root / L"가나다_7z");
 		EXPECT_TRUE(result.has_value());
 		EXPECT_TRUE(result.value());
 	}
 	{
+		fs::remove_all(root / L"가나다_zip");
 		auto result = gtl::UnzipFolder(root / L"가나다.zip", root / L"가나다_zip");
+		EXPECT_TRUE(result.has_value());
+		EXPECT_TRUE(result.value());
+	}
+	{
+		fs::remove_all(root / L"가나다_7zdata");
+		auto result = gtl::UnzipFolder(root / L"가나다.7zdata", root / L"가나다_7zdata");
+		EXPECT_TRUE(result.has_value());
+		EXPECT_TRUE(result.value());
+	}
+	{
+		fs::remove_all(root / L"가나다_zipdata");
+		auto result = gtl::UnzipFolder(root / L"가나다.zipdata", root / L"가나다_zipdata");
 		EXPECT_TRUE(result.has_value());
 		EXPECT_TRUE(result.value());
 	}

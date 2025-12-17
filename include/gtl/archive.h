@@ -1106,8 +1106,8 @@ namespace gtl {
 		return (bool)f;
 	}
 
-	GTL__API std::expected<bool, std::string> ZipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder);
-	GTL__API std::expected<bool, std::string> UnzipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder);
+	GTL__API std::expected<bool, std::string> ZipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder, std::string const& svFormat = {});
+	GTL__API std::expected<bool, std::string> UnzipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder, std::string const& strFormat = {} /*Not Used*/);
 
 #pragma pack(pop)
 }	// namespace gtl;
