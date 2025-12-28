@@ -25,6 +25,43 @@ struct FIBITMAP;	// FreeImage
 namespace gtl {
 #pragma pack(push, 8)	// default align. (8 bytes)
 
+	//-----------------------------------------------------------------------------
+	// DeepCopying Mat
+	class xMat : public cv::Mat {
+	public:
+		using this_t = xMat;
+		using base_t = cv::Mat;
+	public:
+		xMat() = default;
+		xMat(const xMat& b) { *this = b; }
+		xMat(xMat&& b) = default;
+		xMat& operator = (const xMat& b) { base() = b.clone(); return *this; }
+		xMat& operator = (xMat&& b) = default;
+
+		using base_t::base_t;
+		using base_t::operator=;
+
+		operator cv::Mat& () { return (cv::Mat&)(*this); }
+		operator cv::Mat const& () const { return (cv::Mat&)(*this); }
+
+		cv::Mat& base() { return (cv::Mat&)(*this); }
+		cv::Mat const& base() const { return (cv::Mat&)(*this); }
+
+		bool operator == (const xMat& b) const {
+			if (size() != b.size() || type() != b.type() || channels() != b.channels())
+				return false;
+			size_t rowBytes = step;
+			for (int y = 0; y < rows; ++y) {
+				auto ptrA = ptr(y);
+				auto ptrB = b.ptr(y);
+				if (std::memcmp(ptrA, ptrB, rowBytes) != 0)
+					return false;
+			}
+			return true;
+			//return cv::countNonZero(base() != b.base()) == 0;
+		}
+		bool operator != (const xMat& b) const = default;
+	};
 
 	//-----------------------------------------------------------------------------
 	// Mat Load/Store
@@ -180,7 +217,7 @@ namespace gtl {
 
 
 	//-----------------------------------------------------------------------------
-	// Mat 
+	// Mat
 	GTL__API bool CheckGPU(bool bUse);
 	GTL__API bool IsGPUEnabled();
 	GTL__API bool ConvertColor(cv::Mat const& imgSrc, cv::Mat& imgDest, int eCode);
@@ -322,12 +359,12 @@ namespace gtl {
 #pragma pack(pop)
 
 	/// @brief Save Image to BITMAP. Image is COLOR or GRAY level image.
-	/// @param path 
+	/// @param path
 	/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
-	/// @param nBPP 
-	/// @param palette 
+	/// @param nBPP
+	/// @param palette
 	/// @param bPixelIndex if true, img value is NOT a pixel but a palette index. a full palette must be given.
-	/// @return 
+	/// @return
 	GTL__API bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t const> palette = {}, bool bPixelIndex = false, bool bBottom2Top = false, callback_progress_t funcCallback = nullptr);
 
 	struct sLoadBitmapHeaderResult {
