@@ -23,9 +23,9 @@ namespace gtl {
 #pragma pack(push, 8)
 
 	template < typename T = uint8_t > requires (std::is_trivially_copyable_v<T> and sizeof(T) == 1)
-	static std::string EncodeBase64(std::span<T> data) {
+	std::string EncodeBase64(std::span<T const> data) {
 		using namespace boost::archive::iterators;
-		using It = base64_from_binary<transform_width< typename std::span<T>::iterator, 6, 8>>;
+		using It = base64_from_binary<transform_width< typename std::span<T const>::const_iterator, 6, 8>>;
 		auto tmp = std::string(It(std::begin(data)), It(std::end(data)));
 		return tmp.append((3 - data.size() % 3) % 3, '=');
 	}

@@ -115,7 +115,7 @@ namespace gtl {
 			for (int y{}; y < m.rows; y++) {
 				auto* ptr = m.ptr(y);
 				// ptr to base64
-				data.emplace_back(EncodeBase64(std::span(ptr, step)));
+				data.emplace_back(EncodeBase64<uchar>(std::span{ptr, step}));
 			}
 		}
 
