@@ -5,7 +5,7 @@
 // dynamic.h: dynamic create, polymorphic serialize
 //
 // PWH
-// 
+//
 // 2013.
 // 2021.01.19.
 //
@@ -70,10 +70,10 @@ namespace gtl {
 
 
 	/// @brief TDynamicCreateHelper
-	/// @tparam tobject 
-	/// @tparam tidentifier 
-	/// @tparam tcreator 
-	/// @tparam tmap 
+	/// @tparam tobject
+	/// @tparam tidentifier
+	/// @tparam tcreator
+	/// @tparam tmap
 	template < typename tobject, typename tidentifier,
 		typename tcreator = std::function<std::unique_ptr<tobject>()>,
 		typename tmap = std::map<tidentifier, tcreator> >
@@ -335,40 +335,16 @@ namespace gtl {
 			this->reset(other ? cloner2(*other).release() : nullptr);
 			return*this;
 		}
-	};
 
-	template < typename T1, typename T2, typename ... targs, typename ... targs2 >
-	bool operator == (TCloneablePtr<T1, targs...> const& a, TCloneablePtr<T2, targs2...> const& b) {
-		bool bEmptyA = !a;
-		bool bEmptyB = !b;
-		if (bEmptyA and bEmptyB) return true;
-		else if (bEmptyA or bEmptyB) return false;
-		return *a == *b;
-	}
-	template < typename T1, typename T2, typename ... targs, typename ... targs2 >
-	bool operator != (TCloneablePtr<T1, targs...> const& a, TCloneablePtr<T2, targs2...> const& b) {
-		return !(a == b);
-	}
-	template < typename T1, typename T2, typename ... targs, typename ... targs2 >
-	bool operator < (TCloneablePtr<T1, targs...> const& a, TCloneablePtr<T2, targs2...> const& b) {
-		bool bEmptyA = !a;
-		bool bEmptyB = !b;
-		if (bEmptyA and bEmptyB) return false;
-		else if (bEmptyA) return true;
-		else if (bEmptyB) return false;
-		return *a < *b;
-	}
-	template < typename T1, typename T2, typename ... targs, typename ... targs2 >
-	bool operator > (TCloneablePtr<T1, targs...> const& a, TCloneablePtr<T2, targs2...> const& b) {
-		return b < a;
-	}
-	template < typename T1, typename T2, typename ... targs, typename ... targs2 >
-	bool operator <= (TCloneablePtr<T1, targs...> const& a, TCloneablePtr<T2, targs2...> const& b) {
-		return a == b or a < b;
-	}
-	template < typename T1, typename T2, typename ... targs, typename ... targs2 >
-	bool operator >= (TCloneablePtr<T1, targs...> const& a, TCloneablePtr<T2, targs2...> const& b) {
-		return b <= a;
-	}
+		auto operator <=> (TCloneablePtr const& other) const {
+			bool bEmptyA = !(*this);
+			bool bEmptyB = !other;
+			if (bEmptyA and bEmptyB) return std::strong_ordering::equal;
+			else if (bEmptyA) return std::strong_ordering::less;
+			else if (bEmptyB) return std::strong_ordering::greater;
+			return (**this) <=> (*other);
+		}
+
+	};
 
 }
