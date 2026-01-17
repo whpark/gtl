@@ -344,6 +344,26 @@ namespace gtl {
 			else if (bEmptyB) return std::strong_ordering::greater;
 			return (**this) <=> (*other);
 		}
+		bool operator == (TCloneablePtr const& other) const {
+			T const* pA = this->get();
+			T const* pB = other.get();
+			if (pA == pB)
+				return true;
+			if (!pA || !pB)
+				return false;
+			return (*pA) == (*pB);
+		}
+		//bool operator != (TCloneablePtr const& other) const { return (operator <=> (other)) != 0; }
+		//bool operator <  (TCloneablePtr const& other) const { return (operator <=> (other)) < 0; }
+		//bool operator <= (TCloneablePtr const& other) const { return (operator <=> (other)) <= 0; }
+		//bool operator >  (TCloneablePtr const& other) const { return (operator <=> (other)) > 0; }
+		//bool operator >= (TCloneablePtr const& other) const { return (operator <=> (other)) >= 0; }
+		//bool operator == (TCloneablePtr const& other) const = default;
+		//bool operator != (TCloneablePtr const& other) const = default;
+		//bool operator <  (TCloneablePtr const& other) const = default;
+		//bool operator <= (TCloneablePtr const& other) const = default;
+		//bool operator >  (TCloneablePtr const& other) const = default;
+		//bool operator >= (TCloneablePtr const& other) const = default;
 
 	};
 

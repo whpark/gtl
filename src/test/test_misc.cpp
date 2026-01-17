@@ -405,16 +405,31 @@ doubleVar                = 3.1415926535897932384626433832795028 ; pi
 
 
 	TEST(misc, CloneablePtr) {
-		{
-			TCloneablePtr<std::string> p1 = std::make_unique<std::string>("abcdef");
-			TCloneablePtr<std::string> p2 = std::make_unique<std::string>("abcdef");
-			TCloneablePtr<std::string> p3 = std::make_unique<std::string>("abcde");
-			auto r1 = p1 == p2;
-			auto r2 = p1 == p3;
-			EXPECT_TRUE(r1);
-			EXPECT_FALSE(r2);
-
-		}
+		TCloneablePtr<std::string> p0;
+		TCloneablePtr<std::string> p0_;
+		TCloneablePtr<std::string> p1 = std::make_unique<std::string>("abcdef");
+		TCloneablePtr<std::string> p2 = std::make_unique<std::string>("abcdef");
+		TCloneablePtr<std::string> p3 = std::make_unique<std::string>("abcde");
+		EXPECT_EQ(p0, p0_);
+		EXPECT_EQ(p1, p2);
+		EXPECT_TRUE(p0 == p0_);
+		EXPECT_TRUE(p1 == p2);
+		EXPECT_TRUE(!(p0 != p0_));
+		EXPECT_TRUE(!(p1 != p2));
+		EXPECT_TRUE(p0 < p1);
+		EXPECT_TRUE(p1 > p0);
+		EXPECT_TRUE(p0 <= p1);
+		EXPECT_TRUE(p1 >= p0);
+		EXPECT_TRUE(p1 <= p2);
+		EXPECT_TRUE(p2 <= p1);
+		EXPECT_TRUE(p1 == p2);
+		EXPECT_TRUE(!(p1 < p2));
+		EXPECT_TRUE(!(p1 > p2));
+		EXPECT_TRUE(p1 != p3);
+		EXPECT_TRUE(p1 > p3);
+		EXPECT_TRUE(p1 >= p3);
+		EXPECT_TRUE(p3 < p1);
+		EXPECT_TRUE(p3 <= p1);
 
 	}
 
