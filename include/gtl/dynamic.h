@@ -86,18 +86,22 @@ namespace gtl {
 
 	public:
 		static void RegisterDynamicCreator(identifier_t const& id, creator_t Creator) {
-			tableDynamicCreate_s[id] = Creator;
+			GetDynamicCreatorTable()[id] = Creator;
 		}
 
 		[[nodiscard]] static std::unique_ptr<object_t> CreateObject(identifier_t const& identifier) {
-			if (auto const& item = tableDynamicCreate_s.find(identifier); item != tableDynamicCreate_s.end())
+			auto const& map = GetDynamicCreatorTable();
+			if (auto const& item = map.find(identifier); item != tableDynamicCreate_s.end())
 				return item->second();
 			throw std::invalid_argument(GTL__FUNCSIG "no creator");
 			return nullptr;
 		};
 
 	private:
-		static inline map_t tableDynamicCreate_s;
+		static inline map_t& GetDynamicCreatorTable() {
+			static map_t tableDynamicCreate;
+			return tableDynamicCreate;
+		}
 	};
 
 #define GTL__DYNAMIC_BASE(T_IDENTIFIER)\
