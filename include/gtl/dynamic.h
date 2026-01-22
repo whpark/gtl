@@ -91,7 +91,7 @@ namespace gtl {
 
 		[[nodiscard]] static std::unique_ptr<object_t> CreateObject(identifier_t const& identifier) {
 			auto const& map = GetDynamicCreatorTable();
-			if (auto const& item = map.find(identifier); item != tableDynamicCreate_s.end())
+			if (auto const& item = map.find(identifier); item != map.end())
 				return item->second();
 			throw std::invalid_argument(GTL__FUNCSIG "no creator");
 			return nullptr;
