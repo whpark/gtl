@@ -87,7 +87,7 @@ private:\
 
 	public:
 		virtual creator_key_t const& GetObjectKeyName() const = 0;
-		virtual std::unique_ptr<base_t> clone() const = 0;
+		virtual std::unique_ptr<base_t> clone() const = 0;	// "clone" : de facto standard name
 		virtual bool Equals(tSelf const&) const = 0;
 		virtual std::partial_ordering Compare(tSelf const&) const = 0;
 
@@ -119,7 +119,7 @@ private:\
 		};
 	};
 
-
+	//-------------------------------------------------------------------------
 	template < typename T >
 	struct TCloner {
 		std::unique_ptr<T> operator () (T const& self) const { return self.clone(); }
