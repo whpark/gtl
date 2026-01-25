@@ -10,10 +10,11 @@ using namespace gtl::literals;
 
 namespace gtl::test::reflection::MACRO {
 
-	struct CTestStruct {
+	struct CTestStruct : public gtl::TDynamicCreator<CTestStruct, int> {
 	public:
 		using this_t = CTestStruct;
-		using base_t = this_t;
+		auto operator <=> (this_t const&) const = default;
+		bool operator == (this_t const&) const = default;
 		GTL__REFLECTION_BASE(gtl::njson)
 
 	public:
@@ -32,16 +33,16 @@ namespace gtl::test::reflection::MACRO {
 	#endif
 
 	public:
-		GTL__DYNAMIC_BASE(int);
 		GTL__DYNAMIC_CLASS(0);
 
 	};
 
 
-	class CTestClass {
+	class CTestClass : public gtl::TDynamicCreator<CTestClass, int> {
 	public:
 		using this_t = CTestClass;
-		using base_t = this_t;
+		auto operator <=> (this_t const&) const = default;
+		bool operator == (this_t const&) const = default;
 		GTL__REFLECTION_BASE(gtl::njson<>)
 
 	public:
@@ -65,12 +66,16 @@ namespace gtl::test::reflection::MACRO {
 								test)
 
 	public:
-		GTL__DYNAMIC_BASE(int);
 		GTL__DYNAMIC_CLASS(0);
 	};
 
 
 	class CTestClassDerived : public CTestClass {
+	public:
+		using this_t = CTestClassDerived;
+		auto operator <=> (this_t const&) const = default;
+		bool operator == (this_t const&) const = default;
+		GTL__DYNAMIC_CLASS(1);
 
 	public:
 		int k{};
@@ -86,30 +91,26 @@ namespace gtl::test::reflection::MACRO {
 	private:
 
 		GTL__REFLECTION_MEMBERS(k, a, b, c, str, strU8)
-
-	public:
-		//GTL__DYNAMIC_CLASS(1);
-		constexpr static inline auto Creator = []() -> std::unique_ptr<base_t>{ return std::make_unique<this_t>(); };
-		static inline TDynamicCreateHelper<this_t, 1, Creator> dynamicCreateDerived_s;
 	};
 
 
 	class CTestClassDerived2 : public CTestClass {
 	public:
-		double dummy{};
+		using parent_t = CTestClass;
+		using this_t = CTestClassDerived2;
+		auto operator <=> (this_t const&) const = default;
+		bool operator == (this_t const&) const = default;
+		GTL__DYNAMIC_CLASS(3, 1.2);
 
+	public:
+		double dummy{};
 	public:
 		CTestClassDerived2(double d) : dummy(d) {}
 
-		using this_t = CTestClassDerived2;
-		using base_t = CTestClass;
 		GTL__REFLECTION_DERIVED()
 
 	private:
 		GTL__REFLECTION_MEMBERS(dummy)
-
-	public:
-		GTL__DYNAMIC_CLASS_EMPLACE(3, 1.2);
 
 	};
 
@@ -117,7 +118,7 @@ namespace gtl::test::reflection::MACRO {
 	
 	TEST(dynamic, create) {
 
-		auto p = CTestClass::dynamicCreateBase_s.CreateObject(3);
+		auto p = CTestClass::CreateObject(3);
 		auto* p2 = dynamic_cast<CTestClassDerived2*>(p.get());
 
 		EXPECT_TRUE(p2 != nullptr);
@@ -126,6 +127,108 @@ namespace gtl::test::reflection::MACRO {
 	}
 }
 
+
+namespace gtl::test::dynamic {
+
+	class xBase : public gtl::TDynamicCreator<xBase, std::string> {
+	public:
+		using base_t = xBase;
+		using this_t = xBase;
+		auto operator <=> (this_t const&) const = default;
+		bool operator == (this_t const&) const = default;
+		GTL__DYNAMIC_CLASS("Base")
+
+	public:
+		int m_base{};
+
+	};
+
+	class xDerivedA : public xBase {
+	public:
+		using this_t = xDerivedA;
+		auto operator <=> (this_t const&) const = default;
+		bool operator == (this_t const&) const = default;
+		GTL__DYNAMIC_CLASS("DerivedA")
+
+	public:
+		int m_derivedA{};
+	};
+
+	class xDerivedA_A : public xDerivedA {
+	public:
+		using this_t = xDerivedA_A;
+		auto operator <=> (this_t const&) const = default;
+		bool operator == (this_t const&) const = default;
+		GTL__DYNAMIC_CLASS("DerivedA_A")
+
+	public:
+		int m_derivedA_A{};
+	};
+
+	class xDerivedB : public xBase {
+	public:
+		using this_t = xDerivedB;
+		auto operator <=> (this_t const&) const = default;
+		bool operator == (this_t const&) const = default;
+		GTL__DYNAMIC_CLASS("DerviedB")
+	public:
+		int m_derivedB{};
+	};
+
+
+	TEST(basic, polymorphic) {
+		EXPECT_TRUE(true);
+
+		gtl::TCloneablePtr<xBase> pA1 = std::make_unique<xDerivedA>();
+		gtl::TCloneablePtr<xBase> pA2 = std::make_unique<xDerivedA>();
+		EXPECT_TRUE(pA1.get() != pA2.get());
+		EXPECT_TRUE(*pA1 == *pA2);
+		EXPECT_TRUE(*pA1 <= *pA2);
+		EXPECT_TRUE(*pA1 >= *pA2);
+		EXPECT_TRUE(!(*pA1 != *pA2));
+		EXPECT_TRUE(!(*pA1 < *pA2));
+		EXPECT_TRUE(!(*pA1 > *pA2));
+		EXPECT_TRUE(pA1 == pA2);
+		EXPECT_TRUE(pA1 <= pA2);
+		EXPECT_TRUE(pA1 >= pA2);
+		EXPECT_TRUE(!(pA1 != pA2));
+		EXPECT_TRUE(!(pA1 < pA2));
+		EXPECT_TRUE(!(pA1 > pA2));
+		EXPECT_TRUE(pA1->Equals(*pA2));
+		EXPECT_TRUE(pA2->Equals(*pA1));
+		EXPECT_TRUE(pA1->Compare(*pA2) == std::partial_ordering::equivalent);
+		EXPECT_TRUE(pA2->Compare(*pA1) == std::partial_ordering::equivalent);
+		pA2->m_base = 1;
+		EXPECT_TRUE(!(*pA1 == *pA2));
+		EXPECT_TRUE(*pA1 <= *pA2);
+		EXPECT_TRUE(!(*pA1 >= *pA2));
+		EXPECT_TRUE( (*pA1 != *pA2));
+		EXPECT_TRUE( (*pA1 < *pA2));
+		EXPECT_TRUE(!(*pA1 > *pA2));
+		EXPECT_TRUE(!(pA1 == pA2));
+		EXPECT_TRUE(pA1 <= pA2);
+		EXPECT_TRUE(!(pA1 >= pA2));
+		EXPECT_TRUE( (pA1 != pA2));
+		EXPECT_TRUE( (pA1 < pA2));
+		EXPECT_TRUE(!(pA1 > pA2));
+		EXPECT_TRUE(!pA1->Equals(*pA2));
+		EXPECT_TRUE(!pA2->Equals(*pA1));
+		EXPECT_TRUE(pA1->Compare(*pA2) == std::partial_ordering::less);
+		EXPECT_TRUE(pA2->Compare(*pA1) == std::partial_ordering::greater);
+
+		gtl::TCloneablePtr<xBase> pB1 = std::make_unique<xDerivedB>();
+		EXPECT_TRUE(*pA1 == *pB1);	// !!! xBase 부분은 동일함 (static cast)
+		EXPECT_TRUE(!pA1->Equals(*pB1));
+		EXPECT_TRUE(!(pA1 == pB1));
+		EXPECT_TRUE(pA1 != pB1);
+		EXPECT_TRUE(!(pA1 < pB1));
+		EXPECT_TRUE(!(pA1 > pB1));
+		EXPECT_TRUE(pA1->Compare(*pB1) == std::partial_ordering::unordered);
+
+	}
+
+
+}
 
 //namespace gtl::test::reflection::CRTP {
 //

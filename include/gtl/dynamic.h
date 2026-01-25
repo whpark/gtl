@@ -19,18 +19,6 @@ namespace gtl {
 #pragma pack(push, 8)
 
 
-	namespace internal {
-
-		template < typename OWNER >
-		struct T_DYNAMIC_CREATE_Register {
-			T_DYNAMIC_CREATE_Register() {
-				OWNER::RegisterDynamicCreate(OWNER::s_identifier_dn, OWNER::NewObject);
-			};
-		};
-
-	}
-
-
 #define GTL__DYNAMIC_VIRTUAL_INTERFACE(className)\
 	using mw_base_t = className;\
 	using mw_this_t = className;\
@@ -66,236 +54,75 @@ namespace gtl {
 	//             static 변수의 초기화 순서도 문제가 됨. 일단 static 함수내의 static 변수로 있으면 상관 없음..... 그래서 구현이 복잡해짐.
 	// 2019.11.20. MACRO -> CRTP
 	// 2021.01.19. renewal. CRTP -> MACRO + nested class
+	// 2026-01-25. CRTP+MACRO again
 	//
 
-
-	/// @brief TDynamicCreateHelper
-	/// @tparam tobject
-	/// @tparam tidentifier
-	/// @tparam tcreator
-	/// @tparam tmap
-	template < typename tobject, typename tidentifier,
-		typename tcreator = std::function<std::unique_ptr<tobject>()>,
-		typename tmap = std::map<tidentifier, tcreator> >
-	class TDynamicCreateBase {
-	public:
-		using object_t = tobject;
-		using identifier_t = tidentifier;
-		using creator_t = tcreator;
-		using map_t = tmap;
-
-	public:
-		static void RegisterDynamicCreator(identifier_t const& id, creator_t Creator) {
-			GetDynamicCreatorTable()[id] = Creator;
-		}
-
-		[[nodiscard]] static std::unique_ptr<object_t> CreateObject(identifier_t const& identifier) {
-			auto const& map = GetDynamicCreatorTable();
-			if (auto const& item = map.find(identifier); item != map.end())
-				return item->second();
-			throw std::invalid_argument(GTL__FUNCSIG "no creator");
-			return nullptr;
-		};
-
-	private:
-		static inline map_t& GetDynamicCreatorTable() {
-			static map_t tableDynamicCreate;
-			return tableDynamicCreate;
-		}
-	};
-
-#define GTL__DYNAMIC_BASE(T_IDENTIFIER)\
-	static inline TDynamicCreateBase<this_t, T_IDENTIFIER> dynamicCreateBase_s;
-
-
-	template < typename tobject, auto id, std::unique_ptr<typename tobject::base_t> (*Creator)() >
-	class TDynamicCreateHelper {
-	public:
-		using object_t = tobject;
-
-	public:
-		struct SDynamicCreateRegister {
-			SDynamicCreateRegister() {
-				object_t::dynamicCreateBase_s.RegisterDynamicCreator(id, Creator);
-			};
-		};
-		static inline SDynamicCreateRegister dynamicCreateRegister_s;
-	};
-
-//#define GTL__DYNAMIC_CLASS(ID)\
-//	static inline TDynamicCreateHelper<this_t, ID, []() -> std::unique_ptr<mw_base_t>{ return std::make_unique<this_t>(); }> dynamicCreateDerived_s;
-#define GTL__DYNAMIC_CLASS(ID)\
-	static inline TDynamicCreateHelper<this_t, ID, std::make_unique<this_t>> dynamicCreateDerived_s;
-#define GTL__DYNAMIC_CLASS_EMPLACE(ID, ...)\
-	static inline TDynamicCreateHelper<this_t, ID, []()->std::unique_ptr<base_t>{ return std::make_unique<this_t>(__VA_ARGS__); }> dynamicCreateDerived_s;
-
-
-//	//-----------------------------------------------------------------------------
-//	// IDynamicCreateDerived
-//	//			template < auto& ID >
-//	//			template < const char8_t& ID[20] >
-//	//			template < const wchar_t& ID[20] >
-//
-//	template < typename BASE_CLASS, typename THIS_CLASS, auto ... ID >
-//	class IDynamicCreateDerived : public INewCloneDerived<BASE_CLASS, THIS_CLASS> {
-//	public:
-//
-//		// ID
-//		using identifier_dn_t = typename BASE_CLASS::identifier_dn_t;
-//		static inline identifier_dn_t const s_identifier_dn { ID ..., };
-//		virtual const identifier_dn_t& GetIdentifierDN() const override { return s_identifier_dn; }
-//
-//		// New Object
-//		using INewObject<THIS_CLASS>::NewObject;
-//
-//	private:
-//		// Register
-//		friend internal::T_DYNAMIC_CREATE_Register<IDynamicCreateDerived>;
-//		static inline internal::T_DYNAMIC_CREATE_Register<IDynamicCreateDerived> s_DYNAMIC_CREATE_Register;
-//
-//	};
-//
-//
-//#define DECLARE_DYNAMIC_CREATE_BASE__(THIS_CLASS, IDENTIFIER_DN)\
-//	public:\
-//		using identifier_dn_t = IDENTIFIER_DN;\
-//		using INewObject<THIS_CLASS>::NewObject;\
-//	private:\
-//		using creator_t = std::function<std::unique_ptr<THIS_CLASS>()>;\
-//		static inline std::map<identifier_dn_t, creator_t> s_tableDynamicCreate;\
-//		friend internal::T_DYNAMIC_CREATE_Register<THIS_CLASS>;\
-//		static inline internal::T_DYNAMIC_CREATE_Register<THIS_CLASS> s_DYNAMIC_CREATE_Register;\
-//	protected:\
-//		static void RegisterDynamicCreate(const identifier_dn_t& id, creator_t NewObject) {\
-//			s_tableDynamicCreate[id] = NewObject;\
-//		}\
-//	public:\
-//		[[nodiscard]] static std::unique_ptr<THIS_CLASS> CreateObject(const identifier_dn_t& identifier) {\
-//			const auto& table = s_tableDynamicCreate;\
-//			if (const auto& item = table.find(identifier); item != table.end())\
-//				return item->second();\
-//			throw std::invalid_argument(__FMSG "no creator");\
-//			return nullptr;\
-//		};
-//#define DECLARE_DYNAMIC_CREATE__(ID)\
-//	static inline identifier_dn_t const s_identifier_dn { ID };\
-//	virtual const identifier_dn_t& GetIdentifierDN() const { return s_identifier_dn; }
-//#define DECLARE_DYNAMIC_CREATE_INTERFACE__()\
-//	static inline identifier_dn_t const s_identifier_dn { };\
-//	virtual const identifier_dn_t& GetIdentifierDN() const = 0;
-//
-//#define DECLARE_DYNAMIC_CREATE_BASE(THIS_CLASS, IDENTIFIER_DN, ID)\
-//	DECLARE_DYNAMIC_CREATE_BASE__(THIS_CLASS, IDENTIFIER_DN)\
-//	DECLARE_DYNAMIC_CREATE__(ID)
-//#define DECLARE_DYNAMIC_CREATE_BASE_INTERFACE(THIS_CLASS, IDENTIFIER_DN, ID)\
-//	DECLARE_DYNAMIC_CREATE_BASE__(THIS_CLASS, IDENTIFIER_DN)\
-//	DECLARE_DYNAMIC_CREATE_INTERFACE__(ID)
-//#define DECLARE_DYNAMIC_CREATE_DERIVED(ID)\
-//	DECLARE_DYNAMIC_CREATE__(ID)
-//
-//
-//	//-----------------------------------------------------------------------------
-//	// DynamicSerializeOut, DynamicSerializeIn
-//	template < typename ARCHIVE_OUT, typename BASE_CLASS >
-//	//requires (requires (BASE_CLASS base) { BASE_CLASS::identifier_dn_t; BASE_CLASS::identifier_dn_serialize_as_t; base.SerializeOut; })
-//	//[[nodiscard]]
-//	inline bool DynamicSerializeOut(ARCHIVE_OUT& ar, const BASE_CLASS* pObject) {
-//		if (!pObject)
-//			return false;
-//		ar & (typename BASE_CLASS::identifier_dn_serialize_as_t&) pObject->GetIdentifierDN();
-//		pObject->SerializeOut(ar);
-//		return true;
-//	};
-//	template < typename ARCHIVE_IN, typename BASE_CLASS >
-//	//requires (requires (BASE_CLASS base) { BASE_CLASS::identifier_dn_t; BASE_CLASS::identifier_dn_serialize_as_t; base.SerializeIn; })
-//	[[nodiscard]]
-//	inline std::unique_ptr<BASE_CLASS> DynamicSerializeIn(ARCHIVE_IN& ar, BASE_CLASS* = nullptr)
-//	{
-//		typename BASE_CLASS::identifier_dn_serialize_as_t id;
-//		ar >> id;
-//		auto rObject = BASE_CLASS::CreateObject((const BASE_CLASS::identifier_dn_t&)id);
-//		if (rObject)
-//			rObject->SerializeIn(ar);
-//		return rObject;
-//	};
-//	//-----------------------------------------------------------------------------
-//	// IDynamicSerializeBase
-//	//   2019.11.21.
-//	//
-//	//   THIS_CLASS class must have ( ARCHIVE& operator & (ARCHIVE& ar, Data& value) {} )
-//	//
-//	template < typename THIS_CLASS,
-//		typename IDENTIFIER_DN,
-//		typename ARCHIVE_IN, typename ARCHIVE_OUT = ARCHIVE_IN,
-//		typename IDENTIFIER_SERIALIZE_AS = IDENTIFIER_DN,
-//		template <typename> typename SMART_PTR = std::unique_ptr >
-//	class IDynamicSerializeBase : public IDynamicCreateBase<THIS_CLASS, IDENTIFIER_DN> {
-//	public:
-//		using this_t = THIS_CLASS;
-//		using archive_in_t = ARCHIVE_IN;
-//		using archive_out_t = ARCHIVE_OUT;
-//		using archive_smart_ptr_t = SMART_PTR<THIS_CLASS>;
-//		using identifier_dn_serialize_as_t = IDENTIFIER_SERIALIZE_AS;
-//
-//
-//		static archive_smart_ptr_t DynamicSerializeIn(archive_in_t& ar) {
-//			return gtl::DynamicSerializeIn<archive_in_t, THIS_CLASS>(ar, (THIS_CLASS*)nullptr);
-//		}
-//		void DynamicSerializeOut(archive_out_t& ar) {
-//			gtl::DynamicSerializeOut<archive_out_t, THIS_CLASS>(ar, (THIS_CLASS*)this);
-//		}
-//
-//		virtual archive_out_t& SerializeOut(archive_out_t& ar) const {
-//			// THIS_CLASS class must have the (operator &).
-//			return ar & *(const THIS_CLASS*)this;
-//		};
-//		virtual archive_in_t& SerializeIn(archive_in_t& ar) {
-//			// THIS_CLASS class must have the (operator &).
-//			return ar & *(THIS_CLASS*)this;
-//		};
-//
-//	};
-//
-//
-//
-//	//-----------------------------------------------------------------------------
-//	// IDynamicSerializeDerived
-//	template < typename BASE_CLASS, typename THIS_CLASS, auto ... ID >
-//	class IDynamicSerializeDerived : public IDynamicCreateDerived<BASE_CLASS, THIS_CLASS, ID ...> {
-//	public:
-//
-//		using archive_in_t = typename BASE_CLASS::archive_in_t;
-//		using archive_out_t = typename BASE_CLASS::archive_out_t;
-//
-//		virtual archive_out_t& SerializeOut(archive_out_t& ar) const override {
-//			// THIS_CLASS class must have the (operator &).
-//			return ar & *(const THIS_CLASS*)this;
-//		};
-//		virtual archive_in_t& SerializeIn(archive_in_t& ar) override {
-//			// THIS_CLASS class must have the (operator &).
-//			return ar & *(THIS_CLASS*)this;
-//		};
-//
-//	};
-//
-//
-//#define DECLARE_DYNAMIC_SERIALIZE_BASE__(THIS_CLASS, IDENTIFIER_SERIALIZE_AS)
-
-
-
-
-
-#pragma pack(pop)
-};	// namespace gtl
-
-
-namespace gtl {
+	//=============================================================================================================================
+	// Dynamically Creatable, Cloneable, Comparable Interface
+	//
 
 	// from biscuit/memory.ixx
+#define GTL__DYNAMIC_CLASS(KEY, ...) \
+public:\
+	creator_key_t const& GetObjectKeyName() const override { return s_dynamicCreateHelper.m_id; }\
+	std::unique_ptr<base_t> clone() const override { return std::make_unique<this_t>(*this); }\
+	bool Equals(base_t const& b) const override { return typeid(*this) == typeid(b) and (*this == (this_t const&)b); }\
+	std::partial_ordering Compare(base_t const& b) const override { if (typeid(*this) != typeid(b)) return std::partial_ordering::unordered; return (*this) <=> (this_t const&)b; }\
+private:\
+	static inline sDynamicCreateRegister s_dynamicCreateHelper{std::move(KEY), []{ return std::make_unique<this_t>(__VA_ARGS__); }};\
+
+	//-------------------------------------------------------------------------
+	template < typename tSelf, typename tKey >
+	struct TDynamicCreator {
+		// Dynamic Create
+	public:
+		using base_t = tSelf;
+	public:
+		auto operator <=> (TDynamicCreator const&) const = default;
+		bool operator == (TDynamicCreator const&) const = default;
+	protected:
+		using creator_func_t = std::function<std::unique_ptr<base_t>()>;
+		using creator_key_t = tKey;
+		using creator_map_t = std::map<creator_key_t, creator_func_t>;
+
+	public:
+		virtual creator_key_t const& GetObjectKeyName() const = 0;
+		virtual std::unique_ptr<base_t> clone() const = 0;
+		virtual bool Equals(tSelf const&) const = 0;
+		virtual std::partial_ordering Compare(tSelf const&) const = 0;
+
+	private:
+		static inline creator_map_t& GetDynamicCreatorTable() { static creator_map_t tableDynamicCreate; return tableDynamicCreate; }
+	public:
+		static inline std::vector<creator_key_t> GetDynamicCreatableObjectKeyNameList() {
+			std::vector<creator_key_t> types;
+			auto const& map = GetDynamicCreatorTable();
+			for (auto const& [key, _] : map)
+				types.push_back(key);
+			return types;
+		}
+	protected:
+		static void RegisterDynamicCreator(creator_key_t const& id, creator_func_t&& Creator) { GetDynamicCreatorTable()[id] = std::move(Creator); }
+	public:
+		[[nodiscard]] static std::unique_ptr<base_t> CreateObject(creator_key_t const& identifier) {
+			auto const& map = GetDynamicCreatorTable();
+			if (auto iter = map.find(identifier); iter != map.end())
+				return iter->second();
+			return nullptr;
+		};
+	protected:
+		struct sDynamicCreateRegister {
+			creator_key_t m_id;
+			sDynamicCreateRegister(creator_key_t&& id, creator_func_t&& Creator) : m_id(id) {
+				RegisterDynamicCreator(id, std::move(Creator));
+			};
+		};
+	};
+
 
 	template < typename T >
 	struct TCloner {
-		std::unique_ptr<T> operator () (T const& self) const { return self.NewClone(); }
+		std::unique_ptr<T> operator () (T const& self) const { return self.clone(); }
 	};
 	template < typename T >
 	struct TStaticCloner {
@@ -340,13 +167,18 @@ namespace gtl {
 			return*this;
 		}
 
-		auto operator <=> (TCloneablePtr const& other) const {
+		std::partial_ordering operator <=> (TCloneablePtr const& other) const {
 			bool bEmptyA = !(*this);
 			bool bEmptyB = !other;
-			if (bEmptyA and bEmptyB) return std::strong_ordering::equal;
-			else if (bEmptyA) return std::strong_ordering::less;
-			else if (bEmptyB) return std::strong_ordering::greater;
-			return (**this) <=> (*other);
+			if (bEmptyA and bEmptyB) return std::partial_ordering::equivalent;
+			else if (bEmptyA) return std::partial_ordering::less;
+			else if (bEmptyB) return std::partial_ordering::greater;
+			if constexpr (requires (T const& a, T const& b) { a.Compare(b); }) {
+				return (*this)->Compare(*other);
+			}
+			else {
+				return (**this) <=> (*other);
+			}
 		}
 		bool operator == (TCloneablePtr const& other) const {
 			T const* pA = this->get();
@@ -355,20 +187,13 @@ namespace gtl {
 				return true;
 			if (!pA || !pB)
 				return false;
-			return (*pA) == (*pB);
+			if constexpr (requires (T const& a, T const& b) { a.Equals(b); }) {
+				return pA->Equals(*pB);
+			}
+			else {
+				return (*pA) == (*pB);
+			}
 		}
-		//bool operator != (TCloneablePtr const& other) const { return (operator <=> (other)) != 0; }
-		//bool operator <  (TCloneablePtr const& other) const { return (operator <=> (other)) < 0; }
-		//bool operator <= (TCloneablePtr const& other) const { return (operator <=> (other)) <= 0; }
-		//bool operator >  (TCloneablePtr const& other) const { return (operator <=> (other)) > 0; }
-		//bool operator >= (TCloneablePtr const& other) const { return (operator <=> (other)) >= 0; }
-		//bool operator == (TCloneablePtr const& other) const = default;
-		//bool operator != (TCloneablePtr const& other) const = default;
-		//bool operator <  (TCloneablePtr const& other) const = default;
-		//bool operator <= (TCloneablePtr const& other) const = default;
-		//bool operator >  (TCloneablePtr const& other) const = default;
-		//bool operator >= (TCloneablePtr const& other) const = default;
-
 	};
 
 }
