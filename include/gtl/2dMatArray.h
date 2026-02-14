@@ -87,6 +87,7 @@ namespace gtl {
 
 		// Copies Matrix member only. NO ( Thumbnail Maker, Callback Function )
 		C2dMatArray& operator = (const C2dMatArray& B);
+		C2dMatArray& operator = (C2dMatArray&& B) = default;
 
 		bool Create(const xSize2i& size);																						// 아무것도 없이 그냥 배열만 생성. 데이터 없음.
 		bool Create(const cv::Mat& imgWhole, const xSize2i& sizePieceImage, const xSize2i& size);								// imgWhole 을 연결하여 생성.

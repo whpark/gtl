@@ -141,12 +141,12 @@ namespace gtl::seq::inline v01 {
 		using promise_type = TPromise<tResult, TCoroutineHandle>;
 
 	public:
-		TCoroutineHandle(std::coroutine_handle<promise_type>&& h) : base_t(std::exchange(h, nullptr)) {}
+		TCoroutineHandle(std::coroutine_handle<promise_type>&& h) noexcept : base_t(std::exchange(h, nullptr)) {}
 		TCoroutineHandle(TCoroutineHandle const&) = delete;
-		TCoroutineHandle(TCoroutineHandle&& b) : base_t(std::move(b)) { ((base_t&)b) = nullptr; }
+		TCoroutineHandle(TCoroutineHandle&& b) noexcept : base_t(std::move(b)) { ((base_t&)b) = nullptr; }
 		TCoroutineHandle& operator = (std::nullptr_t) { Destroy(); return *this; }
 		TCoroutineHandle& operator = (TCoroutineHandle const&) = delete;
-		TCoroutineHandle& operator = (TCoroutineHandle&& b) { Destroy(); *(base_t*)this = std::move(b);  ((base_t&)b) = nullptr; return *this;  }
+		TCoroutineHandle& operator = (TCoroutineHandle&& b) noexcept { Destroy(); *(base_t*)this = std::move(b);  ((base_t&)b) = nullptr; return *this;  }
 		virtual ~TCoroutineHandle() { Destroy(); }
 
 	public:

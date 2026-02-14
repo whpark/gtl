@@ -57,7 +57,7 @@ namespace gtl::test::reflection::MACRO {
 		virtual ~CTestClass() {}
 
 	private:
-		
+
 		GTL__REFLECTION_MEMBERS(b1, b2,
 								i, j,
 								k, l,
@@ -114,8 +114,8 @@ namespace gtl::test::reflection::MACRO {
 
 	};
 
-	
-	
+
+
 	TEST(dynamic, create) {
 
 		auto p = CTestClass::CreateObject(3);

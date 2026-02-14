@@ -1,5 +1,4 @@
-﻿
-#pragma once
+﻿#pragma once
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -53,14 +52,14 @@ namespace gtl::seq::inline v01 {
 		explicit TSequence(seq_id_t name = "") : m_name(std::move(name)), m_handle(nullptr) {}
 		TSequence(TSequence const&) = delete;
 		TSequence& operator = (TSequence const&) = delete;
-		TSequence(TSequence&& b) {
+		TSequence(TSequence&& b) noexcept {
 			m_name.swap(b.m_name);
 			m_handle = std::exchange(b.m_handle, nullptr);
 			//m_timeout = std::exchange(b.m_timeout, {});
 			m_state = std::exchange(b.m_state, {});
 			m_children.swap(b.m_children);
 		}
-		TSequence& operator = (TSequence&& b) {
+		TSequence& operator = (TSequence&& b) noexcept {
 			Destroy();
 			m_name.swap(b.m_name);
 			m_handle = std::exchange(b.m_handle, nullptr);

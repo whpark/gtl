@@ -52,14 +52,14 @@ namespace gtl::seq::inline v01 {
 		explicit xSequenceTReturn(seq_id_t name = "") : m_name(std::move(name)) {}
 		xSequenceTReturn(xSequenceTReturn const&) = delete;
 		xSequenceTReturn& operator = (xSequenceTReturn const&) = delete;
-		xSequenceTReturn(xSequenceTReturn&& b) {
+		xSequenceTReturn(xSequenceTReturn&& b) noexcept {
 			m_name.swap(b.m_name);
 			m_handle = std::exchange(b.m_handle, nullptr);
 			//m_timeout = std::exchange(b.m_timeout, {});
 			m_state = std::exchange(b.m_state, {});
 			m_children.swap(b.m_children);
 		}
-		xSequenceTReturn& operator = (xSequenceTReturn&& b) {
+		xSequenceTReturn& operator = (xSequenceTReturn&& b) noexcept {
 			Destroy();
 			m_name.swap(b.m_name);
 			m_handle = std::exchange(b.m_handle, nullptr);

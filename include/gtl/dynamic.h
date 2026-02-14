@@ -144,23 +144,30 @@ private:\
 
 		static inline CLONER cloner;
 
-		TCloneablePtr(std::unique_ptr<T>&& other) : base_t(std::move(other)) {}
-		TCloneablePtr(this_t&& other) : base_t(std::move(other)) {}
-		// copy constructor
-		TCloneablePtr(std::unique_ptr<T> const& other) : base_t(other ? cloner(*other) : nullptr) {}
+		TCloneablePtr() = default;
 		TCloneablePtr(this_t const& other) : base_t(other ? cloner(*other) : nullptr) {}
-
-		TCloneablePtr& operator = (std::unique_ptr<T>&& other) { base_t::operator = (std::move(other)); return *this; }
-		TCloneablePtr& operator = (std::unique_ptr<T> const& other) { base_t::operator = (cloner(*other)); return *this; }
-		TCloneablePtr& operator = (this_t&& other) { base_t::operator = (std::move(other)); return *this; }
+		TCloneablePtr(this_t&& other) = default;
 		TCloneablePtr& operator = (this_t const& other) { base_t::operator = (cloner(*other)); return *this; }
+		TCloneablePtr& operator = (this_t&& other) = default;
 
-		template < typename U, class CLONER2 >
+		// move from unique_ptr
+		template < typename U > requires std::is_base_of_v<T, U>
+		TCloneablePtr(std::unique_ptr<U>&& other) : base_t(std::move(other)) {}
+		template < typename U > requires std::is_base_of_v<T, U>
+		TCloneablePtr& operator = (std::unique_ptr<U>&& other) { base_t::operator = (std::move(other)); return *this; }
+
+		// copy from unique_ptr
+		template < typename U > requires std::is_base_of_v<T, U>
+		TCloneablePtr(std::unique_ptr<U> const& other) : base_t(other ? cloner(*other) : nullptr) {}
+		template < typename U > requires std::is_base_of_v<T, U>
+		TCloneablePtr& operator = (std::unique_ptr<U> const& other) { base_t::operator = (cloner(*other)); return *this; }
+
+		template < typename U, class CLONER2 > requires std::is_base_of_v<T, U>
 		TCloneablePtr& operator = (TCloneablePtr<U, CLONER2>&& other) {
 			this->reset(other.release());
 			return*this;
 		}
-		template < typename U, class CLONER2 >
+		template < typename U, class CLONER2 > requires std::is_base_of_v<T, U>
 		TCloneablePtr& operator = (TCloneablePtr<U, CLONER2> const& other) {
 			static CLONER2 cloner2;
 			this->reset(other ? cloner2(*other).release() : nullptr);

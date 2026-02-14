@@ -65,7 +65,7 @@ namespace gtl::seq::inline v01 {
 		}
 		TSequenceMap(TSequenceMap const&) = delete;
 		TSequenceMap& operator = (TSequenceMap const&) = delete;
-		TSequenceMap(TSequenceMap&& b) {
+		TSequenceMap(TSequenceMap&& b) noexcept {
 			if (this == &b)
 				return;
 
