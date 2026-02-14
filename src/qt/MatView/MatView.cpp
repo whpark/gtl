@@ -113,6 +113,10 @@ namespace gtl::qt {
 		UpdateCT(bCenter, eZoomMode);
 		UpdateScrollBars();
 		UpdateCanvas();
+		// get cursor position
+		auto ptView = ui->canvas->mapFromGlobal(QCursor::pos());
+		auto ptImage = m_ctScreenFromImage.TransI(xPoint2d(ptView.x(), ptView.y()));
+		UpdateStatus(ptImage);
 		return true;
 	}
 
@@ -353,6 +357,61 @@ namespace gtl::qt {
 		}
 
 		return true;
+	}
+
+	void xMatView::UpdateStatus(xPoint2i ptImage) {
+		std::wstring status;
+
+		// Current Position
+		int nx{}, ny{};
+		{
+			for (auto v = m_img.cols; v; v/= 10, nx++);
+			nx = nx*4/3;
+			for (auto v = m_img.rows; v; v/= 10, ny++);
+			ny = ny*4/3;
+			// print ptImage.x and ptImage.y with thousand comma separated
+			if (!m_img.empty())
+				status += fmt::format(L"(w{} h{}) ",
+					AddThousandCommaW(m_img.cols),
+					AddThousandCommaW(m_img.rows));
+			if (ptImage.x >= 0 and ptImage.y >= 0) {
+				status += fmt::format(L"[x{:>{}} y{:>{}}]",
+					AddThousandCommaW(ptImage.x), nx,
+					AddThousandCommaW(ptImage.y), ny);
+			}
+		}
+
+		// image value
+		{
+			int n = m_img.channels();
+			if (xRect2i(0, 0, m_img.cols, m_img.rows).PtInRect(ptImage)) {
+				int depth = m_img.depth();
+				auto cr = GetMatValue(m_img.ptr(ptImage.y), depth, n, ptImage.y, ptImage.x);
+				auto strValue = std::format(L" [{:3}", cr[0]);
+				for (int i{1}; i < n; i++)
+					strValue += std::format(L",{:3}", cr[i]);
+				status += strValue + L"]";
+			}
+			else {
+				auto strValue = std::format(L" [{:3}", ' ');
+				for (int i{1}; i < n; i++)
+					strValue += std::format(L" {:3}", ' ');
+				status += strValue + L"]";
+			}
+		}
+
+		// Selection
+		if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
+			gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
+			status += fmt::format(L" (x{0} y{1} w{2} h{3})",
+				AddThousandCommaW((int)m_mouse.ptSel0.x), AddThousandCommaW((int)m_mouse.ptSel0.y),
+				AddThousandCommaW(std::abs(size.cx)), AddThousandCommaW(std::abs(size.cy)));
+		}
+
+		if (auto str = ToQString(status); str != ui->edtInfo->text()) {
+			ui->edtInfo->setText(str);
+			ui->edtInfo->setSelection(0, 0);
+		}
 	}
 
 	bool xMatView::ZoomInOut(double step, xPoint2i ptAnchor, bool bCenter) {
@@ -781,60 +840,8 @@ namespace gtl::qt {
 		}
 
 		// status
-		{
-			auto ptImage = gtl::Floor(m_ctScreenFromImage.TransI(xPoint2d(ptView)));
-			std::wstring status;
-
-			// Current Position
-			int nx{}, ny{};
-			{
-				for (auto v = m_img.cols; v; v/= 10, nx++);
-				nx = nx*4/3;
-				for (auto v = m_img.rows; v; v/= 10, ny++);
-				ny = ny*4/3;
-				// print ptImage.x and ptImage.y with thousand comma separated
-				if (!m_img.empty())
-					status += fmt::format(L"(w{} h{}) ",
-										  AddThousandCommaW((int)m_img.cols),
-										  AddThousandCommaW((int)m_img.rows));
-				status += fmt::format(L"[x{:>{}} y{:>{}}]",
-									  AddThousandCommaW((int)ptImage.x), nx,
-									  AddThousandCommaW((int)ptImage.y), ny);
-			}
-
-			// image value
-			{
-				int n = m_img.channels();
-				if (xRect2i(0, 0, m_img.cols, m_img.rows).PtInRect(ptImage)) {
-					int depth = m_img.depth();
-					auto cr = GetMatValue(m_img.ptr(ptImage.y), depth, n, ptImage.y, ptImage.x);
-					auto strValue = std::format(L" [{:3}", cr[0]);
-					for (int i{1}; i < n; i++)
-						strValue += std::format(L",{:3}", cr[i]);
-					status += strValue + L"]";
-				}
-				else {
-					auto strValue = std::format(L" [{:3}", ' ');
-					for (int i{1}; i < n; i++)
-						strValue += std::format(L" {:3}", ' ');
-					status += strValue + L"]";
-				}
-			}
-
-			// Selection
-			if (m_mouse.bInSelectionMode or m_mouse.bRectSelected) {
-				gtl::xSize2i size = m_mouse.ptSel1 - m_mouse.ptSel0;
-				status += fmt::format(L" (x{0} y{1} w{2} h{3})",
-					AddThousandCommaW((int)m_mouse.ptSel0.x), AddThousandCommaW((int)m_mouse.ptSel0.y),
-					AddThousandCommaW(std::abs(size.cx)), AddThousandCommaW(std::abs(size.cy)));
-			}
-
-
-			if (auto str = ToQString(status); str != ui->edtInfo->text()) {
-				ui->edtInfo->setText(str);
-				ui->edtInfo->setSelection(0, 0);
-			}
-		}
+		auto ptImage = gtl::Floor(m_ctScreenFromImage.TransI(xPoint2d(ptView)));
+		UpdateStatus(ptImage);
 	}
 
 	void xMatView::OnView_wheelEvent(xMatViewCanvas* canvas, QWheelEvent* event) {

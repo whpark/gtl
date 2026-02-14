@@ -30,7 +30,7 @@ public:
 
 public:
 	// ZOOM
-	enum class eZOOM : int8_t { none = -1, one2one, fit2window, fit2width, fit2height, mouse_wheel_locked, free };	// lock : 
+	enum class eZOOM : int8_t { none = -1, one2one, fit2window, fit2width, fit2height, mouse_wheel_locked, free };	// lock :
 	enum class eZOOM_IN : uint8_t { nearest, linear, bicubic, lanczos4/* EDSR, ESPCN, FSRCNN, LapSRN */};
 	enum class eZOOM_OUT : uint8_t { nearest, area, };
 
@@ -196,6 +196,7 @@ public:
 	S_SCROLL_GEOMETRY GetScrollGeometry();
 	bool UpdateCT(bool bCenter = false, eZOOM eZoom = eZOOM::none);
 	bool UpdateScrollBars();
+	void UpdateStatus(xPoint2i ptImage);
 	bool ZoomInOut(double step, xPoint2i ptAnchor, bool bCenter);
 	bool SetZoom(double scale, xPoint2i ptAnchor, bool bCenter);
 	bool ScrollTo(xPoint2d pt, std::chrono::milliseconds tsScroll = -1ms);
