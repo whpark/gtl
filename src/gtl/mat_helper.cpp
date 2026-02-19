@@ -580,6 +580,9 @@ namespace gtl {
 		if (img.empty())
 			return false;
 
+		if (palette.empty())
+			bNoPaletteLookup = true;
+
 		auto type = img.type();
 
 		int cx = img.cols;
@@ -641,7 +644,7 @@ namespace gtl {
 			if ((nBPP != 1) and /*(nBPP != 2) and */(nBPP != 4) and (nBPP != 8)) {
 				return false;
 			}
-			if (palette.empty()) {
+			if ( (nBPP < 8) and (palette.empty() or bNoPaletteLookup) ) {
 				return false;
 			}
 
@@ -1159,11 +1162,11 @@ namespace gtl {
 	}
 
 	/// @brief Load Image from BITMAP file. Image is COLOR or GRAY level image.
-	/// @param path 
+	/// @param path
 	/// @param img : CV_8UC1 : gray scale, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
-	/// @param nBPP 
-	/// @param palette 
-	/// @return 
+	/// @param nBPP
+	/// @param palette
+	/// @return
 	cv::Mat LoadBitmapMat(std::istream& is, gtl::xSize2i& pelsPerMeter, callback_progress_t funcCallback) {
 		bool bOK{};
 
@@ -1273,11 +1276,11 @@ namespace gtl {
 	}
 
 	/// @brief Load Image into Mat. Image is Pixel ColorIndex.
-	/// @param path 
+	/// @param path
 	/// @param img : CV_8UC1 : pixel palette index, CV_8UC3 : color (no palette supported), for CV8UC3, palette is not used.
-	/// @param nBPP 
-	/// @param palette 
-	/// @return 
+	/// @param nBPP
+	/// @param palette
+	/// @return
 	cv::Mat LoadBitmapMatPixelArray(std::istream& is, gtl::xSize2i& pelsPerMeter, std::vector<gtl::color_bgra_t>& palette, callback_progress_t funcCallback) {
 		bool bOK{};
 
@@ -1383,11 +1386,11 @@ namespace gtl {
 
 
 	//! @brief Copy smaller Mat to larger Mat. (to dest xy)
-	//! @param src 
-	//! @param dest 
-	//! @param ptDestTopLeft 
-	//! @param mask 
-	//! @return 
+	//! @param src
+	//! @param dest
+	//! @param ptDestTopLeft
+	//! @param mask
+	//! @return
 	bool CopyMatToXY(cv::Mat const& src, cv::Mat& dest, gtl::xPoint2i ptDestTopLeft, cv::Mat const* pMask) {
 		if (src.type() != dest.type())
 			return false;
