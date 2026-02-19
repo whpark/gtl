@@ -13,8 +13,8 @@ class GTL__QT_CLASS QGlazeModel : public QAbstractItemModel {
 public:
 	using this_t = QGlazeModel;
 	using base_t = QAbstractItemModel;
-	using json_t = glz::json_t;
-	using decorator_t = std::function<std::optional<std::string>(glz::json_t const&)>;
+	using json_t = glz::generic;
+	using decorator_t = std::function<std::optional<std::string>(glz::generic const&)>;
 
 	enum class eCOLUMN : int { key, value, n, };
 	friend constexpr std::string ToStringA(eCOLUMN e) {

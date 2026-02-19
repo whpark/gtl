@@ -7,12 +7,12 @@
 #include "glaze/glaze.hpp"
 
 
-class xTestSeqDlg : public QDialog, public gtl::seq::TSequenceMap<glz::json_t> {
+class xTestSeqDlg : public QDialog, public gtl::seq::TSequenceMap<glz::generic> {
 	Q_OBJECT
 public:
 	using this_t = xTestSeqDlg;
 	using base_t = QDialog;
-	using seq_map_t = gtl::seq::TSequenceMap<glz::json_t>;
+	using seq_map_t = gtl::seq::TSequenceMap<glz::generic>;
 	using seq_t = seq_map_t::seq_t;
 	using seq_result_t = seq_t::result_t;
 	using seq_param_t = seq_map_t::param_t;

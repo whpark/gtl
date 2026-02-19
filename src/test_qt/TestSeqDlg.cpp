@@ -171,7 +171,7 @@ coro_t xTestSeqDlg::SuspendHandler(seq_t&, seq_param_t param) {
 		co_await seq->WaitFor(100ms);
 		Log("{} await > {}\n", sl.function_name(), i);
 	}
-	glz::json_t result;
+	glz::generic result;
 	result["result"] = std::format("time : {}",
 		std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0));
 	Log("{} >>>>>>>> {} \n", sl.function_name(), i);
@@ -188,7 +188,7 @@ coro_t xTestSeqDlg::Seq1(seq_t& seq, seq_param_t param) {
 
 	// Call SuspendHandler
 	{
-		auto future = CreateChildSequence("SuspendHandler", glz::json_t{ {"duration", 1500} });
+		auto future = CreateChildSequence("SuspendHandler", glz::generic{ {"duration", 1500} });
 		co_await WaitForChild();
 		auto r = future.get();
 		ui.txtMessage1->setText(ToQString(fmt::format("{}", gtl::ValueOr(r["result"], "no result"s))));
@@ -199,7 +199,7 @@ coro_t xTestSeqDlg::Seq1(seq_t& seq, seq_param_t param) {
 	//	co_await std::suspend_always();
 	//}
 	ui.txtMessage2->setText(ToQString(fmt::format("{}", ++counter)));
-	
+
 	seq.CreateChildSequence<std::string>("SuspendString", 0, Suspend3, "sdfasdf"s);//, self.CreateSequence(Suspend), self.CreateSequence(Suspend), self.CreateSequence(Suspend);
 	co_await seq.WaitForChild();
 

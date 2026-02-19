@@ -43,7 +43,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 	ui.treeView->setModel(&m_modelGlaze);
 
 	{
-		glz::json_t j{};
+		glz::generic j{};
 		sJsonTest test;
 		std::string str;
 		glz::write<glz::opts{}>(test, str);
