@@ -62,11 +62,9 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <VcpkgConfiguration>$(Configuration)</VcpkgConfiguration>
-    <VcpkgTriplet>x64-windows-v143</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <VcpkgConfiguration>$(Configuration)</VcpkgConfiguration>
-    <VcpkgTriplet>x64-windows-v143</VcpkgTriplet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

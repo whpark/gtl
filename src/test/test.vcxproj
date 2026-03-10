@@ -37,10 +37,6 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
-    <VcpkgTriplet>x64-windows-v143</VcpkgTriplet>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgTriplet>x64-windows-v143</VcpkgTriplet>
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

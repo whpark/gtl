@@ -53,12 +53,6 @@
     <TargetName>$(ProjectName).x$(PlatformArchitecture)$(Configuration[0])</TargetName>
     <IntDir>$(SolutionDir)Temp\$(Platform)\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgTriplet>x64-windows-v143</VcpkgTriplet>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgTriplet>x64-windows-v143</VcpkgTriplet>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -219,6 +213,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\etc\vcpkg\install-vcpkg.bat" />
+    <None Include="..\..\etc\vcpkg\move_opencv4.bat" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="gtl.rc" />

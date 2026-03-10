@@ -258,6 +258,9 @@
     <None Include="..\..\etc\vcpkg\install-vcpkg.bat">
       <Filter>etc\vcpkg</Filter>
     </None>
+    <None Include="..\..\etc\vcpkg\move_opencv4.bat">
+      <Filter>etc\vcpkg</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="gtl.rc" />
