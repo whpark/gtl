@@ -16,24 +16,29 @@ rem Save current folder
 set SourceFolder=%~dp0
 set FAILED=
 set PopDirectory=0
+set CallBootStrap=0
 
-rem check if %VCPKG_ROOT% is empty or not
-set VCPKG_FOLDER=%VCPKG_ROOT%
+rem check if %VCPKG_ROOT% is empty or not, replace '/' to '\'
+set VCPKG_FOLDER=%VCPKG_ROOT:/=\%
 if "%VCPKG_FOLDER%"=="" set VCPKG_FOLDER=\vcpkg
 
 if exist "%VCPKG_FOLDER%" (
 	echo Install?
 	echo     "%VCPKG_FOLDER%"
 	pause
-	pushd "%VCPKG_FOLDER%" & set PopDirectory=1
 ) else (
 	echo Clone a vcpkg ?
 	echo     "%VCPKG_FOLDER%"
 	pause
 	git clone https://github.com/microsoft/vcpkg.git "%VCPKG_FOLDER%"
 	rem if %errorlevel% neq 0 set FAILED=%FAILED% failed : cloning vcpkg (%ERRORLEVEL%) & goto end
-	pushd "%VCPKG_FOLDER%" & set PopDirectory=1
+	set CallBootStrap=1
+)
+xcopy /sdchry triplets %VCPKG_FOLDER%\triplets
+pushd "%VCPKG_FOLDER%" & set PopDirectory=1
+if %CallBootStrap% neq 0 (
 	call bootstrap-vcpkg.bat
+	vcpkg integrate install
 )
 
 rem x64
@@ -46,8 +51,12 @@ rem vcpkg install --triplet=x64-windows --recurse cppcoro --overlay-ports=%Sourc
 rem if %errorlevel% neq 0 set FAILED=%FAILED% cppcoro:x64,
 
 echo installing x64-windows...
-vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 libarchive fmt imgui spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut tinyspline libxml2 libxmlmm openssl exprtk eigen3 freeimage blend2d opencv[contrib,core,cuda,cudnn,dnn,ffmpeg,freetype,fs,ipp,opengl,python,vtk] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
+vcpkg install --triplet=x64-windows-v143 --recurse gtest catch2 benchmark boost flux 7zip bzip2 libarchive fmt imgui spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut tinyspline libxml2 libxmlmm openssl exprtk eigen3 freeimage blend2d ffmpeg[all] aravis[introspection,packet-socket,usb] opencv[ade,aravis,calib3d,contrib,core,cuda,cudnn,dnn,dnn-cuda,eigen,ffmpeg,freetype,fs,gapi,gdcm,gstreamer,hdf,highgui,intrinsics,ipp,jpeg,jpegxl,openexr,opengl,openjpeg,openmp,png,python,quality,quirc,rgbd,sfm,text,thread,tiff,vtk,webp] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
 rem deleted : maddy, websocketpp,
+if %errorlevel% neq 0 set FAILED=%FAILED% x64-windows,
+
+vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 libarchive fmt imgui spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut tinyspline libxml2 libxmlmm openssl exprtk eigen3 freeimage blend2d ffmpeg[all] aravis[introspection,packet-socket,usb] opencv[ade,aravis,calib3d,contrib,core,dnn,eigen,ffmpeg,freetype,fs,gapi,gdcm,gstreamer,hdf,highgui,intrinsics,ipp,jpeg,jpegxl,openexr,opengl,openjpeg,openmp,png,python,quality,quirc,rgbd,sfm,text,thread,tiff,vtk,webp] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
+
 if %errorlevel% neq 0 set FAILED=%FAILED% x64-windows,
 
 rem skip x86
@@ -64,10 +73,8 @@ if %errorlevel% neq 0 set FAILED=%FAILED% x86-windows,
 
 :end
 
-call move_opencv4.bat
-
 set VCPKG_FOLDER=
-if %PopDirectory% neq 0 popd & set PopDirectory=
+if %PopDirectory% neq 0 popd & set PopDirectory= & set CallBootStrap=
 
 if "%FAILED%" neq "" (
 	echo

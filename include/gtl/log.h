@@ -13,7 +13,7 @@
 #pragma once
 
 
-	
+
 #if 1
 
 #include "gtl/_default.h"
@@ -110,11 +110,11 @@ namespace gtl {
 
 	public:
 		// Write Log
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>("", fmt::format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>("", fmt::format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>("", fmt::format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char16_t>("", fmt::format(fmt, std::forward<targs>(args)...)); }
-		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char32_t>("", fmt::format(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>("", TFormat<char>(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>("", TFormat<wchar_t>(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>("", TFormat<char8_t>(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char16_t>("", TFormat<char16_t>(fmt, std::forward<targs>(args)...)); }
+		template < typename ... targs> constexpr void Log(gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char32_t>("", TFormat<char32_t>(fmt, std::forward<targs>(args)...)); }
 		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)		{ return _Log<char>(svTag, fmt::format(fmt, std::forward<targs>(args)...)); }
 		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)	{ return _Log<wchar_t>(svTag, fmt::format(fmt, std::forward<targs>(args)...)); }
 		template < typename ... targs> constexpr void LogTag(std::string_view const& svTag, gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)	{ return _Log<char8_t>(svTag, fmt::format(fmt, std::forward<targs>(args)...)); }
@@ -173,7 +173,7 @@ namespace gtl {
 			if (m_pLog) m_pLog->_Log(svTag, std::format(fmt, std::forward<Args>(args)...));
 		}
 	#else
-		template < typename ... Args > void Log(std::string_view svText, Args&& ... args) 
+		template < typename ... Args > void Log(std::string_view svText, Args&& ... args)
 			{ if (m_pLog) m_pLog->_Log<char>({}, std::format(svText, std::forward<Args>(args)...)); }
 		template < typename ... Args > void Log(std::wstring_view svText, Args&& ... args)
 			{ if (m_pLog) m_pLog->_Log<wchar_t>({}, std::format(svText, std::forward<Args>(args)...)); }
@@ -272,7 +272,7 @@ namespace gtl {
 		#endif
 
 			auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(now - std::chrono::system_clock::from_time_t(t));
-			
+
 #define GTL__FMT_EXPAND "{:04}/{:02}/{:02}, {:02}:{:02}:{:02}.{:03} {} : "
 			if constexpr (std::is_same_v<tchar_t, char>) {
 				m_ar->WriteString(GTL__FMT_EXPAND, st.tm_year, st.tm_mon, st.tm_mday, st.tm_hour, st.tm_min, st.tm_sec, msec.count(), svTag);
