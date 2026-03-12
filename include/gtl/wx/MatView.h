@@ -44,7 +44,7 @@ namespace gtl::wx {
 
 	public:
 		// ZOOM
-		enum class eZOOM : int8_t { none = -1, one2one, fit2window, fit2width, fit2height, mouse_wheel_locked, free };	// lock : 
+		enum class eZOOM : int8_t { none = -1, one2one, fit2window, fit2width, fit2height, mouse_wheel_locked, free };	// lock :
 		enum class eZOOM_IN : uint8_t { nearest, linear, bicubic, lanczos4/* EDSR, ESPCN, FSRCNN, LapSRN */};
 		enum class eZOOM_OUT : uint8_t { nearest, area, };
 
@@ -146,16 +146,17 @@ namespace gtl::wx {
 				bInSelectionMode = {};
 				bRectSelected = {};
 				ptAnchor.reset();
-				ptOffset0 = {};
-				ptSel0 = ptSel1 = {};
+				ptOffset0.SetZero();
+				ptSel0.SetZero();
+				ptSel1.SetZero();
 			}
 		} m_mouse;
 		mutable struct {
 			xPoint2d pt0, pt1;
 			std::chrono::steady_clock::time_point t0, t1;
 			void Clear() {
-				pt0 = pt1 = {};
-				t0 = t1 = {};
+				pt0 = pt1 = xPoint2d{};
+				t0 = t1 = std::chrono::steady_clock::time_point{};
 			}
 		} m_smooth_scroll;
 

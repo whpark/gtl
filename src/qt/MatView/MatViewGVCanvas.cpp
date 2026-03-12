@@ -302,10 +302,10 @@ namespace gtl::qt {
 		penWhite.setColor(Qt::white);
 		penWhite.setStyle(Qt::SolidLine);
 
-		auto y0 = std::max(0, roi.top());
-		auto y1 = std::min(m_img.rows, roi.bottom() + 1);
-		auto x0 = std::max(0, roi.left());
-		auto x1 = std::min(m_img.cols, roi.right() + 1);
+		//auto y0 = std::max(0, roi.top());
+		//auto y1 = std::min(m_img.rows, roi.bottom() + 1);
+		//auto x0 = std::max(0, roi.left());
+		//auto x1 = std::min(m_img.cols, roi.right() + 1);
 
 		for (int y{roi.y()}, y1{roi.y() + roi.height()}; y < y1; y++) {
 			auto* ptr = m_img.ptr(y);
@@ -314,9 +314,9 @@ namespace gtl::qt {
 			for (int x{roi.x()}; x < x1; x++) {
 				//auto p = SkPoint::Make(pt.x, pt.y);
 				auto v = GetMatValue(ptr, depth, nChannel, y, x);
-				float one_over_channel = 1.f / nChannel;
-				auto avg = (v[0] + v[1] + v[2]) * one_over_channel;
-				auto cr = (avg > 128) ? QColor{0, 0, 0} : QColor{255, 255, 255};
+				//float one_over_channel = 1.f / nChannel;
+				//auto avg = (v[0] + v[1] + v[2]) * one_over_channel;
+				//auto cr = (avg > 128) ? QColor{0, 0, 0} : QColor{255, 255, 255};
 				painter->setPen((v[0] + v[1] + v[2] < 128*3) ? penWhite : penBlack);
 				auto r = trans.mapRect(QRectF{(qreal)x, (qreal)y, 1.0, 1.0});
 				r.setY(r.bottom() - heightText * nChannel);

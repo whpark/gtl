@@ -25,7 +25,7 @@ namespace gtl {
 
 	//-------------------------------------------------------------------------
 	/// @brief StopWatch
-	/// @tparam tclock 
+	/// @tparam tclock
 	template < typename tchar, typename tresolution = std::chrono::duration<double>, typename tclock = std::chrono::steady_clock >
 	class TStopWatch {
 	protected:
@@ -64,7 +64,7 @@ namespace gtl {
 			} else if constexpr (gtlc::is_one_of<tchar, wchar_t>) {
 				Lap(L"end");
 			} else {
-				static_assert(gtlc::dependent_false_v);
+				static_assert(false);
 			}
 			os.flush();
 			depth--;
@@ -101,7 +101,7 @@ namespace gtl {
 		std::chrono::duration<double> m_durMin;
 		std::chrono::steady_clock::time_point m_t0 = std::chrono::steady_clock::now();
 	public:
-		xDurationWatch(std::chrono::duration<double> durMin = std::chrono::milliseconds(100), std::source_location loc = std::source_location::current()) : m_durMin(durMin), m_loc(loc) {
+		xDurationWatch(std::chrono::duration<double> durMin = std::chrono::milliseconds(100), std::source_location loc = std::source_location::current()) : m_loc(loc), m_durMin(durMin) {
 		}
 	#ifdef _DEBUG
 		~xDurationWatch() {

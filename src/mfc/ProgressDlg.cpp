@@ -50,7 +50,7 @@ namespace gtl::win::inline mfc {
 	BEGIN_MESSAGE_MAP(CProgressDlg, CDialogEx)
 		ON_WM_TIMER()
 		ON_WM_CREATE()
-		ON_BN_CLICKED(IDABORT, OnAbort)
+		ON_BN_CLICKED(IDABORT, &CProgressDlg::OnAbort)
 	END_MESSAGE_MAP()
 
 

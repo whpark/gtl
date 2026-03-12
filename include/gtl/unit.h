@@ -42,26 +42,26 @@ namespace gtl {
 	using mm_t = tlength_mm_t<double>;
 
 	inline namespace literals {
-		inline mm_t operator "" _nm (long double v)					{ return mm_t(v * 1.e-6); }
-		inline mm_t operator "" _um (long double v)					{ return mm_t(v * 1.e-3); }
-		inline mm_t operator "" _mm (long double v)					{ return mm_t(v); }
-		inline mm_t operator "" _cm (long double v)					{ return mm_t(v * 1.e1); }
-		inline mm_t operator ""  _m (long double v)					{ return mm_t(v * 1.e3); }
-		inline mm_t operator "" _km (long double v)					{ return mm_t(v * 1.e6); }
-		inline mm_t operator "" _nm (unsigned long long v)			{ return mm_t(v * 1.e-6); }
-		inline mm_t operator "" _um (unsigned long long v)			{ return mm_t(v * 1.e-3); }
-		inline mm_t operator "" _mm (unsigned long long v)			{ return mm_t((double)v); }
-		inline mm_t operator "" _cm (unsigned long long v)			{ return mm_t(v * 1.e1); }
-		inline mm_t operator ""  _m (unsigned long long v)			{ return mm_t(v * 1.e3); }
-		inline mm_t operator "" _km (unsigned long long v)			{ return mm_t(v * 1.e6); }
+		inline mm_t operator ""_nm (long double v)						{ return mm_t(v * 1.e-6); }
+		inline mm_t operator ""_um (long double v)						{ return mm_t(v * 1.e-3); }
+		inline mm_t operator ""_mm (long double v)						{ return mm_t(v); }
+		inline mm_t operator ""_cm (long double v)						{ return mm_t(v * 1.e1); }
+		inline mm_t operator ""_m  (long double v)						{ return mm_t(v * 1.e3); }
+		inline mm_t operator ""_km (long double v)						{ return mm_t(v * 1.e6); }
+		inline mm_t operator ""_nm (unsigned long long v)				{ return mm_t(v * 1.e-6); }
+		inline mm_t operator ""_um (unsigned long long v)				{ return mm_t(v * 1.e-3); }
+		inline mm_t operator ""_mm (unsigned long long v)				{ return mm_t((double)v); }
+		inline mm_t operator ""_cm (unsigned long long v)				{ return mm_t(v * 1.e1); }
+		inline mm_t operator ""_m  (unsigned long long v)				{ return mm_t(v * 1.e3); }
+		inline mm_t operator ""_km (unsigned long long v)				{ return mm_t(v * 1.e6); }
 
-		inline unsigned long long operator "" _KB (unsigned long long v)	{ return v * 1024; }
-		inline unsigned long long operator "" _MB (unsigned long long v)	{ return v * 1024_KB; }
-		inline unsigned long long operator "" _GB (unsigned long long v)	{ return v * 1024_MB; }
+		inline unsigned long long operator ""_KB (unsigned long long v)	{ return v * 1024; }
+		inline unsigned long long operator ""_MB (unsigned long long v)	{ return v * 1024_KB; }
+		inline unsigned long long operator ""_GB (unsigned long long v)	{ return v * 1024_MB; }
 
 		// Percent - %
-		inline double operator "" _percent (long double v)					{ return double(v * 1.e-2); }
-		inline double operator "" _percent (unsigned long long v)			{ return double(v * 1.e-2); }
+		inline double operator ""_percent (long double v)				{ return double(v * 1.e-2); }
+		inline double operator ""_percent (unsigned long long v)		{ return double(v * 1.e-2); }
 	}
 
 
@@ -293,10 +293,10 @@ namespace gtl {
 	using rad_t = tangle_rad_t<double>;
 	using deg_t = tangle_deg_t<double>;
 	inline namespace literals {
-		inline rad_t operator "" _rad (long double v)				{ return rad_t(v); }
-		inline rad_t operator "" _rad (unsigned long long v)		{ return rad_t((double) v); }
-		inline deg_t operator "" _deg (long double v)				{ return deg_t(v); }
-		inline deg_t operator "" _deg (unsigned long long v)		{ return deg_t((double) v); }
+		inline rad_t operator ""_rad (long double v)			{ return rad_t(v); }
+		inline rad_t operator ""_rad (unsigned long long v)		{ return rad_t((double) v); }
+		inline deg_t operator ""_deg (long double v)			{ return deg_t(v); }
+		inline deg_t operator ""_deg (unsigned long long v)		{ return deg_t((double) v); }
 	}
 
 }	// namespace gtl

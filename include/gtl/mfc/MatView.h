@@ -175,7 +175,7 @@ namespace gtl::win::inline mfc {
 		CMatView();   // standard constructor
 		virtual ~CMatView();
 
-		virtual BOOL PreTranslateMessage(MSG* pMsg);
+		virtual BOOL PreTranslateMessage(MSG* pMsg) override;
 
 		// operations
 	public:
@@ -201,7 +201,7 @@ namespace gtl::win::inline mfc {
 
 		bool GetImage(cv::Mat& img) { if (m_imgOrg.empty()) return false; cv::Rect rc(0, 0, m_imgOrg.GetWidth(), m_imgOrg.GetHeight()); m_imgOrg.GetROI(rc).copyTo(img); return true; }
 		bool GetImageView(cv::Mat& img) const { if (m_imgView.empty()) return false; m_imgView.copyTo(img); return true; }
-		cv::Mat GetImage() { cv::Mat img; GetImage(img); return std::move(img); }
+		cv::Mat GetImage() { cv::Mat img; GetImage(img); return img; }
 		bool GetCurrentImageRect(xRect2d& rect) const;
 		bool SetCurrentImageRect(xRect2d const& rect);
 

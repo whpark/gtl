@@ -177,7 +177,7 @@ xMatView::xMatView( wxWindow* parent, wxWindowID id, const wxPoint& pos, const w
 			img.row(y+cy2) = cv::Scalar(0, 0, v, 255);
 		}
 		for (int x{}; x < img.cols; x++) {
-			double v = (x+1.)/img.cols;
+			//double v = (x+1.)/img.cols;
 			img.col(x) *= (x+1.)/img.cols;
 		}
 		img.col(0) = cv::Scalar(v, v, v);
@@ -366,6 +366,8 @@ bool xMatView::UpdateCT(bool bCenter, eZOOM eZoom) {
 	case fit2window:	dScale = std::min((double)sizeClient.cx / m_img.cols, (double)sizeClient.cy / m_img.rows); break;
 	case fit2width:		dScale = (double)sizeClient.cx / m_img.cols; break;
 	case fit2height:	dScale = (double)sizeClient.cy / m_img.rows; break;
+	default:
+		break;
 	//case free:			dScale = m_ctScreenFromImage.m_scale; break;
 	}
 	if (dScale > 0)
@@ -381,7 +383,7 @@ bool xMatView::UpdateCT(bool bCenter, eZOOM eZoom) {
 		xPoint2i ptLT = ct2(ptOrigin);
 
 		if (bCenter or eZoom == eZOOM::fit2window) {
-			m_ctScreenFromImage.m_origin = {};
+			m_ctScreenFromImage.m_origin = xCoordTrans::point_t{};
 			m_ctScreenFromImage.m_offset = ptLT;
 		}
 		else if (eZoom == eZOOM::fit2width) {
@@ -626,7 +628,7 @@ bool xMatView::KeyboardNavigate(int key, bool ctrl, bool alt, bool shift) {
 			int heightMax { (int) (ctS2I.Trans((double)rectClient.Height()) * 9.5 / 10) };
 			xPoint2i ptImgBottom = ctS2I(xPoint2i{rectClient.left, rectClient.bottom});
 			xPoint2i ptImgTop = ctS2I(xPoint2i{rectClient.left, rectClient.top});
-			auto y0 = std::min(ptImgBottom.y + heightMax, m_img.rows - 1);
+			//auto y0 = std::min(ptImgBottom.y + heightMax, m_img.rows - 1);
 
 			auto CheckIfBlank = [&](int y) -> bool {
 				constexpr static int margin = 5;
@@ -843,7 +845,7 @@ void xMatView::OnSpinCtrl(double scale) {
 	xRect2d rect{m_view->GetClientRect()};
 	auto ptImage = m_ctScreenFromImage.TransI(rect.CenterPoint());
 	m_ctScreenFromImage.m_scale = scale;
-	auto pt2 = m_ctScreenFromImage(ptImage);
+	//auto pt2 = m_ctScreenFromImage(ptImage);
 	m_ctScreenFromImage.m_offset += rect.CenterPoint() - m_ctScreenFromImage(ptImage);
 	UpdateScrollBars();
 	Refresh(false);
@@ -981,7 +983,7 @@ void xMatView::OnPaint_View( wxPaintEvent& event ) {
 			}
 			if (!imgPyr.empty()) {
 				double scaleP = (double)imgPyr.cols / m_img.cols;
-				double scale = (double)size.width / imgPyr.cols;
+				//double scale = (double)size.width / imgPyr.cols;
 				cv::Rect roiP(roi);
 				roiP.x *= scaleP;
 				roiP.y *= scaleP;

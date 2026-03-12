@@ -12,7 +12,7 @@ using namespace gtl::literals;
 template <typename tchar, typename tarchive >
 std::vector<gtl::TString<tchar>> ReadFile(tarchive& ar) {
 	std::vector<gtl::TString<tchar>> strs;
-	for (std::optional<std::basic_string<tchar>> r; r = ar.ReadLine<tchar>(tchar('\n')); ) {
+	for (auto r = ar.ReadLine<tchar>(tchar('\n')); r; r = ar.ReadLine<tchar>(tchar('\n'))) {
 		strs.emplace_back(std::move(*r));
 	}
 	return strs;
@@ -47,7 +47,7 @@ TEST(gtl_archive, ReadLine) {
 		xIFArchive ar(dir.path());
 
 		ar.GetStream().seekg(0);
-		auto codepage = ar.ReadCodepageBOM(gtl::eCODEPAGE::UTF8);
+		[[maybe_usused]] auto codepage = ar.ReadCodepageBOM(gtl::eCODEPAGE::UTF8);
 
 		auto strsA = ReadFile<char>(ar);
 		EXPECT_TRUE(strs.size() == strsA.size());
@@ -418,10 +418,10 @@ TEST(gtl_archive, ZipFolder) {
 		}
 	}
 
-	gtl::ZipFolder(root / L"가나다.7z", path);
-	gtl::ZipFolder(root / L"가나다.zip", path);
-	gtl::ZipFolder(root / L"가나다.7zdata", path, ".7z");
-	gtl::ZipFolder(root / L"가나다.zipdata", path, ".zip");
+	[[maybe_unused]] auto e1 = gtl::ZipFolder(root / L"가나다.7z", path);
+	[[maybe_unused]] auto e2 = gtl::ZipFolder(root / L"가나다.zip", path);
+	[[maybe_unused]] auto e3 = gtl::ZipFolder(root / L"가나다.7zdata", path, ".7z");
+	[[maybe_unused]] auto e4 = gtl::ZipFolder(root / L"가나다.zipdata", path, ".zip");
 
 	// unzip
 	{

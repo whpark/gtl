@@ -19,7 +19,7 @@ public:
 	CClassView() noexcept;
 	virtual ~CClassView();
 
-	void AdjustLayout();
+	void AdjustLayout() override;
 	void OnChangeVisualStyle();
 
 protected:
@@ -32,7 +32,7 @@ protected:
 
 // Overrides
 public:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual BOOL PreTranslateMessage(MSG* pMsg) override;
 
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

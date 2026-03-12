@@ -18,7 +18,7 @@ class CPropertiesWnd : public CDockablePane
 public:
 	CPropertiesWnd() noexcept;
 
-	void AdjustLayout();
+	void AdjustLayout() override;
 
 // Attributes
 public:

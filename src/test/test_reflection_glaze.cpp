@@ -57,7 +57,8 @@ namespace gtl::test::reflection_glaze {
 
 		//cv::Mat m;
 
-		auto operator <=> (this_t const& ) const = default;
+		//auto operator <=> (this_t const& ) const = delete;
+		bool operator == (this_t const&) const = default;
 
 		GLZ_LOCAL_META(parent, dd, str, dValue, iValue, on_off, values, m, stru8, strw, stru16, stru32, len, td1, td2, tr1, tr2, arr);
 		//struct glaze {
@@ -102,7 +103,8 @@ namespace gtl::test::reflection_glaze {
 
 		GLZ_LOCAL_META_DERIVED(derived1, parent, a);
 
-		auto operator <=> (this_t const& ) const = default;
+		//auto operator <=> (this_t const& ) const = delete;
+		bool operator == (this_t const&) const = default;
 
 		virtual void Purturb() override {
 			base_t::Purturb();
@@ -123,7 +125,8 @@ namespace gtl::test::reflection_glaze {
 
 		GLZ_LOCAL_META_DERIVED(derived2, derived1, str2, pt, rc, ct);
 
-		auto operator <=> (this_t const& ) const = default;
+		//auto operator <=> (this_t const& ) const = delete;
+		bool operator == (this_t const&) const = default;
 
 		virtual void Purturb() override {
 			base_t::Purturb();
@@ -150,7 +153,8 @@ namespace gtl::test::reflection_glaze {
 
 		GLZ_LOCAL_META(second, d);
 
-		auto operator <=> (this_t const& ) const = default;
+		//auto operator <=> (this_t const& ) const = delete;
+		bool operator == (this_t const&) const = default;
 
 	};
 }	// namespace gtl::test::reflection_glaze

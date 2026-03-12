@@ -41,8 +41,8 @@ namespace gtl {
 		using base_t::base_t;
 		using base_t::operator=;
 
-		operator cv::Mat& () { return (cv::Mat&)(*this); }
-		operator cv::Mat const& () const { return (cv::Mat&)(*this); }
+		//operator cv::Mat& () { return (cv::Mat&)(*this); }
+		//operator cv::Mat const& () const { return (cv::Mat&)(*this); }
 
 		cv::Mat& base() { return (cv::Mat&)(*this); }
 		cv::Mat const& base() const { return (cv::Mat&)(*this); }
@@ -106,7 +106,7 @@ namespace gtl {
 #endif
 
 	static inline bool ReadMat(std::istream& is, cv::Mat& mat) {
-		auto ReadVar = [&is, &mat](auto& var) -> bool {
+		auto ReadVar = [&is](auto& var) -> bool {
 			return (bool)is.read((char*)&var, sizeof(var));
 		};
 

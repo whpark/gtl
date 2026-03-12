@@ -82,7 +82,7 @@ void xTestSeqDlg::Dispatch() {
 	t0 = t1;
 
 	//auto tNext = base_seq_t::Dispatch();
-	auto tNext = GetSequenceDriver()->Dispatch();
+	//auto tNext = GetSequenceDriver()->Dispatch();
 	//if (tNext < gtl::seq::clock_t::time_point::max()) {
 	//	auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(tNext - t1);
 	//	m_timer.start(std::max(1ms, dur));

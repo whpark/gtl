@@ -160,18 +160,18 @@ namespace gtl::win::inline mfc {
 		ON_WM_VSCROLL()
 		ON_WM_SETCURSOR()
 
-		ON_CBN_SELCHANGE(eIDZoom, OnSelchangeZoom)
-		ON_CBN_EDITCHANGE(eIDZoom, OnEditchangeZoom)
-		ON_COMMAND(eIDZoomUp, OnZoomUp)
-		ON_COMMAND(eIDZoomDown, OnZoomDown)
-		ON_COMMAND(eIDZoomReset, OnZoomReset)
-		//ON_COMMAND(eIDPatternMatching, OnPatternMatching)
-		//ON_COMMAND(eIDSettings, OnSettings)
-		//ON_CBN_SELCHANGE(eIDScaleDownMethod, OnSelchangeScaleDownMethod)
-		//ON_CBN_SELCHANGE(eIDScaleUpMethod, OnSelchangeScaleUpMethod)
-		ON_COMMAND(eIDSave, OnSave)
+		ON_CBN_SELCHANGE(eIDZoom, &CMatView::OnSelchangeZoom)
+		ON_CBN_EDITCHANGE(eIDZoom, &CMatView::OnEditchangeZoom)
+		ON_COMMAND(eIDZoomUp, &CMatView::OnZoomUp)
+		ON_COMMAND(eIDZoomDown, &CMatView::OnZoomDown)
+		ON_COMMAND(eIDZoomReset, &CMatView::OnZoomReset)
+		//ON_COMMAND(eIDPatternMatching, &CMatView::OnPatternMatching)
+		//ON_COMMAND(eIDSettings, &CMatView::OnSettings)
+		//ON_CBN_SELCHANGE(eIDScaleDownMethod, &CMatView::OnSelchangeScaleDownMethod)
+		//ON_CBN_SELCHANGE(eIDScaleUpMethod, &CMatView::OnSelchangeScaleUpMethod)
+		ON_COMMAND(eIDSave, &CMatView::OnSave)
 
-		ON_MESSAGE(WM_UPDATE_DISPLAY_IMAGE, OnUpdateDisplayImage)
+		ON_MESSAGE(WM_UPDATE_DISPLAY_IMAGE, &CMatView::OnUpdateDisplayImage)
 	END_MESSAGE_MAP()
 
 	// CMatView message handlers
@@ -811,8 +811,8 @@ namespace gtl::win::inline mfc {
 
 			xCoordTrans2d ct(dRate, {1, 0, 0, 1}, {cx/2., cy/2.}, {rcx/2., rcy/2.} );
 
-			CRect rectFullSize((CPoint)ct.Trans(xPoint2d(0, 0)), (CPoint)ct.Trans(xPoint2d(cx, cy)));
-			CRect rectDisplayed((CPoint)ct.Trans(xPoint2d(ptImgTopLeft)), (CPoint)ct.Trans(xPoint2d(ptImgBottomRight)));
+			CRect rectFullSize((POINT)ct.Trans(xPoint2d(0, 0)), (POINT)ct.Trans(xPoint2d(cx, cy)));
+			CRect rectDisplayed((POINT)ct.Trans(xPoint2d(ptImgTopLeft)), (POINT)ct.Trans(xPoint2d(ptImgBottomRight)));
 			int nMinLength = 2;
 			if (rectDisplayed.Width() < nMinLength)
 				rectDisplayed.right = rectDisplayed.left + nMinLength;
@@ -1416,7 +1416,7 @@ namespace gtl::win::inline mfc {
 				nNewPos = si.nPos-1;
 			break;
 		case SB_PAGEDOWN :
-			if ((si.nPos + (int)si.nPage) < si.nMax) 
+			if ((si.nPos + (int)si.nPage) < si.nMax)
 				nNewPos = si.nPos + si.nPage;
 			else
 				nNewPos = si.nMax;
@@ -1479,7 +1479,7 @@ namespace gtl::win::inline mfc {
 				SetCursor(m_hCursorMag);
 				return true;
 			}
-		}	
+		}
 		return CWnd::OnSetCursor(pWnd, nHitTest, message);
 	}
 
@@ -1746,7 +1746,7 @@ namespace gtl::win::inline mfc {
 
 		//CWaitCursor wc;
 
-		DWORD dwTick = GetTickCount();
+		//DWORD dwTick = GetTickCount();
 
 		CheckAndGetZoom(dZoom);
 		if (dZoom > 0.0) {
@@ -1801,7 +1801,7 @@ namespace gtl::win::inline mfc {
 		if (!m_bDraggingProcessed && bDelayedUpdate) {
 			SetTimer(T_UPDATE_DISPLAY_IMAGE, 100, nullptr);
 			return true;
-		}	
+		}
 		//CWaitCursor wc;
 
 		PrepareDisplayImage(m_imgOrg, m_imgView, rectClient, dZoom);
@@ -1851,7 +1851,7 @@ namespace gtl::win::inline mfc {
 			}
 
 			// Backup Center Position
-			xPoint2i ptScroll;
+			//xPoint2i ptScroll;
 			xPoint2d ptShift = m_ctI2S.m_origin;
 			m_ctI2S.m_scale = dZoom;
 			CRect rect(0, 0, m_imgOrg.GetWidth(), m_imgOrg.GetHeight());
@@ -1956,11 +1956,11 @@ namespace gtl::win::inline mfc {
 					return false;
 				m_imgOrg.SetPartialImage({0, 0}, img, bCopyImage);
 			} else {
-				if (!m_imgOrg.Create((Mat&)img, xSize2i(img.size()), xSize2i(1, 1)) ) //, { { 1, 2}, {1, 4}, }, 2);
+				if (!m_imgOrg.Create(const_cast<Mat&>(img), xSize2i(img.size()), xSize2i(1, 1)) ) //, { { 1, 2}, {1, 4}, }, 2);
 					return false;
 			}
 
-			m_ctI2S.m_origin = {m_imgOrg.GetWidth()/2, m_imgOrg.GetHeight()/2};
+			m_ctI2S.m_origin.Set(m_imgOrg.GetWidth()/2, m_imgOrg.GetHeight()/2);
 
 			InitView(dZoom);
 			UpdateDisplayImage();

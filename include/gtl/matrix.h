@@ -3,7 +3,7 @@
 // matrix.ixx: TMatrix class. from mocha
 //
 // PWH
-// 2000.05.27 
+// 2000.05.27
 // 2008.11.01
 // 2021.06.08 from mocha. (NOT FULLY TESTED)
 //
@@ -131,13 +131,13 @@ namespace gtl {
 			return C;
 		}
 
-		constexpr [[nodiscard]] value_type sum(void) const {
+		[[nodiscard]] constexpr value_type sum(void) const {
 			value_type s{};
 			for (auto v : m_mat) s += v;
 			return s;
 		}
 
-		constexpr [[nodiscard]] TMatrix<T, n, m> trans(void) const {
+		[[nodiscard]] constexpr TMatrix<T, n, m> trans(void) const {
 			TMatrix<T, n, m> C;
 			for (size_t i{}; i < rows; i++) {
 				for (size_t j{}; j < cols; j++) {
@@ -307,7 +307,6 @@ namespace gtl {
 			constexpr int const dim = rows;
 			T tresh{}, theta{}, tau{}, t{}, sm{}, s{}, h{}, g{}, c{};
 
-			dim = A.m_nN;
 			TMatrix<T, 1, dim> b;
 			TMatrix<T, 1, dim> z;
 

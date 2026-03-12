@@ -65,7 +65,7 @@ namespace gtl::seq::test {
 	coro_t Child2(seq_t&);
 
 	coro_t TopSeq(seq_t& seq) {
-		auto sl = std::source_location::current();
+		//auto sl = std::source_location::current();
 		auto funcname = seq.GetName();// sl.function_name();
 
 		// step 1
@@ -91,7 +91,7 @@ namespace gtl::seq::test {
 	}
 
 	coro_t Child1(seq_t& seq) {
-		auto sl = std::source_location::current();
+		//auto sl = std::source_location::current();
 		auto funcname = seq.GetName();// sl.function_name();
 
 		// step 1
@@ -108,12 +108,12 @@ namespace gtl::seq::test {
 		fmt::print("{}: Child1_1, Child1_2 Done. {}\n", funcname, chrono::duration_cast<chrono::milliseconds>(t1 - t0));
 
 		fmt::print("{}: End\n", funcname);
-	
+
 		co_return "OK";
 	}
 
 	coro_t Child1_1(seq_t& seq) {
-		auto sl = std::source_location::current();
+		//auto sl = std::source_location::current();
 		auto funcname = seq.GetName();// sl.function_name();
 
 		auto t0 = gtl::seq::clock_t::now();
@@ -126,12 +126,12 @@ namespace gtl::seq::test {
 			co_await seq.WaitFor(200ms);
 		}
 		fmt::print("{}: End. Creating Child1_1, Child1_2\n", funcname);
-	
+
 		co_return "OK";
 	}
 
 	coro_t Child1_2(seq_t& seq) {
-		auto sl = std::source_location::current();
+		//auto sl = std::source_location::current();
 		auto funcname = seq.GetName();// sl.function_name();
 
 		auto t0 = gtl::seq::clock_t::now();
@@ -144,7 +144,7 @@ namespace gtl::seq::test {
 			co_await seq.WaitFor(200ms);
 		}
 		fmt::print("{}: End. Creating Child1_1, Child1_2\n", funcname);
-	
+
 		co_return "OK";
 	}
 

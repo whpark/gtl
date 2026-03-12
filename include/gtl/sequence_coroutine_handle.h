@@ -70,9 +70,9 @@ namespace gtl::seq::inline v01 {
 		}
 		sState(std::suspend_always) : tNextDispatch(clock_t::time_point::max()) {}
 		sState(std::suspend_never) : tNextDispatch{} {}
-		sState(sState const&) = default;
+		sState(sState const&) = delete;
 		sState(sState&&) = default;
-		sState& operator = (sState const&) = default;
+		sState& operator = (sState const&) = delete;
 		sState& operator = (sState&&) = default;
 
 		void Clear() { *this ={}; }
@@ -124,6 +124,8 @@ namespace gtl::seq::inline v01 {
 	/// @brief coroutine handle
 	class ICoroutineHandle {	// interface, pure virtual
 	public:
+		virtual ~ICoroutineHandle() = default;
+
 		virtual void Destroy() = 0;
 		virtual bool Valid() const = 0;
 		virtual void Resume() = 0;
@@ -132,7 +134,7 @@ namespace gtl::seq::inline v01 {
 	};
 
 	//-------------------------------------------------------------------------
-	/// @brief 
+	/// @brief
 	template < typename tResult >
 	class TCoroutineHandle : protected std::coroutine_handle<TPromise<tResult, TCoroutineHandle>>, public ICoroutineHandle {
 	public:
@@ -165,7 +167,7 @@ namespace gtl::seq::inline v01 {
 	};
 
 	//-------------------------------------------------------------------------
-	/// @brief 
+	/// @brief
 	template < typename tResult, template < typename tResult2 > typename tCoroutineHandle >
 	struct TPromise {
 		using result_t = tResult;

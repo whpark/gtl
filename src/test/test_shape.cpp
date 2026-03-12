@@ -12,7 +12,7 @@ using namespace gtl::literals;
 #ifdef _DEBUG
 #define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
 #else
-#define DEBUG_PRINT(...) 
+#define DEBUG_PRINT(...)
 #endif
 
 TEST(gtl_shape, basic) {
@@ -24,13 +24,13 @@ TEST(gtl_shape, basic) {
 
 	auto rLine1 = std::make_unique<gtl::shape::xLine>();
 	auto rLine2 = std::make_unique<gtl::shape::xLine>();
-	rLine1->m_pt0 = {1, 1};
-	rLine1->m_pt1 = {2, 2};
-	rLine2->m_pt0 = {1, 1};
-	rLine2->m_pt1 = {2, 2};
+	rLine1->m_pt0.Set(1, 1);
+	rLine1->m_pt1.Set(2, 2);
+	rLine2->m_pt0.Set(1, 1);
+	rLine2->m_pt1.Set(2, 2);
 	EXPECT_EQ(*rLine1, *rLine2);
 
-	rLine2->m_pt1 = {2, 2.1};
+	rLine2->m_pt1.Set(2, 2.1);
 	EXPECT_NE(*rLine1, *rLine2);
 
 	std::unique_ptr<gtl::shape::xShape> r1 = std::move(rLine1);

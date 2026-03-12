@@ -76,7 +76,7 @@ namespace gtl::seq::inline v01 {
 		}
 
 		// destructor
-		~xSequenceTReturn() {
+		virtual ~xSequenceTReturn() {
 			Destroy();
 		}
 		inline void Destroy() {
@@ -86,21 +86,21 @@ namespace gtl::seq::inline v01 {
 			}
 		}
 
-		/// @brief 
-		/// @return 
+		/// @brief
+		/// @return
 		inline bool IsDone() const {
 			return m_children.empty() and (!m_handle or m_handle->Done());
 		}
 
-		/// @brief 
+		/// @brief
 		/// @return current running sequence
 		static this_t* GetCurrentSequence() { return s_seqCurrent; }
 
-		/// @brief 
+		/// @brief
 		/// @return working thread id
 		auto GetWorkingThreadID() const { return m_threadID; }
 
-		/// @brief 
+		/// @brief
 		/// @return Get Next Dispatch Time
 		/// this function seems to be very heavy. need to optimize.
 		template <bool bRefreshChild = false>
@@ -167,15 +167,15 @@ namespace gtl::seq::inline v01 {
 		}
 		bool ReserveResume(clock_t::duration dur) { return ReserveResume(dur.count() ? clock_t::now() + dur : clock_t::time_point{}); }
 
-		/// @brief 
+		/// @brief
 		/// @return direct child sequence count
 		auto CountChild() const { return m_children.size(); }
 
-		/// @brief 
+		/// @brief
 		/// @param name Task Name
 		/// @param func coroutine function
 		/// @param ...args for coroutine function. must be moved or copied.
-		/// @return 
+		/// @return
 		template < typename tResult, typename ... tArgs >
 		std::future<tResult> CreateChildSequence(seq_id_t name, std::function<tcoro_t<tResult>(this_t&, tArgs&& ...)> func, tArgs&& ... args) {
 			if constexpr (false) {	// todo: do I need this?
@@ -207,7 +207,7 @@ namespace gtl::seq::inline v01 {
 		}
 
 		/// @brief Find Child Sequence (Direct Child Only)
-		/// @param name 
+		/// @param name
 		/// @return child sequence. if not found, empty child sequence.
 	#if __cpp_explicit_this_parameter
 		auto FindDirectChild(this auto&& self, seq_id_t const& name) -> decltype(&self) {
@@ -239,7 +239,7 @@ namespace gtl::seq::inline v01 {
 	#endif
 
 		/// @brief Find Child Sequence (Depth First Search)
-		/// @param name 
+		/// @param name
 		/// @return child sequence. if not found, empty child sequence.
 	#if __cpp_explicit_this_parameter
 		auto FindChildDFS(this auto&& self, seq_id_t const& name) -> decltype(&self) {

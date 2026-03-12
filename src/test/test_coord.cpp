@@ -60,7 +60,7 @@ TEST(gtl_coord, point) {
 	EXPECT_EQ((xPoint3d{1, 0, 0}.CountNonZero()), 1);
 	EXPECT_EQ((xPoint3d{1, 0, 2}.CountNonZero()), 2);
 
-	
+
 	EXPECT_EQ((xPoint3d{1, 2, 3} += {1, 2, 3}), (xPoint3d{2, 4, 6}));
 	EXPECT_EQ((xPoint3d{1, 2, 3} -= {3, 2, 1}), (xPoint3d{-2, 0, 2}));
 	EXPECT_EQ((xPoint3d{1, 2, 3} + xPoint3d{1, 2, 3}), (xPoint3d{2, 4, 6}));

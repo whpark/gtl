@@ -114,8 +114,8 @@ namespace gtl {
 				this->x = B.left;
 				this->y = B.top;
 				//z = {};
-			} else 
-				static_assert(gtlc::dependent_false_v);
+			} else
+				static_assert(false);
 			return *this;
 		};
 
@@ -131,7 +131,7 @@ namespace gtl {
 
 		// Type Casting to cv::Size_, SIZE, ...
 		template < gtlc::generic_coord T_COORD >
-		operator T_COORD const () const {
+		operator T_COORD () const {
 		#define GTL__TYPE_CAST_COORD_VAL4(tx, ty, tz, tw)\
 			T_COORD{RoundOrForward<decltype(T_COORD::tx)>(this->x), RoundOrForward<decltype(T_COORD::ty)>(this->y), RoundOrForward<decltype(T_COORD::tz)>(this->z), RoundOrForward<decltype(T_COORD::tw)>(this->w)};
 		#define GTL__TYPE_CAST_COORD_VAL3(tx, ty, tz)\
@@ -163,7 +163,7 @@ namespace gtl {
 				return GTL__TYPE_CAST_COORD_VAL2(width, height);
 			}
 			else {
-				static_assert(gtlc::dependent_false_v);
+				static_assert(false);
 			}
 
 		#undef GTL__TYPE_CAST_COORD_VAL2
@@ -205,7 +205,7 @@ namespace gtl {
 				this->y += RoundOrForward<T>(B.cy);
 				if constexpr ((dim >= 3) and gtlc::has__cz<T_COORD>)
 					this->z += RoundOrForward<T>(B.cz);
-			} else static_assert(gtlc::dependent_false_v);
+			} else static_assert(false);
 			return *this;
 		};
 		template < gtlc::generic_coord T_COORD > this_t& operator -= (T_COORD const& B) {
@@ -226,7 +226,7 @@ namespace gtl {
 				this->y -= RoundOrForward<T>(B.cy);
 				if constexpr ((dim >= 3) and gtlc::has__cz<T_COORD>)
 					this->z -= RoundOrForward<T>(B.cz);
-			} else static_assert(gtlc::dependent_false_v);
+			} else static_assert(false);
 			return *this;
 		};
 
@@ -244,10 +244,10 @@ namespace gtl {
 		template < gtlc::arithmetic T2 > [[nodiscard]] this_t operator + (T2 d) const				{ auto C = *this; return C += d; };
 		template < gtlc::arithmetic T2 > [[nodiscard]] this_t operator - (T2 d) const				{ auto C = *this; return C -= d; };
 
-		template < gtlc::arithmetic T2 > friend [[nodiscard]] this_t operator * (T2 A, this_t B)	{ for (auto& v: B.arr()) v = RoundOrForward<T>(A*v); return B; }
-		template < gtlc::arithmetic T2 > friend [[nodiscard]] this_t operator / (T2 A, this_t B)	{ for (auto& v: B.arr()) v = RoundOrForward<T>(A/v); return B; }
-		template < gtlc::arithmetic T2 > friend [[nodiscard]] this_t operator + (T2 A, this_t B)	{ for (auto& v: B.arr()) v = RoundOrForward<T>(A+v); return B; }
-		template < gtlc::arithmetic T2 > friend [[nodiscard]] this_t operator - (T2 A, this_t B)	{ for (auto& v: B.arr()) v = RoundOrForward<T>(A-v); return B; }
+		template < gtlc::arithmetic T2 > [[nodiscard]] friend this_t operator * (T2 A, this_t B)	{ for (auto& v: B.arr()) v = RoundOrForward<T>(A*v); return B; }
+		template < gtlc::arithmetic T2 > [[nodiscard]] friend this_t operator / (T2 A, this_t B)	{ for (auto& v: B.arr()) v = RoundOrForward<T>(A/v); return B; }
+		template < gtlc::arithmetic T2 > [[nodiscard]] friend this_t operator + (T2 A, this_t B)	{ for (auto& v: B.arr()) v = RoundOrForward<T>(A+v); return B; }
+		template < gtlc::arithmetic T2 > [[nodiscard]] friend this_t operator - (T2 A, this_t B)	{ for (auto& v: B.arr()) v = RoundOrForward<T>(A-v); return B; }
 
 		//
 		void Set(T x = {}, T y = {})						requires (dim == 2) { this->x = x; this->y = y; }
@@ -257,13 +257,13 @@ namespace gtl {
 		void SetAll(T value = {})							requires (dim == 3) { this->x = this->y = this->z = value; }
 		void SetAll(T value = {})							requires (dim == 4) { this->x = this->y = this->z = this->w = value; }
 		void SetZero()															{ SetAll(); }
-		[[nodiscard]] void SetAsNAN() requires (std::is_floating_point_v<T>) {
+		void SetAsNAN() requires (std::is_floating_point_v<T>) {
 			if constexpr (std::is_same_v<T, float>) {
 				SetAll(std::nanf(""));
 			} else if constexpr (std::is_same_v<T, double>) {
 				SetAll(std::nan(""));
 			} else {
-				static_assert(gtlc::dependent_false_v);
+				static_assert(false);
 			}
 		}
 

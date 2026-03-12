@@ -241,7 +241,7 @@ namespace gtl::qt {
 			xPoint2i ptLT = ct2(ptOrigin);
 
 			if (bCenter or eZoom == eZOOM::fit2window) {
-				m_ctScreenFromImage.m_origin = {};
+				m_ctScreenFromImage.m_origin.SetZero();
 				m_ctScreenFromImage.m_offset = ptLT;
 			}
 			else if (eZoom == eZOOM::fit2width) {
@@ -547,7 +547,7 @@ namespace gtl::qt {
 				int heightMax { (int) (ctS2I.Trans((double)rectClient.Height()) * 9.5 / 10) };
 				xPoint2i ptImgBottom = ctS2I(xPoint2i{rectClient.left, rectClient.bottom});
 				xPoint2i ptImgTop = ctS2I(xPoint2i{rectClient.left, rectClient.top});
-				auto y0 = std::min(ptImgBottom.y + heightMax, m_img.rows - 1);
+				//auto y0 = std::min(ptImgBottom.y + heightMax, m_img.rows - 1);
 
 				auto CheckIfBlank = [&](int y) -> bool {
 					constexpr static int margin = 5;
@@ -666,7 +666,7 @@ namespace gtl::qt {
 
 	void xMatView::keyPressEvent(QKeyEvent* event) {
 		// Print Char Pressed
-		auto l = std::source_location::current();
+		//auto l = std::source_location::current();
 		//OutputDebugStringW(std::format(L"{}: {}\n", gtl::ToStringW(l.function_name()), event->key()).c_str());
 		auto bControl = event->modifiers() & Qt::ControlModifier;
 		auto bAlt =	event->modifiers() & Qt::AltModifier;
@@ -909,7 +909,7 @@ namespace gtl::qt {
 		auto rect{GetViewRect()};
 		auto ptImage = m_ctScreenFromImage.TransI(rect.CenterPoint());
 		m_ctScreenFromImage.m_scale = scale;
-		auto pt2 = m_ctScreenFromImage(ptImage);
+		//auto pt2 = m_ctScreenFromImage(ptImage);
 		m_ctScreenFromImage.m_offset += rect.CenterPoint() - m_ctScreenFromImage(ptImage);
 		UpdateScrollBars();
 		UpdateCanvas();
@@ -993,7 +993,7 @@ namespace gtl::qt {
 			return;
 		auto [rectClient, rectImageScreen, rectScrollRange] = GetScrollGeometry();
 		int range = rectScrollRange.Width();
-		int page =  rectClient.Width();
+		//int page =  rectClient.Width();
 		pos = std::clamp(pos, 0, range);
 		m_ctScreenFromImage.m_offset.x = - pos;
 		if (m_option.bExtendedPanning)
@@ -1006,7 +1006,7 @@ namespace gtl::qt {
 			return;
 		auto [rectClient, rectImageScreen, rectScrollRange] = GetScrollGeometry();
 		int range = rectScrollRange.Height();
-		int page =  rectClient.Height();
+		//int page =  rectClient.Height();
 		pos = std::clamp(pos, 0, range);
 		m_ctScreenFromImage.m_offset.y = - pos;
 		if (m_option.bExtendedPanning)
@@ -1314,7 +1314,7 @@ R"(
 					xWaitCursor wc;
 
 					double scaleP = m_img.cols < m_img.rows ? (double)imgPyr.rows / m_img.rows : (double)imgPyr.cols / m_img.cols;
-					double scale = imgPyr.cols < imgPyr.rows ? (double)size.height / imgPyr.rows : (double)size.width / imgPyr.cols;
+					//double scale = imgPyr.cols < imgPyr.rows ? (double)size.height / imgPyr.rows : (double)size.width / imgPyr.cols;
 					cv::Rect roiP(roi);
 					roiP.x *= scaleP;
 					roiP.y *= scaleP;

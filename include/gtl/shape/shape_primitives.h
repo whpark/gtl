@@ -80,14 +80,14 @@ namespace gtl::shape {
 
 	using polypoint_t = tpolypoint_t<double>;
 
-	inline point_t PointFrom(gtl::bjson<json_t> j) {
+	inline point_t PointFrom(gtl::bjson<json_t> const& j) {
 		point_t pt;
 		pt.x = j[0];
 		pt.y = j[1];
 		pt.z = j[2];
 		return pt;
 	}
-	inline polypoint_t PolyPointFrom(gtl::bjson<json_t> j) {
+	inline polypoint_t PolyPointFrom(gtl::bjson<json_t> const& j) {
 		polypoint_t pt;
 		pt.x = j[0];
 		pt.y = j[1];
@@ -95,7 +95,7 @@ namespace gtl::shape {
 		pt.w = j[4];
 		return pt;
 	}
-	inline polypoint_t PolyPointFromVertex(gtl::bjson<json_t> j) {
+	inline polypoint_t PolyPointFromVertex(gtl::bjson<json_t> const& j) {
 		using namespace std::literals;
 		polypoint_t pt;
 		pt = PolyPointFrom(j["basePoint"sv]);
@@ -178,12 +178,12 @@ namespace gtl::shape {
 			ar & var.buffer;
 			ar & var.str;
 			decltype(var.duration)::rep count{};
-			if constexpr (archive::is_saving()) {
+			if constexpr (typename archive::is_saving()) {
 				count = var.duration.count();
 			}
 			ar & count;
 
-			if constexpr (archive::is_loading()) {
+			if constexpr (typename archive::is_loading()) {
 				var.duration = std::chrono::nanoseconds(count);
 			}
 			return ar;
@@ -251,11 +251,10 @@ namespace gtl::shape {
 		//GTL__REFLECTION_VIRTUAL_BASE(xShape);
 		//GTL__REFLECTION_MEMBERS(m_color, m_eLineType, m_strLineType, m_lineWeight, m_bVisible, m_bTransparent, m_cookie);
 
-		//auto operator <=> (xShape const&) const = default;
+		auto operator <=> (xShape const&) const = delete;	//......
 		bool operator == (xShape const& B) const {
 			return Compare(B);
 		}
-		auto operator <=> (xShape const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xShape& var, unsigned int const file_version) {

@@ -93,7 +93,7 @@ using namespace gtl;
 //			static_assert(true);
 //		}
 //		else {
-//			static_assert(gtlc::dependent_false_v);
+//			static_assert(false);
 //		}
 //	}
 //
@@ -112,19 +112,18 @@ TEST(gtl_string, tszlen) {
 		std::array<char, 10> buf1;
 		std::vector<char> buf2;
 
-		auto const* v0 = std::data(buf0);
-		auto const* v1 = std::data(buf1);
-		auto const* v2 = std::data(buf2);
-		auto s0 = std::size(buf0);
-		auto s1 = std::size(buf1);
-		auto s2 = std::size(buf2);
+		[[maybe_unused]] auto const* v0 = std::data(buf0);
+		[[maybe_unused]] auto const* v1 = std::data(buf1);
+		[[maybe_unused]] auto const* v2 = std::data(buf2);
+		[[maybe_unused]] auto s0 = std::size(buf0);
+		[[maybe_unused]] auto s1 = std::size(buf1);
+		[[maybe_unused]] auto s2 = std::size(buf2);
 
 		EXPECT_EQ(std::size("ABCDEF"), 7);
 	}
 
 	//tszlen
 	EXPECT_EQ(5, "asdfe"sv.size());
-	gtl::tszlen("123456789012");
 	EXPECT_EQ(12, gtl::tszlen("123456789012"));
 	EXPECT_EQ(11, (gtl::tszlen(u"asdfjaskdlf", u"asdfjaskdlf"sv.size()+1)));
 	EXPECT_EQ(3, gtl::tszlen(U"가나다"));
@@ -153,7 +152,7 @@ TEST(gtl_string, tszlen) {
 
 //namespace test {
 //	template < gtlc::string_elem tchar, gtlc::contiguous_type_string_container<tchar> tstring_buf >
-//	constexpr GTL__DEPR_SEC errno_t tsz(tstring_buf& szDest, tchar const* const& pszSrc) {
+//	GTL__DEPR_SEC constexpr errno_t tsz(tstring_buf& szDest, tchar const* const& pszSrc) {
 //	#pragma warning(suppress:4996)
 //		return tszcpy(std::data(szDest), std::size(szDest), pszSrc);
 //	}
@@ -389,7 +388,7 @@ TEST(gtl_string, tszrmchar) {
 	}
 	{
 		std::vector<char> buf;
-		buf.resize(32); 
+		buf.resize(32);
 		tszcpy(buf, "AhBhCDEFGh0123h4"sv);
 		EXPECT_TRUE("ABCDEFG01234"sv.size() == tszrmchar(buf, 'h'));
 		EXPECT_TRUE("ABCDEFG01234"sv        == buf.data());
@@ -637,9 +636,9 @@ TEST(gtl_string, tszupr_lwr) {
 
 TEST(gtl_string, tszto) {
 
-	auto ExpectEQ = []<typename T1, typename T2 = T1>(T1 && a, T2 && b) {
-		EXPECT_EQ(std::forward<T1>(a), std::forward<T2>(b));
-	};
+	//auto ExpectEQ = []<typename T1, typename T2 = T1>(T1 && a, T2 && b) {
+	//	EXPECT_EQ(std::forward<T1>(a), std::forward<T2>(b));
+	//};
 
 
 	char16_t sz[30];
@@ -664,20 +663,20 @@ TEST(gtl_string, tszto) {
 	EXPECT_TRUE(CompareStringContainingNumbers(u"0123456789"sv, u"01234567891"sv) < 0);
 	EXPECT_TRUE(CompareStringContainingNumbers(u"0123456789"sv, u"0123456788"sv) > 0);
 
-	auto a1 = gtl::tsztoi("12345"sv);
-	auto a2 = gtl::tsztoi("12345"s);
-	auto a3 = gtl::tsztoi("12345");
-	xString str;
+	[[maybe_unused]] auto a1 = gtl::tsztoi("12345"sv);
+	[[maybe_unused]] auto a2 = gtl::tsztoi("12345"s);
+	[[maybe_unused]] auto a3 = gtl::tsztoi("12345");
+	[[maybe_unused]] xString str;
 	str = "12345";
-	auto a4 = gtl::tsztoi(xString("12345"sv));
+	[[maybe_unused]] auto a4 = gtl::tsztoi(xString("12345"sv));
 	//auto aa = overload{
 	//	[]() { std::cout << "()" << std::endl; },
 	//	[](int) { std::cout << "(int)" << std::endl; },
 	//	[](float) { std::cout << "(float)" << std::endl; },
 	//};
 
-	char* psz{};
-	auto v0 = gtl::tsztoi<int>("123456"sv);
+	[[maybe_unused]] char* psz{};
+	[[maybe_unused]] auto v0 = gtl::tsztoi<int>("123456"sv);
 	//auto v1 = gtl::tsztoi<int>(std::string_view("123456"s), nullptr, 0, 0);
 	//auto v2 = gtl::tsztoi((std::string_view)std::basic_string<char>("123456"), nullptr, 0, 0);
 	//EXPECT_EQ(123456, v2);
@@ -702,8 +701,8 @@ TEST(gtl_string, tszto) {
 	//EXPECT_EQ(1.3e-3, gtl::tsztod("1.3e-3"sv));
 	//EXPECT_EQ(-1.3e-3, gtl::tsztod("-1.3e-3"sv));
 
-	std::regex rx(R"(^([+-]?(?:[[:d:]]+\.?|[[:d:]]*\.[[:d:]]+))(?:[Ee][+-]?[[:d:]]+)?$)");
-	std::regex reg{ R"x(^([+\-]?(?:[[:d:]]+\.?|[[:d:]]*\.[[:d:]]+))(?:[Ee][+\-]?[[:d:]]+)?$)x" };
+	[[maybe_unused]] std::regex rx(R"(^([+-]?(?:[[:d:]]+\.?|[[:d:]]*\.[[:d:]]+))(?:[Ee][+-]?[[:d:]]+)?$)");
+	[[maybe_unused]] std::regex reg{ R"x(^([+\-]?(?:[[:d:]]+\.?|[[:d:]]*\.[[:d:]]+))(?:[Ee][+\-]?[[:d:]]+)?$)x" };
 	//std::regex_starts_with
 	//static constexpr auto pattern = ctll::fixed_string{ R"()" };
 	//static constexpr auto pattern = ctll::fixed_string{ R"x(^[\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?$)x" };

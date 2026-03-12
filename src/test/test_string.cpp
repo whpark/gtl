@@ -72,11 +72,11 @@ TEST(gtl_string, TString_CodepageConversion) {
 	gtl::g_eCodepageMBCS = gtl::eCODEPAGE::UTF8;
 
 	using namespace gtl;
-	std::string_view sv{"ACBDEF"};
+	[[maybe_unused]] std::string_view sv{"ACBDEF"};
 
-	auto len0 = gtl::tszlen(u"ABCDEF");
+	[[maybe_unused]] auto len0 = gtl::tszlen(u"ABCDEF");
 	static_assert(gtl::tszlen(u"ABCDEF") == 6);
-	auto len1 = gtl::tszlen(u"ABCDEF"sv);
+	[[maybe_unused]] auto len1 = gtl::tszlen(u"ABCDEF"sv);
 	static_assert(gtl::tszlen(u"ABCDEF"sv) == 6);
 
 	gtl::xStringU8 strU8 (L"가다다라😊"sv);
@@ -166,8 +166,8 @@ TEST(gtl_string, TString_Upper_Lower) {
 
 		//auto mapC = gtl::charset::mapUL_latin_extended_g;
 
-		char32_t c1 = *pos;
-		char32_t c2 = *(pos+1);
+		[[maybe_unused]] char32_t c1 = *pos;
+		[[maybe_unused]] char32_t c2 = *(pos+1);
 
 		xStringU16 str1;
 		str1 = std::u16string_view(pos, pos+1);

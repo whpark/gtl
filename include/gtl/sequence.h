@@ -108,7 +108,7 @@ namespace gtl::seq::inline v01 {
 			auto t = clock_t::time_point::max();
 			if constexpr (bRefreshChild) {
 				for (auto const& child : m_children) {
-					t = std::min(t, child.GetNextDispatchTime<bRefreshChild>());
+					t = std::min(t, child.template GetNextDispatchTime<bRefreshChild>());
 				}
 			}
 			else {

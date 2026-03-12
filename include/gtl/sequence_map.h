@@ -206,7 +206,7 @@ namespace gtl::seq::inline v01 {
 			auto handler = unitTarget->FindHandler(name);
 			if (!handler.handler)
 				throw xException("no handler");
-			return parent->CreateChildSequence<param_t>(
+			return parent->template CreateChildSequence<param_t>(
 				running.empty() ? std::move(name) : std::move(running), handler.max_sequence_count, handler.handler, std::move(params));
 		}
 
@@ -237,7 +237,7 @@ namespace gtl::seq::inline v01 {
 		size_t BroadcastSequence(seq_t& parent, seq_id_t name, param_t params = {}) {
 			size_t count{};
 			if (auto handler = FindHandler(name)) {
-				parent.CreateChildSequence<std::shared_ptr<param_t>>(handler.max_sequence_count, name, handler.handler, std::move(params));
+				parent.template CreateChildSequence<std::shared_ptr<param_t>>(handler.max_sequence_count, name, handler.handler, std::move(params));
 				count++;
 			}
 			for (auto* child : m_mapChildren) {

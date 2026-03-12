@@ -121,6 +121,7 @@ namespace gtl::concepts {
 	template < string_elem tchar >
 	using as_wide_t = typename as_wide<tchar>::type;
 
+	using charuw_t = as_utf_t<wchar_t>;	// charuw_t : char16_t or char32_t, according to wchar_t size.
 
 	/// @brief check if the type is same. (ex, char16_t == wchar_t for windows)
 	template < typename tchar1, typename tchar2 >
@@ -131,12 +132,12 @@ namespace gtl::concepts {
 
 	///// @brief type for string buffer. ex) char buf[12]; std::array<char, 12> buf; std::vector<char> buf;...
 	//template < typename tcontainer >
-	//concept contiguous_string_container = 
+	//concept contiguous_string_container =
 	//	string_elem<std::remove_cvref_t<decltype(tcontainer{}[0])>>
 	//	and
 	//	contiguous_container<tcontainer>;
 	template < typename tcontainer >
-	concept contiguous_string_container = 
+	concept contiguous_string_container =
 		string_elem<std::remove_cvref_t<decltype(tcontainer{}[0])>>
 		and
 		(
@@ -153,7 +154,7 @@ namespace gtl::concepts {
 
 	/// @brief type for string buffer with type constraints
 	template < typename tcontainer, typename tchar >
-	concept contiguous_type_string_container = 
+	concept contiguous_type_string_container =
 		(std::is_same_v<std::remove_cvref_t<typename tcontainer::value_type>, tchar> or std::is_same_v<std::remove_cvref_t<decltype(tcontainer{}[0])>, tchar>)
 		and
 		contiguous_string_container<tcontainer>;

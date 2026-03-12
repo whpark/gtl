@@ -24,21 +24,21 @@ public:
 
 // Overrides
 public:
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs) override;
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	virtual void OnInitialUpdate(); // called first time after construct
-	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
-	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
-	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
-	virtual void OnPrint(CDC* pDC, CPrintInfo* pInfo);
+	virtual void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	virtual void OnInitialUpdate() override; // called first time after construct
+	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo) override;
+	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo) override;
+	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo) override;
+	virtual void OnPrint(CDC* pDC, CPrintInfo* pInfo) override;
 
 // Implementation
 public:
 	virtual ~CtestwinView();
 #ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
+	virtual void AssertValid() const override;
+	virtual void Dump(CDumpContext& dc) const override;
 #endif
 
 protected:

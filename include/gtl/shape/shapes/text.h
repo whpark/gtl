@@ -58,7 +58,7 @@ namespace gtl::shape {
 				and ( m_alignVert	== B.m_alignVert )
 				;
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::text; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::text; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
@@ -89,7 +89,8 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xText);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(xText, xShape);
 		//GTL__REFLECTION_MEMBERS(pt0, pt1, text, height, angle, widthScale, oblique, textStyle, textgen, alignHorz, alignVert);
-		auto operator <=> (xText const&) const = default;
+		auto operator <=> (xText const&) const = delete;
+		bool operator == (xText const& B) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xText& var, unsigned int const file_version) {
@@ -121,12 +122,12 @@ namespace gtl::shape {
 
 			m_pt0 = PointFrom(j["basePoint"sv]);
 			m_pt1 = PointFrom(j["secPoint"sv]);
-			m_text = j["text"sv];
+			m_text = (gtl::shape::string_t)j["text"sv];
 			m_height = j["height"sv];
 			m_angle = deg_t{(double)j["angle"sv]};
 			m_widthScale = j["widthscale"sv];
 			m_oblique = deg_t{(double)j["oblique"sv]};
-			m_textStyle = j["style"sv];
+			m_textStyle = (gtl::shape::string_t)j["style"sv];
 			m_textgen = j["textgen"sv];
 			m_alignHorz = (eALIGN_HORZ)(int)j["alignH"sv];
 			m_alignVert = (eALIGN_VERT)(int)j["alignV"sv];
@@ -166,7 +167,7 @@ namespace gtl::shape {
 			this_t const& B = (this_t const&)B_;
 			return m_interlin == B.m_interlin;
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::mtext; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::mtext; }
 
 		//virtual point_t PointAt(double t) const override {};
 		//virtual void FlipX() override {}
@@ -180,7 +181,8 @@ namespace gtl::shape {
 		}
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xMText);
-		auto operator <=> (xMText const&) const = default;
+		auto operator <=> (xMText const&) const = delete;
+		bool operator == (xMText const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xMText& var, unsigned int const file_version) {

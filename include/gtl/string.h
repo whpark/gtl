@@ -55,7 +55,7 @@ namespace gtl {
 		using index_type = intptr_t;
 
 		/// @brief Constructor
-		/// @tparam tchar 
+		/// @tparam tchar
 		using base_t::base_t;
 		TString() = default;
 		TString(TString const& B) = default;
@@ -73,7 +73,7 @@ namespace gtl {
 
 
 		///// @brief Constructor from other codepage (sz[])
-		///// @param pszOther 
+		///// @param pszOther
 		//template < size_t N, gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
 		//explicit TString(tchar_other const (&szOther)[N]) {
 		//#pragma warning(suppress:4996)
@@ -81,7 +81,7 @@ namespace gtl {
 		//}
 
 		/// @brief Constructor from other codepage (psz)
-		/// @param pszOther 
+		/// @param pszOther
 		template < gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
 		GTL__DEPR_SEC explicit TString(tchar_other const* pszOther) {
 #pragma warning(suppress:4996)
@@ -89,7 +89,7 @@ namespace gtl {
 		}
 
 		/// @brief Constructor from other codepage
-		/// @param 
+		/// @param
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_same_v< tchar, tchar_other >)
 		explicit TString(tstring_buf const& b) : base_t(gtl::ToString<tchar, tchar_other>(b)) {
@@ -209,33 +209,33 @@ namespace gtl {
 		//---------------------------------------------------------------------
 		/// @brief operator + ... (which needs codepage conversion)
 		template < gtlc::string_elem tchar_other > requires (!std::is_same_v<tchar, tchar_other>)
-		friend inline [[nodiscard]] TString operator + (TString const& a, TString<tchar_other> const& b) {
+		[[nodiscard]] friend inline TString operator + (TString const& a, TString<tchar_other> const& b) {
 			return (std::basic_string<tchar> const&)a + gtl::ToString<tchar, tchar_other>(b);
 		}
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_same_v<tchar, tchar_other>)
-		friend inline [[nodiscard]] TString operator + (TString const& a, tstring_buf const& b) {
+		[[nodiscard]] friend inline TString operator + (TString const& a, tstring_buf const& b) {
 			return (std::basic_string<tchar> const&)a + gtl::ToString<tchar, tchar_other>(b);
 		}
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_same_v<tchar, tchar_other>)
-		friend inline [[nodiscard]] TString&& operator + (TString&& a, tstring_buf const& b) {
+		[[nodiscard]] friend inline TString&& operator + (TString&& a, tstring_buf const& b) {
 			a += gtl::ToString<tchar, tchar_other>(b);
 			return std::move(a);
 		}
 
 		///// @brief operator + (move) ...
-		//friend inline [[nodiscard]] TString&& operator + (TString&& a, TString const& b) {
+		//[[nodiscard]] friend inline TString&& operator + (TString&& a, TString const& b) {
 		//	a += b;
 		//	return std::move(a);
 		//}
 		//template < gtlc::string_elem tchar_other >
-		//friend inline [[nodiscard]] TString&& operator + (TString&& a, TString<tchar_other> const& b) {
+		//[[nodiscard]] friend inline TString&& operator + (TString&& a, TString<tchar_other> const& b) {
 		//	a += b.ToString<tchar>();
 		//	return std::move(a);
 		//}
 		//template < gtlc::string_elem tchar_other >
-		//friend [[nodiscard]] TString&& operator + (TString&& a, std::basic_string<tchar_other> const& b) {
+		//[[nodiscard]] friend TString&& operator + (TString&& a, std::basic_string<tchar_other> const& b) {
 		//	if constexpr (std::is_same_v<tchar, tchar_other>) {
 		//		a += b;
 		//	} else {
@@ -244,7 +244,7 @@ namespace gtl {
 		//	return std::move(a);
 		//}
 		//template < gtlc::string_elem tchar_other >
-		//friend inline [[nodiscard]] TString&& operator + (TString&& a, std::basic_string_view<tchar_other> b)	{
+		//[[nodiscard]] friend inline TString&& operator + (TString&& a, std::basic_string_view<tchar_other> b)	{
 		//	if constexpr (std::is_same_v<tchar, tchar_other>) {
 		//		a += b;
 		//	} else {
@@ -253,12 +253,12 @@ namespace gtl {
 		//	return std::move(a);
 		//}
 		//template < gtlc::string_elem tchar_other >
-		//friend inline [[nodiscard]] TString&& operator + (TString&& a, tchar_other const b) {
+		//[[nodiscard]] friend inline TString&& operator + (TString&& a, tchar_other const b) {
 		//	a += std::basic_string_view<tchar_other>(b);
 		//	return std::move(a);
 		//}
 		//template < gtlc::string_elem tchar_other >
-		//GTL__DEPR_SEC friend inline [[nodiscard]] TString&& operator + (TString&& a, tchar_other const* const& b) {
+		//[[nodiscard]] GTL__DEPR_SEC friend inline TString&& operator + (TString&& a, tchar_other const* const& b) {
 		//	a += std::basic_string_view<tchar_other>(b);
 		//	return std::move(a);
 		//}
@@ -290,20 +290,20 @@ namespace gtl {
 		// TString<tchar_other> 로 하면 동작 안함. friend 함수의 인자에 하나라도 class와 동일한 인자가 있어야 하나?....
 		template < gtlc::contiguous_string_container tstring_buf, gtlc::string_elem tchar_other = std::remove_cvref_t<decltype(tstring_buf{}[0])> >
 		requires (!std::is_base_of_v<TString<tchar_other>, tstring_buf>)
-		friend inline [[nodiscard]] TString<tchar_other> operator + (tstring_buf const& a, TString const& b) {
+		[[nodiscard]] friend inline TString<tchar_other> operator + (tstring_buf const& a, TString const& b) {
 			return TString::Add<tchar_other, tchar>(a, b);
 		}
 		//template < typename tchar_other >
 		//requires (!std::is_same_v<tchar, tchar_other>)
-		//friend inline [[nodiscard]] TString<tchar> operator + (TString<tchar_other> const& a, TString const& b) {
+		//[[nodiscard]] friend inline TString<tchar> operator + (TString<tchar_other> const& a, TString const& b) {
 		//	return TString::Add<tchar_other, tchar>(a, b);
 		//}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
-		GTL__DEPR_SEC friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const* const& a, TString<tchar> const& b) {
+		[[nodiscard]] GTL__DEPR_SEC friend inline TString<tchar_other> operator + (tchar_other const* const& a, TString<tchar> const& b) {
 			return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>(a), b);
 		}
 		template < gtlc::string_elem tchar_other >// requires (!std::is_same_v<tchar, tchar_other>)
-		friend inline [[nodiscard]] TString<tchar_other> operator + (tchar_other const a, TString const& b) {
+		[[nodiscard]] friend inline TString<tchar_other> operator + (tchar_other const a, TString const& b) {
 			return TString::Add<tchar_other, tchar>(std::basic_string_view<tchar_other>{&a, &a+1}, b);
 		}
 
@@ -624,7 +624,7 @@ namespace gtl {
 		template <typename tchar, typename... targs>
 		using tformat_string = fmt::basic_format_string<tchar, std::type_identity_t<targs>...>;
 	};
-		
+
 	template < typename tchar, typename ... targs>
 	constexpr auto TFormat(fmt::basic_string_view<tchar> fmt, targs&& ... args) -> std::basic_string<tchar> {
 		if constexpr (concepts::is_one_of<tchar, char, wchar_t>) {
@@ -636,11 +636,11 @@ namespace gtl {
 		////return fmt::format(fmt, std::forward<targs>(args)...);
 		//return fmt::vformat(fmt, fmt::make_format_args<fmt::buffer_context<tchar>>(args...));
 	}
-	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char> Format(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)			{ return TFormat<char>(fmt, std::forward<targs>(args)...); }
-	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<wchar_t> Format(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)		{ return TFormat<wchar_t>(fmt, std::forward<targs>(args)...); }
-	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char8_t> Format(gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)		{ return TFormat<char8_t>(fmt, std::forward<targs>(args)...); }
-	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char16_t> Format(gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return TFormat<char16_t>(fmt, std::forward<targs>(args)...); }
-	template < typename ... targs> constexpr [[nodiscard]] std::basic_string<char32_t> Format(gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return TFormat<char32_t>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> [[nodiscard]] constexpr std::basic_string<char> Format(gtl::internal::tformat_string<char, targs...> const& fmt, targs&& ... args)			{ return TFormat<char>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> [[nodiscard]] constexpr std::basic_string<wchar_t> Format(gtl::internal::tformat_string<wchar_t, targs...> const& fmt, targs&& ... args)		{ return TFormat<wchar_t>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> [[nodiscard]] constexpr std::basic_string<char8_t> Format(gtl::internal::tformat_string<char8_t, targs...> const& fmt, targs&& ... args)		{ return TFormat<char8_t>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> [[nodiscard]] constexpr std::basic_string<char16_t> Format(gtl::internal::tformat_string<char16_t, targs...> const& fmt, targs&& ... args)	{ return TFormat<char16_t>(fmt, std::forward<targs>(args)...); }
+	template < typename ... targs> [[nodiscard]] constexpr std::basic_string<char32_t> Format(gtl::internal::tformat_string<char32_t, targs...> const& fmt, targs&& ... args)	{ return TFormat<char32_t>(fmt, std::forward<targs>(args)...); }
 
 	template < typename tchar, typename toutput, typename ... targs>
 	constexpr auto TFormatTo(toutput& out, fmt::basic_string_view<tchar> fmt, targs&& ... args) {
@@ -656,7 +656,7 @@ namespace gtl {
 
 	template < typename tchar_to, gtl::xStringLiteral literal, typename ... targs >
 	inline static std::basic_string<tchar_to> FormatToTString(targs&& ... args) {
-		fmt::basic_format_string<tchar_to, targs...>{gtl::TStringLiteral<tchar_to, literal>{}.value};	// Compiltime Validation only
+		fmt::basic_format_string<tchar_to, targs...>{gtl::TStringLiteral<tchar_to, literal>{}.value};	// Compile time Validation only
 		static constexpr gtl::TStringLiteral<tchar_to, literal> tfmt{};
 		if constexpr (gtlc::is_one_of<tchar_to, char, wchar_t>) {
 			return fmt::format(fmt::runtime(tfmt.value), std::forward<targs>(args)...);
@@ -678,7 +678,7 @@ namespace gtl {
 		else if constexpr (std::is_same_v<tchar, char16_t>) return u"{}";
 		else if constexpr (std::is_same_v<tchar, char32_t>) return U"{}";
 		else if constexpr (std::is_same_v<tchar, char8_t>) return u8"{}";
-		else static_assert(gtlc::dependent_false_v, "invalid type");
+		else static_assert(false, "invalid type");
 	}
 
 #pragma pack(pop)

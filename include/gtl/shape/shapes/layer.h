@@ -47,7 +47,7 @@ namespace gtl::shape {
 				and (m_shapes == B.m_shapes);
 		}
 
-		virtual eSHAPE GetShapeType() const { return eSHAPE::layer; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::layer; }
 		//virtual point_t PointAt(double t) const override { throw std::exception{GTL__FUNCSIG "not here."}; return point_t {}; }	// no PointAt();
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
 			if (m_shapes.empty())
@@ -102,7 +102,8 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xLayer);
 		//GTL__REFLECTION_DERIVED(xLayer, xShape);
 		//GTL__REFLECTION_MEMBERS(name, flags, m_strLineType, m_lineWeight, shapes);
-		auto operator <=> (xLayer const&) const = default;
+		auto operator <=> (xLayer const&) const = delete;
+		bool operator == (xLayer const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xLayer& var, unsigned int const file_version) {
@@ -124,7 +125,7 @@ namespace gtl::shape {
 			xShape::LoadFromCADJson(_j);
 			using namespace std::literals;
 			gtl::bjson j(_j);
-			m_name = j["name"];	// not a "layer"
+			m_name = (gtl::shape::string_t)j["name"];	// not a "layer"
 			m_flags = j["flags"];
 			m_bUse = j["plotF"];
 

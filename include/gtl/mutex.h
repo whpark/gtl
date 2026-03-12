@@ -66,8 +66,8 @@ namespace gtl {
 		spin_mutex(bool bOwn = false) noexcept : m_flag(bOwn) {}
 		spin_mutex(spin_mutex const&) = delete;
 		spin_mutex& operator = (spin_mutex const&) = delete;
-		spin_mutex(spin_mutex&&) = default;
-		spin_mutex& operator = (spin_mutex&&) = default;
+		spin_mutex(spin_mutex&&) = delete;
+		spin_mutex& operator = (spin_mutex&&) = delete;
 
 		void lock() { // lock the mutex
 			while (!m_flag.exchange(true)) {
@@ -143,7 +143,9 @@ namespace gtl {
 			if (m_mutex.try_lock()) {
 				m_owner = idCurrent;
 				m_counter = 1;
+				return true;
 			}
+			return false;
 		}
 		bool try_lock_shared() noexcept {
 			if (auto idCurrent = std::this_thread::get_id(); idCurrent == m_owner) {

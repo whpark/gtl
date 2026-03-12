@@ -133,9 +133,9 @@ namespace gtl {
 
 	/// @brief string to int/double ...
 	/// @tparam value_t arithmetic type
-	/// @param str 
-	/// @param base 
-	/// @return 
+	/// @param str
+	/// @param base
+	/// @return
 	template < gtlc::arithmetic value_t >
 	value_t ToArithmeticValue(std::string_view sv, int base = 0, std::from_chars_result* result = {}) {
 		value_t value{};
@@ -218,32 +218,32 @@ namespace gtl {
 	}
 
 	/// @brief Rounding to nearest integer
-	/// @tparam T_DEST 
-	/// @tparam T_SOURCE 
-	/// @param v 
-	/// @return 
+	/// @tparam T_DEST
+	/// @tparam T_SOURCE
+	/// @param v
+	/// @return
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 		requires (std::is_integral_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST Round(T_SOURCE v) {
+	[[nodiscard]] constexpr T_DEST Round(T_SOURCE v) {
 		//return T_DEST(std::round(v));
 		return T_DEST(v+0.5*(v<T_SOURCE{}?-1:1));
 	}
 	/// @brief Rounding to nearest integer.
-	/// @tparam T_DEST 
-	/// @tparam T_SOURCE 
-	/// @param v 
+	/// @tparam T_DEST
+	/// @tparam T_SOURCE
+	/// @param v
 	/// @param place rounding place (ex, 1, 10, 100, 0.01 ...)
-	/// @return 
+	/// @return
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST Round(T_SOURCE v, T_SOURCE place) {
+	[[nodiscard]] constexpr T_DEST Round(T_SOURCE v, T_SOURCE place) {
 		//return T_DEST(T_DEST(std::round(v/place/10))*place*10);
 		return T_DEST(T_DEST(v/place/10+0.5*(v<T_SOURCE{}?-1:1))*place*10);
 	}
-	
+
 	/// @brief Round for gtlc::generic_coord
 	template < gtlc::generic_coord T_COORD >
-	constexpr [[nodiscard]] T_COORD Round(T_COORD const& coord) {
+	[[nodiscard]] constexpr T_COORD Round(T_COORD const& coord) {
 		T_COORD v;
 		if constexpr (gtlc::has__x<T_COORD>) { v.x = std::round(coord.x); }
 		if constexpr (gtlc::has__y<T_COORD>) { v.y = std::round(coord.y); }
@@ -259,13 +259,13 @@ namespace gtl {
 	}
 
 	/// @brief Round or just forward values. (실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.)
-	/// @tparam T_DEST 
-	/// @tparam T_SOURCE 
-	/// @param v2 
-	/// @return 
+	/// @tparam T_DEST
+	/// @tparam T_SOURCE
+	/// @param v2
+	/// @return
 	template < typename T_DEST, typename T_SOURCE >
 		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST RoundOrForward(T_SOURCE v2) {
+	[[nodiscard]] constexpr T_DEST RoundOrForward(T_SOURCE v2) {
 		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {
 			return Round<T_DEST, T_SOURCE>(v2);
 		} else {
@@ -277,18 +277,18 @@ namespace gtl {
 	// Ceil
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST Ceil(T_SOURCE v) {
+	[[nodiscard]] constexpr T_DEST Ceil(T_SOURCE v) {
 		return T_DEST(std::ceil(v));	// std::ceil is not constexpr yet.
 	}
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST Ceil(T_SOURCE v, T_SOURCE place) {
+	[[nodiscard]] constexpr T_DEST Ceil(T_SOURCE v, T_SOURCE place) {
 		return T_DEST(std::ceil(v/place/10)*place*10);
 	}
 	// 실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.
 	template < typename T_DEST, typename T_SOURCE >
 		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST CeilOrForward(T_SOURCE v2) {
+	[[nodiscard]] constexpr T_DEST CeilOrForward(T_SOURCE v2) {
 		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {
 			return Ceil<T_DEST, T_SOURCE>(v2);
 		} else {
@@ -298,7 +298,7 @@ namespace gtl {
 
 	/// @brief Ceil for gtlc::generic_coord
 	template < gtlc::generic_coord T_COORD >
-	constexpr [[nodiscard]] T_COORD Ceil(T_COORD const& coord) {
+	[[nodiscard]] constexpr T_COORD Ceil(T_COORD const& coord) {
 		T_COORD v;
 		if constexpr (gtlc::has__x<T_COORD>) { v.x = std::ceil(coord.x); }
 		if constexpr (gtlc::has__y<T_COORD>) { v.y = std::ceil(coord.y); }
@@ -316,18 +316,18 @@ namespace gtl {
 	// Floor
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST Floor(T_SOURCE v) {
+	[[nodiscard]] constexpr T_DEST Floor(T_SOURCE v) {
 		return T_DEST(std::floor(v));	// std::floor is not constexpr yet.
 	}
 	template < typename T_DEST = std::int32_t, typename T_SOURCE = double >
 		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST Floor(T_SOURCE v, T_SOURCE place) {
+	[[nodiscard]] constexpr T_DEST Floor(T_SOURCE v, T_SOURCE place) {
 		return T_DEST(std::floor(v/place/10)*place*10);
 	}
 	// 실수 -> 정수 대입시 반올림. (실수 -> 실수) 또는 (정수 -> 정수) 일 경우에는 값의 변화 없이 그대로 대입.
 	template < typename T_DEST, typename T_SOURCE >
 		requires (std::is_arithmetic_v<std::remove_cvref_t<T_DEST>> and std::is_arithmetic_v<std::remove_cvref_t<T_SOURCE>>)
-	constexpr [[nodiscard]] T_DEST FloorOrForward(T_SOURCE v2) {
+	[[nodiscard]] constexpr T_DEST FloorOrForward(T_SOURCE v2) {
 		if constexpr (std::is_integral_v<T_DEST> && std::is_floating_point_v<T_SOURCE>) {
 			return Floor<T_DEST, T_SOURCE>(v2);
 		} else {
@@ -337,7 +337,7 @@ namespace gtl {
 
 	/// @brief Floor for gtlc::generic_coord
 	template < gtlc::generic_coord T_COORD >
-	constexpr [[nodiscard]] T_COORD Floor(T_COORD const& coord) {
+	[[nodiscard]] constexpr T_COORD Floor(T_COORD const& coord) {
 		T_COORD v{};
 		if constexpr (gtlc::has__x<T_COORD>) { v.x = std::floor(coord.x); }
 		if constexpr (gtlc::has__y<T_COORD>) { v.y = std::floor(coord.y); }
@@ -397,7 +397,7 @@ namespace gtl {
 		} else if constexpr (sizeof(v) == sizeof(std::uint64_t)) {
 			return _byteswap_uint64(v);
 		} else {
-			static_assert(gtlc::dependent_false_v, "not supported data type.");
+			static_assert(false, "not supported data type.");
 		}
 	}
 	template < std::integral type >
@@ -449,11 +449,16 @@ namespace gtl {
 
 		};
 
+		//template < typename T1, typename T2 >
+		//pair(T1 a, T2 b) -> pair<std::remove_cvref_t<T1>, std::remove_cvref_t<T2>>;
+		//template < typename T1, typename T2 >
+		//pair(T1 const& a, T2 const& b) -> pair<std::remove_cvref_t<T1>, std::remove_cvref_t<T2>>;
+		//template < typename T1, typename T2 >
+		//pair(T1&& a, T2&& b) -> pair<std::remove_cvref_t<T1>, std::remove_cvref_t<T2>>;
 
 		//// non-const function call in const function. -----> std::remove_cvref_t
 		//template < typename T >
 		//using remove_ref_const_t = std::remove_const_t<std::remove_reference_t<T>>;
-
 
 	}
 
@@ -630,15 +635,15 @@ namespace gtl {
 		using namespace std::literals;
 		switch (eDirection) {
 		case eAXIS::NONE : return ""sv;
-		case eAXIS::X  : return  "X"sv; case  eAXIS::Y : return  "Y"sv; case eAXIS::Z  : return  "Z"sv;
-		case eAXIS::NX : return "-X"sv; case eAXIS::NY : return "-Y"sv; case eAXIS::NZ : return "-Z"sv;
+		case eAXIS::X:  return  "X"sv; case eAXIS::Y:  return  "Y"sv; case eAXIS::Z:  return  "Z"sv; case eAXIS::W:  return  "W"sv;
+		case eAXIS::NX: return "-X"sv; case eAXIS::NY: return "-Y"sv; case eAXIS::NZ: return "-Z"sv; case eAXIS::NW: return "-W"sv;
 		}
 		return ""sv;
 	}
 
 	inline bool IsChildPath(std::filesystem::path const& a, std::filesystem::path const& base) {
 		auto rel = std::filesystem::relative(a, base);
-		return !rel.empty() && rel.is_relative() and !rel.string().starts_with("..");
+		return !rel.empty() and rel.is_relative() and !rel.string().starts_with("..");
 	};
 
 	inline bool HasParentPath(std::filesystem::path const& path) {
@@ -646,7 +651,7 @@ namespace gtl {
 	}
 	/// @brief Get Project Name from source file path
 	/// @param l : don't touch.
-	/// @return 
+	/// @return
 	inline /*constexpr*/ std::wstring GetGTLProjectName(std::source_location const& l = std::source_location::current()) {
 		std::filesystem::path path = l.file_name();
 		if (path.extension() == ".h")	// CANNOT get project name from header file

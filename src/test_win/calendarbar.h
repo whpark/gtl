@@ -18,8 +18,8 @@ protected:
 
 // Overrides
 public:
-	virtual BOOL Create(const RECT& rect, CWnd* pParentWnd, UINT nID = (UINT)-1);
-	virtual BOOL PreTranslateMessage(MSG *pMsg);
+	BOOL Create(const RECT& rect, CWnd* pParentWnd, UINT nID = (UINT)-1);
+	virtual BOOL PreTranslateMessage(MSG *pMsg) override;
 
 // Implementation
 public:

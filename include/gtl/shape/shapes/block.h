@@ -40,10 +40,11 @@ namespace gtl::shape {
 				and (m_pt == B.m_pt)
 				;
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::block; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::block; }
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xBlock);
-		auto operator <=> (xBlock const&) const = default;
+		auto operator <=> (xBlock const&) const = delete;
+		bool operator == (xBlock const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xBlock& var, unsigned int const file_version) {
@@ -61,11 +62,11 @@ namespace gtl::shape {
 
 		virtual bool LoadFromCADJson(json_t& _j) override {
 			xShape::LoadFromCADJson(_j);
-			this->m_layer = m_layer;
+			//this->m_layer = m_layer;
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
-			m_name = j["name"];
+			m_name = (gtl::shape::string_t)j["name"];
 			m_flags = j["flags"];
 			m_pt = PointFrom(j["basePoint"]);
 

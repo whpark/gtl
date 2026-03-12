@@ -96,7 +96,7 @@ namespace gtl::shape {
 				and ( m_deflines		== B.m_deflines )
 				;
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::hatch; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::hatch; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
@@ -124,7 +124,8 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xHatch);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(xHatch, xShape);
 		//GTL__REFLECTION_MEMBERS(name, bSolid, bAssociative, nLoops, hstyle, hpattern, bDouble, angle, scale, deflines);
-		auto operator <=> (xHatch const&) const = default;
+		auto operator <=> (xHatch const&) const = delete;
+		bool operator == (xHatch const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xHatch& var, unsigned int const file_version) {
@@ -154,7 +155,7 @@ namespace gtl::shape {
 			using namespace std::literals;
 			gtl::bjson j(_j);
 
-			m_name			= j["name"sv];
+			m_name			= (gtl::shape::string_t)j["name"sv];
 			m_bSolid		= (bool)(int)j["solid"sv];
 			m_bAssociative	= (bool)(int)j["associative"sv];
 			m_hstyle		= j["hstyle"sv];
@@ -191,7 +192,8 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xInsert);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(xInsert, xShape);
 		//GTL__REFLECTION_MEMBERS(name, xscale, yscale, zscale, angle, nCol, nRow, spacingCol, spacingRow);
-		auto operator <=> (xInsert const&) const = default;
+		auto operator <=> (xInsert const&) const = delete;
+		bool operator == (xInsert const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xInsert& var, unsigned int const file_version) {
@@ -200,7 +202,7 @@ namespace gtl::shape {
 		}
 		template < typename archive >
 		friend archive& operator & (archive& ar, xInsert& var) {
-			ar & var.m_name & var.m_xscale & var.m_yscale & var.m_zscale & (double&)m_angle;
+			ar & var.m_name & var.m_xscale & var.m_yscale & var.m_zscale & var.m_angle.dValue;
 			ar & var.m_nCol & var.m_nRow & var.m_spacingCol & var.m_spacingRow;
 			return ar;
 		}
@@ -211,7 +213,7 @@ namespace gtl::shape {
 			gtl::bjson j(_j);
 
 			m_pt = PointFrom(j["basePoint"]);
-			m_name = j["name"];
+			m_name = (gtl::shape::string_t)j["name"];
 			m_xscale = j["xscale"];
 			m_yscale = j["yscale"];
 			m_zscale = j["zscale"];
@@ -241,7 +243,7 @@ namespace gtl::shape {
 				and ( m_spacingRow	== B.m_spacingRow )
 				;
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::insert; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::insert; }
 
 		//virtual point_t PointAt(double t) const = 0;
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override { return {}; }

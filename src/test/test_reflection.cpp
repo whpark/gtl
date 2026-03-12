@@ -48,7 +48,7 @@ namespace gtl::test::reflection::MACRO {
 		using this_t = CTestClass;
 		using base_t = this_t;
 		GTL__REFLECTION_BASE(gtl::njson<>)
-		
+
 		GTL__REFLECTION_MEMBERS(b1, b2,
 								i, j,
 								k, l,

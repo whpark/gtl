@@ -20,7 +20,7 @@ constexpr std::array<std::u8string_view, 3> TEST_STRING = { {
 
 namespace gtl {
 	template < typename tchar >
-	inline [[nodiscard]] std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, eCODEPAGE eCodepage) {
+	[[nodiscard]] inline std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, eCODEPAGE eCodepage) {
 		if (eCODEPAGE_OTHER_ENDIAN<tchar> != eCodepage) {
 			[[likely]]
 			return {};

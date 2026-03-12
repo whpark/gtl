@@ -51,7 +51,7 @@ namespace gtl::wx {
 			return str;
 		}
 		else {
-			static_assert(gtlc::dependent_false_v);
+			static_assert(false);
 		}
 
 		return valueDefault;

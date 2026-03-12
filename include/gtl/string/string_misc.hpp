@@ -16,6 +16,7 @@
 //#include "latin_charset.h"
 //#include <gtl/concepts.h>
 //#include <gtl/string/string_primitives.h>
+#include <gtl/string/string_to_arithmetic.h>
 
 namespace gtl {
 #pragma pack(push, 8)
@@ -24,7 +25,7 @@ namespace gtl {
 	//-----------------------------------------------------------------------------
 	/// @brief  misc. GetSpaceString()
 	/// @return " \r\t\n"
-	/// 
+	///
 	template < gtlc::string_elem tchar > [[nodiscard]] constexpr std::basic_string_view<tchar> GetSpaceString() {
 		if constexpr (std::is_same_v<tchar, char>) { return TEXT_A(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, char8_t>) { return TEXT_u8(SPACE_STRING); }
@@ -32,21 +33,21 @@ namespace gtl {
 		else if constexpr (std::is_same_v<tchar, char32_t>) { return TEXT_U(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, wchar_t>) { return TEXT_W(SPACE_STRING); }
 		else if constexpr (std::is_same_v<tchar, charKSSM_t>) { return (charKSSM_t*)TEXT_u(SPACE_STRING); }
-		else { static_assert(gtlc::dependent_false_v, "tchar must be one of (char, char8_t, wchar_t) !"); }
+		else { static_assert(false, "tchar must be one of (char, char8_t, wchar_t) !"); }
 	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c) {
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsDigit(tchar const c) {
 		return (c >= '0') && (c <= '9');
 	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c) {
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsOdigit(tchar const c) {
 		return (c >= '0') && (c <= '7');
 	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c) {
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsXdigit(tchar const c) {
 		return ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F'));
 	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsSpace(tchar const c) {
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsSpace(tchar const c) {
 		return (c == '\t') || (c == '\r') || (c == '\n') || (c == ' ');
 	}
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsNotSpace(tchar const c) {
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsNotSpace(tchar const c) {
 		return !IsSpace(c);
 	}
 
@@ -70,7 +71,7 @@ namespace gtl {
 
 
 
-	/// @brief Compare two Strings. according to number (only for '0'-'9' are taken as number. no '-' sign, neither '.' for floating point 
+	/// @brief Compare two Strings. according to number (only for '0'-'9' are taken as number. no '-' sign, neither '.' for floating point
 	///  ex)
 	///      "123" > "65"         // 123 > 65
 	///      "abc123" > "abc6"    // 123 > 65 ("abc" == "abc")
@@ -79,7 +80,7 @@ namespace gtl {
 	///      "01" < "001"         // if same (1 == 1) ===> longer gets winner.
 	/// @param pszA
 	/// @param pszB
-	/// @return 
+	/// @return
 	template < gtlc::string_elem tchar, bool bIgnoreCase >
 	constexpr int/*std::strong_ordering*/ CompareStringContainingNumbers(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB) {
 		tchar const* pszA				= svA.data();
@@ -342,18 +343,18 @@ namespace gtl {
 			}
 #endif
 			else {
-				static_assert(gtlc::dependent_false_v);
+				static_assert(false);
 			}
 
 			pos = pHexEnd-1;
-			
+
 			return true;
 		}
 	}
 
 	/// @brief Translate Escape Sequence String
 	template < gtlc::string_elem tchar >
-	constexpr [[nodiscard]] std::optional<std::basic_string<tchar>> TranslateEscapeSequence(std::basic_string_view<tchar> sv, tchar cFill, tchar cTerminating) {
+	[[nodiscard]] constexpr std::optional<std::basic_string<tchar>> TranslateEscapeSequence(std::basic_string_view<tchar> sv, tchar cFill, tchar cTerminating) {
 		std::basic_string<tchar> str;
 		str.reserve(sv.size());
 		const tchar* pos{};
@@ -431,7 +432,7 @@ namespace gtl {
 		int const nLenDelimiter = (cDelimiter ? 1 : 0);
 		int const nLenDelimiterText = (cDelimiterText ? 1 : 0);
 		while (nLeft > 0) {
-			result.push_back(TString<tchar_t>());
+			result.emplace_back();
 			auto& str = result.back();
 
 			size_t n = std::min(nCol, nLeft);

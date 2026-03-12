@@ -35,7 +35,7 @@ namespace gtl::shape {
 			this_t const& B = (this_t const&)B_;
 			return (m_bLoop == B.m_bLoop) and (m_pts == B.m_pts);
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::polyline; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::polyline; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
@@ -105,7 +105,8 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolyline);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(xPolyline, xShape);
 		//GTL__REFLECTION_MEMBERS(m_pts);
-		auto operator <=> (xPolyline const&) const = default;
+		auto operator <=> (xPolyline const&) const = delete;
+		bool operator == (xPolyline const& B) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xPolyline& var, unsigned int const file_version) {
@@ -201,12 +202,13 @@ namespace gtl::shape {
 		//		return false;
 		//	return true;
 		//}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::lwpolyline; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::lwpolyline; }
 
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xPolylineLW);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(xPolylineLW, xPolyline);
 		//GTL__REFLECTION_MEMBERS(dummy);
-		auto operator <=> (xPolylineLW const&) const = default;
+		auto operator <=> (xPolylineLW const&) const = delete;
+		bool operator == (xPolylineLW const& B) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xPolylineLW& var, unsigned int const file_version) {

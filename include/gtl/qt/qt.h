@@ -46,7 +46,7 @@ namespace gtl::qt {
 		return qlst;
 	}
 
-	template < typename T > requires 
+	template < typename T > requires
 		requires (T t) { {ToString(t)} -> std::convertible_to<std::string>; }
 	or  requires (T t) { {ToString(t)} -> std::convertible_to<std::wstring>; }
 	inline QString ToQString(T const& t) {
@@ -78,7 +78,7 @@ namespace gtl::qt {
 			return str.toStdU32String();
 		}
 		else {
-			static_assert(gtlc::dependent_false_v, "Not supported");
+			static_assert(false, "Not supported");
 		}
 	}
 
@@ -91,8 +91,8 @@ namespace gtl::qt {
 	template < gtlc::coord T_COORD >
 	T_COORD FromString(QString const& str) {
 		T_COORD coord;
-		wchar_t const* pos = str.begin();
-		wchar_t const* const end = str.end();
+		auto pos = str.begin();
+		auto const end = str.end();
 		for (auto& v : coord.arr()) {
 			if (pos >= end)
 				break;

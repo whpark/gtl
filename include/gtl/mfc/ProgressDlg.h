@@ -35,15 +35,15 @@ namespace gtl::win::inline mfc {
 
 	protected:
 		CProgressCtrl m_ctrlProgress;
-		virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-		virtual BOOL OnInitDialog();
+		virtual void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+		virtual BOOL OnInitDialog() override;
 
 		DECLARE_MESSAGE_MAP()
 	public:
 		enum eTIMER { T_UPDATE_UI = 1064, };
 		afx_msg void OnTimer(UINT_PTR nIDEvent);
-		virtual void OnOK();
-		virtual void OnCancel();
+		virtual void OnOK() override;
+		virtual void OnCancel() override;
 		void OnAbort();
 		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	};

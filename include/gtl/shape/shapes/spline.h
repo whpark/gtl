@@ -60,7 +60,7 @@ namespace gtl::shape {
 				and ( m_toleranceFitPoint		== B.m_toleranceFitPoint )
 			;
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::spline; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::spline; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
@@ -109,7 +109,8 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xSpline);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(xSpline, xShape);
 		//GTL__REFLECTION_MEMBERS(flags, ptNormal, vStart, vEnd, degree, knots, ptsControl, toleranceKnot, toleranceControlPoint, toleranceFitPoint);
-		auto operator <=> (xSpline const&) const = default;
+		auto operator <=> (xSpline const&) const = delete;
+		bool operator == (xSpline const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xSpline& var, unsigned int const file_version) {

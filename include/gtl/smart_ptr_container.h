@@ -66,7 +66,7 @@ namespace gtl {
 
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------
 	// TSmartPtrContainer
-	template < typename T, template < typename T > typename TSmartPtr, template < typename TSmartPtr > typename base_container, typename TMutex = gtl::null_mutex >
+	template < typename T, template < typename T2 > typename TSmartPtr, template < typename TSmartPtr2 > typename base_container, typename TMutex = gtl::null_mutex >
 	class TSmartPtrContainer : public base_container<TSmartPtr<T>>, public TMutex {
 	public:
 		// alias
@@ -141,7 +141,7 @@ namespace gtl {
 			base_t::emplace_back(ptr);
 			return back();
 		}
-		constexpr [[nodiscard]] TSmartPtr<T> pop_front() requires has_push_pop_front<base_t> {
+		[[nodiscard]] constexpr TSmartPtr<T> pop_front() requires has_push_pop_front<base_t> {
 			std::unique_lock lock(*this);
 			if (base_t::empty())
 				return {};
@@ -149,7 +149,7 @@ namespace gtl {
 			base_t::pop_front();
 			return r;
 		}
-		constexpr [[nodiscard]] TSmartPtr<T> pop_back() {
+		[[nodiscard]] constexpr TSmartPtr<T> pop_back() {
 			std::unique_lock lock(*this);
 			if (base_t::empty())
 				return {};

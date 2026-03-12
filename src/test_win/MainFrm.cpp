@@ -323,7 +323,7 @@ BOOL CMainFrame::CreateOutlookBar(CMFCOutlookBar& bar, UINT uiID, CMFCShellTreeC
 
 	pOutlookBar->EnableInPlaceEdit(TRUE);
 
-	static UINT uiPageID = 1;
+	//static UINT uiPageID = 1;
 
 	// can float, can autohide, can resize, CAN NOT CLOSE
 	DWORD dwStyle = AFX_CBRS_FLOAT | AFX_CBRS_AUTOHIDE | AFX_CBRS_RESIZE;

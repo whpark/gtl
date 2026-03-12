@@ -280,7 +280,7 @@ namespace gtl {
 				return tvalue{sv};
 			}
 			else {
-				static_assert(gtlc::dependent_false_v<tvalue>);
+				static_assert(false);
 			}
 			return {};
 		}

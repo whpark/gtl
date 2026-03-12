@@ -49,7 +49,7 @@ namespace gtl::shape {
 				and ( m_layers			== B.m_layers )
 				;
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::drawing; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::drawing; }
 
 		//virtual point_t PointAt(double t) const override { throw std::exception{GTL__FUNCSIG "not here."}; return point_t {}; }	// no PointAt();
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
@@ -135,7 +135,8 @@ namespace gtl::shape {
 			return true;
 		}
 	#endif
-		auto operator <=> (xDrawing const&) const = default;
+		auto operator <=> (xDrawing const&) const = delete;
+		bool operator == (xDrawing const&) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xDrawing& var, unsigned int const file_version) {

@@ -8,11 +8,11 @@ namespace gtl::wx {
 	wxIMPLEMENT_DYNAMIC_CLASS(wxRoundButton, wxRoundButton::base_t)
 
 	wxBEGIN_EVENT_TABLE(wxRoundButton, wxRoundButton::base_t)
-		EVT_MOUSE_EVENTS(OnMouse)
-		EVT_PAINT(OnPaint)
-		//EVT_NC_PAINT(OnNcPaint)
-		EVT_SET_FOCUS(OnSetFocus)
-		EVT_ERASE_BACKGROUND(OnEraseBackground)
+		EVT_MOUSE_EVENTS(wxRoundButton::OnMouse)
+		EVT_PAINT(wxRoundButton::OnPaint)
+		//EVT_NC_PAINT(wxRoundButton::OnNcPaint)
+		EVT_SET_FOCUS(wxRoundButton::OnSetFocus)
+		EVT_ERASE_BACKGROUND(wxRoundButton::OnEraseBackground)
 	wxEND_EVENT_TABLE()
 
 	bool wxRoundButton::Enable(bool enable) {
@@ -24,10 +24,9 @@ namespace gtl::wx {
 	void wxRoundButton::OnMouse(wxMouseEvent& evt) {
 		evt.Skip();
 
-		bool bInRect{};
 		auto pos = evt.GetPosition();
 		auto rect = GetClientRect();
-		bInRect = rect.Contains(pos);
+		//auto bInRect = rect.Contains(pos);
 
 		if (evt.GetEventType() == wxEVT_LEFT_DOWN) {
 			OutputDebugStringA("LDown \n");

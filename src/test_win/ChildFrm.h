@@ -19,15 +19,15 @@ public:
 public:
 
 // Overrides
-	public:
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+public:
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs) override;
 
 // Implementation
 public:
 	virtual ~CChildFrame();
 #ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
+	virtual void AssertValid() const override;
+	virtual void Dump(CDumpContext& dc) const override;
 #endif
 
 // Generated message map functions

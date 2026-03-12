@@ -34,7 +34,7 @@ namespace gtl::test::bll {
 namespace gtl::test::misc {
 	TEST(misc, TLazyProfile) {
 		auto sv3 = xStringLiteral{"asdfsdff"};
-		auto sv = TStringLiteral<wchar_t, "asdf">().value;
+		std::wstring sv = TStringLiteral<wchar_t, "asdf">().value;
 		static auto sv4 = TStringLiteral<wchar_t, "{}">{};
 		auto wstr = FormatToTString<wchar_t, "{}">(L"abcd");
 		EXPECT_EQ(wstr, L"abcd"s);
@@ -232,7 +232,7 @@ doubleVar                = 3.1415926535897932384626433832795028 ; pi
 
 	TEST(misc, xFinalAction) {
 
-		auto* p = std::bit_cast<int64_t*>(nullptr);
+		[[maybe_unused]] auto* p = std::bit_cast<int64_t*>(nullptr);
 
 		int i{};
 		{

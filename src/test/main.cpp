@@ -28,7 +28,7 @@ namespace testing::internal {
 }
 
 
-int main(int argc, wchar_t** argv) {
+int main(int argc, wchar_t* argv[]) {
 	testing::InitGoogleTest(&argc, argv);
 	EXPECT_TRUE(std::setlocale(LC_ALL, "Korean.949"));
 

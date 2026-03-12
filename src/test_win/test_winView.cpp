@@ -90,8 +90,8 @@ void CtestwinView::OnInitialUpdate() {
 		auto size = gtl::FromString<gtl::xSize2i, wchar_t>((LPCTSTR)strMatSize);
 		auto str = gtl::ToString<wchar_t>(size);
 		constexpr COLORREF cr = RGB(255, 128, 32);
-		constexpr gtl::color_bgra_t crBGRA{.cr = cr};
-		constexpr gtl::color_rgba_t crRGBA{.cr = cr};
+		[[maybe_unused]] constexpr gtl::color_bgra_t crBGRA{.cr = cr};
+		[[maybe_unused]] constexpr gtl::color_rgba_t crRGBA{.cr = cr};
 
 		std::vector<gtl::color_bgra_t> pal;
 		pal.push_back(gtl::ColorBGRA(GetBValue(cr), GetGValue(cr), GetRValue(cr), 0));
@@ -194,7 +194,7 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 						v = 254;
 					else if (row < 400)
 						v = 255;
-					else 
+					else
 						v = row % 256;
 					img.row(row) = v;
 				}
@@ -213,7 +213,7 @@ void CtestwinView::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 			if (palette.empty()) {
 				palette.assign(256, {});
 				for (size_t i{}; i < 256; i++) {
-					palette[i] = (RGBQUAD const&)(gtl::ColorBGRA(0,0,(uint8_t)i));
+					palette[i] = std::bit_cast<RGBQUAD>(gtl::ColorBGRA(0,0,(uint8_t)i).cr);
 				}
 			}
 
@@ -277,7 +277,7 @@ void CtestwinView::OnBnClickedTestSaveCImage() {
 		return ;
 	std::vector<RGBQUAD> palette;
 	palette.assign(2, {});
-	palette.back() = (RGBQUAD&)gtl::ColorBGRA(255, 255, 255, 0);
+	palette.back() = std::bit_cast<RGBQUAD>(gtl::ColorBGRA(255, 255, 255, 0).cr);
 	img.SetColorTable(0, (UINT)std::size(palette), palette.data());
 
 	gtlw::xStopWatch sw;
@@ -307,7 +307,7 @@ void CtestwinView::OnBnClickedTestSaveCImage() {
 
 	{
 		cv::Mat mat = cv::imread((folder / "\\a.bmp").string());
-		auto s = mat.size();
+		[[maybe_unused]] auto s = mat.size();
 		sw.Lap("imread {}x{}", mat.cols, mat.rows);
 	}
 }
@@ -428,7 +428,7 @@ void CtestwinView::OnBnClickedTestLoadBMP() {
 	if (img.empty()) {
 		if (m_bitmap.cols* m_bitmap.rows >= 20'000*20'000)
 			m_bitmap.release();
-		
+
 		gtl::xSize2i pelsPerMeter;
 		img = gtlw::LoadBitmapMatProgress(path, pelsPerMeter);
 

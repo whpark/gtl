@@ -43,10 +43,10 @@ namespace gtl {
 
 		//-------------------------------------------------------------------------------------------------------------------------
 		/// @brief UTF8 -> UTF16, UTF32
-		/// @tparam treturn 
-		/// @param pos 
-		/// @param end 
-		/// @param r 
+		/// @tparam treturn
+		/// @param pos
+		/// @param end
+		/// @param r
 		template < gtlc::string_elem_utf tchar_to, gtlc::string_elem tchar_from = char8_t,
 			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
@@ -138,7 +138,7 @@ namespace gtl {
 					}
 				}
 				else {
-					static_assert(gtlc::dependent_false_v);
+					static_assert(false);
 				}
 				pos += 4;
 			}
@@ -157,19 +157,19 @@ namespace gtl {
 
 		//-------------------------------------------------------------------------------------------------------------------------
 		/// @brief UTF16 -> UTF8, UTF32
-		/// @tparam treturn 
-		/// @param pos 
-		/// @param end 
-		/// @param r 
+		/// @tparam treturn
+		/// @param pos
+		/// @param end
+		/// @param r
 		template < gtlc::string_elem_utf tchar_to, gtlc::string_elem tchar_from = char16_t,
 			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
 		>
 		constexpr inline bool UTFCharConverter_FromUTF16(tchar_from const*& pos, tchar_from const* const& end, treturn& r) {
 
-			auto MAS = [&pos] (int i, tchar_to mask, int sh) -> tchar_to {	// MaskAndShift
-				return (((tchar_to)pos[i]) & mask) << sh;
-			};
+			//auto MAS = [&pos] (int i, tchar_to mask, int sh) -> tchar_to {	// MaskAndShift
+			//	return (((tchar_to)pos[i]) & mask) << sh;
+			//};
 
 			namespace uc = utf_const;
 
@@ -218,7 +218,7 @@ namespace gtl {
 					}
 				}
 				else {
-					static_assert(gtlc::dependent_false_v);
+					static_assert(false);
 				}
 				pos += 1;
 				return true;
@@ -256,7 +256,7 @@ namespace gtl {
 					}
 				}
 				else {
-					static_assert(gtlc::dependent_false_v);
+					static_assert(false);
 				}
 				pos += 2;
 			}
@@ -275,10 +275,10 @@ namespace gtl {
 
 		//-------------------------------------------------------------------------------------------------------------------------
 		/// @brief UTF32 -> UTF8, UTF16
-		/// @tparam treturn 
-		/// @param pos 
-		/// @param end 
-		/// @param r 
+		/// @tparam treturn
+		/// @param pos
+		/// @param end
+		/// @param r
 		template < gtlc::string_elem_utf tchar_to, gtlc::string_elem tchar_from = char32_t,
 			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, ptrdiff_t>
@@ -386,10 +386,10 @@ namespace gtl {
 
 		//-------------------------------------------------------------------------------------------------------------------------
 		/// @brief UTF_x -> UTF_y
-		/// @tparam treturn 
-		/// @param pos 
-		/// @param end 
-		/// @param r 
+		/// @tparam treturn
+		/// @param pos
+		/// @param end
+		/// @param r
 		template < gtlc::string_elem_utf tchar_to, gtlc::string_elem tchar_from,
 			bool bAddChar = true, bool bCheckError = true, bool bThrow = true,
 			typename treturn = std::conditional_t<bAddChar, std::basic_string<tchar_to>, size_t>
@@ -417,7 +417,7 @@ namespace gtl {
 				return UTFCharConverter_FromUTF32<tchar_to, tchar_from, bAddChar, bCheckError, bThrow, treturn>(pos, end, r);
 			}
 			else {
-				static_assert(gtlc::dependent_false_v);
+				static_assert(false);
 			}
 
 			return true;

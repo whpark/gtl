@@ -131,7 +131,7 @@ namespace gtl::shape {
 			MoveTo(radius * point_t{cos(t0), sin(t0), .0}+ptCenter);
 			for (int i = 1; i <= n; i++) {
 				deg_t t {std::lerp(t0, t1, (double)i/n)};
-				constexpr static auto m2pi = std::numbers::pi*2;
+				//constexpr static auto m2pi = std::numbers::pi*2;
 				double c = radius * cos(t);
 				double s = radius * sin(t);
 				xPoint2d pt(ptCenter.x + c, ptCenter.y+s);
@@ -147,7 +147,7 @@ namespace gtl::shape {
 			int n = Round<int, double>(tLength * std::numbers::pi * std::max(radius1, radius2) / m_target_interpolation_inverval);
 			for (int i = 0; i <= n; i++) {
 				deg_t t {std::lerp(t0, t1, (double)i/n)};
-				constexpr static auto m2pi = std::numbers::pi*2;
+				//constexpr static auto m2pi = std::numbers::pi*2;
 				double c = cos(t);
 				double s = sin(t);
 				LineTo(ct(point_t{radius1*c, radius2*s}));
@@ -211,7 +211,7 @@ namespace gtl::shape {
 		int m_line_type = cv::LINE_8;
 
 	public:
-		xCanvasMat(cv::Mat& img, ICoordTrans const& ct) : m_img(img), ICanvas(ct) { }
+		xCanvasMat(cv::Mat& img, ICoordTrans const& ct) : ICanvas(ct), m_img(img) { }
 		virtual ~xCanvasMat() { }
 
 		virtual void PreDraw(xShape const& shape) override {
@@ -233,7 +233,7 @@ namespace gtl::shape {
 		//virtual void MoveRelTo(const point_t& pt) { MoveTo(m_ptLast+pt); }
 		//virtual void LineRelTo(const point_t& pt, bool bShowDirection = false) { LineTo(m_ptLast + pt, bShowDirection); }
 		//virtual void ArcRelTo(const point_t& ptCenter, deg_t dTLength) { ArcTo(m_ptLast + ptCenter, dTLength); }
-	
+
 		std::optional<xRect2d> GetClippingRect() override {
 			xRect2d rc;
 			rc.pt0() = m_ctI(xPoint2d(0, 0));
@@ -345,7 +345,7 @@ namespace gtl::shape {
 	//	//				SH_T2B
 	//	//				SH_LT2RB
 	//	//				SH_LB2RT
-	//	virtual void Hatch(const TList<QSLine>& lines, DWORD eHatching, double dHatching); 
+	//	virtual void Hatch(const TList<QSLine>& lines, DWORD eHatching, double dHatching);
 
 	//	//-----------------------
 	//	// Text :

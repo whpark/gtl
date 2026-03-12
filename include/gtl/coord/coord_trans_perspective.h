@@ -34,7 +34,9 @@ namespace gtl {
 		xCoordTransP33(xCoordTransP33 const& B) = default;
 		explicit xCoordTransP33(mat_t const& mat) : m_mat(mat) {};
 		xCoordTransP33& operator = (xCoordTransP33 const& B) = default;
-		auto operator <=> (xCoordTransP33 const&) const = default;
+		auto operator <=> (xCoordTransP33 const&) const = delete;
+		bool operator == (xCoordTransP33 const& B) const = default;
+		//{ return std::equal(m_mat.val, m_mat.val + 9, B.m_mat.val);}
 
 		xCoordTransP33& operator *= (xCoordTransP33 const& B)	{
 			m_mat = m_mat * B.m_mat;
@@ -120,7 +122,7 @@ namespace gtl {
 		//-------------------------------------------------------------------------
 		// Operation
 		//
-		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const override {
+		[[nodiscard]] virtual point2_t Trans(point2_t const& pt) const override {
 			point3_t ptNew;
 			ptNew.x = m_mat(0, 0) * pt.x + m_mat(0, 1) * pt.y + m_mat(0, 2);
 			ptNew.y = m_mat(1, 0) * pt.x + m_mat(1, 1) * pt.y + m_mat(1, 2);
@@ -133,44 +135,44 @@ namespace gtl {
 			}
 			return ptNew;
 		}
-		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override  {
+		[[nodiscard]] virtual point3_t Trans(point3_t const& pt) const override  {
 			return Trans(point2_t{pt.x, pt.y});
 		}
-		virtual [[nodiscard]] double Trans(double dLength) const override  {
+		[[nodiscard]] virtual double Trans(double dLength) const override  {
 			return std::sqrt(cv::determinant(m_mat))*dLength;
 		}
-		virtual [[nodiscard]] std::optional<point2_t> TransInverse(point2_t const& pt) const override {
+		[[nodiscard]] virtual std::optional<point2_t> TransInverse(point2_t const& pt) const override {
 			this_t ctI;
 			if (!GetInv(ctI))
 				return {};
 			return ctI.Trans(pt);
 		}
-		virtual [[nodiscard]] std::optional<point3_t> TransInverse(point3_t const& pt) const override {
+		[[nodiscard]] virtual std::optional<point3_t> TransInverse(point3_t const& pt) const override {
 			if (pt.z == 0.0)
 				return TransInverse(point2_t{pt.x, pt.y});
 			return {};
 		}
-		virtual [[nodiscard]] std::optional<double> TransInverse(double dLength) const override {
+		[[nodiscard]] virtual std::optional<double> TransInverse(double dLength) const override {
 			double d = cv::determinant(m_mat);
 			if (d == 0)
 				return {};
 			return dLength / std::sqrt(d);
 		}
 
-		virtual [[nodiscard]] bool IsRightHanded() const override {
+		[[nodiscard]] virtual bool IsRightHanded() const override {
 			bool bRightHanded{cv::determinant(m_mat) > 0};
 			return bRightHanded;
 		}
 
-		static inline [[nodiscard]] mat_t GetRotatingMatrixXY(rad_t angle) {
+		[[nodiscard]] static inline mat_t GetRotatingMatrixXY(rad_t angle) {
 			double c{cos(angle)}, s{sin(angle)};
 			return mat_t{c, -s, 0., 0., /**/ s, c, 0., 0., /**/ 0., 0., 1., 0., /**/ 0., 0., 0., 1. };
 		}
-		//static inline [[nodiscard]] mat_t GetRotatingMatrixYZ(rad_t angle) {
+		//[[nodiscard]] static inline mat_t GetRotatingMatrixYZ(rad_t angle) {
 		//	double c{cos(angle)}, s{sin(angle)};
 		//	//return mat_t{1., 0., 0., 0., /**/ 0., c, -s, 0., /**/ 0., s, c, 0., /**/ 0., 0., 0., 1. };
 		//}
-		//static inline [[nodiscard]] mat_t GetRotatingMatrixZX(rad_t angle) {
+		//[[nodiscard]] static inline mat_t GetRotatingMatrixZX(rad_t angle) {
 		//	double c{cos(angle)}, s{sin(angle)};
 		//	//return mat_t{c, 0., s, 0., /**/ 0., 1., 0., 0., /**/ -s, 0., c, 0., /**/ 0., 0., 0., 1., };
 		//}
@@ -196,7 +198,8 @@ namespace gtl {
 		xCoordTransP44(xCoordTransP44 const& B) = default;
 		explicit xCoordTransP44(mat_t const& mat) : m_mat(mat) {};
 		xCoordTransP44& operator = (xCoordTransP44 const& B) = default;
-		auto operator <=> (xCoordTransP44 const&) const = default;
+		auto operator <=> (xCoordTransP44 const&) const = delete;
+		bool operator == (xCoordTransP44 const&) const = default;
 
 		xCoordTransP44& operator *= (xCoordTransP44 const& B)	{
 			m_mat = m_mat * B.m_mat;
@@ -302,11 +305,11 @@ namespace gtl {
 		//-------------------------------------------------------------------------
 		// Operation
 		//
-		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const override {
+		[[nodiscard]] virtual point2_t Trans(point2_t const& pt) const override {
 			return Trans(point3_t{pt.x, pt.y, 0.});
 		}
-		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override  {
-			auto t0 = std::chrono::steady_clock::now();
+		[[nodiscard]] virtual point3_t Trans(point3_t const& pt) const override  {
+			//auto t0 = std::chrono::steady_clock::now();
 			point3_t ptNew;
 			ptNew.x = m_mat(0, 0) * pt.x + m_mat(0, 1) * pt.y + m_mat(0, 2) * pt.z + m_mat(0, 3);
 			ptNew.y = m_mat(1, 0) * pt.x + m_mat(1, 1) * pt.y + m_mat(1, 2) * pt.z + m_mat(1, 3);
@@ -317,43 +320,43 @@ namespace gtl {
 				ptNew.y /= d;
 				ptNew.z /= d;
 			}
-			auto t1 = std::chrono::steady_clock::now();
-			auto duration = std::chrono::duration<double, std::micro>(t1-t0);
+			//auto t1 = std::chrono::steady_clock::now();
+			//auto duration = std::chrono::duration<double, std::micro>(t1-t0);
 			return ptNew;
 		}
-		virtual [[nodiscard]] double Trans(double dLength) const override  {
+		[[nodiscard]] virtual double Trans(double dLength) const override  {
 			return std::sqrt(cv::determinant(m_mat))*dLength;
 		}
-		virtual [[nodiscard]] std::optional<point2_t> TransInverse(point2_t const& pt) const override {
+		[[nodiscard]] virtual std::optional<point2_t> TransInverse(point2_t const& pt) const override {
 			return TransInverse(point3_t{pt.x, pt.y, 0.0});
 		}
-		virtual [[nodiscard]] std::optional<point3_t> TransInverse(point3_t const& pt) const override {
+		[[nodiscard]] virtual std::optional<point3_t> TransInverse(point3_t const& pt) const override {
 			this_t ctI;
 			if (!GetInv(ctI))
 				return {};
 			return ctI.Trans(pt);
 		}
-		virtual [[nodiscard]] std::optional<double> TransInverse(double dLength) const override {
+		[[nodiscard]] virtual std::optional<double> TransInverse(double dLength) const override {
 			double d = cv::determinant(m_mat);
 			if (d == 0)
 				return {};
 			return dLength / std::sqrt(d);
 		}
 
-		virtual [[nodiscard]] bool IsRightHanded() const override {
+		[[nodiscard]] virtual bool IsRightHanded() const override {
 			bool bRightHanded{cv::determinant(m_mat) > 0};
 			return bRightHanded;
 		}
 
-		static inline [[nodiscard]] mat_t GetRotatingMatrixXY(rad_t angle) {
+		[[nodiscard]] static inline mat_t GetRotatingMatrixXY(rad_t angle) {
 			double c{cos(angle)}, s{sin(angle)};
 			return mat_t{c, -s, 0., 0., /**/ s, c, 0., 0., /**/ 0., 0., 1., 0., /**/ 0., 0., 0., 1. };
 		}
-		//static inline [[nodiscard]] mat_t GetRotatingMatrixYZ(rad_t angle) {
+		//[[nodiscard]] static inline mat_t GetRotatingMatrixYZ(rad_t angle) {
 		//	double c{cos(angle)}, s{sin(angle)};
 		//	//return mat_t{1., 0., 0., 0., /**/ 0., c, -s, 0., /**/ 0., s, c, 0., /**/ 0., 0., 0., 1. };
 		//}
-		//static inline [[nodiscard]] mat_t GetRotatingMatrixZX(rad_t angle) {
+		//[[nodiscard]] static inline mat_t GetRotatingMatrixZX(rad_t angle) {
 		//	double c{cos(angle)}, s{sin(angle)};
 		//	//return mat_t{c, 0., s, 0., /**/ 0., 1., 0., 0., /**/ -s, 0., c, 0., /**/ 0., 0., 0., 1., };
 		//}

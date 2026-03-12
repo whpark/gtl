@@ -80,14 +80,14 @@ namespace gtl {
 	public:
 		C2dMatArray() = default;
 		C2dMatArray(C2dMatArray const&) = delete;
-		C2dMatArray(C2dMatArray&&) = default;
+		C2dMatArray(C2dMatArray&&) = delete;
 		virtual ~C2dMatArray() {
 			Destroy();
 		}
 
 		// Copies Matrix member only. NO ( Thumbnail Maker, Callback Function )
 		C2dMatArray& operator = (const C2dMatArray& B);
-		C2dMatArray& operator = (C2dMatArray&& B) = default;
+		C2dMatArray& operator = (C2dMatArray&& B) = delete;
 
 		bool Create(const xSize2i& size);																						// 아무것도 없이 그냥 배열만 생성. 데이터 없음.
 		bool Create(const cv::Mat& imgWhole, const xSize2i& sizePieceImage, const xSize2i& size);								// imgWhole 을 연결하여 생성.
@@ -115,7 +115,7 @@ namespace gtl {
 		int GetHeight() const override	{ return m_sizeImage.cy; }
 		cv::Size size() const override	{ return cv::Size(m_sizeImage.cx, m_sizeImage.cy); }
 
-		void SetResizingMethod(int eScaleDownMethod = -1, int eScaleUpMethod = -1, bool bThumbnailInBkgnd = true);
+		void SetResizingMethod(int eScaleDownMethod = -1, int eScaleUpMethod = -1, bool bThumbnailInBkgnd = true) override;
 
 	public:
 		xPoint2i GetPos(int iIndex) const;

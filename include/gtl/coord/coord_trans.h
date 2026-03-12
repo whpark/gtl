@@ -188,14 +188,14 @@ namespace gtl {
 		//-------------------------------------------------------------------------
 		// Operation
 		//
-		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const = 0;
-		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const = 0;
-		virtual [[nodiscard]] double Trans(double dLength) const = 0;
-		virtual [[nodiscard]] std::optional<point2_t> TransInverse(point2_t const& pt) const = 0;
-		virtual [[nodiscard]] std::optional<point3_t> TransInverse(point3_t const& pt) const = 0;
-		virtual [[nodiscard]] std::optional<double> TransInverse(double dLength) const = 0;
+		[[nodiscard]] virtual point2_t Trans(point2_t const& pt) const = 0;
+		[[nodiscard]] virtual point3_t Trans(point3_t const& pt) const = 0;
+		[[nodiscard]] virtual double Trans(double dLength) const = 0;
+		[[nodiscard]] virtual std::optional<point2_t> TransInverse(point2_t const& pt) const = 0;
+		[[nodiscard]] virtual std::optional<point3_t> TransInverse(point3_t const& pt) const = 0;
+		[[nodiscard]] virtual std::optional<double> TransInverse(double dLength) const = 0;
 
-		virtual [[nodiscard]] bool IsRightHanded() const = 0;
+		[[nodiscard]] virtual bool IsRightHanded() const = 0;
 	};
 
 
@@ -225,24 +225,26 @@ namespace gtl {
 		//virtual ~TCoordTransChain() { }
 		xCoordTransChain(xCoordTransChain const& B) = default;
 		xCoordTransChain& operator = (xCoordTransChain const& B) = default;
-		auto operator <=> (xCoordTransChain const&) const = default;
+
+		auto operator <=> (xCoordTransChain const&) const = delete;	// ????
+		bool operator == (xCoordTransChain const& B) const = default;
 
 		xCoordTransChain& operator *= (xCoordTransChain const& B)	{
 			for (auto const& ct : B.chain_)
-				chain_.push_back(std::move(ct.NewClone()));
+				chain_.push_back(ct.NewClone());
 			return *this;
 		}
 		xCoordTransChain& operator *= (ICoordTrans const& B) {
-			chain_.push_back(std::move(B.NewClone()));
+			chain_.push_back(B.NewClone());
 			return *this;
 		}
 		[[nodiscard]] xCoordTransChain operator * (xCoordTransChain const& B) const {
 			xCoordTransChain newChain;
 			for (auto const& ct : chain_) {
-				newChain.chain_.push_back(std::move(ct.NewClone()));
+				newChain.chain_.push_back(ct.NewClone());
 			}
 			for (auto const& ct : B.chain_) {
-				newChain.chain_.push_back(std::move(ct.NewClone()));
+				newChain.chain_.push_back(ct.NewClone());
 			}
 			return newChain;
 		}
@@ -250,17 +252,17 @@ namespace gtl {
 		[[nodiscard]] xCoordTransChain operator * (ICoordTrans const& B) const {
 			xCoordTransChain newChain;
 			for (auto const& ct : chain_) {
-				newChain.chain_.push_back(std::move(ct.NewClone()));
+				newChain.chain_.push_back(ct.NewClone());
 			}
-			newChain.chain_.push_back(std::move(B.NewClone()));
+			newChain.chain_.push_back(B.NewClone());
 			return newChain;
 		}
 
-		friend [[nodiscard]] xCoordTransChain operator * (ICoordTrans const& A, xCoordTransChain const& B) {
+		[[nodiscard]] friend xCoordTransChain operator * (ICoordTrans const& A, xCoordTransChain const& B) {
 			xCoordTransChain newChain;
-			newChain.chain_.push_back(std::move(A.NewClone()));
+			newChain.chain_.push_back(A.NewClone());
 			for (auto const& ct : B.chain_) {
-				newChain.chain_.push_back(std::move(ct.NewClone()));
+				newChain.chain_.push_back(ct.NewClone());
 			}
 			return newChain;
 		}
@@ -269,7 +271,7 @@ namespace gtl {
 		virtual std::unique_ptr<ICoordTrans> GetInverse() const override {
 			auto inv = std::make_unique<xCoordTransChain>();
 			for (auto iter = chain_.rbegin(); iter != chain_.rend(); iter++) {
-				if (auto r = iter->GetInverse(); r) {
+				if (auto&& r = iter->GetInverse(); r) {
 					inv->chain_.push_back(std::move(r));
 				} else {
 					return {};
@@ -280,7 +282,7 @@ namespace gtl {
 		bool GetInv(xCoordTransChain& ctI) const {
 			ctI.chain_.clear();
 			for (auto iter = chain_.rbegin(); iter != chain_.rend(); iter++) {
-				if (auto r = iter->GetInverse(); r) {
+				if (auto&& r = iter->GetInverse(); r) {
 					ctI.chain_.push_back(std::move(r));
 				} else {
 					return false;
@@ -315,14 +317,14 @@ namespace gtl {
 			return ptT;
 		}
 
-		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const override  { return ChainTrans(chain_, pt); }
-		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override  { return ChainTrans(chain_, pt); }
-		virtual [[nodiscard]] double Trans(double dLength) const override  { return ChainTrans(chain_, dLength); }
-		virtual [[nodiscard]] std::optional<point2_t> TransInverse(point2_t const& pt) const override { return ChainTransI(chain_, pt); }
-		virtual [[nodiscard]] std::optional<point3_t> TransInverse(point3_t const& pt) const override { return ChainTransI(chain_, pt); }
-		virtual [[nodiscard]] std::optional<double> TransInverse(double dLength) const override { return ChainTransI(chain_, dLength); }
+		[[nodiscard]] virtual point2_t Trans(point2_t const& pt) const override  { return ChainTrans(chain_, pt); }
+		[[nodiscard]] virtual point3_t Trans(point3_t const& pt) const override  { return ChainTrans(chain_, pt); }
+		[[nodiscard]] virtual double Trans(double dLength) const override  { return ChainTrans(chain_, dLength); }
+		[[nodiscard]] virtual std::optional<point2_t> TransInverse(point2_t const& pt) const override { return ChainTransI(chain_, pt); }
+		[[nodiscard]] virtual std::optional<point3_t> TransInverse(point3_t const& pt) const override { return ChainTransI(chain_, pt); }
+		[[nodiscard]] virtual std::optional<double> TransInverse(double dLength) const override { return ChainTransI(chain_, dLength); }
 
-		virtual [[nodiscard]] bool IsRightHanded() const override {
+		[[nodiscard]] virtual bool IsRightHanded() const override {
 			bool bRightHanded{true};
 			for (auto const& ct : chain_) {
 				if (!ct.IsRightHanded())
@@ -491,8 +493,8 @@ namespace gtl {
 			auto v2s = ptsSource[2] - ptsSource[0];
 			auto v1t = ptsTarget[1] - ptsTarget[0];
 			auto v2t = ptsTarget[2] - ptsTarget[0];
-			double dLenSource = v1s.GetLength();
-			double dLenTarget = v1t.GetLength();
+			//double dLenSource = v1s.GetLength();
+			//double dLenTarget = v1t.GetLength();
 
 			mat_t matS { v1s.x, v2s.x, v1s.y, v2s.y };
 
@@ -575,19 +577,19 @@ namespace gtl {
 			return true;
 		}
 
-		static inline [[nodiscard]] mat_t GetRotatingMatrix(rad_t angle) requires (dim == 2) {
+		[[nodiscard]] static inline mat_t GetRotatingMatrix(rad_t angle) requires (dim == 2) {
 			double c{cos(angle)}, s{sin(angle)};
 			return mat_t(c, -s, s, c);
 		}
-		static inline [[nodiscard]] mat_t GetRotatingMatrixXY(rad_t angle) requires (dim >= 3) {
+		[[nodiscard]] static inline mat_t GetRotatingMatrixXY(rad_t angle) requires (dim >= 3) {
 			double c{cos(angle)}, s{sin(angle)};
 			return mat_t{c, -s, 0, s, c, 0, 0, 0, 1};
 		}
-		static inline [[nodiscard]] mat_t GetRotatingMatrixYZ(rad_t angle) requires (dim >= 3) {
+		[[nodiscard]] static inline mat_t GetRotatingMatrixYZ(rad_t angle) requires (dim >= 3) {
 			double c{cos(angle)}, s{sin(angle)};
 			return mat_t{1, 0, 0, 0, c, -s, 0, s, c};
 		}
-		static inline [[nodiscard]] mat_t GetRotatingMatrixZX(rad_t angle) requires (dim >= 3) {
+		[[nodiscard]] static inline mat_t GetRotatingMatrixZX(rad_t angle) requires (dim >= 3) {
 			double c{cos(angle)}, s{sin(angle)};
 			return mat_t{c, 0, s, 0, 1, 0, -s, 0, c};
 		}
@@ -624,14 +626,14 @@ namespace gtl {
 		//-------------------------------------------------------------------------
 		// Operation
 		//
-		virtual [[nodiscard]] point2_t Trans(point2_t const& pt) const override {
+		[[nodiscard]] virtual point2_t Trans(point2_t const& pt) const override {
 			if constexpr (dim == 2) {
 				return m_scale * (m_mat * (pt-m_origin)) + m_offset;
 			} else if constexpr (dim == 3) {
 				return m_scale * (m_mat * (point_t(pt)-m_origin)) + m_offset;
 			}
 		}
-		virtual [[nodiscard]] point3_t Trans(point3_t const& pt) const override {
+		[[nodiscard]] virtual point3_t Trans(point3_t const& pt) const override {
 			if constexpr (dim == 2) {
 				point3_t ptNew(Trans((point2_t&)pt));
 				ptNew.z = pt.z;
@@ -640,30 +642,30 @@ namespace gtl {
 				return m_scale * (m_mat * (pt-m_origin)) + m_offset;
 			}
 		}
-		virtual [[nodiscard]] std::optional<point2_t> TransInverse(point2_t const& pt) const override {
+		[[nodiscard]] virtual std::optional<point2_t> TransInverse(point2_t const& pt) const override {
 			if (auto r = GetInverse(); r)
 				return (*r)(pt);
 			return {};
 		}
-		virtual [[nodiscard]] std::optional<point3_t> TransInverse(point3_t const& pt) const override {
+		[[nodiscard]] virtual std::optional<point3_t> TransInverse(point3_t const& pt) const override {
 			if (auto r = GetInverse(); r)
 				return (*r)(pt);
 			return {};
 		}
 
-		virtual [[nodiscard]] double Trans(double dLength) const override {
+		[[nodiscard]] virtual double Trans(double dLength) const override {
 			point_t pt0 = Trans(point_t::All(0));
 			point_t pt1 = Trans(point_t::All(1));
 			double scale = pt0.Distance(pt1) / sqrt((double)dim);
 			return scale * dLength;
 		}
-		virtual [[nodiscard]] std::optional<double> TransInverse(double dLength) const override {
+		[[nodiscard]] virtual std::optional<double> TransInverse(double dLength) const override {
 			point2_t pt0 = Trans(point_t::All(0));
 			point2_t pt1 = Trans(point_t::All(1));
 			double scale = sqrt((double)dim) / pt0.Distance(pt1);
 			return scale * dLength;
 		}
-		virtual [[nodiscard]] bool IsRightHanded() const override {
+		[[nodiscard]] virtual bool IsRightHanded() const override {
 			return cv::determinant(m_mat) >= 0;
 		}
 

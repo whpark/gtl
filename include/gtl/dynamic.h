@@ -203,4 +203,6 @@ private:\
 		}
 	};
 
+#pragma pack(pop)
 }
+

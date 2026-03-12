@@ -20,19 +20,19 @@ public:
 
 // Overrides
 public:
-	virtual BOOL OnNewDocument();
-	virtual void Serialize(CArchive& ar);
+	virtual BOOL OnNewDocument() override;
+	virtual void Serialize(CArchive& ar) override;
 #ifdef SHARED_HANDLERS
-	virtual void InitializeSearchContent();
-	virtual void OnDrawThumbnail(CDC& dc, LPRECT lprcBounds);
+	virtual void InitializeSearchContent() override;
+	virtual void OnDrawThumbnail(CDC& dc, LPRECT lprcBounds) override;
 #endif // SHARED_HANDLERS
 
 // Implementation
 public:
 	virtual ~CtestwinDoc();
 #ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
+	virtual void AssertValid() const override;
+	virtual void Dump(CDumpContext& dc) const override;
 #endif
 
 protected:

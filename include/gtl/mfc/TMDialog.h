@@ -225,7 +225,7 @@ namespace gtl::win::inline mfc {
 		}
 		CWnd* GetParent() { return m_pWndParent; }
 
-		CEdit* GetFocusedEdit() { return ::GetFocusedEdit(this); }
+		CEdit* GetFocusedEdit() { return gtl::win::GetFocusedEdit(this); }
 
 		CMFCDynamicLayout* CreateDynamicLayout() {
 			CMFCDynamicLayout* pDynamicLayout = this->GetDynamicLayout();
@@ -292,10 +292,10 @@ namespace gtl::win::inline mfc {
 		#pragma warning(push)
 		#pragma warning(disable: 4640) /* message maps can only be called by single threaded message pump */
 			static const AFX_MSGMAP_ENTRY _messageEntries[] = {
-				ON_COMMAND(ID_EDIT_COPY, &OnEditCopy)
-				ON_COMMAND(ID_EDIT_CUT, &OnEditCut)
-				ON_COMMAND(ID_EDIT_PASTE, &OnEditPaste)
-				ON_COMMAND(ID_EDIT_UNDO, &OnEditUndo)
+				ON_COMMAND(ID_EDIT_COPY, &TMDialog::OnEditCopy)
+				ON_COMMAND(ID_EDIT_CUT, &TMDialog::OnEditCut)
+				ON_COMMAND(ID_EDIT_PASTE, &TMDialog::OnEditPaste)
+				ON_COMMAND(ID_EDIT_UNDO, &TMDialog::OnEditUndo)
 				{0, 0, 0, 0, AfxSig_end, (AFX_PMSG)0 },
 			};
 		#pragma warning(pop)

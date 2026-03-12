@@ -34,7 +34,7 @@ namespace gtl::shape {
 			this_t const& B = (this_t const&)B_;
 			return (m_pt == B.m_pt);
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::dot; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::dot; }
 
 		//virtual point_t PointAt(double t) const override { return pt; };
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
@@ -64,7 +64,8 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xDot);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(xDot, xShape);
 		//GTL__REFLECTION_MEMBERS(pt);
-		auto operator <=> (xDot const&) const = default;
+		auto operator <=> (xDot const&) const = delete;
+		bool operator == (xDot const& B) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xDot& var, unsigned int const file_version) {

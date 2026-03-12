@@ -19,7 +19,7 @@ class CFileView : public CDockablePane
 public:
 	CFileView() noexcept;
 
-	void AdjustLayout();
+	void AdjustLayout() override;
 	void OnChangeVisualStyle();
 
 // Attributes

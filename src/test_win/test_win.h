@@ -22,16 +22,16 @@ public:
 
 // Overrides
 public:
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
+	virtual BOOL InitInstance() override;
+	virtual int ExitInstance() override;
 
 // Implementation
 	UINT  m_nAppLook;
 	BOOL  m_bHiColorIcons;
 
-	virtual void PreLoadState();
-	virtual void LoadCustomState();
-	virtual void SaveCustomState();
+	virtual void PreLoadState() override;
+	virtual void LoadCustomState() override;
+	virtual void SaveCustomState() override;
 
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()

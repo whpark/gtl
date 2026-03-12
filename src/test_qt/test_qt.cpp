@@ -46,8 +46,8 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 		glz::generic j{};
 		sJsonTest test;
 		std::string str;
-		glz::write<glz::opts{}>(test, str);
-		auto e = glz::read_json(j, str);
+		[[maybe_unused]] auto e1 = glz::write<glz::opts{}>(test, str);
+		[[maybe_unused]] auto e2 = glz::read_json(j, str);
 		m_modelGlaze.SetJson(j);
 	}
 
@@ -58,7 +58,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 
 	m_dlgMatView = std::make_unique<gtl::qt::xMatViewDlg>(this);
 	//m_dlgMatView->show();
-	m_dlgMatView->GetView().m_fnSyncSetting = [this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
+	m_dlgMatView->GetView().m_fnSyncSetting = [&, this](bool bStore, std::string_view cookie, xMatView::S_OPTION& option) -> bool {
 		if (bStore) {
 			std::string buffer = glz::write_json(option).value_or("");;
 			reg.setValue("misc/viewOption", ToQString(buffer));
@@ -68,7 +68,7 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 			if (str.isEmpty())
 				return false;
 			auto buffer = ToString(str);
-			auto e = glz::read_json(option, buffer);
+			[[maybe_unused]] auto e = glz::read_json(option, buffer);
 		}
 		return true;
 	};

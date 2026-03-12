@@ -6,7 +6,7 @@
 //
 // PWH
 // 2021.11.08. from Mocha
-// 
+//
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -473,7 +473,8 @@ namespace gtl {
 				{
 					std::lock_guard<std::mutex> lock(m_mtxThumbnailWork);
 					if (m_dequeThumbnailWork.size()) {
-						rItem = move(m_dequeThumbnailWork.front());
+						//rItem = move(m_dequeThumbnailWork.front());
+						std::swap(rItem, m_dequeThumbnailWork.front());
 						m_dequeThumbnailWork.pop_front();
 					}
 					if (m_dequeThumbnailWork.empty())
@@ -484,7 +485,8 @@ namespace gtl {
 
 				MakeThumbnail(*(rItem->second));
 
-				rItemL = move(rItem);
+				//rItemL = move(rItem);
+				std::swap(rItemL, rItem);
 
 				if (nThumbnail > 3) {
 					if (rItemL && !token.stop_requested() && m_funcNotifier) {

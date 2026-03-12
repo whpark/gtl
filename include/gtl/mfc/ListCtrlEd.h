@@ -93,7 +93,7 @@ namespace gtl::win::inline mfc {
 		afx_msg void OnEnKillFocus();
 		afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 		afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-		virtual BOOL PreTranslateMessage(MSG* pMsg);
+		virtual BOOL PreTranslateMessage(MSG* pMsg) override;
 	};
 
 	///----------------------------------------------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ namespace gtl::win::inline mfc {
 		afx_msg void OnEnKillFocus();
 		afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 		afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-		virtual BOOL PreTranslateMessage(MSG* pMsg);
+		virtual BOOL PreTranslateMessage(MSG* pMsg) override;
 	};
 
 

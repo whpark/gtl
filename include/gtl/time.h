@@ -75,7 +75,7 @@ namespace gtl {
 		using base_t::base_t;
 		TSysTime(base_t t) : base_t{t} {}
 		TSysTime(std::time_t t) : base_t{clock_t::from_time_t(t)} {}
-		TSysTime(file_time_t t) : base_t(tclock::duration(t.time_since_epoch().count() - eSysTimeToFileTime)) {}
+		TSysTime(file_time_t t) : base_t(typename tclock::duration(t.time_since_epoch().count() - eSysTimeToFileTime)) {}
 		TSysTime(const char*) : base_t(base_t::clock::now()) {}		// tclock::now() 함수가. 타이핑 하기 귀찮으니까, "" or "now" 등으로...
 
 		static base_t now() {
@@ -181,7 +181,6 @@ namespace gtl {
 
 
 
-
 	namespace example::time {
 
 		template < typename T >
@@ -195,12 +194,10 @@ namespace gtl {
 			// 큰 단위 -> 작은 단위 변형시 loss-less (ex, s -> ms  OK)
 			// 작은 단위 -> 큰 단위 변형시 Data-loss (ex, ms -> s  NG) =====>>> 이때에는 duration_cast<> 사용.
 			using namespace std::chrono;
-			auto si = duration_cast<milliseconds>(ts);
+			[[maybe_unused]] auto si = duration_cast<milliseconds>(ts);
 			//milliseconds{ts}.count();	// 작은단위(nano) -> 큰단위(milli) 이므로 안됨
 
 		}
-
-
 	}
 
 #pragma pack(pop)

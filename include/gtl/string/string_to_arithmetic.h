@@ -48,13 +48,13 @@ namespace gtl {
 	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
 	/// <returns>number value. (no overflow checked)</returns>
 	template < std::integral tvalue = int, gtlc::string_elem tchar >
-	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
+	[[nodiscard]] constexpr tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 	template < std::integral tvalue = int, gtlc::string_elem tchar >
 	[[nodiscard]] tvalue tsztoi(std::basic_string<tchar> const& str, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 	template < std::integral tvalue = int, gtlc::string_elem tchar >
 	GTL__DEPR_SEC [[nodiscard]] tvalue tsztoi(tchar const* const& psz, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 	template < std::integral tvalue = int, gtlc::string_elem tchar, size_t size >
-	constexpr [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
+	[[nodiscard]] constexpr tvalue tsztoi(tchar const (&sz)[size], tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
 
 	template < std::floating_point tvalue = double, gtlc::string_elem tchar = char16_t >
 	[[deprecated("NOT A STANDARD CONVERTING !")]] constexpr tvalue _tsztod(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, tchar cSplitter = 0);
@@ -114,7 +114,7 @@ namespace gtl {
 	/// <param name="cSplitter">digit splitter. such as ',' (thousand sepperator) or '\'' (like c++v14 notation)</param>
 	/// <returns>number value. (no overflow checked)</returns>
 	template < std::integral tvalue, gtlc::string_elem tchar>
-	constexpr [[nodiscard]] tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped, int radix, tchar cSplitter) {
+	[[nodiscard]] constexpr tvalue tsztoi(std::basic_string_view<tchar> svNumberString, tchar const** ppszStopped, int radix, tchar cSplitter) {
 		if (svNumberString.empty()) {
 			if (ppszStopped)
 				*ppszStopped = svNumberString.data();
@@ -201,7 +201,7 @@ namespace gtl {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ psz, psz + tszlen(psz) }, ppszStopped, radix, cSplitter);
 	}
 	template < std::integral tvalue, gtlc::string_elem tchar, size_t size >
-	constexpr [[nodiscard]] tvalue tsztoi(tchar const (&sz)[size], tchar const** ppszStopped, int radix, tchar cSplitter) {
+	[[nodiscard]] constexpr tvalue tsztoi(tchar const (&sz)[size], tchar const** ppszStopped, int radix, tchar cSplitter) {
 		return tsztoi<tvalue, tchar>(std::basic_string_view<tchar>{ sz, sz + tszlen(sz, size) }, ppszStopped, radix, cSplitter);
 	}
 
@@ -340,7 +340,7 @@ namespace gtl {
 	constexpr std::basic_string<tchar> AddThousandComma(std::basic_string_view<tchar> sv, tchar separator = ',') {
 		static_assert(interval > 0);
 		using namespace std::literals;
-		using view_t = std::basic_string_view<tchar>;
+		//using view_t = std::basic_string_view<tchar>;
 		using string_t = std::basic_string<tchar>;
 
 		string_t result;

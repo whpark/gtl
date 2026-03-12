@@ -34,7 +34,7 @@ namespace gtl::shape {
 			this_t const& B = (this_t const&)B_;
 			return m_angle_start == B.m_angle_start;
 		}
-		virtual eSHAPE GetShapeType() const { return eSHAPE::arc_xy; }
+		virtual eSHAPE GetShapeType() const override { return eSHAPE::arc_xy; }
 
 		//virtual point_t PointAt(double t) const override {};
 		virtual std::optional<std::pair<point_t, point_t>> GetStartEndPoint() const override {
@@ -102,7 +102,8 @@ namespace gtl::shape {
 		GTL__DYNAMIC_VIRTUAL_DERIVED(xArc);
 		//GTL__REFLECTION_VIRTUAL_DERIVED(xArc, xCircle);
 		//GTL__REFLECTION_MEMBERS(m_angle_start);
-		auto operator <=> (xArc const&) const = default;
+		auto operator <=> (xArc const&) const = delete;
+		bool operator == (xArc const& B) const = default;
 
 		template < typename archive >
 		friend void serialize(archive& ar, xArc& var, unsigned int const file_version) {

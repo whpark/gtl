@@ -146,9 +146,9 @@ COutputList::~COutputList()
 
 BEGIN_MESSAGE_MAP(COutputList, CListBox)
 	ON_WM_CONTEXTMENU()
-	ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
-	ON_COMMAND(ID_EDIT_CLEAR, OnEditClear)
-	ON_COMMAND(ID_VIEW_OUTPUTWND, OnViewOutput)
+	ON_COMMAND(ID_EDIT_COPY, &COutputList::OnEditCopy)
+	ON_COMMAND(ID_EDIT_CLEAR, &COutputList::OnEditClear)
+	ON_COMMAND(ID_VIEW_OUTPUTWND, &COutputList::OnViewOutput)
 	ON_WM_WINDOWPOSCHANGING()
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////

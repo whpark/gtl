@@ -126,8 +126,9 @@ public:
 			bInSelectionMode = {};
 			bRectSelected = {};
 			ptAnchor.reset();
-			ptOffset0 = {};
-			ptSel0 = ptSel1 = {};
+			ptOffset0.SetZero();
+			ptSel0.SetZero();
+			ptSel1.SetZero();
 		}
 	} m_mouse;
 	mutable struct {
@@ -135,8 +136,8 @@ public:
 		std::chrono::steady_clock::time_point t0, t1;
 		QTimer timer;
 		void Clear() {
-			pt0 = pt1 = {};
-			t0 = t1 = {};
+			pt0 = pt1 = xPoint2d{};
+			t0 = t1 = std::chrono::steady_clock::time_point{};
 			timer.stop();
 		}
 	} m_smooth_scroll;

@@ -7,7 +7,7 @@ using namespace std::literals;
 //#ifdef _DEBUG
 //#define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
 //#else
-//#define DEBUG_PRINT(...) 
+//#define DEBUG_PRINT(...)
 //#endif
 
 namespace gtl::shape {
@@ -94,7 +94,7 @@ namespace gtl::shape {
 
 
 	// Cohen-Sutherland clipping algorithm clips a line from
-	// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
+	// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with
 	// diagonal from (xmin, ymin) to (xmax, ymax).
 	enum fOUT_CODE : uint8_t {
 		INSIDE	= 0b0000,
@@ -244,10 +244,10 @@ namespace gtl::shape {
 		using namespace std::literals;
 		gtl::bjson<json_t> j(_j);
 		//m_color.cr = (int)j["color"sv];
-		m_strLayer = j["layer"sv];
+		m_strLayer = (gtl::shape::string_t)j["layer"sv];
 
 		m_lineWeight = j["lWeight"];
-		m_strLineType = j["lineType"];
+		m_strLineType = (gtl::shape::string_t)j["lineType"];
 
 		//eLineType = j["lineType"sv];
 		m_crIndex = j["color"].value_or(0);
@@ -542,9 +542,9 @@ namespace gtl::shape {
 			for (auto& item : jLineTypes) {
 				bjson<json_t> jLT(item);
 				auto lt = std::make_unique<line_type_t>();
-				lt->name = jLT["name"];
+				lt->name = (gtl::shape::string_t)jLT["name"];
 				lt->flags = jLT["flags"];
-				lt->description = jLT["desc"];
+				lt->description = (gtl::shape::string_t)jLT["desc"];
 				if (jLT["path"].json().is_array()) {
 					for (auto& jp : jLT["path"].json().as_array()) {
 						lt->path.push_back(jp.is_double() ? jp.as_double() : jp.as_int64());

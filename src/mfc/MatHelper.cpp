@@ -92,7 +92,7 @@ namespace gtl::win::inline mfc {
 
 			pImage = nullptr;
 		} catch (...) {
-			TRACE(_T(__FUNCTION__) _T(" - Unknown Error..."));
+			TRACE(__FUNCTION__ " - Unknown Error...");
 			return false;
 		}
 

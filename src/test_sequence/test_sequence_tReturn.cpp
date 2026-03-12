@@ -68,7 +68,7 @@ namespace gtl::seq::test {
 			return std::chrono::steady_clock::now() - t0 >= 10s;
 		};
 		bool bOK = co_await seq.Wait(pred, 10ms, 10s);
-		fmt::print("{} : END\n", seq.GetName());
+		fmt::print("{} : END {}\n", seq.GetName(), bOK);
 		co_return 0;
 	}
 
@@ -77,7 +77,7 @@ namespace gtl::seq::test {
 		bool bOK = co_await seq.Wait([t0 = std::chrono::steady_clock::now()] {
 			return std::chrono::steady_clock::now() - t0 >= 5s;
 		}, 1ms, 10s);
-		fmt::print("{} : END\n", seq.GetName());
+		fmt::print("{} : END {}\n", seq.GetName(), bOK);
 		co_return 0;
 	}
 

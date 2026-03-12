@@ -15,7 +15,7 @@ namespace gtl::test::reflection::MACRO {
 		using this_t = CTestStruct;
 		auto operator <=> (this_t const&) const = default;
 		bool operator == (this_t const&) const = default;
-		GTL__REFLECTION_BASE(gtl::njson)
+		GTL__REFLECTION_BASE(gtl::njson<>)
 
 	public:
 		std::string str1{"str1"};

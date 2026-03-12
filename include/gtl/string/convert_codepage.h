@@ -4,7 +4,7 @@
 //
 // PWH
 // 2020.11.13.
-// 2020.12.28. 
+// 2020.12.28.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -93,12 +93,12 @@ namespace gtl {
 
 
 
-	/// @brief default codepage for MBCS (windows) 
+	/// @brief default codepage for MBCS (windows)
 	/// you can set this value for your region.
 	GTL__DATA extern eCODEPAGE g_eCodepageMBCS;
 
 
-	constexpr static inline [[nodiscard]] std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {
+	[[nodiscard]] constexpr static inline std::string_view GetCodepageBOM(eCODEPAGE eCodepage) {
 		using namespace std::literals;
 		switch (eCodepage) {
 			using enum eCODEPAGE;
@@ -108,6 +108,8 @@ namespace gtl {
 		case UTF16BE : return "\xFE\xFF"sv;
 		case UTF32LE : return "\xFF\xFE\x00\x00"sv;
 		case UTF32BE : return "\x00\x00\xFE\xFF"sv;
+		default:
+			;
 		}
 		return {};
 	}
@@ -179,17 +181,17 @@ namespace gtl {
 
 
 	/// @brief Convert Codepage (from -> to) ex, wstring -> u32string, u8string -> string, u16string -> string, string -> u16string...
-	/// @param svFrom 
-	/// @param codepage 
-	/// @return 
+	/// @param svFrom
+	/// @param codepage
+	/// @return
 	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bCOUNT_FIRST = true >
 	constexpr std::basic_string<tchar_to> ToUTFString(std::basic_string_view<tchar_from> svFrom, S_CODEPAGE_OPTION codepage = {});
 
 
 	/// @brief Convert Codepage (from -> to) ex, wstring -> u32string, u8string -> string, u16string -> string, string -> u16string...
-	/// @param svFrom 
-	/// @param codepage 
-	/// @return 
+	/// @param svFrom
+	/// @param codepage
+	/// @return
 	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from, bool bCOUNT_FIRST = true >
 	std::basic_string<tchar_to> ToString(std::basic_string_view<tchar_from> svFrom, S_CODEPAGE_OPTION codepage = {});
 
@@ -198,9 +200,9 @@ namespace gtl {
 	inline void ToString(std::basic_string_view<tchar_from> svFrom, std::basic_string<tchar_to>& strTo, S_CODEPAGE_OPTION codepage = {});
 
 	/// @brief Wide <-> MBCS
-	/// @param svFrom 
-	/// @param codepage 
-	/// @return 
+	/// @param svFrom
+	/// @param codepage
+	/// @return
 	template < bool bCOUNT_FIRST = true> std::string	ConvWide2MBCS(std::wstring_view svFrom, S_CODEPAGE_OPTION codepage);
 	template < bool bCOUNT_FIRST = true> std::wstring	ConvMBCS2Wide(std::string_view svFrom, S_CODEPAGE_OPTION codepage);
 
@@ -225,6 +227,24 @@ namespace gtl {
 	template < bool bCOUNT_FIRST = true> inline std::u8string	ToStringU8(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 	template < bool bCOUNT_FIRST = true> inline std::u8string	ToStringU8(std::u16string_view svFrom, S_CODEPAGE_OPTION codepage = {});
 	template < bool bCOUNT_FIRST = true> inline std::u8string	ToStringU8(std::u32string_view svFrom, S_CODEPAGE_OPTION codepage = {});
+
+	/// @brief Typecast between string types with same character size. (ex, std::string <-> std::u8string, std::wstring <-> std::u16string when sizeof(wchar_t) == sizeof(char16_t), etc.) NO code conversion.
+	template < typename tStringTo, typename tStringFrom >
+		requires (sizeof(std::remove_cvref_t<tStringTo>::value_type) == sizeof(std::remove_cvref_t<tStringFrom>::value_type))
+	[[nodiscard]] auto StringCast(tStringFrom&& svFrom) -> decltype(auto) {
+		using T = std::conditional_t<std::is_const_v<decltype(svFrom)>, tStringTo const&, tStringTo&&>;
+		return (T)std::forward<tStringFrom>(svFrom);
+	}
+	[[nodiscard]] std::string const&		U8A (std::u8string const& from)			{ return StringCast<std::string>(from); }
+	[[nodiscard]] std::string_view const&	U8A (std::u8string_view const& from)	{ return StringCast<std::string_view>(from); }
+	[[nodiscard]] std::u8string const&		AU8 (std::string const& from)			{ return StringCast<std::u8string>(from); }
+	[[nodiscard]] std::u8string_view const&	AU8 (std::string_view const& from)		{ return StringCast<std::u8string_view>(from); }
+
+	[[nodiscard]] std::wstring const&		U_W(std::basic_string<gtlc::charuw_t> const& from)		{ return StringCast<std::wstring>(from); }
+	[[nodiscard]] std::wstring_view const&	U_W(std::basic_string_view<gtlc::charuw_t> const& from)	{ return StringCast<std::wstring_view>(from); }
+	[[nodiscard]] std::basic_string<gtlc::charuw_t> const&		W_U(std::wstring const& from)		{ return StringCast<std::basic_string<gtlc::charuw_t>>(from); }
+	[[nodiscard]] std::basic_string_view<gtlc::charuw_t> const&	W_U(std::wstring_view const& from)	{ return StringCast<std::basic_string_view<gtlc::charuw_t>>(from); }
+
 
 	/// @brief Converts Codepage To utf-16
 	template < bool bCOUNT_FIRST = true> inline std::u16string	ToStringU16(std::string_view svFrom, S_CODEPAGE_OPTION codepage = {});
@@ -266,7 +286,7 @@ namespace gtl {
 	namespace internal {
 
 		/// @brief static type cast (wide string/string_view) -> char16_t/char32_t string/string_vew. (according to its size), NO code conversion.
-		/// @tparam tchar 
+		/// @tparam tchar
 		/// @param str : basic_string or basic_string_view. (or whatever )
 		/// @return same container with char??_t
 		template < typename tchar >
@@ -297,15 +317,16 @@ namespace gtl {
 		}
 
 		template < gtlc::string_elem tchar, bool bCOUNT_FIRST >
-		inline [[nodiscard]] std::wstring ToStringWide(std::basic_string_view<tchar>& s, S_CODEPAGE_OPTION codepage) {
+		[[nodiscard]] inline std::wstring ToStringWide(std::basic_string_view<tchar>& s, S_CODEPAGE_OPTION codepage) {
 			if constexpr (sizeof(wchar_t) == sizeof(char16_t)) {
-				return (std::wstring&)ToStringU16<bCOUNT_FIRST>(s, codepage);
+				auto r = ToStringU16<bCOUNT_FIRST>(s, codepage);
+				return reinterpret_cast<std::wstring&>(r);
 			}
 			else if constexpr (sizeof(wchar_t) == sizeof(char32_t)) {
 				return (std::wstring&)ToStringU32<bCOUNT_FIRST>(s, codepage);
 			}
 			else {
-				static_assert(gtlc::dependent_false_v, "no way!");
+				static_assert(false, "no way!");
 			}
 		};
 	}
@@ -371,7 +392,7 @@ namespace gtl {
 	}
 	template < bool bCOUNT_FIRST >
 	std::u8string ToStringU8(std::u8string_view svFrom, S_CODEPAGE_OPTION codepage) {
-		//if (codepage.from == codepage.to) 
+		//if (codepage.from == codepage.to)
 
 		return std::u8string{ svFrom };
 	}
@@ -388,7 +409,7 @@ namespace gtl {
 	template < bool bCOUNT_FIRST >
 	std::u16string ToStringU16(std::string_view svFrom, S_CODEPAGE_OPTION codepage) {
 		if constexpr (gtlc::is_same_utf<char16_t, wchar_t>) {
-			return (std::u16string&)ConvMBCS2Wide<bCOUNT_FIRST>(svFrom, codepage);
+			return W_U(ConvMBCS2Wide<bCOUNT_FIRST>(svFrom, codepage));
 		}
 		else {
 			auto str = ConvMBCS2Wide<false>(svFrom, {.from = codepage.from});
@@ -450,8 +471,8 @@ namespace gtl {
 		return str;
 	}
 	GTL__API inline std::string WtoU8A(std::wstring const& str) {
-		std::string r = (std::string&)gtl::ToStringU8(str);
-		return r;
+		auto str1 = gtl::ToStringU8(str);
+		return reinterpret_cast<std::string&>(str1);
 	}
 	GTL__API inline std::u8string WtoU8(std::wstring const& str) {
 		return gtl::ToStringU8(str);
@@ -467,7 +488,7 @@ namespace gtl {
 
 	namespace internal {
 		template < typename tchar >
-		constexpr inline [[nodiscard]] std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, eCODEPAGE eCodepage) {
+		[[nodiscard]] constexpr inline std::optional<std::basic_string<tchar>> CheckAndConvertEndian(std::basic_string_view<tchar> sv, eCODEPAGE eCodepage) {
 			if constexpr (gtlc::is_one_of<tchar, char, char8_t>) {
 				return {};
 			}
@@ -505,9 +526,9 @@ namespace gtl {
 
 
 	/// @brief Convert Codepage (from -> to) ex, wstring -> u32string, u8string -> string, u16string -> string, string -> u16string...
-	/// @param svFrom 
-	/// @param codepage 
-	/// @return 
+	/// @param svFrom
+	/// @param codepage
+	/// @return
 	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bCOUNT_FIRST >
 	constexpr std::basic_string<tchar_to> ToUTFString(std::basic_string_view<tchar_from> svFrom, S_CODEPAGE_OPTION codepage) {
 		std::basic_string<tchar_to> str;
@@ -555,9 +576,9 @@ namespace gtl {
 
 
 	/// @brief Convert Codepage (from -> to) ex, wstring -> u32string, u8string -> string, u16string -> string, string -> u16string...
-	/// @param svFrom 
-	/// @param codepage 
-	/// @return 
+	/// @param svFrom
+	/// @param codepage
+	/// @return
 	template < gtlc::string_elem tchar_to, gtlc::string_elem tchar_from, bool bCOUNT_FIRST >
 	[[nodiscard]] std::basic_string<tchar_to> ToString(std::basic_string_view<tchar_from> svFrom, S_CODEPAGE_OPTION codepage) {
 
@@ -578,7 +599,8 @@ namespace gtl {
 		}
 		else if constexpr (gtlc::is_same_utf<tchar_from, char>) {
 			if constexpr (gtlc::is_same_utf<tchar_to, wchar_t>) {
-				return (std::basic_string<tchar_to>&)ConvMBCS2Wide(svFrom, codepage);
+				auto r = ConvMBCS2Wide(svFrom, codepage);
+				return reinterpret_cast<std::basic_string<tchar_to>&>(r);
 			}
 			else {
 				return ToUTFString<tchar_to, wchar_t, bCOUNT_FIRST>(
@@ -592,7 +614,7 @@ namespace gtl {
 			return ToUTFString<tchar_to, tchar_from, bCOUNT_FIRST>(svFrom, codepage);
 		}
 		else {
-			static_assert(gtlc::dependent_false_v);
+			static_assert(false);
 		}
 	}
 
@@ -688,7 +710,7 @@ namespace gtl {
 		codepage.from = codepage.From<wchar_t>();
 		codepage.to = codepage.To<char>();		// ..if codepage.to == 0 then codepage.to = DEFAULT Codepage
 		if (codepage.to == eCODEPAGE::UTF8) {
-			return (std::string&)ToUTFString<char8_t, wchar_t, bCOUNT_FIRST>(svFrom, codepage);
+			return U8A(ToUTFString<char8_t, wchar_t, bCOUNT_FIRST>(svFrom, codepage));
 		} else if (codepage == S_CODEPAGE_OPTION{.from = eCODEPAGE_DEFAULT<wchar_t>, .to = eCODEPAGE::KO_KR_949}) {
 			// cache
 			thread_local static gtl::Ticonv<char, wchar_t> iconv{ "CP949", GetCodepageName<wchar_t>() };

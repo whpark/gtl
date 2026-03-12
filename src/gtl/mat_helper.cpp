@@ -422,7 +422,7 @@ namespace gtl {
 				if (nBPP == 24) {
 					if (sizeof(telement) != 3)
 						return false;
-					PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
+					PackSingleRow = [img_cols = img.cols](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
 						telement* line3 = (telement*)line.data();
 						for (int x{}; x < img_cols; x++) {
 							if constexpr (bNoPaletteLookup) {
@@ -457,7 +457,7 @@ namespace gtl {
 				std::atomic<int> yCur, yWritten;
 				bool bWritten{};
 
-				auto GetBuffer = [img_rows = img.rows, &mtxBuffer, &buffers, &yCur, &yWritten](std::stop_token stop) -> BUFFER* {
+				auto GetBuffer = [img_rows = img.rows, &mtxBuffer, &buffers, &yCur](std::stop_token stop) -> BUFFER* {
 					if (yCur >= img_rows)
 						return nullptr;
 					std::unique_lock lock(mtxBuffer);
@@ -478,7 +478,7 @@ namespace gtl {
 					return &buf;
 				};
 
-				auto PackBuffer = [&img, &buffers, &PackSingleRow, &pal, &yCur, &yWritten/*, &id*/, &GetBuffer](std::stop_token stop) {
+				auto PackBuffer = [&img, &PackSingleRow, &pal/*, &id*/, &GetBuffer](std::stop_token stop) {
 					do {
 						auto* pBuffer = GetBuffer(stop);
 						if (!pBuffer)
@@ -704,8 +704,6 @@ namespace gtl {
 			Func_UnPackSingleRow UnPackSingleRow;
 
 
-			using Func_UnpackLine = std::function<void()>;
-
 			if constexpr (bLoopUnrolling) {
 				if (nBPP == 1) {
 					if (palette.size() < 2)
@@ -732,7 +730,7 @@ namespace gtl {
 				else if (nBPP == 4) {
 					if (palette.size() < 16)
 						return false;
-					UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette) {
+					UnPackSingleRow = [img_cols = img.cols, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr, std::vector<telement> const& palette) {
 						int x{};
 						for (; x < nColPixel; x += 2) {
 							int col = x / 2;
@@ -940,8 +938,6 @@ namespace gtl {
 			using Func_UnPackSingleRow = std::function<void(int y, std::vector<uint8> const& line, telement* ptr)>;
 			Func_UnPackSingleRow UnPackSingleRow;
 
-			using Func_UnpackLine = std::function<void()>;
-
 			if (nBPP == 1) {
 				UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr) {
 					int x{};
@@ -963,7 +959,7 @@ namespace gtl {
 				};
 			}
 			else if (nBPP == 4) {
-				UnPackSingleRow = [img_cols = img.cols, &nBPP, &pixel_per_byte, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr) {
+				UnPackSingleRow = [img_cols = img.cols, &nColPixel](int y, std::vector<uint8> const& line, telement* ptr) {
 					int x{};
 					for (; x < nColPixel; x += 2) {
 						int col = x / 2;
@@ -1516,6 +1512,8 @@ namespace gtl {
 			case 24: type = CV_8UC3; break;
 			case 32: type = CV_8UC4; break;
 			}
+			break;
+		default:
 			break;
 		}
 		if (type < 0)

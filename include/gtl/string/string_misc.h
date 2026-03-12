@@ -27,19 +27,19 @@ namespace gtl {
 	/// @brief  misc. GetSpaceString()
 	/// @return " \r\t\n"
 	template < gtlc::string_elem tchar > [[nodiscard]] constexpr std::basic_string_view<tchar> GetSpaceString();
-	constexpr inline [[nodiscard]] std::basic_string_view<char>     GetSpaceStringA()	{ return GetSpaceString<char>(); }
-	constexpr inline [[nodiscard]] std::basic_string_view<char8_t>  GetSpaceStringU8()	{ return GetSpaceString<char8_t>(); }
-	constexpr inline [[nodiscard]] std::basic_string_view<char16_t> GetSpaceStringU16()	{ return GetSpaceString<char16_t>(); }
-	constexpr inline [[nodiscard]] std::basic_string_view<char32_t> GetSpaceStringU32()	{ return GetSpaceString<char32_t>(); }
-	constexpr inline [[nodiscard]] std::basic_string_view<wchar_t>  GetSpaceStringW()	{ return GetSpaceString<wchar_t>(); }
+	[[nodiscard]] constexpr inline std::basic_string_view<char>     GetSpaceStringA()	{ return GetSpaceString<char>(); }
+	[[nodiscard]] constexpr inline std::basic_string_view<char8_t>  GetSpaceStringU8()	{ return GetSpaceString<char8_t>(); }
+	[[nodiscard]] constexpr inline std::basic_string_view<char16_t> GetSpaceStringU16()	{ return GetSpaceString<char16_t>(); }
+	[[nodiscard]] constexpr inline std::basic_string_view<char32_t> GetSpaceStringU32()	{ return GetSpaceString<char32_t>(); }
+	[[nodiscard]] constexpr inline std::basic_string_view<wchar_t>  GetSpaceStringW()	{ return GetSpaceString<wchar_t>(); }
 
 
 	/// @brief ToDigit, IsSpace ... (locale irrelavant)
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsDigit(tchar const c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsOdigit(tchar const c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsXdigit(tchar const c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsSpace(tchar const c/* Locale Irrelavant */);
-	template < gtlc::string_elem tchar > constexpr inline [[nodiscard]] tchar IsNotSpace(tchar const c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsDigit(tchar const c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsOdigit(tchar const c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsXdigit(tchar const c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsSpace(tchar const c/* Locale Irrelavant */);
+	template < gtlc::string_elem tchar > [[nodiscard]] constexpr inline tchar IsNotSpace(tchar const c/* Locale Irrelavant */);
 
 
 	/// @brief Compare strings (containing numbers)
@@ -53,7 +53,7 @@ namespace gtl {
 	constexpr inline int tdszicmp(std::basic_string<tchar> const& strA, std::basic_string<tchar> const& strB);
 
 
-	/// @brief Compare two Strings. according to number (only for '0'-'9' are taken as number. no '-' sign, neither '.' for floating point 
+	/// @brief Compare two Strings. according to number (only for '0'-'9' are taken as number. no '-' sign, neither '.' for floating point
 	///  ex)
 	///      "123" > "65"         // 123 > 65
 	///      "abc123" > "abc6"    // 123 > 65 ("abc" == "abc")
@@ -62,7 +62,7 @@ namespace gtl {
 	///      "01" < "001"         // if same (1 == 1) ===> longer gets winner.
 	/// @param pszA
 	/// @param pszB
-	/// @return 
+	/// @return
 	template < gtlc::string_elem tchar, bool bIgnoreCase = false >
 	constexpr int/*std::strong_ordering*/ CompareStringContainingNumbers(std::basic_string_view<tchar> svA, std::basic_string_view<tchar> svB);
 	template < gtlc::string_elem tchar >
@@ -71,7 +71,7 @@ namespace gtl {
 
 	//-----------------------------------------------------------------------------
 	/// @brief TrimLeft, TrimRight, Trim
-	/// @tparam tchar 
+	/// @tparam tchar
 	/// @param str : string
 	/// @param pszTrim : chars to trim
 	template < gtlc::string_elem tchar > void TrimRight(std::basic_string<tchar>& str,	std::basic_string_view<tchar> svTrim);
@@ -87,7 +87,7 @@ namespace gtl {
 
 	//-----------------------------------------------------------------------------
 	/// @brief TrimLeftView, TrimRightView, TrimView
-	/// @tparam tchar 
+	/// @tparam tchar
 	/// @param str : string
 	/// @param pszTrim : chars to trim
 	/// @return Trimmed string_view
@@ -111,7 +111,7 @@ namespace gtl {
 
 	/// @brief Translate Escape Sequence Characters
 	template < gtlc::string_elem tchar >
-	constexpr [[nodiscard]] std::optional<std::basic_string<tchar>> TranslateEscapeSequence(std::basic_string_view<tchar> sv, tchar cFill = (tchar)'?', tchar cTerminating = 0);
+	[[nodiscard]] constexpr std::optional<std::basic_string<tchar>> TranslateEscapeSequence(std::basic_string_view<tchar> sv, tchar cFill = (tchar)'?', tchar cTerminating = 0);
 
 	template < gtlc::string_elem tchar_t >
 	std::vector<std::basic_string<tchar_t>> ConvDataToHexString(std::span<uint8_t> data, size_t nCol = 16, int cDelimiter = ' ', bool bAddText = false, int cDelimiterText = '|');

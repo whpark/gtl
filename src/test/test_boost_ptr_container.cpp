@@ -67,13 +67,13 @@ namespace gtl::test::boost_ptr_container {
 		//auto* ptr = new_clone(lst.back());
 		{
 			boost::ptr_deque<ttt> lst_2 = lst;
-			auto& a0 = lst_2[0];
-			auto& a1 = lst_2[1];
-			auto& a2 = lst_2[2];
-			auto& a3 = lst_2[3];
-			auto& a4 = lst_2[4];
+			[[maybe_unused]] auto& a0 = lst_2[0];
+			[[maybe_unused]] auto& a1 = lst_2[1];
+			[[maybe_unused]] auto& a2 = lst_2[2];
+			[[maybe_unused]] auto& a3 = lst_2[3];
+			[[maybe_unused]] auto& a4 = lst_2[4];
 
-			int k = a0.i;
+			[[maybe_unused]] int k = a0.i;
 		}
 
 		lst.sort();

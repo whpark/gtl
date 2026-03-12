@@ -77,8 +77,8 @@ namespace gtl {
 
 	public:
 		// Constructors
-		constexpr T default_front() const requires (dim == 3) { return DEFAULT_FRONT; }
-		constexpr T default_depth()  const requires (dim == 3) { return DEFAULT_DEPTH; }
+		inline static constexpr T default_front() requires (dim == 3) { return DEFAULT_FRONT; }
+		inline static constexpr T default_depth() requires (dim == 3) { return DEFAULT_DEPTH; }
 
 		TSRectT() = default;
 		TSRectT(TSRectT const&) = default;
@@ -135,7 +135,7 @@ namespace gtl {
 					//z = {};
 				} else if constexpr (gtlc::has__xy<T_COORD>) { // 삭제금지!. static_assert 걸러내기 위해서 첫 번째 if 절 다시 추가.
 				} else {
-					static_assert(gtlc::dependent_false_v);
+					static_assert(false);
 				}
 			}
 			return *this;
@@ -243,12 +243,12 @@ namespace gtl {
 		}
 		// returns true if rect is within rectangle
 		/// @brief *this including B
-		/// @return 
+		/// @return
 		bool RectInRect(this_t const& B) const {
 			return (pt0() <= B.pt0()) and (B.pt1() <= pt1());
 		}
 		/// @brief *this including B (No boundary)
-		/// @return 
+		/// @return
 		bool RectInRectNE(this_t const& B) const {
 			return (pt0() < B.pt0()) and (B.pt1() < pt1());
 		}

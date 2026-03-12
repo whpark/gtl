@@ -26,7 +26,7 @@ namespace gtl::win::inline mfc {
 
 	BEGIN_MESSAGE_MAP(CListCtrlEd, CListCtrl)
 		ON_WM_LBUTTONDOWN()
-		ON_EN_KILLFOCUS(IDC_EDIT, OnEnKillFocus)
+		ON_EN_KILLFOCUS(IDC_EDIT, &CListCtrlEd::OnEnKillFocus)
 		ON_WM_HSCROLL()
 		ON_WM_VSCROLL()
 	END_MESSAGE_MAP()
@@ -96,7 +96,7 @@ namespace gtl::win::inline mfc {
 			ldi.item.iSubItem = iSubItem;
 			ldi.item.mask = 0;
 			ldi.item.pszText = NULL;
-			if (!GetParent()->SendMessage(WM_NOTIFY, ldi.hdr.idFrom, (LPARAM)&ldi) == 0) {
+			if (GetParent()->SendMessage(WM_NOTIFY, ldi.hdr.idFrom, (LPARAM)&ldi) != 0) {
 				return FALSE;
 			}
 		}
@@ -341,7 +341,7 @@ namespace gtl::win::inline mfc {
 
 	BEGIN_MESSAGE_MAP(CMFCListCtrlEd, CMFCListCtrl)
 		ON_WM_LBUTTONDOWN()
-		ON_EN_KILLFOCUS(IDC_EDIT, OnEnKillFocus)
+		ON_EN_KILLFOCUS(IDC_EDIT, &CMFCListCtrlEd::OnEnKillFocus)
 		ON_WM_HSCROLL()
 		ON_WM_VSCROLL()
 	END_MESSAGE_MAP()
@@ -411,7 +411,7 @@ namespace gtl::win::inline mfc {
 			ldi.item.iSubItem = iSubItem;
 			ldi.item.mask = 0;
 			ldi.item.pszText = NULL;
-			if (!GetParent()->SendMessage(WM_NOTIFY, ldi.hdr.idFrom, (LPARAM)&ldi) == 0) {
+			if (GetParent()->SendMessage(WM_NOTIFY, ldi.hdr.idFrom, (LPARAM)&ldi) != 0) {
 				return FALSE;
 			}
 		}

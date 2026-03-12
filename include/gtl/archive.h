@@ -126,7 +126,7 @@ namespace gtl {
 						this->Write(std::data(v), sizeof(v));
 					}
 					else {
-						static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
+						static_assert(false, "Object Type cannot be Serialized directly.");
 					}
 				}
 				else if constexpr (std::is_integral_v<TYPE>) {
@@ -136,7 +136,7 @@ namespace gtl {
 					this->Write(&v, sizeof(v));
 				}
 				else {
-					static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
+					static_assert(false, "Object Type cannot be Serialized directly.");
 				}
 			} else {
 				Write(&v, sizeof(v));
@@ -176,7 +176,7 @@ namespace gtl {
 						return this->Read(std::data(v), sizeof(v));
 					}
 					else {
-						static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
+						static_assert(false, "Object Type cannot be Serialized directly.");
 					}
 				}
 				else if constexpr (std::is_integral_v<TYPE>) {
@@ -186,7 +186,7 @@ namespace gtl {
 					return this->Read(&v, sizeof(v));
 				}
 				else {
-					static_assert(gtlc::dependent_false_v, "Object Type cannot be Serialized directly.");
+					static_assert(false, "Object Type cannot be Serialized directly.");
 				}
 			} else {
 				return Read(&v, sizeof(v));
@@ -311,7 +311,7 @@ namespace gtl {
 			} else if constexpr (bLOAD) {
 				return *this >> v;
 			} else {
-				static_assert(gtlc::dependent_false_v, "no way");
+				static_assert(false, "no way");
 				return *this;
 			}
 		};
@@ -342,7 +342,7 @@ namespace gtl {
 		/// @brief Read BOM
 		eCODEPAGE ReadCodepageBOM(eCODEPAGE eDefaultCodepage = eCODEPAGE::UTF8) requires (bLOAD) {
 			CHECK_ARCHIVE_LOADABLE;
-			unsigned char c = 0;
+			//unsigned char c = 0;
 
 			auto peek = [](tstream& stream, std::string_view sv) -> bool {
 				std::ifstream s;
@@ -441,7 +441,8 @@ namespace gtl {
 						.from = std::is_same_v<tchar_codepage, char> ? eCodepage_ : eCODEPAGE::DEFAULT,
 						.to = std::is_same_v<tchar, char> ? g_eCodepageMBCS : eCODEPAGE::DEFAULT
 					};
-					return ((TString<tchar_codepage>&)*r).ToString<tchar>(option);
+					return ToString<tchar, tchar_codepage, false>(*r, option);
+					//return ((TString<tchar_codepage>&)*r).ToString<tchar>(option);
 				}
 				else {
 					return {};
@@ -581,7 +582,7 @@ namespace gtl {
 		// Read / Write Size
 		template < size_t nMinItemSize = 4 > requires (bLOAD)
 		size_t LoadFlexSize() {
-			static_assert(std::ranges::any_of({1, 2, 4, sizeof(size_t)}, nMinItemSize));
+			static_assert(std::ranges::any_of({1uz, 2uz, 4uz, sizeof(size_t)}, [](auto val) {return val == nMinItemSize;}));
 			CHECK_ARCHIVE_LOADABLE;
 			auto& ar = *this;
 			union {
@@ -620,7 +621,7 @@ namespace gtl {
 		}
 		template < size_t nMinItemSize = 4 > requires (bSTORE)
 		TArchive& StoreFlexSize(size_t size) {
-			static_assert(std::ranges::any_of({1, 2, 4, sizeof(size_t)}, nMinItemSize));
+			static_assert(std::ranges::any_of({1, 2, 4, sizeof(size_t)}, [](auto val) { return val == nMinItemSize; }));
 			CHECK_ARCHIVE_STORABLE;
 			auto& ar = *this;
 			if constexpr (nMinItemSize <= 1) {
@@ -730,7 +731,7 @@ namespace gtl {
 		//					*this >> a;
 		//					container.insert(std::move(a));
 		//				} else {
-		//					static_assert(gtlc::dependent_false_v, "CONTAINER must have push_back or insert ...");
+		//					static_assert(false, "CONTAINER must have push_back or insert ...");
 		//				}
 		//			}
 		//		}
@@ -758,7 +759,7 @@ namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return LoadContainer(data);
 		//	} else {
-		//		//static_assert(gtlc::dependent_false_v, "what???");
+		//		//static_assert(false, "what???");
 		//		return *this;
 		//	}
 		//};
@@ -814,7 +815,7 @@ namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return *this >> ptr;
 		//	} else {
-		//		//static_assert(gtlc::dependent_false_v, "what???");
+		//		//static_assert(false, "what???");
 		//		return *this;
 		//	}
 		//}
@@ -893,7 +894,7 @@ namespace gtl {
 		//		ar & (std::uint8_t)0xff;
 		//		ar & (std::uint16_t)0xfffd;
 		//	} else {
-		//		static_assert(gtlc::dependent_false_v, "only MBCS, UNICODE(little endian), UTF-8 types are supported.");
+		//		static_assert(false, "only MBCS, UNICODE(little endian), UTF-8 types are supported.");
 		//		return ar;
 		//	}
 
@@ -1022,7 +1023,7 @@ namespace gtl {
 		//	} else if constexpr (bLOAD) {
 		//		return *this >> str;
 		//	} else {
-		//		//static_assert(gtlc::dependent_false_v, "what???");
+		//		//static_assert(false, "what???");
 		//		return *this;
 		//	}
 		//}

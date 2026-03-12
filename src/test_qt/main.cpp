@@ -3,9 +3,9 @@
 
 int main(int argc, char* argv[]) {
 	QString str(" \t \r\n 0xffff");
-	auto t = gtl::qt::ToArithmeticValue<int>(str);
+	[[maybe_unused]] auto t = gtl::qt::ToArithmeticValue<int>(str);
 	QString str2(" \t \r\n 0x1234567890ABC");
-	auto t2 = gtl::qt::ToArithmeticValue<int64_t>(str2);
+	[[maybe_unused]] auto t2 = gtl::qt::ToArithmeticValue<int64_t>(str2);
 
 
 	QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
