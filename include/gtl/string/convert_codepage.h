@@ -235,15 +235,15 @@ namespace gtl {
 		using T = std::conditional_t<std::is_const_v<decltype(svFrom)>, tStringTo const&, tStringTo&&>;
 		return (T)std::forward<tStringFrom>(svFrom);
 	}
-	[[nodiscard]] std::string const&		U8A (std::u8string const& from)			{ return StringCast<std::string>(from); }
-	[[nodiscard]] std::string_view const&	U8A (std::u8string_view const& from)	{ return StringCast<std::string_view>(from); }
-	[[nodiscard]] std::u8string const&		AU8 (std::string const& from)			{ return StringCast<std::u8string>(from); }
-	[[nodiscard]] std::u8string_view const&	AU8 (std::string_view const& from)		{ return StringCast<std::u8string_view>(from); }
+	[[nodiscard]] inline std::string const&			U8A (std::u8string const& from)			{ return StringCast<std::string>(from); }
+	[[nodiscard]] inline std::string_view const&	U8A (std::u8string_view const& from)	{ return StringCast<std::string_view>(from); }
+	[[nodiscard]] inline std::u8string const&		AU8 (std::string const& from)			{ return StringCast<std::u8string>(from); }
+	[[nodiscard]] inline std::u8string_view const&	AU8 (std::string_view const& from)		{ return StringCast<std::u8string_view>(from); }
 
-	[[nodiscard]] std::wstring const&		U_W(std::basic_string<gtlc::charuw_t> const& from)		{ return StringCast<std::wstring>(from); }
-	[[nodiscard]] std::wstring_view const&	U_W(std::basic_string_view<gtlc::charuw_t> const& from)	{ return StringCast<std::wstring_view>(from); }
-	[[nodiscard]] std::basic_string<gtlc::charuw_t> const&		W_U(std::wstring const& from)		{ return StringCast<std::basic_string<gtlc::charuw_t>>(from); }
-	[[nodiscard]] std::basic_string_view<gtlc::charuw_t> const&	W_U(std::wstring_view const& from)	{ return StringCast<std::basic_string_view<gtlc::charuw_t>>(from); }
+	[[nodiscard]] inline std::wstring const&		U_W(std::basic_string<gtlc::charuw_t> const& from)		{ return StringCast<std::wstring>(from); }
+	[[nodiscard]] inline std::wstring_view const&	U_W(std::basic_string_view<gtlc::charuw_t> const& from)	{ return StringCast<std::wstring_view>(from); }
+	[[nodiscard]] inline std::basic_string<gtlc::charuw_t> const&		W_U(std::wstring const& from)		{ return StringCast<std::basic_string<gtlc::charuw_t>>(from); }
+	[[nodiscard]] inline std::basic_string_view<gtlc::charuw_t> const&	W_U(std::wstring_view const& from)	{ return StringCast<std::basic_string_view<gtlc::charuw_t>>(from); }
 
 
 	/// @brief Converts Codepage To utf-16
