@@ -126,14 +126,17 @@ namespace gtl::shape {
 			LineTo(pt1);
 		}
 		virtual void Arc(point_t const& ptCenter, double radius, deg_t t0, deg_t tLength) {
-			int n = Round(std::abs(tLength * std::numbers::pi * radius / m_target_interpolation_inverval));
-			deg_t t1 = t0+tLength;
-			MoveTo(radius * point_t{cos(t0), sin(t0), .0}+ptCenter);
+			rad_t r0 = t0;
+			rad_t rLength = tLength;
+			rad_t r1 = r0+rLength;
+			double scale = m_ct(point_t::All(0)).Distance(m_ct(point_t(1.0, 0.0, 0.0)));
+			int n = Round(std::abs(rLength * std::numbers::pi * radius * scale / m_target_interpolation_inverval));
+			MoveTo(radius * point_t{cos(r0), sin(r0), .0}+ptCenter);
 			for (int i = 1; i <= n; i++) {
-				deg_t t {std::lerp(t0, t1, (double)i/n)};
+				rad_t r {std::lerp(r0, r1, (double)i/n)};
 				//constexpr static auto m2pi = std::numbers::pi*2;
-				double c = radius * cos(t);
-				double s = radius * sin(t);
+				double c = radius * cos(r);
+				double s = radius * sin(r);
 				xPoint2d pt(ptCenter.x + c, ptCenter.y+s);
 				LineTo(pt);
 			}
