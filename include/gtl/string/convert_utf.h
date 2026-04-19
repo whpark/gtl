@@ -13,7 +13,7 @@
 #ifndef GTL__HEADER__STRING_CONVERT_UTF
 #define GTL__HEADER__STRING_CONVERT_UTF
 
-#include <experimental/generator>
+#include <generator>
 
 #include "string_primitives.h"
 
@@ -431,7 +431,7 @@ namespace gtl {
 	/// @param svFrom source text
 	/// @return converted text
 	template < gtlc::string_elem_utf tchar_to, gtlc::string_elem_utf tchar_from, bool bThrow = true >
-	std::experimental::generator<tchar_to> SeqUTF(std::basic_string_view<tchar_from> svFrom) {
+	std::generator<tchar_to> SeqUTF(std::basic_string_view<tchar_from> svFrom) {
 		namespace uc = gtl::utf_const;
 
 		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {

@@ -656,8 +656,8 @@ namespace gtl {
 
 	template < typename tchar_to, gtl::xStringLiteral literal, typename ... targs >
 	inline static std::basic_string<tchar_to> FormatToTString(targs&& ... args) {
-		fmt::basic_format_string<tchar_to, targs...>{gtl::TStringLiteral<tchar_to, literal>{}.value};	// Compile time Validation only
 		static constexpr gtl::TStringLiteral<tchar_to, literal> tfmt{};
+		fmt::basic_format_string<tchar_to, targs...>{tfmt.value};	// Compile time Validation only
 		if constexpr (gtlc::is_one_of<tchar_to, char, wchar_t>) {
 			return fmt::format(fmt::runtime(tfmt.value), std::forward<targs>(args)...);
 		}
