@@ -69,7 +69,8 @@ public:\
 	bool Equals(base_t const& b) const override { return typeid(*this) == typeid(b) and (*this == (this_t const&)b); }\
 	std::partial_ordering Compare(base_t const& b) const override { if (typeid(*this) != typeid(b)) return std::partial_ordering::unordered; return (*this) <=> (this_t const&)b; }\
 private:\
-	static inline sDynamicCreateRegister s_dynamicCreateHelper{std::move(KEY), []{ return std::make_unique<this_t>(__VA_ARGS__); }};\
+	static std::unique_ptr<base_t> create_object() { return std::make_unique<this_t>(__VA_ARGS__); }\
+	inline static sDynamicCreateRegister s_dynamicCreateHelper{std::move(KEY), &this_t::create_object };
 
 	//-------------------------------------------------------------------------
 	template < typename tSelf, typename tKey >
