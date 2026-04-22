@@ -297,6 +297,15 @@ TEST(gtl_coord, rect) {
 		EXPECT_EQ(rect2.Width(), 100);
 		EXPECT_EQ(rect2.Height(), 200);
 		EXPECT_EQ(rect2.Depth(), 300);
+		EXPECT_TRUE(rect2 == rect);
+		rect2.left = 2;
+		EXPECT_FALSE(rect2 == rect);
+		EXPECT_TRUE(rect2 != rect);
+		EXPECT_TRUE(rect < rect2);
+		EXPECT_TRUE(rect <= rect2);
+		EXPECT_TRUE(rect2 > rect);
+		EXPECT_TRUE(rect2 >= rect);
+		EXPECT_FALSE(rect > rect2);
 	}
 
 	{

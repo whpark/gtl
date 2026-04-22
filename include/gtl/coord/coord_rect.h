@@ -23,11 +23,11 @@ namespace gtl {
 #pragma pack(push, 1)
 
 
-	template < typename T, int dim, int DEFAULT_FRONT = -1, int DEFAULT_BACK = 1 > struct TRectT;
+	template < typename T, int dim > struct TRectT;
 
-	template < typename T, int DEFAULT_FRONT = -1, int DEFAULT_BACK = 1 >
+	template < typename T >
 	struct TRECT3 {
-		T left{}, top{}, front{DEFAULT_FRONT}, right{}, bottom{}, back{DEFAULT_BACK};
+		T left{}, top{}, front = -1, right{}, bottom{}, back = 1;
 		auto operator <=> (TRECT3 const&) const = default;
 	};
 	template < typename T > struct TRECT2 {
@@ -38,14 +38,14 @@ namespace gtl {
 	//--------------------------------------------------------------------------------------------------------------------------------
 	// Rect 3 (left, top, front, right, bottom, back)
 	//
-	template < typename T, int dim, int DEFAULT_FRONT, int DEFAULT_BACK >
-	struct TRectT : std::conditional_t<dim == 2, TRECT2<T>, TRECT3<T, DEFAULT_FRONT, DEFAULT_BACK> > {
+	template < typename T, int dim >
+	struct TRectT : std::conditional_t<dim == 2, TRECT2<T>, TRECT3<T> > {
 	public:
 		//T left{}, top{}, front{DEFAULT_FRONT};
 		//T right{}, bottom{}, back{DEFAULT_BACK};
 
-		using base_t = std::conditional_t< dim == 2, TRECT2<T>, TRECT3<T, DEFAULT_FRONT, DEFAULT_BACK> >;
-		using this_t = TRectT;
+		using base_t = std::conditional_t< dim == 2, TRECT2<T>, TRECT3<T> >;
+		using this_t = TRectT<T, dim>;
 		using coord_t = std::array<T, 2*dim>;
 		using coord_point_t = TPointT<T, dim>;
 		using coord_size_t = TSizeT<T, dim>;
@@ -74,8 +74,8 @@ namespace gtl {
 
 	public:
 		// Constructors
-		inline static constexpr T default_front() requires (dim == 3) { return DEFAULT_FRONT; }
-		inline static constexpr T default_back()  requires (dim == 3) { return DEFAULT_BACK; }
+		inline static constexpr T default_front() requires (dim == 3) { return -1; }
+		inline static constexpr T default_back()  requires (dim == 3) { return 1; }
 
 		TRectT() = default;
 		TRectT(TRectT const&) = default;
@@ -192,7 +192,7 @@ namespace gtl {
 		template < typename T2 > operator TRectT<T2, 2> () const requires (dim == 3) { return TRectT<T2, 2>(this->left, this->top, this->right, this->bottom); }
 
 		// Compare
-		auto operator <=> (TRectT const&) const = default;
+		auto operator <=> (this_t const&) const = default;
 		auto operator <=> (T const& v) const { return *this <=> All(v); }
 
 		T Width() const						{ return this->right - this->left; }
