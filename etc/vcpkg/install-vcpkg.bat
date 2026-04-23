@@ -53,7 +53,7 @@ rem vcpkg install --triplet=x64-windows --recurse cppcoro --overlay-ports=%Sourc
 rem if %errorlevel% neq 0 set FAILED=%FAILED% cppcoro:x64,
 
 echo installing x64-windows...
-vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 libarchive fmt imgui spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut tinyspline libxml2 libxmlmm openssl exprtk eigen3 freeimage blend2d ffmpeg[all] aravis[introspection,packet-socket,usb] opencv[ade,aravis,calib3d,contrib,core,cuda,cudnn,dnn,dnn-cuda,eigen,ffmpeg,freetype,fs,gapi,gdcm,gstreamer,hdf,highgui,intrinsics,ipp,jpeg,jpegxl,openexr,opengl,openjpeg,openmp,png,python,quality,quirc,rgbd,sfm,text,thread,tiff,vtk,webp] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
+vcpkg install --triplet=x64-windows --recurse gtest catch2 benchmark boost flux 7zip bzip2 libarchive fmt imgui spdlog scnlib ctre cpp-peglib ctpg foonathan-lexy ms-gsl magic-enum libenvpp winreg tinyxml2 icu utfcpp libiconv freetype cpr glaze nlohmann-json tomlplusplus opengl glew glm glfw3 freeglut tinyspline libxml2 libxmlmm openssl exprtk eigen3 libdmtx freeimage blend2d ffmpeg[all] aravis[introspection,packet-socket,usb] opencv[ade,aravis,calib3d,contrib,core,cuda,cudnn,dnn,dnn-cuda,eigen,ffmpeg,freetype,fs,gapi,gdcm,gstreamer,hdf,highgui,intrinsics,ipp,jpeg,jpegxl,openexr,opengl,openjpeg,openmp,png,python,quality,quirc,rgbd,sfm,text,thread,tiff,vtk,webp] vtk[atlmfc,opengl] wxwidgets[debug-support,example,fonts,media,webview] eventpp xlnt
 rem deleted : maddy, websocketpp,
 if %errorlevel% neq 0 set FAILED=%FAILED% x64-windows,
 
