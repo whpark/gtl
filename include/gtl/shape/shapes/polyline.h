@@ -71,15 +71,15 @@ namespace gtl::shape {
 				(point_t&)pt = ct((point_t&)pt);
 			}
 			if (!bRightHanded) {
-				for (auto& pt : m_pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); } 
+				for (auto& pt : m_pts) { pt.x = -pt.x;  pt.Bulge() = -pt.Bulge(); }
 			}
 		};
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
 			bool bModified{};
 
 			auto nPt = m_pts.size();
-			if (!m_bLoop)
-				nPt--;
+			//if (!m_bLoop)
+			//	nPt--;
 			for (int iPt = 0; iPt < nPt; iPt++) {
 				auto pt0 = m_pts[iPt];
 				bModified |= rectBoundary.UpdateBoundary(pt0);
