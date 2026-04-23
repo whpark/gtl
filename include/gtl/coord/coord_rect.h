@@ -30,7 +30,8 @@ namespace gtl {
 		T left{}, top{}, front = -1, right{}, bottom{}, back = 1;
 		auto operator <=> (TRECT3 const&) const = default;
 	};
-	template < typename T > struct TRECT2 {
+	template < typename T >
+	struct TRECT2 {
 		T left{}, top{}, right{}, bottom{};
 		auto operator <=> (TRECT2 const&) const = default;
 	};
