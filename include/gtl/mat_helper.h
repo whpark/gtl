@@ -105,64 +105,8 @@ namespace gtl {
 	}
 #endif
 
-	static inline bool ReadMat(std::istream& is, cv::Mat& mat) {
-		auto ReadVar = [&is](auto& var) -> bool {
-			return (bool)is.read((char*)&var, sizeof(var));
-		};
-
-		do {
-			// read sign
-			{
-				uint8_t buf[3];
-				uint8_t b = (uint8_t)sizeof(buf);
-				if (!ReadVar(b))
-					break;
-				if (b != sizeof(buf))
-					break;
-				if (!ReadVar(buf))
-					break;
-				if (memcmp(buf, "mat", b) != 0)
-					break;
-			}
-
-			int rows{}, cols{}, type{};
-			if (!ReadVar(rows)) break;
-			if (!ReadVar(cols)) break;
-			if (!ReadVar(type)) break;
-
-			if ( (rows < 0) || (cols < 0) )
-				break;
-			if ( (rows == 0) || (cols == 0) ) {
-				mat.release();
-				return true;
-			}
-
-			mat = cv::Mat::zeros(rows, cols, type);
-			if (mat.empty())
-				break;
-
-			for (int i = 0; i < rows; i++)
-				is.read((char*)mat.ptr(i), (mat.cols*mat.elemSize()));	// step -> (cols*elemSize())
-
-			return true;
-
-		} while (false);
-
-		return false;
-	}
-	static inline bool SaveMat(std::ostream& os, cv::Mat const& mat) {
-		uint8_t buf[4] = { 3, 'm', 'a', 't' };
-		os.write((char const*)buf, sizeof(buf));
-		os.write((char const*)&mat.rows, sizeof(mat.rows));
-		os.write((char const*)&mat.cols, sizeof(mat.cols));
-		int type = mat.type();
-		os.write((char const*)&type, sizeof(type));
-		for (int i = 0; i < mat.rows; i++) {
-			os.write((char*)mat.ptr(i), mat.cols*mat.elemSize());	// step -> (cols*elemSize())
-		}
-
-		return true;
-	}
+	GTL__API bool ReadMat(std::istream& is, cv::Mat& mat);
+	GTL__API bool SaveMat(std::ostream& os, cv::Mat const& mat);
 
 
 #if 0	// using boost

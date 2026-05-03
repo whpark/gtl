@@ -54,11 +54,9 @@
 #include <codecvt>
 #include <string>
 #include <string_view>
-#if defined(__cpp_lib_format)
-#	include <format>
-#else
-#endif
-#define FMT_HEADER_ONLY
+#include <format>
+#include <print>
+
 #include "fmt/format.h"
 #include "fmt/args.h"
 #include "fmt/chrono.h"
