@@ -1,4 +1,5 @@
-﻿#include "benchmark/benchmark.h"
+﻿#include <catch2/benchmark/catch_benchmark.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "gtl/gtl.h"
 #include "gtl/iconv_wrapper.h"
@@ -49,15 +50,14 @@ namespace gtl {
 namespace uc = gtl::utf_const;
 
 
-static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) {
+static std::u32string StringCodepageConv_U8toU32_CountAndConvert(std::size_t range) {
 
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
 
-	std::u8string_view svFrom { TEST_STRING[state.range(0)] };
-	for (auto _ : state) {
-		std::u32string str;
+	std::u8string_view svFrom { TEST_STRING[range] };
+	std::u32string str;
 
 		//if (svFrom.empty())
 		//	return str;
@@ -75,7 +75,7 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 		}
 
 		if (nOutputLen <= 0)
-			continue;
+			return str;
 		str.reserve(nOutputLen);
 
 		pos = svFrom.data();
@@ -86,7 +86,7 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 		// check endian, Convert
 		gtl::CheckAndConvertEndian(str, gtl::eCODEPAGE::DEFAULT);
 
-	}
+	return str;
 
 
 #pragma warning(pop)
@@ -94,14 +94,13 @@ static void StringCodepageConv_U8toU32_CountAndConvert(benchmark::State& state) 
 }
 
 
-static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state) {
+static std::u32string StringCodepageConv_U8toU32_NoCountAndConvert(std::size_t range) {
 
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
-	std::u8string_view svFrom { TEST_STRING[state.range(0)] };
-	for (auto _ : state) {
-		std::u32string str;
+	std::u8string_view svFrom { TEST_STRING[range] };
+	std::u32string str;
 
 		//if (svFrom.empty())
 		//	return str;
@@ -119,7 +118,7 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 		//}
 
 		if (nOutputLen <= 0)
-			continue;
+			return str;
 		str.reserve(nOutputLen);
 
 		pos = svFrom.data();
@@ -131,20 +130,19 @@ static void StringCodepageConv_U8toU32_NoCountAndConvert(benchmark::State& state
 		// check endian, Convert
 		gtl::CheckAndConvertEndian(str, gtl::eCODEPAGE::DEFAULT);
 
-	}
+	return str;
 
 #pragma warning(pop)
 
 }
 
-static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::State& state) {
+static std::u32string StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(std::size_t range) {
 
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
-	std::u8string_view svFrom { TEST_STRING[state.range(0)] };
-	for (auto _ : state) {
-		std::u32string str;
+	std::u8string_view svFrom { TEST_STRING[range] };
+	std::u32string str;
 
 		//if (svFrom.empty())
 		//	return str;
@@ -162,7 +160,7 @@ static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::Stat
 		//}
 
 		if (nOutputLen <= 0)
-			continue;
+			return str;
 		str.reserve(nOutputLen);
 
 		pos = svFrom.data();
@@ -173,21 +171,20 @@ static void StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(benchmark::Stat
 		// check endian, Convert
 		gtl::CheckAndConvertEndian(str, gtl::eCODEPAGE::DEFAULT);
 
-	}
+	return str;
 
 #pragma warning(pop)
 
 }
 
 
-static void StringCodepageConv_U8toU32_coroutine(benchmark::State& state) {
+static std::u32string StringCodepageConv_U8toU32_coroutine(std::size_t range) {
 
 #pragma warning(push)
 #pragma warning(disable: 4566)
 
-	std::u8string_view svFrom { TEST_STRING[state.range(0)] };
-	for (auto _ : state) {
-		std::u32string str;
+	std::u8string_view svFrom { TEST_STRING[range] };
+	std::u32string str;
 
 		if (svFrom.size() > std::min((size_t)INT32_MAX, (size_t)RSIZE_MAX)) {
 			[[unlikely]]
@@ -202,82 +199,81 @@ static void StringCodepageConv_U8toU32_coroutine(benchmark::State& state) {
 		// check endian, Convert
 		gtl::CheckAndConvertEndian(str, gtl::eCODEPAGE::DEFAULT);
 
-	}
+	return str;
 
 #pragma warning(pop)
 
 }
 
-//BENCHMARK(StringCodepageConv_U8toU32_CountAndConvert)->Arg(0)->Arg(1)->Arg(2);
-//BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvert)->Arg(0)->Arg(1)->Arg(2);
-//BENCHMARK(StringCodepageConv_U8toU32_NoCountAndConvertNoShrink)->Arg(0)->Arg(1)->Arg(2);
-//BENCHMARK(StringCodepageConv_U8toU32_coroutine)->Arg(0)->Arg(1)->Arg(2);
+// BENCHMARK("U8 to U32 count and convert") { return StringCodepageConv_U8toU32_CountAndConvert(0); };
+// BENCHMARK("U8 to U32 no count and convert") { return StringCodepageConv_U8toU32_NoCountAndConvert(0); };
+// BENCHMARK("U8 to U32 no count and no shrink") { return StringCodepageConv_U8toU32_NoCountAndConvertNoShrink(0); };
+// BENCHMARK("U8 to U32 coroutine") { return StringCodepageConv_U8toU32_coroutine(0); };
 
 #pragma optimize ("", off)
-void StringCodepageConv_ICONV_MBCS_WIDE(benchmark::State& state) {
-	for (auto _ : state) {
-		std::string str{TEST_SZ};
-		auto strT = gtl::ToString_iconv<wchar_t, char, "", "CP949">(str);
-	}
+std::optional<std::wstring> StringCodepageConv_ICONV_MBCS_WIDE() {
+	std::string str{TEST_SZ};
+	return gtl::ToString_iconv<wchar_t, char, "", "CP949">(str);
 }
 #pragma optimize ("", on)
 
 #pragma optimize ("", off)
-void StringCodepageConv_WindowsAPI_MBCS_WIDE(benchmark::State& state) {
-	for (auto _ : state) {
-		std::string str{TEST_SZ};
-		auto n = MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, str.c_str(), (int)str.size(), nullptr, 0);
-		if (n <= 0)
-			continue;
-		std::wstring strW;
-		strW.resize(n);
-		MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, str.c_str(), (int)str.size(), strW.data(), (int)strW.size());
-	}
-}
-#pragma optimize ("", on)
-
-BENCHMARK(StringCodepageConv_ICONV_MBCS_WIDE);
-BENCHMARK(StringCodepageConv_WindowsAPI_MBCS_WIDE);
-
-#pragma optimize ("", off)
-void StringCodepageConv_ICONV_UTF8_WIDE(benchmark::State& state) {
-
-	for (auto _ : state) {
-		std::u8string str{TEXT_u8(TEST_SZ)};
-		auto strT = gtl::ToString_iconv<wchar_t>(str);
-	}
-
+std::wstring StringCodepageConv_WindowsAPI_MBCS_WIDE() {
+	std::string str{TEST_SZ};
+	auto n = MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, str.c_str(), (int)str.size(), nullptr, 0);
+	if (n <= 0)
+		return {};
+	std::wstring strW;
+	strW.resize(n);
+	MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, str.c_str(), (int)str.size(), strW.data(), (int)strW.size());
+	return strW;
 }
 #pragma optimize ("", on)
 
 #pragma optimize ("", off)
-void StringCodepageConv_WindowsAPI_UTF8_WIDE(benchmark::State& state) {
-
-	for (auto _ : state) {
-		std::u8string str{TEXT_u8(TEST_SZ)};
-		auto n = MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, (char const*)str.c_str(), (int)str.size(), nullptr, 0);
-		if (n <= 0)
-			continue;
-		std::wstring strW;
-		strW.resize(n);
-		MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, (char const*)str.c_str(), (int)str.size(), strW.data(), (int)strW.size());
-	}
-
+std::optional<std::wstring> StringCodepageConv_ICONV_UTF8_WIDE() {
+	std::u8string str{TEXT_u8(TEST_SZ)};
+	return gtl::ToString_iconv<wchar_t>(str);
 }
 #pragma optimize ("", on)
 
-BENCHMARK(StringCodepageConv_ICONV_UTF8_WIDE);
-BENCHMARK(StringCodepageConv_WindowsAPI_UTF8_WIDE);
+#pragma optimize ("", off)
+std::wstring StringCodepageConv_WindowsAPI_UTF8_WIDE() {
+	std::u8string str{TEXT_u8(TEST_SZ)};
+	auto n = MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, (char const*)str.c_str(), (int)str.size(), nullptr, 0);
+	if (n <= 0)
+		return {};
+	std::wstring strW;
+	strW.resize(n);
+	MultiByteToWideChar((int)gtl::eCODEPAGE::KO_KR_949, 0, (char const*)str.c_str(), (int)str.size(), strW.data(), (int)strW.size());
+	return strW;
+}
+#pragma optimize ("", on)
+
+TEST_CASE("String codepage conversion benchmarks", "[benchmark][string]") {
+	BENCHMARK("ICONV MBCS to wide") {
+		return StringCodepageConv_ICONV_MBCS_WIDE();
+	};
+
+	BENCHMARK("Windows API MBCS to wide") {
+		return StringCodepageConv_WindowsAPI_MBCS_WIDE();
+	};
+
+	BENCHMARK("ICONV UTF-8 to wide") {
+		return StringCodepageConv_ICONV_UTF8_WIDE();
+	};
+
+	BENCHMARK("Windows API UTF-8 to wide") {
+		return StringCodepageConv_WindowsAPI_UTF8_WIDE();
+	};
+}
 
 //#pragma optimize ("", off)
-//void StringCodepageConv_ICONV_R_MBCS_WIDE(benchmark::State& state) {
+//std::optional<std::wstring> StringCodepageConv_ICONV_R_MBCS_WIDE() {
 //
 //	gtl::Ticonv<wchar_t, char> conv(nullptr, "CP949");
-//	for (auto _ : state) {
-//		std::u8string str{TEXT_u8(TEST_SZ)};
-//		auto strT = conv.Convert(str);
-//	}
-//
+//	std::u8string str{TEXT_u8(TEST_SZ)};
+//	return conv.Convert(str);
 //}
 //#pragma optimize ("", on)
 //

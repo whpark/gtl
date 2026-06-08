@@ -1,27 +1,23 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "gtl/gtl.h"
+
+#include <catch2/catch_session.hpp>
 
 //#pragma comment(lib, "Shlwapi.lib")
 
-namespace testing::internal {
-
-	//void PrintU8StringTo(const ::std::u8string& s, ::std::ostream* os) {
-	//	for (auto c : s) {
-	//		*os << std::hex << (int) c << ", ";
-	//	}
-	//	*os << std::dec;
-	//}
-
-}
-
-
-int main(int argc, wchar_t* argv[]) {
-	testing::InitGoogleTest(&argc, argv);
-	EXPECT_TRUE(std::setlocale(LC_ALL, "Korean.949"));
+int main(int argc, char* argv[]) {
+	if (!std::setlocale(LC_ALL, "Korean.949")) {
+		fmt::println(stderr, "Failed to set locale: Korean.949");
+		return 1;
+	}
 
 	gtl::SetCurrentPath_ProjectFolder();
 	fmt::println("Current Folder : {}\n", std::filesystem::current_path());
-	auto r = RUN_ALL_TESTS();
-	return r;
+
+	fmt::print(fmt::emphasis::bold|fmt::fg(fmt::rgb{0,255,0}), "Hello world {{0x{:06x}}}\n", 0x00'ff'00);
+	fmt::print(fmt::emphasis::bold|fmt::fg(fmt::terminal_color::green), "Hello world {{{}}}\n", "TerminalGreen");
+	fmt::print(fmt::emphasis::bold|fmt::fg(fmt::color::green), "Hello world {{{}}}\n", "Color::Green");
+
+	return Catch::Session().run(argc, argv);
 }
 

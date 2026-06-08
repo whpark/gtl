@@ -11,9 +11,13 @@
 //#define NOMINMAX
 //#include <windows.h>
 
-#include "gtest/gtest.h"
-#include "benchmark/benchmark.h"
-//#include <catch2/catch_all.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#define TEST(suite, name) TEST_CASE(#suite "." #name, "[" #suite "]")
+#define EXPECT_TRUE(expr) CHECK(expr)
+#define EXPECT_FALSE(expr) CHECK_FALSE(expr)
+#define EXPECT_EQ(lhs, rhs) CHECK((lhs) == (rhs))
+#define EXPECT_NE(lhs, rhs) CHECK((lhs) != (rhs))
 
 #include "opencv2/opencv.hpp"
 

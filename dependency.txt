@@ -1,6 +1,4 @@
-gtest
 catch2
-benchmark
 boost
 flux
 7zip
@@ -46,5 +44,3 @@ aravis[introspection,packet-socket,usb]
 opencv[ade,aravis,calib3d,contrib,core,cuda,cudnn,dnn,dnn-cuda,eigen,ffmpeg,freetype,fs,gapi,gdcm,gstreamer,hdf,highgui,intrinsics,ipp,jpeg,jpegxl,openexr,opengl,openjpeg,openmp,png,python,quality,quirc,rgbd,sfm,text,thread,tiff,vtk,webp]
 vtk[atlmfc,opengl]
 wxwidgets[debug-support,example,fonts,media,webview]
-eventpp
-xlnt
