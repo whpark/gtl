@@ -21,12 +21,6 @@
     <Filter Include="gtl\ui">
       <UniqueIdentifier>{cc155a50-7a80-4047-be94-0b8b3f23f116}</UniqueIdentifier>
     </Filter>
-    <Filter Include="etc">
-      <UniqueIdentifier>{f8ff9a2e-f4f0-4034-b2f6-e786562051ee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="etc\vcpkg">
-      <UniqueIdentifier>{55b033db-46f8-4793-935d-ca6a541645ae}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\gtl\string.h">
@@ -253,14 +247,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\dependency.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\etc\vcpkg\install-vcpkg.bat">
-      <Filter>etc\vcpkg</Filter>
-    </None>
-    <None Include="..\..\etc\vcpkg\move_opencv4.bat">
-      <Filter>etc\vcpkg</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="gtl.rc" />

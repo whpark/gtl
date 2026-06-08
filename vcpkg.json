@@ -1,0 +1,83 @@
+{
+  "dependencies": [
+    "boost",
+    "catch2",
+    "ctre",
+    "eigen3",
+    {
+      "name": "ffmpeg",
+      "features": [
+        "all"
+      ]
+    },
+    "fmt",
+    "freeglut",
+    "freeimage",
+    "freetype",
+    "glaze",
+    "glew",
+    "glfw3",
+    "glm",
+    "libdmtx",
+    "libiconv",
+    "nlohmann-json",
+    {
+      "name": "opencv",
+      "default-features": false,
+      "features": [
+        "ade",
+        "calib3d",
+        "contrib",
+        "cuda",
+        "cudnn",
+        "dnn",
+        "dnn-cuda",
+        "eigen",
+        "ffmpeg",
+        "freetype",
+        "fs",
+        "gapi",
+        "gdcm",
+        "gstreamer",
+        "hdf",
+        "highgui",
+        "intrinsics",
+        "ipp",
+        "jpeg",
+        "jpegxl",
+        "openexr",
+        "opengl",
+        "openjpeg",
+        "openmp",
+        "png",
+        "python",
+        "quality",
+        "quirc",
+        "rgbd",
+        "sfm",
+        "text",
+        "thread",
+        "tiff",
+        "webp"
+      ]
+    },
+    "opengl",
+    "scnlib",
+    "spdlog",
+    "tinyspline",
+    "utfcpp",
+    "winreg",
+    {
+      "name": "wxwidgets",
+      "features": [
+        "debug-support",
+        "example",
+        "fonts",
+        "media",
+        "webview"
+      ]
+    },
+    "gtest",
+    "benchmark"
+  ]
+}
