@@ -1,32 +1,27 @@
 {
   "dependencies": [
-    "catch2",
     "boost",
-    "fmt",
-    "spdlog",
-    "scnlib",
+    "catch2",
+    "cereal",
     "ctre",
-    "winreg",
-    "utfcpp",
-    "libiconv",
-    "freetype",
-    "glaze",
-    "nlohmann-json",
-    "opengl",
-    "glew",
-    "glm",
-    "glfw3",
-    "freeglut",
-    "tinyspline",
     "eigen3",
-    "libdmtx",
-    "freeimage",
     {
       "name": "ffmpeg",
       "features": [
         "all"
       ]
     },
+    "fmt",
+    "freeglut",
+    "freeimage",
+    "freetype",
+    "glaze",
+    "glew",
+    "glfw3",
+    "glm",
+    "libdmtx",
+    "libiconv",
+    "nlohmann-json",
     {
       "name": "opencv",
       "default-features": false,
@@ -67,6 +62,12 @@
         "webp"
       ]
     },
+    "opengl",
+    "scnlib",
+    "spdlog",
+    "tinyspline",
+    "utfcpp",
+    "winreg",
     {
       "name": "wxwidgets",
       "features": [
