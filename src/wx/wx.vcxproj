@@ -92,7 +92,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <Message>deploy</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>xcopy /dy "$(ProjectDir)MatView\wxMatView.h" "$(SolutionDir)include\gtl\wx\wxMatView.h"
+      <Command>xcopy /dy "$(ProjectDir)MatView\wxMatView.h" "$(ProjectDir)..\..\include\gtl\wx\wxMatView.h"
 </Command>
     </PreBuildEvent>
     <PreBuildEvent>
@@ -138,7 +138,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
       <Message>deploy</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>xcopy /dy "$(ProjectDir)MatView\wxMatView.h" "$(SolutionDir)include\gtl\wx\wxMatView.h"
+      <Command>xcopy /dy "$(ProjectDir)MatView\wxMatView.h" "$(ProjectDir)..\..\include\gtl\wx\wxMatView.h"
 </Command>
     </PreBuildEvent>
     <PreBuildEvent>
