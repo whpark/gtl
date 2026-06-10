@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31423.177
+# Visual Studio Version 18
+VisualStudioVersion = 18.7.11903.348
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl", "src\gtl\gtl.vcxproj", "{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}"
 EndProject
@@ -50,10 +50,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		build_all.bat = build_all.bat
-		dependency.txt = dependency.txt
-		vcpkg-configuration.json = vcpkg-configuration.json
-		vcpkg.json = vcpkg.json
-		vcpkg_add_port.bat = vcpkg_add_port.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{03998576-0AB7-4BDF-9977-319A793C8422}"
+	ProjectSection(SolutionItems) = preProject
+		etc\calc_time.py = etc\calc_time.py
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vcpkg", "vcpkg", "{DF9C2476-BD6B-41BE-8814-600631AE29EA}"
+	ProjectSection(SolutionItems) = preProject
+		etc\vcpkg\dependency.txt = etc\vcpkg\dependency.txt
+		etc\vcpkg\install-vcpkg.bat = etc\vcpkg\install-vcpkg.bat
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "triplets", "triplets", "{EDD73B26-E95D-4C3C-842A-F707ACF7CB1C}"
+	ProjectSection(SolutionItems) = preProject
+		etc\vcpkg\triplets\x64-windows-v143.cmake = etc\vcpkg\triplets\x64-windows-v143.cmake
+		etc\vcpkg\triplets\x64-windows-v145.cmake = etc\vcpkg\triplets\x64-windows-v145.cmake
+		etc\vcpkg\triplets\x64-windows.cmake = etc\vcpkg\triplets\x64-windows.cmake
 	EndProjectSection
 EndProject
 Global
@@ -116,6 +130,9 @@ Global
 		{0F115BD6-A104-41EB-8F5D-194C4E66DD0C} = {5157E3DA-9437-4F16-955C-AB6DAE28555C}
 		{3A2A0FE4-DBAB-4A7C-BBBE-27F5F5B7671F} = {5157E3DA-9437-4F16-955C-AB6DAE28555C}
 		{9A04F548-2EAB-4437-820A-26D600E077CC} = {5157E3DA-9437-4F16-955C-AB6DAE28555C}
+		{03998576-0AB7-4BDF-9977-319A793C8422} = {C6692052-CE8D-4C0D-9F98-6FE804C14234}
+		{DF9C2476-BD6B-41BE-8814-600631AE29EA} = {03998576-0AB7-4BDF-9977-319A793C8422}
+		{EDD73B26-E95D-4C3C-842A-F707ACF7CB1C} = {DF9C2476-BD6B-41BE-8814-600631AE29EA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E7CA12F-04CC-430D-95C2-232C1D5F8C57}
