@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <QtWidgets/QMainWindow>
 #include "ui_test_qt.h"
@@ -9,6 +9,7 @@
 #include "gtl/qt/QGlazeModel.h"
 
 #include "TestSeqDlg.h"
+#include "LayeredMatViewDlg.h"
 
 #include "SeqMainDlg.h"
 #include "SeqChildDlg.h"
@@ -34,6 +35,7 @@ public:
 	std::unique_ptr<xTestSeqDlg> m_dlgTestSeq;
 	std::unique_ptr<xSeqMainDlg> m_dlgSeqMain;
 	std::unique_ptr<xSeqChildDlg> m_dlgSeqChild;
+	std::unique_ptr<xLayeredMatViewDlg> m_dlgLayeredMatView;
 
 protected:
 	void OnLoadImage();

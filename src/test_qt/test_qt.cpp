@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "gtl/qt/qt.h"
 #include "gtl/qt/util.h"
 #include "gtl/win/EnvironmentVariable.h"
@@ -144,6 +144,13 @@ gtl::qt::test_qt::test_qt(QWidget *parent)
 			m_dlgTestSeq = std::make_unique<xTestSeqDlg>(this);
 		m_dlgTestSeq->show();
 		m_dlgTestSeq->setFocus();
+	});
+	connect(ui.btnLayeredMatView, &QPushButton::clicked, this, [this] {
+		if (!m_dlgLayeredMatView)
+			m_dlgLayeredMatView = std::make_unique<xLayeredMatViewDlg>(this);
+		m_dlgLayeredMatView->show();
+		m_dlgLayeredMatView->raise();
+		m_dlgLayeredMatView->activateWindow();
 	});
 	gtl::qt::LoadWindowPosition(reg, "test_qt", this);
 

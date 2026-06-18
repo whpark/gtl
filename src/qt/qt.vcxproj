@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -176,7 +176,10 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <QtUic Include="MatView\LayeredMatView.ui" />
+    <ClCompile Include="MatView\LayeredMatView.cpp" />
     <ClCompile Include="MatBitmapArchive.cpp" />
+    <ClCompile Include="MatView\LayeredMatViewDlg.cpp" />
     <ClCompile Include="ProgressDlg.cpp" />
     <ClCompile Include="QCollapsibleGroupBox.cpp" />
     <ClCompile Include="QFileFolderBrowser.cpp" />
@@ -184,6 +187,8 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClCompile Include="QPathCompleter.cpp" />
     <ClCompile Include="util.cpp" />
     <QtMoc Include="..\..\include\gtl\qt\QFileFolderBrowser.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\LayeredMatView.h" />
+    <QtMoc Include="..\..\include\gtl\qt\MatView\LayeredMatViewDlg.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVCanvas.h" />
     <QtMoc Include="..\..\include\gtl\qt\MatView\MatViewGVDlg.h" />
@@ -238,6 +243,9 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\shape\shape.vcxproj">
+      <Project>{fba95adb-13a2-4139-ba8e-789bfe9aa1ae}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
     </ProjectReference>

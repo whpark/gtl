@@ -17,7 +17,7 @@
 
 namespace gtl::qt {
 
-	static double const dZoomLevels[] = {
+	GTL__QT_DATA std::vector<double> const s_dZoomLevels {
 		1./8192, 1./4096, 1./2048, 1./1024,
 		1./512, 1./256, 1./128, 1./64, 1./32, 1./16, 1./8, 1./4., 1./2.,
 		3./4, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100,
@@ -417,7 +417,7 @@ namespace gtl::qt {
 	bool xMatView::ZoomInOut(double step, xPoint2i ptAnchor, bool bCenter) {
 		auto scale = m_ctScreenFromImage.m_scale;
 		if (step > 0) {
-			for (auto dZoom : dZoomLevels) {
+			for (auto dZoom : s_dZoomLevels) {
 				if (dZoom > scale) {
 					scale = dZoom;
 					break;
@@ -425,7 +425,7 @@ namespace gtl::qt {
 			}
 		}
 		else {
-			for (auto pos = std::rbegin(dZoomLevels); pos != std::rend(dZoomLevels); pos++) {
+			for (auto pos = std::rbegin(s_dZoomLevels); pos != std::rend(s_dZoomLevels); pos++) {
 				auto dZoom = *pos;
 				if (dZoom < scale) {
 					scale = dZoom;
@@ -897,8 +897,8 @@ namespace gtl::qt {
 
 	void xMatView::OnSpinZoom_valueChanged(double value) {
 		auto scale = value * 1.e-2;
-		static auto const dMinZoom = dZoomLevels[0];
-		static auto const dMaxZoom = dZoomLevels[std::size(dZoomLevels)-1];
+		static auto const dMinZoom = s_dZoomLevels[0];
+		static auto const dMaxZoom = s_dZoomLevels[std::size(s_dZoomLevels)-1];
 		scale = std::clamp<double>(scale, dMinZoom, dMaxZoom);
 		if (m_bSkipSpinZoomEvent)
 			return;

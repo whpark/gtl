@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Resource Files">
@@ -28,8 +28,19 @@
     <Filter Include="MatView">
       <UniqueIdentifier>{65e7502c-3bee-4f21-a3eb-a1cd08133b5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LayeredMatView">
+      <UniqueIdentifier>{C3CC5D6B-2AD5-47F7-85C8-A776CB193A9A}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="MatView\LayeredMatView.ui">
+      <Filter>LayeredMatView</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MatView\LayeredMatView.cpp">
+      <Filter>LayeredMatView</Filter>
+    </ClCompile>
     <ClCompile Include="qt.cpp">
       <Filter>code</Filter>
     </ClCompile>
@@ -84,8 +95,14 @@
     <ClCompile Include="QFileFolderBrowser.cpp">
       <Filter>code</Filter>
     </ClCompile>
+    <ClCompile Include="MatView\LayeredMatViewDlg.cpp">
+      <Filter>LayeredMatView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="..\..\include\gtl\qt\MatView\LayeredMatView.h">
+      <Filter>LayeredMatView</Filter>
+    </QtMoc>
     <ClInclude Include="qt_global.h">
       <Filter>[ framework ]</Filter>
     </ClInclude>
@@ -110,6 +127,9 @@
     <ClInclude Include="resource.h">
       <Filter>code</Filter>
     </ClInclude>
+    <QtMoc Include="..\..\include\gtl\qt\MatView\LayeredMatViewDlg.h">
+      <Filter>LayeredMatView</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">

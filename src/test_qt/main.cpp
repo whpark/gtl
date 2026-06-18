@@ -7,7 +7,6 @@ int main(int argc, char* argv[]) {
 	QString str2(" \t \r\n 0x1234567890ABC");
 	[[maybe_unused]] auto t2 = gtl::qt::ToArithmeticValue<int64_t>(str2);
 
-
 	QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
 	fmt.setRenderableType(QSurfaceFormat::OpenGL);
 	fmt.setVersion(4, 6);
@@ -25,8 +24,8 @@ int main(int argc, char* argv[]) {
 
 	QSurfaceFormat::setDefaultFormat(fmt);
 
-
 	QApplication a(argc, argv);
+	a.setStyle("fusion");
 	gtl::qt::test_qt w;
 	w.show();
 	return a.exec();

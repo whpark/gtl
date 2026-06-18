@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -149,17 +149,20 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <QtMoc Include="LayeredMatViewDlg.h" />
     <ClInclude Include="resource.h" />
     <QtMoc Include="SeqChildDlg.h" />
     <QtMoc Include="SeqMainDlg.h" />
     <QtMoc Include="TestSeqDlg.h" />
     <QtRcc Include="test_qt.qrc" />
     <QtUic Include="SeqChildDlg.ui" />
+    <QtUic Include="LayeredMatViewDlg.ui" />
     <QtUic Include="SeqMainDlg.ui" />
     <QtUic Include="TestSeqDlg.ui" />
     <QtUic Include="test_qt.ui" />
     <QtMoc Include="test_qt.h" />
     <ClCompile Include="SeqChildDlg.cpp" />
+    <ClCompile Include="LayeredMatViewDlg.cpp" />
     <ClCompile Include="SeqMainDlg.cpp" />
     <ClCompile Include="TestSeqDlg.cpp" />
     <ClCompile Include="test_qt.cpp" />
@@ -174,6 +177,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\shape\shape.vcxproj">
+      <Project>{fba95adb-13a2-4139-ba8e-789bfe9aa1ae}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\gtl\gtl.vcxproj">
       <Project>{0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0}</Project>
     </ProjectReference>

@@ -1529,8 +1529,9 @@ namespace gtl {
 			for (int x{roi.x}; x < x1; x++) {
 				auto pt = ctCanvasFromImage(xPoint2d{x, y});
 				auto v = GetMatValue(ptr, depth, nChannel, y, x);
-				auto c = ((pt.y+2 < canvas.rows) and (pt.x+2 < canvas.cols))
-					? GetMatValue(canvas.ptr(pt.y+2), canvas.depth(), canvas.channels(), pt.y+2, pt.x+2) : 0;
+				auto ptCanvas = pt + xPoint2d{2, 2};	// not mat value, for the displayed color.
+				auto c = ((ptCanvas.y < canvas.rows) and (ptCanvas.x < canvas.cols) and (ptCanvas.y >= 0) and (ptCanvas.x >= 0))
+					? GetMatValue(canvas.ptr(ptCanvas.y), canvas.depth(), canvas.channels(), ptCanvas.y, ptCanvas.x) : 0;
 				auto avg = (c[0] + c[1] + c[2]) / canvas.channels();
 				auto cr = (avg > 128) ? cv::Scalar{0, 0, 0, 255} : cv::Scalar{255, 255, 255, 255};
 				for (int ch{}; ch < nChannel; ch++) {
