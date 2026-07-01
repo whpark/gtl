@@ -40,7 +40,7 @@ std::optional<cv::Rect> VisibleImageRoi(cv::Mat const& image, gtl::xPoint2d posi
 class xLayeredMatViewCanvasMat final : public gtl::shape::xCanvasMat {
 public:
 	xLayeredMatViewCanvasMat(cv::Mat& image, gtl::xCoordTrans2d const& transform) : xCanvasMat(image, transform), m_scale(transform.m_scale) {
-		m_target_interpolation_inverval = m_scale;
+		m_target_interpolation_inverval = std::max(1.0, m_scale);
 	}
 
 	void PreDraw(gtl::shape::xShape const& shape) override {
