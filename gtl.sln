@@ -45,11 +45,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_sequence", "src\test_s
 		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0} = {0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C6692052-CE8D-4C0D-9F98-6FE804C14234}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "[ Solution Items ]", "[ Solution Items ]", "{C6692052-CE8D-4C0D-9F98-6FE804C14234}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		build_all.bat = build_all.bat
+		CMakeLists.txt = CMakeLists.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{03998576-0AB7-4BDF-9977-319A793C8422}"

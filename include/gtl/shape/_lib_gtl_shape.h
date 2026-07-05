@@ -10,6 +10,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "gtl/_config.h"
 #include "gtl/__lib.h"
 
 #ifndef GTL__SHAPE_AS_DLL
@@ -21,7 +22,7 @@
 #		define GTL__SHAPE_CLASS		GTL__EXPORT
 #		define GTL__SHAPE_API		GTL__EXPORT
 #		define GTL__SHAPE_DATA		GTL__EXPORT
-#	else 
+#	else
 #		define GTL__SHAPE_CLASS		GTL__IMPORT
 #		define GTL__SHAPE_API		GTL__IMPORT
 #		define GTL__SHAPE_DATA		GTL__IMPORT

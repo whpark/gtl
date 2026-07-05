@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "gtl/misc.h"
 
-#define FMT_HEADER_ONLY
+//#define FMT_HEADER_ONLY
 #include "fmt/format.h"
 #include "fmt/xchar.h"
 

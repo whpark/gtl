@@ -273,11 +273,11 @@ namespace gtl {
 				ar & v;
 			return ar;
 		}
-		template < typename JSON > friend void from_json(JSON const& j, this_t& B) {
+		template < typename json > friend void from_json(json const& j, this_t& b) {
 			for (size_t i{}; i < dim; i++)
-				B.member(i) = j[i];
+				b.member(i) = j[i];
 		}
-		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) {
+		template < typename JSON > friend void to_json(JSON& j, this_t const& B) {
 			for (size_t i{}; i < dim; i++)
 				j[i] = B.member(i);
 		}

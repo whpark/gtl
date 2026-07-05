@@ -12,7 +12,7 @@ seq_t g_driver("");
 
 template < typename ... TArgs>
 void Log(fmt::format_string<TArgs...> format_string, TArgs&& ... args) {
-	OutputDebugStringA(fmt::format(format_string, std::forward<TArgs>(args) ...).c_str());
+	qDebug(fmt::format(format_string, std::forward<TArgs>(args) ...).c_str());
 }
 
 xTestSeqDlg::xTestSeqDlg(QWidget* parent) : QDialog(parent), seq_map_t("main", g_driver) {

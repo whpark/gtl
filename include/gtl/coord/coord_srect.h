@@ -399,7 +399,7 @@ namespace gtl {
 			return ar & B.tl() & B.coord_size();
 		}
 		template < typename JSON > friend void from_json(JSON const& j, this_t& B) { B.tl() = j["tl"]; B.coord_size() = j["coord_size"]; }
-		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) { j["tl"] = B.tl(); j["coord_size"] = B.coord_size(); }
+		template < typename JSON > friend void to_json(JSON& j, this_t const& B) { j["tl"] = B.tl(); j["coord_size"] = B.coord_size(); }
 
 
 		bool UpdateBoundary(coord_point_t const& pt) {

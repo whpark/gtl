@@ -49,6 +49,7 @@
 #define _MSC_VER_VS2017		1910
 #define _MSC_VER_VS2019		1920
 #define _MSC_VER_VS2022		1930
+#define _MSC_VER_VS2026		1950
 
 
 //-----------------------------------------------------------------------------
@@ -88,7 +89,9 @@
 
 //-----------------------------------------------------------------------------
 // library name
-#if (_MSC_VER >= _MSC_VER_VS2022)
+#if (_MSC_VER >= _MSC_VER_VS2026)
+#	define GTL__PLATFORM_TOOLSET_VER_ "v145"
+#elif (_MSC_VER >= _MSC_VER_VS2022)
 #	define GTL__PLATFORM_TOOLSET_VER_ "v143"
 #elif (_MSC_VER >= _MSC_VER_VS2019)
 #	define GTL__PLATFORM_TOOLSET_VER_ "v142"
@@ -110,9 +113,9 @@
 #	define GTL__PLATFORM_MACHINE_ "x32"
 #endif
 #ifdef _DEBUG
-#	define GTL__PLATFORM_CONFIGURE_ "d"
+#	define GTL__PLATFORM_CONFIGURE_ "D"
 #else
-#	define GTL__PLATFORM_CONFIGURE_ "r"
+#	define GTL__PLATFORM_CONFIGURE_ "R"
 #endif
 //#ifdef _UNICODE
 //#	define GTL__PLATFORM_CHARSET_ ""

@@ -21,8 +21,17 @@ x64/
 x86/
 bld/
 [Bb]in/
+[Ll]ib/
 [Oo]bj/
 [Ll]og/
+
+# CMake
+build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+_deps/
 [Tt]emp/
 /[Ll]ib/
 /[Mm]odule/

@@ -16,7 +16,7 @@
 #include <deque>
 #include <optional>
 
-#define FMT_HEADER_ONLY
+//#define FMT_HEADER_ONLY
 #include "fmt/ostream.h"
 
 #include "gtl/_config.h"

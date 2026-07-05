@@ -299,7 +299,7 @@ namespace gtl {
 			for (size_t i{}; i < dim; i++)
 				B.member(i) = j[i];
 		}
-		template < typename JSON > friend void to_json(JSON&& j, this_t const& B) {
+		template < typename JSON > friend void to_json(JSON& j, this_t const& B) {
 			for (size_t i{}; i < dim; i++)
 				j[i] = B.member(i);
 		}

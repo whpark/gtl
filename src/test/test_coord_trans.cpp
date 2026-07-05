@@ -13,8 +13,8 @@ TEST(gtl_coord_trans, ct2) {
 	{
 		xCoordTrans2d ct;
 
-		auto p1 = ct(POINT{1, 2});
-		auto p2 = POINT{1, 2};
+		auto p1 = ct(TPOINT2{1, 2});
+		auto p2 = TPOINT2{1, 2};
 		EXPECT_EQ(p1.x, p2.x);
 		EXPECT_EQ(p1.y, p2.y);
 	}

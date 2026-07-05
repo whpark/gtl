@@ -449,8 +449,8 @@ namespace gtl {
 
 		};
 
-		//template < typename T1, typename T2 >
-		//pair(T1 a, T2 b) -> pair<std::remove_cvref_t<T1>, std::remove_cvref_t<T2>>;
+		template < typename T1, typename T2 >
+		pair(T1 a, T2 b) -> pair<std::remove_cvref_t<T1>, std::remove_cvref_t<T2>>;
 		//template < typename T1, typename T2 >
 		//pair(T1 const& a, T2 const& b) -> pair<std::remove_cvref_t<T1>, std::remove_cvref_t<T2>>;
 		//template < typename T1, typename T2 >

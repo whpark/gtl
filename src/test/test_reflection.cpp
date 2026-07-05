@@ -16,7 +16,7 @@ namespace gtl::test::reflection::MACRO {
 		std::string str1{"str1"};
 		std::string str2{"str2"};
 
-	private:
+	public:
 		using this_t = CTestStruct;
 		using base_t = this_t;
 		GTL__REFLECTION_BASE(gtl::njson<>)
@@ -44,7 +44,7 @@ namespace gtl::test::reflection::MACRO {
 		std::u8string strU8 { u8"strU8" };
 		CTestStruct test;
 
-	private:
+	public:
 		using this_t = CTestClass;
 		using base_t = this_t;
 		GTL__REFLECTION_BASE(gtl::njson<>)
@@ -67,7 +67,7 @@ namespace gtl::test::reflection::MACRO {
 		std::string str {"str"};
 		std::u8string strU8 { u8"strU8" };
 
-	private:
+	public:
 		using this_t = CTestClassDerived;
 		using base_t = CTestClass;
 		GTL__REFLECTION_DERIVED()

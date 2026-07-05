@@ -25,7 +25,7 @@ namespace gtl {
 	// REFL : Reflection. (Member Wise..., variables only. not for function ptr.)
 
 
-#define I_GTL__REFLECTION_MEMBER(var)	gtl::internal::pair{ std::string_view{#var}, &this_t::var }
+#define I_GTL__REFLECTION_MEMBER(var)	gtl::internal::pair<std::string_view, std::remove_cvref_t<decltype(&this_t::var)>>{ std::string_view{#var}, &this_t::var }
 
 #define GTL__REFLECTION_MEMBERS(...) \
 	constexpr static inline const std::tuple s_member_tuple {\
@@ -120,7 +120,7 @@ namespace gtl {
 	////
 
 	///// @brief CRTP reflection class. (not good. better to use MACROS)
-	///// @tparam 
+	///// @tparam
 	//template < typename THIS_CLASS, typename tjson = gtl::njson<nlohmann::json> >
 	//class IReflection {
 	//public:
@@ -136,7 +136,7 @@ namespace gtl {
 
 
 	///// @brief CRTP reflection class (derived). (not good. better to use MACROS)
-	///// @tparam 
+	///// @tparam
 	//template < typename THIS_CLASS, typename BASE_CLASS >
 	//class IReflectionDerived : public BASE_CLASS {
 	//public:

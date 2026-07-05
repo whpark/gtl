@@ -247,6 +247,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\dependency.txt" />
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="gtl.rc" />

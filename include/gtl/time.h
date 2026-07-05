@@ -18,9 +18,13 @@
 #include "gtl/string.h"
 #pragma warning(push)
 #pragma warning(disable: 4819)
-#define FMT_HEADER_ONLY
+//#define FMT_HEADER_ONLY
 #include "fmt/chrono.h"
 #pragma warning(pop)
+#ifdef _WINDOWS
+#	include <tchar.h>	// TCHAR is used in TSysTime::OldFormat() below, unconditionally (outside the
+					// GTL__USE_WINDOWS_API block), so it can't rely on <windows.h> having been included.
+#endif
 //#include "gtl/string_view.h"
 
 //#include "gtl/_pre_lib_util.h"

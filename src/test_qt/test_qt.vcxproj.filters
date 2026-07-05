@@ -93,4 +93,7 @@
       <Filter>code</Filter>
     </QtUic>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
 </Project>

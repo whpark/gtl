@@ -10,6 +10,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "gtl/__lib.h"
+#include "gtl/_config.h"
 
 #ifndef GTL__WIN_AS_DLL
 #	define GTL__WIN_AS_DLL 1
@@ -20,7 +21,7 @@
 #		define GTL__WIN_CLASS	GTL__EXPORT
 #		define GTL__WIN_API		GTL__EXPORT
 #		define GTL__WIN_DATA	GTL__EXPORT
-#	else 
+#	else
 #		define GTL__WIN_CLASS	GTL__IMPORT
 #		define GTL__WIN_API		GTL__IMPORT
 #		define GTL__WIN_DATA	GTL__IMPORT
@@ -33,15 +34,15 @@
 #endif	// GTL__WIN_AS_DLL
 
 
-#if (!GTL__USE_WINDOWS_API)
+//#if (GTL__USE_WINDOWS_API)
 #	ifndef NOMINMAX
 #		define NOMINMAX	// disable Windows::min/max
 #	endif
 #	ifndef WIN32_LEAN_AND_MEAN
 #		define WIN32_LEAN_AND_MEAN	// Exclude rarely-used stuff from Windows headers
-#	endif 
+#	endif
 #	pragma warning(push)
 #	pragma warning(disable: 5104 5105)
 #	include <windows.h>
 #	pragma warning(pop)
-#endif
+//#endif

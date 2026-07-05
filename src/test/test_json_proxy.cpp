@@ -35,11 +35,11 @@ namespace gtl {
 
 		template < typename tjson >
 		friend void from_json(tjson const& j, this_t& object) {
-			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s); 
+			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...); }, this_t::member_s);
 		}
 		template < typename tjson >
 		friend void to_json(tjson& j, this_t const& object) {
-			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s); 
+			std::apply([&j, &object](auto& ... pairs) { ((j[pairs.first] = object.*(pairs.second)), ...);}, this_t::member_s);
 		}
 	};
 
@@ -123,7 +123,7 @@ namespace gtl {
 		friend void from_json(tjson const& j, this_t& object) {
 			tjson jb = j["base."sv];
 			from_json(jb, (base_t&)object);
-			std::apply([&j, &object](auto& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...);}, this_t::member_s);
+			std::apply([&j, &object](auto const& ... pairs) { ((object.*(pairs.second) = j[pairs.first]), ...);}, this_t::member_s);
 		}
 		template < typename tjson > //requires requires (this_t obj) { obj.base_t; }
 		friend void to_json(tjson& j, this_t const& object) {
@@ -143,7 +143,7 @@ TEST(json_proxy, basic) {
 		gtl::CTestClassDerived a { .k = 3, .a = 3.1415, .c = 333.3, .str = "asdfjksdf", .strU8 = u8"가나다라마"};
 		j = a;
 
-		std::cout << '\n\t\t' << std::setw(4) << j.json() << '\n';
+		std::cout << "\n\t\t" << std::setw(4) << j.json() << '\n';
 
 		gtl::CTestClassDerived b;
 		b = j;

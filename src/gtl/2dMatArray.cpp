@@ -15,7 +15,7 @@
 #include "gtl/misc.h"
 //#include "MatViewPatternMatchingDlg.h"
 
-#include <VersionHelpers.h>
+//#include <VersionHelpers.h>
 
 //using namespace std;
 //using namespace cv;
