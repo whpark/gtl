@@ -42,6 +42,54 @@ namespace gtl::internal {
 	void DoArithmaticAdd(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}+T2{})> ) { op1add(v1, v2); } else { op2add(v1, v2); } };
 	template < typename T1, typename T2 >
 	void DoArithmaticSub(T1& v1, T2 v2) { if constexpr (std::is_same_v<T1, decltype(T1{}-T2{})> ) { op1sub(v1, v2); } else { op2sub(v1, v2); } };
+
+	// MulDiv using claude
+	inline int32_t MulDiv(int32_t nNumber, int32_t nNumerator, int32_t nDenominator) {
+		if (nDenominator == 0)
+			return -1; // Win32 MulDiv returns -1 on div-by-zero
+
+		// 64-bit intermediate avoids overflow of the 32-bit multiply
+		int64_t product = static_cast<int64_t>(nNumber) * static_cast<int64_t>(nNumerator);
+		int64_t den      = nDenominator;
+
+		int64_t quotient  = product / den;
+		int64_t remainder = product % den;
+
+		// Round to nearest, ties away from zero (matches MulDiv's behavior)
+		int64_t absRem2 = (remainder < 0 ? -remainder : remainder) * 2;
+		int64_t absDen  = (den < 0 ? -den : den);
+
+		if (absRem2 >= absDen)
+			quotient += ((product < 0) != (den < 0)) ? -1 : 1;
+
+		if (quotient > std::numeric_limits<int32_t>::max() ||
+			quotient < std::numeric_limits<int32_t>::min())
+			return -1; // overflow, same as MulDiv
+
+		return static_cast<int32_t>(quotient);
+	}
+
+	//// MulDiv64 using claude
+	//inline int64_t MulDiv64(int64_t a, int64_t b, int64_t den) {
+	//	if (den == 0) return -1;
+
+	//	__int128 product = static_cast<__int128>(a) * b;
+	//	__int128 quotient = product / den;
+	//	__int128 remainder = product % den;
+
+	//	__int128 absRem2 = (remainder < 0 ? -remainder : remainder) * 2;
+	//	__int128 absDen  = (den < 0 ? -den : den);
+
+	//	if (absRem2 >= absDen)
+	//		quotient += ((product < 0) != (den < 0)) ? -1 : 1;
+
+	//	if (quotient > std::numeric_limits<int64_t>::max() ||
+	//		quotient < std::numeric_limits<int64_t>::min())
+	//		return -1;
+
+	//	return static_cast<int64_t>(quotient);
+	//}
+
 }
 
 namespace gtl {

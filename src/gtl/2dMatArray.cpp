@@ -271,7 +271,7 @@ namespace gtl {
 			dScale = 1;
 
 		// Find Thumbnail
-		auto imuldiv = [](int v, const std::pair<int, int>& scale) { return MulDiv(v, scale.first, scale.second); };
+		auto imuldiv = [](int v, const std::pair<int, int>& scale) { return gtl::internal::MulDiv(v, scale.first, scale.second); };
 		auto dmuldiv = [](double v, const std::pair<int, int>& scale) { return (v * scale.first) / scale.second; };
 		int iThumbnail = -1;
 		double dScaleThumbnail = 1;
@@ -511,7 +511,7 @@ namespace gtl {
 			item.thumbnails.clear();
 			for (const auto& size : m_sizesThumbnail) {
 				cv::Mat imgThumbnail;
-				cv::Size sizeThumbnail(MulDiv(item.img.cols, size.first, size.second), MulDiv(item.img.rows, size.first, size.second));
+				cv::Size sizeThumbnail(gtl::internal::MulDiv(item.img.cols, size.first, size.second), gtl::internal::MulDiv(item.img.rows, size.first, size.second));
 				double dScale = (double)size.first / size.second;
 				int eResizingMethod = dScale < 1 ? m_eScaleDownMethod : m_eScaleUpMethod;
 
