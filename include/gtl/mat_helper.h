@@ -356,7 +356,7 @@ namespace gtl {
 
 	inline bool IsImageExtension(std::filesystem::path const& path) {
 		auto ext = gtl::ToLower<char>(path.extension().string());
-		return gtl::IsValueOneOf(ext, ".bmp", ".jpg", ".jpeg", ".tiff", ".png", ".gif", ".jfif");
+		return gtl::IsValueAnyOf(ext, ".bmp", ".jpg", ".jpeg", ".tiff", ".png", ".gif", ".jfif");
 	}
 
 	inline cv::Scalar GetMatValue(uchar const* ptr, int depth, int channel, int row, int col) {

@@ -407,7 +407,7 @@ namespace gtl {
 	template < typename ... Args > constexpr bool IsAnyTrue(Args&& ... args)						{ return (args ||...); }
 	template < typename ... Args > constexpr bool IsAllSame(Args&& ... args)						{ return IsAllTrue(args...) || IsNoneTrue(args...); }
 
-	template < typename T, typename ... Args > constexpr bool IsValueOneOf(T v, Args&& ... args)	{ return ((v == args) || ...); }
+	template < typename T, typename ... Args > constexpr bool IsValueAnyOf(T v, Args&& ... args)	{ return ((v == args) || ...); }
 	template < typename T, typename ... Args > constexpr bool IsValueNoneOf(T v, Args&& ... args)	{ return ((v != args) && ...); }
 
 	template < typename T >

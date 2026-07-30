@@ -232,7 +232,7 @@ namespace gtl::qt {
 			m_ctScreenFromImage.m_scale = dScale;
 
 		// constraints. make image put on the center of the screen
-		if ( bCenter or gtl::IsValueOneOf(eZoom, eZOOM::fit2window, eZOOM::fit2width, eZOOM::fit2height) ) {
+		if ( bCenter or gtl::IsValueAnyOf(eZoom, eZOOM::fit2window, eZOOM::fit2width, eZOOM::fit2height) ) {
 			xCoordTrans ct2 = m_ctScreenFromImage;
 			ct2.m_origin = xPoint2d(m_img.size())/2.;
 			ct2.m_offset = xRect2d(rectClient).CenterPoint();
@@ -881,7 +881,7 @@ namespace gtl::qt {
 		{
 			eZOOM cur = (eZOOM)index;
 			using enum eZOOM;
-			if (m_eZoom == cur and gtl::IsValueOneOf(m_eZoom, fit2window, one2one, mouse_wheel_locked, free))
+			if (m_eZoom == cur and gtl::IsValueAnyOf(m_eZoom, fit2window, one2one, mouse_wheel_locked, free))
 				return;
 			m_eZoom = cur;
 		}

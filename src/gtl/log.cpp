@@ -73,7 +73,7 @@ namespace gtl {
 			// Open log File
 			bool bWriteBOM = false;
 			auto eCharEncoding = m_eCharEncoding;
-			if (IsValueOneOf(m_eCharEncoding, eCODEPAGE::DEFAULT__OR_USE_MBCS_CODEPAGE))
+			if (IsValueAnyOf(m_eCharEncoding, eCODEPAGE::DEFAULT__OR_USE_MBCS_CODEPAGE))
 				m_eCharEncoding = eCODEPAGE_DEFAULT<wchar_t>;
 			{
 				std::ifstream f(path, std::ios::_Nocreate|std::ios::binary, SH_DENYNO);
