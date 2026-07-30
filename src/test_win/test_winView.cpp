@@ -354,7 +354,7 @@ bool CtestwinView::WriteSampleImage(std::filesystem::path const& folder, cv::Mat
 
 	auto path = folder / std::format(L"{}x{}-{}bpp.bmp", mat.cols, mat.rows, nBPP);
 	gtl::xSize2i pelsPerMeter{gtl::Round(360*1'000/25.4), gtl::Round(360*1'000/25.4)};
-	bool bResult = gtlw::SaveBitmapMatProgress(path, mat, nBPP, pelsPerMeter, palette, false);
+	bool bResult = gtlw::SaveBitmapMatProgress(path, mat, nBPP, pelsPerMeter, palette);
 
 	sw.Lap("{}rows = {}, cols = {} {}bpp", bResult ? "" : "FAILED ", mat.rows, mat.cols, nBPP);
 

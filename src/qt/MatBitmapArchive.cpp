@@ -8,11 +8,19 @@
 
 namespace gtl::qt {
 
-	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t const> palette, bool bNoPaletteLookup, bool bBottom2Top) {
+	bool SaveBitmapMatProgress(
+		std::filesystem::path const& path,
+		cv::Mat const& img,
+		int nBPP,
+		gtl::xSize2i const& pelsPerMeter,
+		std::span<gtl::color_bgra_t const> palette,
+		bool bConvertMatValueToPaletteIndex,
+		bool bBottom2Top)
+	{
 		xProgressDlg dlgProgress(nullptr);
 		dlgProgress.m_message = std::format(L"Saving : {}", path.wstring());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, pelsPerMeter, palette, bNoPaletteLookup, bBottom2Top, dlgProgress.GetCallback());
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, pelsPerMeter, palette, bConvertMatValueToPaletteIndex, bBottom2Top, dlgProgress.GetCallback());
 
 		auto r = dlgProgress.exec();
 

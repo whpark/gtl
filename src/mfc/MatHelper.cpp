@@ -137,11 +137,11 @@ namespace gtl::win::inline mfc {
 		return dc.AlphaBlend(rectDst.left, rectDst.top, rectDst.Width(), rectDst.Height(), &dcMem, rectSrc.left, rectSrc.top, rectSrc.Width(), rectSrc.Height(), blend) != FALSE;
 	}
 
-	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette, bool bNoPaletteLookup, bool bBottom2Top) {
+	bool SaveBitmapMatProgress(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t> palette, bool bConvertMatValueToPaletteIndex, bool bBottom2Top) {
 		CProgressDlg dlgProgress;
 		dlgProgress.m_strMessage.Format(_T("Saving : %s"), path.wstring().c_str());
 
-		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, pelsPerMeter, palette, bNoPaletteLookup, bBottom2Top, dlgProgress.m_callback);
+		dlgProgress.m_rThreadWorker = std::make_unique<std::jthread>(gtl::SaveBitmapMat, path, img, nBPP, pelsPerMeter, palette, bConvertMatValueToPaletteIndex, bBottom2Top, dlgProgress.m_callback);
 
 		auto r = dlgProgress.DoModal();
 

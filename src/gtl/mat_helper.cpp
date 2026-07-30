@@ -363,14 +363,14 @@ namespace gtl {
 
 	namespace internal {
 
-		template < bool bNoPaletteLookup, bool bBytePacking, typename telement = uint8, bool bLoopUnrolling = true, bool bMultiThreaded = true >
-		bool MatToBitmapFile(std::ostream& f, cv::Mat const& img, int nBPP, std::vector<telement> const& pal, callback_progress_t funcCallback) {
+		template < bool bConvertMatValueToPaletteIndex, bool bBytePacking, typename telement = uint8, bool bLoopUnrolling = true, bool bMultiThreaded = true >
+		bool MatToBitmapFile(std::ostream& f, cv::Mat const& img, int nBPP, std::span<telement> palInverse, callback_progress_t funcCallback) {
 
 			int width32 = (img.cols * nBPP + 31) / 32 * 4;
 			int pixel_per_byte = (8/nBPP);
 			int nColPixel = pixel_per_byte ? img.cols/ pixel_per_byte * pixel_per_byte : img.cols;
 
-			using Func_PackSingleRow = std::function<void(int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal)>;
+			using Func_PackSingleRow = std::function<void(int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse)>;
 			Func_PackSingleRow PackSingleRow;
 
 			if constexpr (bBytePacking) {
@@ -378,63 +378,63 @@ namespace gtl {
 
 					switch (nBPP) {
 					case 1 :
-						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte, nColPixel](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
+						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte, nColPixel](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 							int x{};
 							for (; x < nColPixel; x += pixel_per_byte) {
 								int col = x / pixel_per_byte;
-								if constexpr (bNoPaletteLookup) {
+								if constexpr (!bConvertMatValueToPaletteIndex) {
 									line[col] = (ptr[x + 0] << 7) | (ptr[x + 1] << 6) | (ptr[x + 2] << 5) | (ptr[x + 3] << 4) | (ptr[x + 4] << 3) | (ptr[x + 5] << 2) | (ptr[x + 6] << 1) | (ptr[x + 7]);
 								}
 								else {
-									line[col] = (pal[ptr[x + 0]] << 7) | (pal[ptr[x + 1]] << 6) | (pal[ptr[x + 2]] << 5) | (pal[ptr[x + 3]] << 4) | (pal[ptr[x + 4]] << 3) | (pal[ptr[x + 5]] << 2) | (pal[ptr[x + 6]] << 1) | (pal[ptr[x + 7]]);
+									line[col] = (palInverse[ptr[x + 0]] << 7) | (palInverse[ptr[x + 1]] << 6) | (palInverse[ptr[x + 2]] << 5) | (palInverse[ptr[x + 3]] << 4) | (palInverse[ptr[x + 4]] << 3) | (palInverse[ptr[x + 5]] << 2) | (palInverse[ptr[x + 6]] << 1) | (palInverse[ptr[x + 7]]);
 								}
 							}
 							int col = x / pixel_per_byte;
 							if (col < line.size())
 								line[col] = 0;
 							for (int shift{ 8-nBPP }; x < img_cols; x++, shift--) {
-								if constexpr (bNoPaletteLookup) {
+								if constexpr (!bConvertMatValueToPaletteIndex) {
 									line[col] |= ptr[x] << shift;
 								}
 								else {
-									line[col] |= pal[ptr[x]] << shift;
+									line[col] |= palInverse[ptr[x]] << shift;
 								}
 							}
 						};
 						break;
 					case 4 :
-						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte, nColPixel](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
+						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte, nColPixel](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 							int x{};
 							for (; x < nColPixel; x += pixel_per_byte) {
 								int col = x / pixel_per_byte;
-								if constexpr (bNoPaletteLookup) {
+								if constexpr (!bConvertMatValueToPaletteIndex) {
 									line[col] = (ptr[x + 0] << 4) | (ptr[x + 1] << 0);
 								}
 								else {
-									line[col] = (pal[ptr[x + 0]] << 4) | (pal[ptr[x + 1]] << 0);
+									line[col] = (palInverse[ptr[x + 0]] << 4) | (palInverse[ptr[x + 1]] << 0);
 								}
 							}
 							int col = x / pixel_per_byte;
 							if (col < line.size())
 								line[col] = 0;
 							for (int shift{ 8-nBPP }; x < img_cols; x++, shift-=nBPP) {
-								if constexpr (bNoPaletteLookup) {
+								if constexpr (!bConvertMatValueToPaletteIndex) {
 									line[col] |= ptr[x] << shift;
 								}
 								else {
-									line[col] |= pal[ptr[x]] << shift;
+									line[col] |= palInverse[ptr[x]] << shift;
 								}
 							}
 						};
 						break;
 					case 8 :
-						PackSingleRow = [img_cols = img.cols](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
+						PackSingleRow = [img_cols = img.cols](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 							for (int x{}; x < img_cols; x++) {
-								if constexpr (bNoPaletteLookup) {
+								if constexpr (!bConvertMatValueToPaletteIndex) {
 									line[x] = ptr[x];
 								}
 								else {
-									line[x] = pal[ptr[x]];
+									line[x] = palInverse[ptr[x]];
 								}
 							}
 						};
@@ -447,28 +447,28 @@ namespace gtl {
 					switch (nBPP) {
 					case 1 :
 					case 4 :
-						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
+						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 							std::memset(line.data(), 0, line.size()*sizeof(line[0]));
 							for (int x{}; x < img_cols; x++) {
 								int col = x / pixel_per_byte;
 								int shift = 8 - (nBPP * ((x%pixel_per_byte)+1));
-								if constexpr (bNoPaletteLookup) {
+								if constexpr (!bConvertMatValueToPaletteIndex) {
 									line[col] |= ptr[x] << shift;
 								}
 								else {
-									line[col] |= pal[ptr[x]] << shift;
+									line[col] |= palInverse[ptr[x]] << shift;
 								}
 							}
 						};
 						break;
 					case 8 :
-						PackSingleRow = [img_cols = img.cols](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
+						PackSingleRow = [img_cols = img.cols](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 							for (int x{}; x < img_cols; x++) {
-								if constexpr (bNoPaletteLookup) {
+								if constexpr (!bConvertMatValueToPaletteIndex) {
 									line[x] = ptr[x];
 								}
 								else {
-									line[x] = pal[ptr[x]];
+									line[x] = palInverse[ptr[x]];
 								}
 							}
 						};
@@ -482,14 +482,14 @@ namespace gtl {
 				if (nBPP == 24) {
 					if (sizeof(telement) != 3)
 						return false;
-					PackSingleRow = [img_cols = img.cols](int y, std::vector<uint8>& line, telement const* ptr, std::vector<telement> const& pal) {
+					PackSingleRow = [img_cols = img.cols](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 						telement* line3 = (telement*)line.data();
 						for (int x{}; x < img_cols; x++) {
-							if constexpr (bNoPaletteLookup) {
+							if constexpr (!bConvertMatValueToPaletteIndex) {
 								line3[x] = ptr[x];
 							}
 							else {
-								line3[x] = pal[ptr[x]];
+								line3[x] = palInverse[ptr[x]];
 							}
 						}
 					};
@@ -538,14 +538,14 @@ namespace gtl {
 					return &buf;
 				};
 
-				auto PackBuffer = [&img, &PackSingleRow, &pal/*, &id*/, &GetBuffer](std::stop_token stop) {
+				auto PackBuffer = [&img, &PackSingleRow, &palInverse/*, &id*/, &GetBuffer](std::stop_token stop) {
 					do {
 						auto* pBuffer = GetBuffer(stop);
 						if (!pBuffer)
 							break;
 						auto& buf = *pBuffer;
 
-						PackSingleRow(buf.y, buf.line, img.ptr<telement>(buf.y), pal);
+						PackSingleRow(buf.y, buf.line, img.ptr<telement>(buf.y), palInverse);
 
 						buf.bReady = true;
 						buf.bReady.notify_one();
@@ -611,7 +611,7 @@ namespace gtl {
 				std::vector<uint8> line((size_t)width32, 0);
 				for (int y{}; y < img.rows; y++) {
 					auto const* ptr = img.ptr<telement>(y);
-					PackSingleRow(y, line, ptr, pal);
+					PackSingleRow(y, line, ptr, palInverse);
 					f.write((char const*)line.data(), width32);
 
 					if (funcCallback) {
@@ -629,7 +629,16 @@ namespace gtl {
 
 	}	// namespace internal
 
-	bool SaveBitmapMat(std::filesystem::path const& path, cv::Mat const& img, int nBPP, gtl::xSize2i const& pelsPerMeter, std::span<gtl::color_bgra_t const> palette, bool bNoPaletteLookup, bool bBottom2Top, callback_progress_t funcCallback) {
+	bool SaveBitmapMat(
+		std::filesystem::path const& path,
+		cv::Mat const& img,
+		int nBPP,
+		gtl::xSize2i const& pelsPerMeter,
+		std::span<gtl::color_bgra_t const> palette,
+		bool bConvertMatValueToPaletteIndex,
+		bool bBottom2Top,
+		callback_progress_t funcCallback)
+	{
 		// todo : CV_8UC3 with palette.
 
 		bool bOK{};
@@ -640,11 +649,10 @@ namespace gtl {
 		if (img.empty())
 			return false;
 
-		if (palette.empty())
-			bNoPaletteLookup = true;
+		if (bConvertMatValueToPaletteIndex and (palette.empty() or (nBPP > 8)))
+			return false;
 
 		auto type = img.type();
-
 		int cx = img.cols;
 		int cy = img.rows;
 		//if ((cx >= 0xffff) or (cy >= 0xffff))
@@ -672,7 +680,7 @@ namespace gtl {
 		if (bBottom2Top)
 			cv::flip(img, img2, 0);
 
-		if (pixel_size == 3) {
+		if (pixel_size == 4 or pixel_size == 3) {
 			std::ofstream f(path, std::ios_base::binary);
 			if (!f)
 				return false;
@@ -682,29 +690,26 @@ namespace gtl {
 			auto width32 = gtl::AdjustAlign32(cx * 3);
 			fh.offsetData = sizeof(fh) + sizeof(header);
 			fh.sizeFile = fh.offsetData + width32 * cy;
-			header.nBPP = nBPP;
+			header.nBPP = (uint16_t)nBPP;
 			header.nColorUsed = header.nColorImportant = 0;
 
 			f.write((char const*)&fh, sizeof(fh));
 			f.write((char const*)&header, sizeof(header));
 
-			//char redundant[4]{};
-			//size_t sr = width32 - (cx * 3);
-			//for (int y{}; y < img.rows; y++) {
-			//	auto* ptr = img.ptr<cv::Vec3b>(y);
-			//	f.write((char const*)ptr, 3 * img.cols);
-			//	f.write(redundant, sr);
-			//}
-			//bOK = true;
-			bOK = gtl::internal::MatToBitmapFile<true, false, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, {}, funcCallback);
+			if (pixel_size == 4) {
+				bOK = gtl::internal::MatToBitmapFile<false, false, cv::Vec4b, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, {}, funcCallback);
+			}
+			else {
+				bOK = gtl::internal::MatToBitmapFile<false, false, cv::Vec3b, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, {}, funcCallback);
+			}
 
 			return true;
 		}
 		else if (type == CV_8UC1) {
-			if ((nBPP != 1) and /*(nBPP != 2) and */(nBPP != 4) and (nBPP != 8)) {
+			if (IsValueNoneOf(nBPP, 1, 2, 4, 8)) {
 				return false;
 			}
-			if ( (nBPP < 8) and (palette.empty() or bNoPaletteLookup) ) {
+			if ( (nBPP < 8) and palette.empty()) {
 				return false;
 			}
 
@@ -717,7 +722,7 @@ namespace gtl {
 			auto width32 = (cx * nBPP + 31) / 32 * 4;
 			fh.offsetData = (uint32_t) ( sizeof(fh) + sizeof(header) + palette.size()/*(0x01 << nBPP)*/ * sizeof(gtl::color_bgra_t) );
 			fh.sizeFile = fh.offsetData + width32 * cy;
-			header.nBPP = nBPP;
+			header.nBPP = (uint16_t)nBPP;
 			header.nColorUsed = header.nColorImportant = (uint32_t)palette.size();
 
 			f.write((char const*)&fh, sizeof(fh));
@@ -725,17 +730,17 @@ namespace gtl {
 
 			f.write((char const*)palette.data(), palette.size() * sizeof(palette[0]));
 
-			std::vector<uint8> pal((size_t)256, 0);
-			if (!bNoPaletteLookup) {
-				for (size_t i{}; i < palette.size(); i++) {
-					pal[palette[i].r] = (uint8)i;
-				}
-			}
 
-			if (bNoPaletteLookup)
-				bOK = gtl::internal::MatToBitmapFile<true, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, pal, funcCallback);
-			else
-				bOK = gtl::internal::MatToBitmapFile<false, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, pal, funcCallback);
+			if (bConvertMatValueToPaletteIndex) {
+				std::vector<uint8> palInverse(256, 0);
+				for (size_t i{}; i < palette.size(); i++) {
+					palInverse[palette[i].r] = (uint8)i;
+				}
+				bOK = gtl::internal::MatToBitmapFile<true, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, palInverse, funcCallback);
+			}
+			else {
+				bOK = gtl::internal::MatToBitmapFile<false, true, uint8, bLoopUnrolling, bMultiThreaded>(f, img2, nBPP, {}, funcCallback);
+			}
 			return bOK;
 		}
 
@@ -745,7 +750,7 @@ namespace gtl {
 	namespace internal {
 
 		template < typename telement = cv::Vec3b, bool bLoopUnrolling = true, bool bMultiThreaded = false >
-		bool MatFromBitmapFile(std::istream& f, cv::Mat& img, int nBPP, std::vector<telement> palette, callback_progress_t funcCallback) {
+		bool MatFromBitmapFile(std::istream& f, cv::Mat& img, int nBPP, std::vector<telement> const& palette, callback_progress_t funcCallback) {
 
 			if ((nBPP != 1) and (nBPP != 4) and (nBPP != 8) and (nBPP != 24) and (nBPP != 32) )
 				return false;
