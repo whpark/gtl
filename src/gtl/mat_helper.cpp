@@ -402,6 +402,31 @@ namespace gtl {
 							}
 						};
 						break;
+					case 2 :
+						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte, nColPixel](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
+							int x{};
+							for (; x < nColPixel; x += pixel_per_byte) {
+								int col = x / pixel_per_byte;
+								if constexpr (!bConvertMatValueToPaletteIndex) {
+									line[col] = (ptr[x + 0] << 6) | (ptr[x + 1] << 4) | (ptr[x + 2] << 2) | (ptr[x + 3]);
+								}
+								else {
+									line[col] = (palInverse[ptr[x + 0]] << 6) | (palInverse[ptr[x + 1]] << 4) | (palInverse[ptr[x + 2]] << 2) | (palInverse[ptr[x + 3]]);
+								}
+							}
+							int col = x / pixel_per_byte;
+							if (col < line.size())
+								line[col] = 0;
+							for (int shift{8-nBPP}; x < img_cols; x++, shift-=nBPP) {
+								if constexpr (!bConvertMatValueToPaletteIndex) {
+									line[col] |= ptr[x] << shift;
+								}
+								else {
+									line[col] |= palInverse[ptr[x]] << shift;
+								}
+							}
+						};
+						break;
 					case 4 :
 						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte, nColPixel](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 							int x{};
@@ -446,6 +471,7 @@ namespace gtl {
 				else {
 					switch (nBPP) {
 					case 1 :
+					case 2 :
 					case 4 :
 						PackSingleRow = [img_cols = img.cols, nBPP, pixel_per_byte](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 							std::memset(line.data(), 0, line.size()*sizeof(line[0]));
@@ -479,8 +505,8 @@ namespace gtl {
 				}
 			}	// if constexpr (bBytePacking)
 			else {
-				if (nBPP == 24) {
-					if (sizeof(telement) != 3)
+				if (IsValueAnyOf(nBPP, 24, 32)) {
+					if (sizeof(telement) != nBPP/8)
 						return false;
 					PackSingleRow = [img_cols = img.cols](int y, std::vector<uint8>& line, telement const* ptr, std::span<telement> palInverse) {
 						telement* line3 = (telement*)line.data();
