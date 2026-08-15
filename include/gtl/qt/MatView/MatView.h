@@ -42,6 +42,7 @@ public:
 		bool bDrawPixelValue{true};			// draw pixel value on image
 		bool bPyrImageDown{true};			// build cache image for down sampling. (such as mipmap)
 		double dPanningSpeed{2.0};			// Image Panning Speed. 1.0 is same with mouse move.
+		double dWheelScrollSpeed{1.0};		// Wheel Scroll Speed. 1.0 is same with mouse wheel.
 		int nScrollMargin{5};				// bExtendedPanning, px margin to scroll
 		std::chrono::milliseconds tsScroll{250ms};	// Smooth Scroll. duration
 		eZOOM_IN eZoomIn{eZOOM_IN::nearest};
@@ -50,7 +51,7 @@ public:
 
 		// Sync with json
 		GLZ_LOCAL_META(S_OPTION, bZoomLock, bPanningLock, bExtendedPanning, bKeyboardNavigation, bDrawPixelValue,
-			bPyrImageDown, dPanningSpeed, nScrollMargin, tsScroll, eZoomIn, eZoomOut, crBackground);
+			bPyrImageDown, dPanningSpeed, dWheelScrollSpeed, nScrollMargin, tsScroll, eZoomIn, eZoomOut, crBackground);
 	};
 
 	std::string m_strCookie;

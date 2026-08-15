@@ -868,7 +868,7 @@ namespace gtl::qt {
 					return;
 				}
 				event->accept();
-				auto pt = xPoint2d(event->angleDelta().x(), event->angleDelta().y());
+				auto pt = m_option.dWheelScrollSpeed * xPoint2d(event->angleDelta().x(), event->angleDelta().y());
 				Scroll(pt);
 			}
 			break;

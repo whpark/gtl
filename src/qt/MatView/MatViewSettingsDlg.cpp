@@ -25,6 +25,7 @@ bool gtl::qt::xMatViewSettingsDlg::UpdateData(bool bSaveAndValidate) {
 	UpdateWidgetValue(b, ui.chkDrawPixelValue, m_option.bDrawPixelValue);
 	UpdateWidgetValue(b, ui.chkBuildPyramidImage, m_option.bPyrImageDown);
 	UpdateWidgetValue(b, ui.spinPanningSpeed, m_option.dPanningSpeed);
+	UpdateWidgetValue(b, ui.spinWheelScrollSpeed, m_option.dWheelScrollSpeed);
 	UpdateWidgetValue(b, ui.spinScrollMargin, m_option.nScrollMargin);
 	UpdateWidgetValue(b, ui.cmbZoomInMethod, m_option.eZoomIn);
 	UpdateWidgetValue(b, ui.cmbZoomOutMethod, m_option.eZoomOut);
