@@ -535,7 +535,7 @@ namespace gtl::qt {
 				else if (key == Qt::Key_PageUp)		{ delta.y += ptShiftPage.y; }
 				else if (key == Qt::Key_PageDown)	{ delta.y -= ptShiftPage.y; }
 
-				Scroll(delta, 0ms);
+				Scroll(delta);
 			}
 			break;
 
