@@ -5,7 +5,7 @@
 // PWH
 //
 // 2021.05.07. libiconv wrapper
-// 
+//
 //   https://www.gnu.org/software/libiconv/
 //
 //   이거 있는줄 알았으면,... codepage converter 안 만들었을.......
@@ -28,6 +28,7 @@
 #include "gtl/_config.h"
 #include "gtl/__lib.h"
 #include "gtl/concepts.h"
+#include "gtl/misc.h"
 
 /*******************************************
 
@@ -65,7 +66,7 @@
 			UTF-16, UTF-16BE, UTF-16LE
 			UTF-32, UTF-32BE, UTF-32LE
 			UTF-7
-			C99, JAVA 
+			C99, JAVA
 		Full Unicode, in terms of uint16_t or uint32_t (with machine dependent endianness and alignment)
 			UCS-2-INTERNAL, UCS-4-INTERNAL
 		Locale dependent, in terms of `char' or `wchar_t' (with machine dependent endianness and alignment, and with OS and locale dependent semantics)
@@ -85,7 +86,7 @@
 		Turkmen
 			TDS565
 		Platform specifics
-			ATARIST, RISCOS-LATIN1 
+			ATARIST, RISCOS-LATIN1
 
 
 *******************************************/

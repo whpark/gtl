@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC1D96B-2C67-4B1D-9C64-1D1C0F5A2E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9E2D1A3C-6F5E-4E62-8E9B-2A0D3B7C4D22}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx</Extensions>
+    </Filter>
+    <Filter Include="Header Files\dxf">
+      <UniqueIdentifier>{C6A2F41B-4E37-4F84-9E60-7B3F9A5D6E33}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dxf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\reflection_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\_lib_gtl_dxf.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\macro.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\group.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\aliases.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\stream.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\entities.reader.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\entities.subclass.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\entities.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\sections.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\shape.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\dxf.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\dxf_reader.h">
+      <Filter>Header Files\dxf</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+</Project>
