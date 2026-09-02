@@ -32,31 +32,6 @@ namespace gtl::dxf {
 
 	using namespace std::literals;
 
-	namespace detail {
-		/// @brief string -> number. (gtl::tszto has a different signature, and DXF needs no locale/separator handling)
-		/// @param base radix for integral types. DXF ascii group values are always decimal.
-		template < typename T >
-			requires (std::is_arithmetic_v<T>)
-		inline T ToNumber(std::string_view sv, int base = 10) {
-			auto const* b = sv.data();
-			auto const* e = b + sv.size();
-			// skip leading white spaces and '+' sign
-			while (b < e and (unsigned char)*b <= ' ') b++;
-			if (b < e and *b == '+') {
-				b++;
-				while (b < e and (unsigned char)*b <= ' ') b++;
-			}
-			T value{};
-			if constexpr (std::is_integral_v<T>) {
-				std::from_chars(b, e, value, base);
-			}
-			else {
-				std::from_chars(b, e, value);
-			}
-			return value;
-		}
-	}	// namespace detail
-
 	//=============================================================================================================================
 	// dxf archive
 	enum class eDXF_FILE_TYPE { ascii, binary, binary_preR14 };
@@ -152,10 +127,13 @@ namespace gtl::dxf {
 					std::string str;
 					if (!std::getline(stream, str))
 						return std::nullopt;
+					// NOTE : gtl::tsztoi requires std::integral, so doubles must go to gtl::tsztod.
 					if constexpr (std::is_same_v<T, bool>)
-						value = !!detail::ToNumber<int>(str, 0);
+						value = !!gtl::tsztoi<int, char>(str, nullptr, 0);
+					else if constexpr (std::is_integral_v<T>)
+						value = gtl::tsztoi<T, char>(str, nullptr, 0);
 					else
-						value = detail::ToNumber<T>(str, 0);
+						value = gtl::tsztod<T, char>(str, nullptr);
 				}
 				else if constexpr (std::is_same_v<T, string_t>) {
 					if (!std::getline(stream, value))
@@ -212,11 +190,11 @@ namespace gtl::dxf {
 					continue;
 				}
 				if (sv.size() >= 2 and std::isxdigit((unsigned char)sv[1])) {
-					value.push_back(detail::ToNumber<uint8>(sv.substr(0, 2), 16));
+					value.push_back(gtl::tsztoi<uint8, char>(sv.substr(0, 2), nullptr, 16));
 					sv = sv.substr(2);
 				}
 				else {
-					value.push_back(detail::ToNumber<uint8>(sv.substr(0, 1), 16));
+					value.push_back(gtl::tsztoi<uint8, char>(sv.substr(0, 1), nullptr, 16));
 					sv = sv.substr(1);
 				}
 			}

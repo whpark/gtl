@@ -26,9 +26,9 @@ namespace gtl {
 
 
 	/// @brief tszto_number
-	/// @param psz 
-	/// @param pszEnd 
-	/// @param radix 
+	/// @param psz
+	/// @param pszEnd
+	/// @param radix
 	/// @return number
 	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
 	tvalue tszto(tchar const* psz, tchar const* pszEnd, tchar const** ppszStopped = nullptr, int radix = 0, tchar cSplitter = 0);
@@ -86,9 +86,9 @@ namespace gtl {
 
 
 	/// @brief tszto_number
-	/// @param psz 
-	/// @param pszEnd 
-	/// @param radix 
+	/// @param psz
+	/// @param pszEnd
+	/// @param radix
 	/// @return number
 	template < gtlc::arithmetic tvalue, gtlc::string_elem tchar>
 	tvalue tszto(tchar const* psz, tchar const* const pszEnd, tchar const** ppszStopped, int radix, tchar cSplitter) {
@@ -280,18 +280,23 @@ namespace gtl {
 
 	template < std::floating_point tvalue, gtlc::string_elem tchar >
 	tvalue tsztod(std::basic_string_view<tchar> sv, tchar const** ppszStopped, tchar cSplitter) {
+		sv = gtl::TrimView(sv);
 		if constexpr (sizeof(tchar) == sizeof(char)) {
 			if (cSplitter == 0) {
 				// 주의!!!!!!! cSplitter 가 0일 경우에만..
-				tvalue value;
+				tvalue value{};
 				auto [ptr, ec] = std::from_chars((char const*)sv.data(), (char const*)sv.data()+sv.size(), value, std::chars_format::general);
-				if (ppszStopped)
-					*ppszStopped = (tchar const*)ptr;
-				return value;
+				if (ec == std::errc()) {
+					if (ppszStopped)
+						*ppszStopped = (tchar const*)ptr;
+					return value;
+				}
 			}
 		}
 
 		char buf[1024];
+		if (sv.size() >= sizeof(buf))
+			throw std::invalid_argument{GTL__FUNCSIG "string too long"};
 		char* str = buf;
 		char const* const end_str = buf+sizeof(buf)-1;
 		tchar const* pos = sv.data();
@@ -335,7 +340,7 @@ namespace gtl {
 
 
 	/// @brief adds comma into number string
-	/// @param separator 
+	/// @param separator
 	template < gtlc::string_elem tchar, int interval = 3 >
 	constexpr std::basic_string<tchar> AddThousandComma(std::basic_string_view<tchar> sv, tchar separator = ',') {
 		static_assert(interval > 0);
