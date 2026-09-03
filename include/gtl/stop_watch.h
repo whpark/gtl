@@ -110,7 +110,7 @@ namespace gtl {
 			if (d < m_durMin)
 				return;
 			std::string msg = fmt::format("Duration: {} ({})\n", d, m_loc.function_name());
-		#ifdef _WINDOWS
+		#if defined(_WINDOWS) && GTL__USE_WINDOWS_API
 			OutputDebugStringA(msg.c_str());
 		#else
 			fmt::print("{}", msg);

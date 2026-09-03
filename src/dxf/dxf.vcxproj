@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>18.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{D6F2A1C4-6E79-4D62-9F81-1A3B5C7D9E20}</ProjectGuid>
+    <RootNamespace>gtl_dxf</RootNamespace>
+    <ProjectName>gtl.dxf</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType><UseDebugLibraries>true</UseDebugLibraries><PlatformToolset>v145</PlatformToolset><CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType><UseDebugLibraries>false</UseDebugLibraries><PlatformToolset>v145</PlatformToolset><WholeProgramOptimization>true</WholeProgramOptimization><CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" /><ImportGroup Label="Shared" /><ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>$(SolutionDir)$(Platform)\Temp\$(Configuration)\$(ProjectName)\</IntDir><TargetName>$(ProjectName).x$(PlatformArchitecture)$(Configuration[0])</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(SolutionDir)$(Platform)\Temp\$(Configuration)\$(ProjectName)\</IntDir><TargetName>$(ProjectName).x$(PlatformArchitecture)$(Configuration[0])</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg"><VcpkgEnableManifest>false</VcpkgEnableManifest></PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel><SDLCheck>true</SDLCheck><ConformanceMode>true</ConformanceMode><PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <LanguageStandard>stdcpplatest</LanguageStandard><AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor><MultiProcessorCompilation>true</MultiProcessorCompilation><DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet><BuildStlModules>false</BuildStlModules><AdditionalOptions>/bigobj /utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="dxf.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\gtl\dxf\aliases.h" /><ClInclude Include="..\..\include\gtl\dxf\detail.h" />
+    <ClInclude Include="..\..\include\gtl\dxf\dxf.h" /><ClInclude Include="..\..\include\gtl\dxf\entities.h" />
+    <ClInclude Include="..\..\include\gtl\dxf\entities_reader.h" /><ClInclude Include="..\..\include\gtl\dxf\entities_subclass.h" />
+    <ClInclude Include="..\..\include\gtl\dxf\group.h" /><ClInclude Include="..\..\include\gtl\dxf\sections.h" />
+    <ClInclude Include="..\..\include\gtl\dxf\shape.h" /><ClInclude Include="..\..\include\gtl\dxf\stream.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\gtl\gtl.vcxproj"><Project>{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}</Project></ProjectReference>
+    <ProjectReference Include="..\shape\shape.vcxproj"><Project>{FBA95ADB-13A2-4139-BA8E-789BFE9AA1AE}</Project></ProjectReference>
+  </ItemGroup>
+  <ItemGroup><Text Include="CMakeLists.txt" /></ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
+

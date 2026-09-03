@@ -206,7 +206,7 @@ namespace gtl {
 	void xSimpleLog::_Log(std::string_view svTag, std::basic_string<tchar_t>&& str) {
 		auto now = std::chrono::system_clock::now();
 
-	#if defined(_DEBUG) and defined(_WINDOWS)
+	#if defined(_DEBUG) and defined(_WINDOWS) and GTL__USE_WINDOWS_API
 		if (m_bTraceOut) {
 			if constexpr (std::is_same_v<tchar_t, char>) {
 				OutputDebugStringA(str.c_str());

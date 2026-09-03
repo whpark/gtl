@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files"><UniqueIdentifier>{A1C2E3F4-1020-4050-8090-A0B0C0D0E0F0}</UniqueIdentifier></Filter>
+    <Filter Include="Source Files"><UniqueIdentifier>{B2D3F405-2131-5161-91A1-B1C1D1E1F101}</UniqueIdentifier></Filter>
+  </ItemGroup>
+  <ItemGroup><ClCompile Include="dxf.cpp"><Filter>Source Files</Filter></ClCompile></ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\gtl\dxf\aliases.h"><Filter>Header Files</Filter></ClInclude><ClInclude Include="..\..\include\gtl\dxf\detail.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\dxf.h"><Filter>Header Files</Filter></ClInclude><ClInclude Include="..\..\include\gtl\dxf\entities.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\entities_reader.h"><Filter>Header Files</Filter></ClInclude><ClInclude Include="..\..\include\gtl\dxf\entities_subclass.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\group.h"><Filter>Header Files</Filter></ClInclude><ClInclude Include="..\..\include\gtl\dxf\sections.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="..\..\include\gtl\dxf\shape.h"><Filter>Header Files</Filter></ClInclude><ClInclude Include="..\..\include\gtl\dxf\stream.h"><Filter>Header Files</Filter></ClInclude>
+  </ItemGroup>
+</Project>
+
