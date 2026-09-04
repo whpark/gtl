@@ -71,9 +71,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "triplets", "triplets", "{ED
 		etc\vcpkg\triplets\x64-windows.cmake = etc\vcpkg\triplets\x64-windows.cmake
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.dxf", "src\gtl.dxf\gtl.dxf.vcxproj", "{E18BEB19-2D8A-4D46-80A4-CD16276A67C0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dxf", "src\dxf\dxf.vcxproj", "{E18BEB19-2D8A-4D46-80A4-CD16276A67C0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test.dxf", "src\test.dxf\test.dxf.vcxproj", "{DCEA71A9-987A-48B7-BD0A-9FF6EF07D093}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_dxf", "src\test_dxf\test_dxf.vcxproj", "{DCEA71A9-987A-48B7-BD0A-9FF6EF07D093}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E18BEB19-2D8A-4D46-80A4-CD16276A67C0} = {E18BEB19-2D8A-4D46-80A4-CD16276A67C0}
 	EndProjectSection

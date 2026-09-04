@@ -7,12 +7,12 @@
 //
 //	the DXF corpus is NOT part of the gtl repository. point the tests at one with
 //
-//		set GTL_DXF_TEST_DIR=D:\Project\biscuit\src\test.dxf\DXF
+//		set GTL_DXF_TEST_DIR=
 //
 //	or drop a "DXF" folder next to this file. layout (all optional) :
 //		<dir>/*.dxf		- must be read successfully
 //		<dir>/ok/*.dxf		- must be read successfully
-//		<dir>/broken/*.dxf	- may fail, but must not crash
+//		<dir>/failed/*.dxf	- may fail, but must not crash
 //
 //	set GTL_DXF_TEST_DUMP=1 to also write a text dump of every file into <dir>/out.
 //
@@ -164,11 +164,15 @@ namespace {
 			bool const ok = dxf.ReadDXF(path);
 			if (bDump)
 				DumpDXF(dxf, pathOutFolder, path);
+			std::error_code ec;
 			if (!ok) {
 				fmt::println("!!! ReadDXF: failed to read {}", path.filename().string());
+				//std::filesystem::rename(path, path.parent_path() / "failed" / path.filename(), ec);
 				failed.push_back(path.filename().string());
 				continue;
 			}
+			std::filesystem::rename(path, path.parent_path() / "ok" / path.filename(), ec);
+
 			// a readable file must also convert to a drawing without throwing.
 			auto drawing = gtl::dxf::ToShape(dxf);
 			(void)drawing;
@@ -182,18 +186,18 @@ namespace {
 TEST_CASE("gtl.dxf : read the DXF corpus") {
 	auto const folder = GetDXFTestFolder();
 	if (folder.empty()) {
-		WARN("no DXF corpus. set GTL_DXF_TEST_DIR (ex: D:\\Project\\biscuit\\src\\test.dxf\\DXF) or add a 'DXF' folder.");
 		SUCCEED();
 		return;
 	}
 	fmt::println("DXF corpus : {}", folder.string());
 
 	auto const pathOut = folder / "out";
+	std::filesystem::create_directories(folder / "failed");
+	std::filesystem::create_directories(folder / "ok");
+	std::filesystem::create_directories(folder / "out");
 
 	// files sitting at the top level, and everything under 'ok', must be read.
 	auto failed = ReadFolder(folder, pathOut);
-	for (auto& name : ReadFolder(folder / "ok", pathOut))
-		failed.push_back(std::move(name));
 	for (auto const& name : failed)
 		fmt::println("failed : {}", name);
 	CHECK(failed.empty());
@@ -321,32 +325,6 @@ TEST_CASE("gtl.dxf : ascii group value conversion", "[!mayfail]") {
 	CHECK(ToDouble("1.5e2") == 150.0);
 	CHECK(ToDouble(" 1.5e2") == 150.0);	// <- fails : gtl::tsztod returns an uninitialized value
 	CHECK(ToDouble("-2.5") == -2.5);
-}
-
-//=============================================================================================================================
-TEST_CASE("benchmark") {
-	std::vector<int> values(10'000uz, 0);
-	constexpr auto map_size = 2000uz;
-	for (auto& v : values)
-		v = rand() % map_size;
-	std::vector<int> map;
-	map.assign(map_size, 0);
-	for (auto v : std::ranges::views::iota(0uz, map_size))
-		map[v] = (int)v/10;
-
-	BENCHMARK("dividing") {
-		int64_t r{};
-		for (auto v : values)
-			r += v / 10;
-		return r;
-	};
-
-	BENCHMARK("map") {
-		int64_t r{};
-		for (auto v : values)
-			r += map[v];
-		return r;
-	};
 }
 
 //=============================================================================================================================
