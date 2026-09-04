@@ -6,7 +6,7 @@ find_package(magic_enum CONFIG REQUIRED)
 add_executable(test.dxf
 	main.cpp
 	pch.cpp
-	test.dxf.cpp
+	test_dxf.cpp
 )
 
 target_include_directories(test.dxf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

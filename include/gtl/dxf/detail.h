@@ -1,32 +1,17 @@
-﻿#pragma once
+#pragma once
 
-//////////////////////////////////////////////////////////////////////
-//
-// reflection_struct.h: boost::pfr like functions for aggregate types.
-//
-// PWH
-// 2025-05-21 biscuit/reflection.ixx
-// 2026-09-02 ported from biscuit (module) to gtl (header)
-//
-//	member count / member access of an aggregate, without any macro.
-//	(boost::pfr is not usable in c++ modules - ICE. till c++26 reflection)
-//
-//////////////////////////////////////////////////////////////////////
-
-#include <array>
-#include <cstddef>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <expected>
-#include <span>
-
-#include "gtl/_default.h"
+#include "gtl/gtl.h"
+#include "gtl/container_map.h"
+#include "gtl/dynamic.h"
+#include "gtl/shape/shape.h"
+#include "gtl/shape/color_table.h"
 
 #include <boost/pfr.hpp>
 
+#include <expected>
+#include <span>
+
 namespace gtl {
-#pragma pack(push, 8)
 
 	template <typename T>
 	constexpr std::size_t CountStructMember() noexcept {
@@ -62,5 +47,10 @@ namespace gtl {
 			std::forward<Func>(func), std::make_index_sequence<N>{});
 	}
 
-#pragma pack(pop)
-}	// namespace gtl
+} // namespace gtl
+
+#define GTL__DXF_DEFINE_SPACESHIP_OPERATOR(CLASS_NAME) \
+	auto operator<=>(CLASS_NAME const&) const = default;
+
+#define GTL__DXF_ENTITY_DERIVED(tEntity, eEntityType, NAME, tSubclasses) \
+	using tEntity = TEntityDerived<eEntityType, NAME, tSubclasses>;

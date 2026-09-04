@@ -31,6 +31,7 @@
 #include "gtl/concepts.h"
 #include "gtl/misc.h"
 #include "gtl/reflection_struct.h"
+#include "gtl/coord.h"
 #include "gtl/unit.h"
 
 #include "gtl/dxf/_lib_gtl_dxf.h"
@@ -52,11 +53,7 @@ namespace gtl::dxf {
 	using group_value_t = std::variant<bool, std::int16_t, std::int32_t, std::int64_t, double, string_t, binary_t>;
 	enum eGROUP_VALUE_TYPE : std::int8_t { none = -1, boolean = 0, i16, i32, i64, dbl, str, binary };
 
-	/// @brief plain aggregate 3d point. (gtl::xPoint3d is NOT an aggregate, but gtl::CountStructMember needs one)
-	struct point_t {
-		double x{}, y{}, z{};
-		auto operator <=> (point_t const&) const = default;
-	};
+	using point_t = gtl::xPoint3d;
 
 	template < typename T >
 	consteval size_t GetGroupValueIndex() {
