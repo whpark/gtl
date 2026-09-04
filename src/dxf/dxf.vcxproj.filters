@@ -67,9 +67,6 @@
     <ClInclude Include="..\..\include\gtl\dxf\dxf.h">
       <Filter>Header Files\dxf</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\dxf\dxf_reader.h">
-      <Filter>Header Files\dxf</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

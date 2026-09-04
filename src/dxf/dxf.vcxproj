@@ -144,7 +144,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\dxf\_lib_gtl_dxf.h" />
     <ClInclude Include="..\..\include\gtl\dxf\aliases.h" />
     <ClInclude Include="..\..\include\gtl\dxf\dxf.h" />
-    <ClInclude Include="..\..\include\gtl\dxf\dxf_reader.h" />
     <ClInclude Include="..\..\include\gtl\dxf\entities.h" />
     <ClInclude Include="..\..\include\gtl\dxf\entities.reader.h" />
     <ClInclude Include="..\..\include\gtl\dxf\entities.subclass.h" />

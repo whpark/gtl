@@ -367,7 +367,7 @@ TEST_CASE("gtl.dxf : ReadShape converts DXF entities to gtl.shape") {
 			"0\r\nEOF\r\n";
 	}
 
-	auto drawing = gtl::dxf::ReadShape(path);
+	auto drawing = gtl::dxf::ReadDXFShape(path);
 	REQUIRE(drawing);
 	auto const* layer = FindLayer(*drawing, L"CUT");
 	REQUIRE(layer);
@@ -432,7 +432,7 @@ TEST_CASE("gtl.dxf : ReadShape expands INSERT entities by cloning their block") 
 			"0\r\nEOF\r\n";
 	}
 
-	auto drawing = gtl::dxf::ReadShape(path);
+	auto drawing = gtl::dxf::ReadDXFShape(path);
 	REQUIRE(drawing);
 	auto const* layer = FindLayer(*drawing, L"CUT");
 	REQUIRE(layer);
