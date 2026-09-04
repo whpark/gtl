@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gtl/dxf/entities_subclass.h"
+#include "gtl/dxf/entities.subclass.h"
 
 using namespace std::literals;
 using namespace gtl::literals;
@@ -67,7 +67,7 @@ namespace gtl::dxf::entities {
 		std::string name{};
 		std::vector<sGroup> data{};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t)
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t)
 	};
 
 	using sControl = TControlData<eGROUP_CODE::control>;
@@ -85,7 +85,7 @@ namespace gtl::dxf::entities {
 		sXData xdata;
 		std::vector<sControl> controls;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		//bool operator == (sEntity const& r) const {
 		//	return m_handle == r.m_handle
 		//		and m_hOwnerBlock == r.m_hOwnerBlock
@@ -122,7 +122,7 @@ namespace gtl::dxf::entities {
 	public:
 		virtual ~xEntity() = default;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		virtual std::unique_ptr<xEntity> clone() const = 0;
 		virtual bool IsEqual(xEntity const& other) const = 0;
@@ -191,7 +191,7 @@ namespace gtl::dxf::entities {
 		TEntityDerived& operator=(TEntityDerived&&) = default;
 		virtual ~TEntityDerived() = default;
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		xEntity& BaseEntity() { return static_cast<xEntity&>(*this); }
 		xEntity const& BaseEntity() const { return static_cast<xEntity const&>(*this); }
@@ -242,7 +242,7 @@ namespace gtl::dxf::entities {
 		string_t m_name;
 		std::vector<sGroup> m_groups;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool PreRead(group_iter_t& iter) {
 			bool bFound{};
@@ -276,32 +276,32 @@ namespace gtl::dxf::entities {
 		using this_t = TSubclass;
 		tSubclass m_field;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t)
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t)
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
 
-	ENTITY_DERIVED(x3DFace,			eENTITY::_3dface, "3DFACE", TSubclass<sAcDb3DFace>);
+	GTL__DXF_ENTITY_DERIVED(x3DFace,			eENTITY::_3dface, "3DFACE", TSubclass<sAcDb3DFace>);
 
 	struct s3DSolid {
 		using this_t = s3DSolid;
 
 		sAcDbModelerGeometry m_geometry;
 		sAcDb3DSolid m_field;
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
-	ENTITY_DERIVED(x3DSolid,		eENTITY::_3dsolid, "3DSOLID", s3DSolid);
+	GTL__DXF_ENTITY_DERIVED(x3DSolid,		eENTITY::_3dsolid, "3DSOLID", s3DSolid);
 
-	ENTITY_DERIVED(xACADProxyEntity, eENTITY::acad_proxy_entity, "ACAD_PROXY_ENTITY", TSubclass<sAcDbProxyEntity>);
+	GTL__DXF_ENTITY_DERIVED(xACADProxyEntity, eENTITY::acad_proxy_entity, "ACAD_PROXY_ENTITY", TSubclass<sAcDbProxyEntity>);
 
 	struct sArc {
 		using this_t = sArc;
 		sAcDbCircle m_circle;	// circle is subclass of arc
 		sAcDbArc m_field;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
-	ENTITY_DERIVED(xArc,			eENTITY::arc, "ARC", sArc);
+	GTL__DXF_ENTITY_DERIVED(xArc,			eENTITY::arc, "ARC", sArc);
 
 	template < typename T >
 	struct TAttrib {
@@ -313,7 +313,7 @@ namespace gtl::dxf::entities {
 		sAcDbEntity m_entityMText;
 		sAcDbMText m_mtext;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t)
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t)
 
 		bool PreRead(group_iter_t& iter) {
 			static sGroup const groupMText{eGROUP_CODE::entity, "MTEXT"s};
@@ -328,34 +328,34 @@ namespace gtl::dxf::entities {
 			return true;
 		}
 	};
-	ENTITY_DERIVED(xAttDef,			eENTITY::attdef,		"ATTDEF",		TAttrib<sAcDbAttributeDefinition>);
-	ENTITY_DERIVED(xAttrib,			eENTITY::attrib,		"ATTRIB",		TAttrib<sAcDbAttribute>);
-	ENTITY_DERIVED(xBody,			eENTITY::body,			"BODY",			TSubclass<sAcDbModelerGeometry>);
-	ENTITY_DERIVED(xCircle,			eENTITY::circle,		"CIRCLE",		TSubclass<sAcDbCircle>);
-	ENTITY_DERIVED(xEllipse,		eENTITY::ellipse,		"ELLIPSE",		TSubclass<sAcDbEllipse>);
-	ENTITY_DERIVED(xHatch,			eENTITY::hatch,			"HATCH",		TSubclass<sAcDbHatch>);
-	ENTITY_DERIVED(xHelix,			eENTITY::helix,			"HELIX",		TSubclass<sAcDbHelix>);
-	ENTITY_DERIVED(xImage,			eENTITY::image,			"IMAGE",		TSubclass<sAcDbImage>);
-	ENTITY_DERIVED(xInsert,			eENTITY::insert,		"INSERT",		TSubclass<sAcDbBlockReference>);
-	ENTITY_DERIVED(xLeader,			eENTITY::leader,		"LEADER",		TSubclass<sAcDbLeader>);
-	ENTITY_DERIVED(xLight,			eENTITY::light,			"LIGHT",		TSubclass<sAcDbLight>);
-	ENTITY_DERIVED(xLine,			eENTITY::line,			"LINE",			TSubclass<sAcDbLine>);
-	ENTITY_DERIVED(xLWPolyline,		eENTITY::lw_polyline,	"LWPOLYLINE",	TSubclass<sAcDbLWPolyline>);
-	ENTITY_DERIVED(xMesh,			eENTITY::mesh,			"MESH",			TSubclass<sAcDbMesh>);
-	//ENTITY_DERIVED(xMLeader,			eENTITY::mleader,		"MLEADER",		TSubclass<sAcDbMLeader>);
-	//ENTITY_DERIVED(xMLeaderStyle,		eENTITY::mleader_style,	"MLEADERSTYLE",	TSubclass<sAcDbMLeaderStyle>);
-	ENTITY_DERIVED(xMText,			eENTITY::mtext,			"MTEXT",		TSubclass<sAcDbMText>);
-	ENTITY_DERIVED(xOleFrame,		eENTITY::ole_frame,		"OLEFRAME",		TSubclass<sAcDbOleFrame>);
-	ENTITY_DERIVED(xOle2Frame,		eENTITY::ole2_frame,	"OLE2FRAME",	TSubclass<sAcDbOle2Frame>);
-	ENTITY_DERIVED(xPoint,			eENTITY::point,			"POINT",		TSubclass<sAcDbPoint>);
-	ENTITY_DERIVED(xPolyline,		eENTITY::polyline,		"POLYLINE",		TSubclass<sAcDbPolyline>);
-	ENTITY_DERIVED(xRay,			eENTITY::ray,			"XRAY",			TSubclass<sAcDbRay>);
-	ENTITY_DERIVED(xRegion,			eENTITY::region,		"REGION",		TSubclass<sAcDbModelerGeometry>);
-	ENTITY_DERIVED(xSection,		eENTITY::section,		"SECTION",		TSubclass<sAcDbSection>);
-	ENTITY_DERIVED(xShape,			eENTITY::shape,			"SHAPE",		TSubclass<sAcDbShape>);
-	ENTITY_DERIVED(xSolid,			eENTITY::solid,			"SOLID",		TSubclass<sAcDbTrace>);	// NOT Solid, but Trace
-	ENTITY_DERIVED(xSpline,			eENTITY::spline,		"SPLINE",		TSubclass<sAcDbSpline>);
-	ENTITY_DERIVED(xSun,			eENTITY::sun,			"SUN",			TSubclass<sAcDbSun>);
+	GTL__DXF_ENTITY_DERIVED(xAttDef,			eENTITY::attdef,		"ATTDEF",		TAttrib<sAcDbAttributeDefinition>);
+	GTL__DXF_ENTITY_DERIVED(xAttrib,			eENTITY::attrib,		"ATTRIB",		TAttrib<sAcDbAttribute>);
+	GTL__DXF_ENTITY_DERIVED(xBody,			eENTITY::body,			"BODY",			TSubclass<sAcDbModelerGeometry>);
+	GTL__DXF_ENTITY_DERIVED(xCircle,			eENTITY::circle,		"CIRCLE",		TSubclass<sAcDbCircle>);
+	GTL__DXF_ENTITY_DERIVED(xEllipse,		eENTITY::ellipse,		"ELLIPSE",		TSubclass<sAcDbEllipse>);
+	GTL__DXF_ENTITY_DERIVED(xHatch,			eENTITY::hatch,			"HATCH",		TSubclass<sAcDbHatch>);
+	GTL__DXF_ENTITY_DERIVED(xHelix,			eENTITY::helix,			"HELIX",		TSubclass<sAcDbHelix>);
+	GTL__DXF_ENTITY_DERIVED(xImage,			eENTITY::image,			"IMAGE",		TSubclass<sAcDbImage>);
+	GTL__DXF_ENTITY_DERIVED(xInsert,			eENTITY::insert,		"INSERT",		TSubclass<sAcDbBlockReference>);
+	GTL__DXF_ENTITY_DERIVED(xLeader,			eENTITY::leader,		"LEADER",		TSubclass<sAcDbLeader>);
+	GTL__DXF_ENTITY_DERIVED(xLight,			eENTITY::light,			"LIGHT",		TSubclass<sAcDbLight>);
+	GTL__DXF_ENTITY_DERIVED(xLine,			eENTITY::line,			"LINE",			TSubclass<sAcDbLine>);
+	GTL__DXF_ENTITY_DERIVED(xLWPolyline,		eENTITY::lw_polyline,	"LWPOLYLINE",	TSubclass<sAcDbLWPolyline>);
+	GTL__DXF_ENTITY_DERIVED(xMesh,			eENTITY::mesh,			"MESH",			TSubclass<sAcDbMesh>);
+	//GTL__DXF_ENTITY_DERIVED(xMLeader,			eENTITY::mleader,		"MLEADER",		TSubclass<sAcDbMLeader>);
+	//GTL__DXF_ENTITY_DERIVED(xMLeaderStyle,		eENTITY::mleader_style,	"MLEADERSTYLE",	TSubclass<sAcDbMLeaderStyle>);
+	GTL__DXF_ENTITY_DERIVED(xMText,			eENTITY::mtext,			"MTEXT",		TSubclass<sAcDbMText>);
+	GTL__DXF_ENTITY_DERIVED(xOleFrame,		eENTITY::ole_frame,		"OLEFRAME",		TSubclass<sAcDbOleFrame>);
+	GTL__DXF_ENTITY_DERIVED(xOle2Frame,		eENTITY::ole2_frame,	"OLE2FRAME",	TSubclass<sAcDbOle2Frame>);
+	GTL__DXF_ENTITY_DERIVED(xPoint,			eENTITY::point,			"POINT",		TSubclass<sAcDbPoint>);
+	GTL__DXF_ENTITY_DERIVED(xPolyline,		eENTITY::polyline,		"POLYLINE",		TSubclass<sAcDbPolyline>);
+	GTL__DXF_ENTITY_DERIVED(xRay,			eENTITY::ray,			"XRAY",			TSubclass<sAcDbRay>);
+	GTL__DXF_ENTITY_DERIVED(xRegion,			eENTITY::region,		"REGION",		TSubclass<sAcDbModelerGeometry>);
+	GTL__DXF_ENTITY_DERIVED(xSection,		eENTITY::section,		"SECTION",		TSubclass<sAcDbSection>);
+	GTL__DXF_ENTITY_DERIVED(xShape,			eENTITY::shape,			"SHAPE",		TSubclass<sAcDbShape>);
+	GTL__DXF_ENTITY_DERIVED(xSolid,			eENTITY::solid,			"SOLID",		TSubclass<sAcDbTrace>);	// NOT Solid, but Trace
+	GTL__DXF_ENTITY_DERIVED(xSpline,			eENTITY::spline,		"SPLINE",		TSubclass<sAcDbSpline>);
+	GTL__DXF_ENTITY_DERIVED(xSun,			eENTITY::sun,			"SUN",			TSubclass<sAcDbSun>);
 
 	struct sSurface {
 		using this_t = sSurface;
@@ -395,19 +395,19 @@ namespace gtl::dxf::entities {
 			return false;
 		}
 	};
-	ENTITY_DERIVED(xSurface,		eENTITY::surface,		"SURFACE",		sSurface);
+	GTL__DXF_ENTITY_DERIVED(xSurface,		eENTITY::surface,		"SURFACE",		sSurface);
 
-	//ENTITY_DERIVED(xTable,			eENTITY::table,			"TABLE",		TSubclass<sAcDbTable>);
-	ENTITY_DERIVED(xText,			eENTITY::text,			"TEXT",			TSubclass<sAcDbText>);
-	ENTITY_DERIVED(xTolerance,		eENTITY::tolerance,		"TOLERANCE",	TSubclass<sAcDbTolerance>);
-	ENTITY_DERIVED(xTrace,			eENTITY::trace,			"TRACE",		TSubclass<sAcDbTrace>);
-	ENTITY_DERIVED(xUnderlay,		eENTITY::underlay,		"UNDERLAY",		TSubclass<sAcDbUnderlay>);
-	ENTITY_DERIVED(xDGNUnderlay,	eENTITY::underlay,		"DGNUNDERLAY",	TSubclass<sAcDbUnderlay>);
-	ENTITY_DERIVED(xDWFUnderlay,	eENTITY::underlay,		"DWFUNDERLAY",	TSubclass<sAcDbUnderlay>);
-	ENTITY_DERIVED(xPDFUnderlay,	eENTITY::underlay,		"PDFUNDERLAY",	TSubclass<sAcDbUnderlay>);
-	ENTITY_DERIVED(xVertex,			eENTITY::vertex,		"VERTEX",		TSubclass<sAcDbVertex>);
-	ENTITY_DERIVED(xViewport,		eENTITY::viewport,		"VIEWPORT",		TSubclass<sAcDbViewport>);
-	ENTITY_DERIVED(xWipeout,		eENTITY::wipeout,		"WIPEOUT",		TSubclass<sAcDbWipeout>);
-	ENTITY_DERIVED(xXLine,			eENTITY::xline,			"XLINE",		TSubclass<sAcDbXLine>);
+	//GTL__DXF_ENTITY_DERIVED(xTable,			eENTITY::table,			"TABLE",		TSubclass<sAcDbTable>);
+	GTL__DXF_ENTITY_DERIVED(xText,			eENTITY::text,			"TEXT",			TSubclass<sAcDbText>);
+	GTL__DXF_ENTITY_DERIVED(xTolerance,		eENTITY::tolerance,		"TOLERANCE",	TSubclass<sAcDbTolerance>);
+	GTL__DXF_ENTITY_DERIVED(xTrace,			eENTITY::trace,			"TRACE",		TSubclass<sAcDbTrace>);
+	GTL__DXF_ENTITY_DERIVED(xUnderlay,		eENTITY::underlay,		"UNDERLAY",		TSubclass<sAcDbUnderlay>);
+	GTL__DXF_ENTITY_DERIVED(xDGNUnderlay,	eENTITY::underlay,		"DGNUNDERLAY",	TSubclass<sAcDbUnderlay>);
+	GTL__DXF_ENTITY_DERIVED(xDWFUnderlay,	eENTITY::underlay,		"DWFUNDERLAY",	TSubclass<sAcDbUnderlay>);
+	GTL__DXF_ENTITY_DERIVED(xPDFUnderlay,	eENTITY::underlay,		"PDFUNDERLAY",	TSubclass<sAcDbUnderlay>);
+	GTL__DXF_ENTITY_DERIVED(xVertex,			eENTITY::vertex,		"VERTEX",		TSubclass<sAcDbVertex>);
+	GTL__DXF_ENTITY_DERIVED(xViewport,		eENTITY::viewport,		"VIEWPORT",		TSubclass<sAcDbViewport>);
+	GTL__DXF_ENTITY_DERIVED(xWipeout,		eENTITY::wipeout,		"WIPEOUT",		TSubclass<sAcDbWipeout>);
+	GTL__DXF_ENTITY_DERIVED(xXLine,			eENTITY::xline,			"XLINE",		TSubclass<sAcDbXLine>);
 
 };	// namespace gtl::dxf::entities

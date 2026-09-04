@@ -49,8 +49,8 @@ namespace gtl {
 
 } // namespace gtl
 
-#define DEFINE_SPACESHIP_OPERATOR(CLASS_NAME) \
+#define GTL__DXF_DEFINE_SPACESHIP_OPERATOR(CLASS_NAME) \
 	auto operator<=>(CLASS_NAME const&) const = default;
 
-#define ENTITY_DERIVED(tEntity, eEntityType, NAME, tSubclasses) \
+#define GTL__DXF_ENTITY_DERIVED(tEntity, eEntityType, NAME, tSubclasses) \
 	using tEntity = TEntityDerived<eEntityType, NAME, tSubclasses>;

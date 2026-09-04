@@ -31,7 +31,8 @@ namespace gtl::dxf {
 
 	//=============================================================================================================================
 	// Header section
-	using variable_map_t = std::map<string_t, std::vector<sGroup>>;
+	// NOTE : gtl::TContainerMap takes the container as its FIRST template argument. (biscuit::TContainerMap takes it last)
+	using variable_map_t = gtl::TContainerMap<std::vector, string_t, std::vector<sGroup>>;
 	//-----------------------------------------------------------------------------------------------------------------------------
 	class xSectionHead {
 	public:
@@ -39,7 +40,7 @@ namespace gtl::dxf {
 
 		variable_map_t m_mapVariables;
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			m_mapVariables.clear();
@@ -77,7 +78,7 @@ namespace gtl::dxf {
 		gcv<280> proxy{};
 		gcv<281> entity{};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 	using classes_t = std::vector<sClass>;
 
@@ -88,7 +89,7 @@ namespace gtl::dxf {
 
 		classes_t m_classes;
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			m_classes.clear();
@@ -119,7 +120,7 @@ namespace gtl::dxf {
 		gcv<330> pOwnerObject;		// Soft-pointer ID/handle to owner object (optional)
 		entities::sAcDbSymbolTable tableSymbol;
 		entities::sAcDbDimStyleTable tableDimStyle;
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 	struct sTableItemHeader {
 		using this_t = sTableItemHeader;
@@ -130,7 +131,7 @@ namespace gtl::dxf {
 		gcv<330> pOwnerObject;				// Soft-pointer ID/handle to owner object (optional)
 		gcv<100> markerEnd{"AcDbSymbolTableRecord"s};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	template < typename T, xStringLiteral name >
@@ -142,7 +143,7 @@ namespace gtl::dxf {
 		sTableHeader header;
 		std::vector<std::pair<sTableItemHeader, T>> items;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		void Init() {
 			header = sTableHeader{};
@@ -190,7 +191,7 @@ namespace gtl::dxf {
 		TTableEntry<entities::sAcDbViewportTableRecord, "VPORT"> m_vports;
 
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			m_appIDs.Init();
@@ -266,7 +267,7 @@ namespace gtl::dxf {
 		entities::sAcDbEntity entity;
 		entities::sAcDbBlockBegin block;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 	struct sBlockEnd {
 		using this_t = sBlockEnd;
@@ -277,7 +278,7 @@ namespace gtl::dxf {
 		entities::sAcDbEntity entity;
 		entities::sAcDbBlockEnd blockEnd;	 //gcv<100> markerBlockEnd{"AcDbBlockEnd"s};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	class xBlock {
@@ -289,7 +290,7 @@ namespace gtl::dxf {
 
 		entities::entities_t entities;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 	class xSectionBlocks {
 	public:
@@ -299,7 +300,7 @@ namespace gtl::dxf {
 	//	binary_t hExit;
 
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			m_blocks.clear();
@@ -344,7 +345,7 @@ namespace gtl::dxf {
 		entities::entities_t m_entities;
 
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			m_entities.clear();
@@ -373,7 +374,7 @@ namespace gtl::dxf {
 	public:
 		using this_t = xSectionObjects;
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			return true;
@@ -397,7 +398,7 @@ namespace gtl::dxf {
 	public:
 		using this_t = xSectionThumbnailImage;
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			return true;
@@ -419,7 +420,7 @@ namespace gtl::dxf {
 	public:
 		using this_t = xSectionACDSDATA;
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			return true;
@@ -442,7 +443,7 @@ namespace gtl::dxf {
 	public:
 		using this_t = xSectionUnknown;
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool InitSection() {
 			return true;

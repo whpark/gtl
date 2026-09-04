@@ -108,7 +108,7 @@ namespace gtl::dxf {
 
 		//constexpr bool operator == (sGroup const&) const = default;
 		//constexpr bool operator != (sGroup const&) const = default;
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		//template < std::convertible_to<group_value_t> T >
 		template < typename T >
@@ -372,7 +372,7 @@ namespace gtl::dxf {
 		}
 
 	public:
-		//DEFINE_SPACESHIP_OPERATOR(this_t);
+		//GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		//auto operator <=> (this_t const&) const = default;
 		bool operator == (this_t const& r) const {
 			if constexpr (requires (value_t v) { v.value(); }) {
@@ -500,7 +500,7 @@ namespace gtl::dxf {
 		}
 
 	public:
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		size_t CountStoredVars() const {
 			return value.size();

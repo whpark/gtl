@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gtl/dxf/entities_reader.h"
+#include "gtl/dxf/entities.reader.h"
 
 using namespace std::literals;
 using namespace gtl::literals;
@@ -250,7 +250,7 @@ namespace gtl::dxf::entities {
 		constexpr static inline xStringLiteral marker{"AcDbSymbolTable"};
 		gcv< 70> maxEntries{};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -260,7 +260,7 @@ namespace gtl::dxf::entities {
 		gcv< 71> a;									// NOT Documented
 		gcv<340> b;									// NOT documented
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -281,7 +281,7 @@ namespace gtl::dxf::entities {
 
 		std::vector<sGroup> unknowns_;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -362,7 +362,7 @@ namespace gtl::dxf::entities {
 
 		std::vector<sGroup> unknowns_;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -381,7 +381,7 @@ namespace gtl::dxf::entities {
 
 		std::vector<sGroup> unknowns_;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -409,7 +409,7 @@ namespace gtl::dxf::entities {
 
 		std::vector<sGroup> unknowns_;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -429,7 +429,7 @@ namespace gtl::dxf::entities {
 
 		std::vector<sGroup> unknowns_;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 	//-----------------------------------------------------------------------------------------------------------------------------
 	struct sAcDbUCSTableRecord {
@@ -449,7 +449,7 @@ namespace gtl::dxf::entities {
 
 		std::vector<sGroup> unknowns_;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 	//-----------------------------------------------------------------------------------------------------------------------------
 	struct sAcDbViewTableRecord {
@@ -487,7 +487,7 @@ namespace gtl::dxf::entities {
 
 		std::vector<sGroup> unknowns_;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 	struct sAcDbViewportTableRecord {
 		using this_t = sAcDbViewportTableRecord;
@@ -538,7 +538,7 @@ namespace gtl::dxf::entities {
 
 		std::vector<sGroup> unknowns_;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -551,7 +551,7 @@ namespace gtl::dxf::entities {
 												// 32: if both this bit and bit 16 are set, the externally dependent xref has been successfully resolved
 												// 64: if set, the table entry was referenced by at least one entity in the drawing the last time the drawing was edited.
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//=============================================================================================================================
@@ -568,7 +568,7 @@ namespace gtl::dxf::entities {
 		gcv<  1> xrefPath;
 		gcv<  4> description;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -577,7 +577,7 @@ namespace gtl::dxf::entities {
 
 		constexpr static inline xStringLiteral marker{"AcDbBlockEnd"};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 
@@ -618,7 +618,7 @@ namespace gtl::dxf::entities {
 		//point_t extrusion{0., 0., 1.};
 		//gcv< 39> thickness{};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -631,7 +631,7 @@ namespace gtl::dxf::entities {
 		mgcv<point_t, 13, 23, 33> pt4;
 		gcv< 70, fHIDDEN> flags{};	// 70:
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -645,7 +645,7 @@ namespace gtl::dxf::entities {
 		gcv<290> a;	// not in documents
 		gcv<  2> b;	// not in documents
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -656,7 +656,7 @@ namespace gtl::dxf::entities {
 		constexpr static inline xStringLiteral marker{"AcDb3dSolid"};				// Subclass marker (AcDb3dSolid)
 		gcv<350> pHistoryObject{};		// Soft-owner ID/handle to history object
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -677,7 +677,7 @@ namespace gtl::dxf::entities {
 		gcv< 95> sizeProxyData{};
 		gcv< 70> dwg_or_dxf{};	// Original custom object data format (0 = DWG, 1 = DXF)
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -690,7 +690,7 @@ namespace gtl::dxf::entities {
 		gcv< 51> endAngle{};
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -704,7 +704,7 @@ namespace gtl::dxf::entities {
 		gcv_extrusion extrusion{{0., 0., 1.}};
 		gcv< 50> angle{};	// angle of x axis for UCS inf effect when the point was drawn (optional, default = 0); used when PDMODE is nonzero
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -718,7 +718,7 @@ namespace gtl::dxf::entities {
 		gcv< 39> thickness;
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -743,7 +743,7 @@ namespace gtl::dxf::entities {
 		gcv<100> marker2{"AcDbText"};			// Exception. (works as end marker for AcDbText)
 		gcv< 73, eVERTICAL_ALIGNMENT> vertical_alignment{};	// 73:
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -800,7 +800,7 @@ namespace gtl::dxf::entities {
 		gcv< 49> columnGutter{};
 		gcv< 50> columnHeights{};						// this code is followed by column count (int16), and then the number of column heights
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -817,7 +817,7 @@ namespace gtl::dxf::entities {
 		gcv< 74> verticalTextJustification{};
 		gcv<280> lockPosition{};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -841,7 +841,7 @@ namespace gtl::dxf::entities {
 		gcv_extrusion extrusion{{0., 0., 1.}};
 		gcv<280> lockPosition{};					// 0 : unlocked, 1 : locked
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -861,7 +861,7 @@ namespace gtl::dxf::entities {
 		gcv<  2> attribute;
 		std::vector<sGroup> params;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool PreRead(group_iter_t& iter) {
 			if (!iter)
@@ -884,7 +884,7 @@ namespace gtl::dxf::entities {
 	//	gcv< 70> version{1};
 	//	sgcv< 1, 3> proprietaryData;		// GroupCode 1, 3
 
-	//	DEFINE_SPACESHIP_OPERATOR(this_t);
+	//	GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	//};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -898,7 +898,7 @@ namespace gtl::dxf::entities {
 		gcv< 40> radius;
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -909,7 +909,7 @@ namespace gtl::dxf::entities {
 		lgcv<40, 16> transform;				// Model transform in wcs coordinates (4x4 matrix)
 		gcv< 40> insertionUnitFactor;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -928,7 +928,7 @@ namespace gtl::dxf::entities {
 		gcv< 41, rad_t> angle0;	// in radian, 0.0 for a full ellipse
 		gcv< 42, rad_t> angle1;	// in radian, 2pi for a full ellipse
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 	};
 
@@ -946,16 +946,16 @@ namespace gtl::dxf::entities {
 				using this_t = sVertex;
 				mgcv<point_t, 10, 20> pt;	// in OCS
 				gcv< 42> bulge;
-				DEFINE_SPACESHIP_OPERATOR(this_t);
+				GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 			};
 			TListVariable<sVertex, &this_t::nVertices> pt;
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		};
 		struct sLineEdge {
 			using this_t = sLineEdge;
 			mgcv<point_t, 10, 20> pt0;	// in OCS
 			mgcv<point_t, 11, 21> pt1;	// in OCS
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		};
 		struct sArcEdge {
 			using this_t = sArcEdge;
@@ -964,7 +964,7 @@ namespace gtl::dxf::entities {
 			gcv< 50, rad_t> angleStart;			// in radians
 			gcv< 51, rad_t> angleEnd;			// in radians
 			gcv< 73> bCounterClockwise;
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		};
 		struct sEllipseEdge {
 			using this_t = sEllipseEdge;
@@ -974,7 +974,7 @@ namespace gtl::dxf::entities {
 			gcv< 50, rad_t> angleStart;
 			gcv< 51, rad_t> angleEnd;
 			gcv< 73> bCounterClockwise;
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		};
 		struct sSplineEdge {
 			using this_t = sSplineEdge;
@@ -990,7 +990,7 @@ namespace gtl::dxf::entities {
 			TListVariable<mgcv<point_t, 11, 21>, &this_t::nFitData> fitData;	// in OCS
 			mgcv<point_t, 12, 22> vcStartTangent;	// in OCS
 			mgcv<point_t, 13, 23> vcEndTangent;		// in OCS
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		};
 		using edge_t = std::variant<sLineEdge, sArcEdge, sEllipseEdge, sSplineEdge>;
 
@@ -1003,7 +1003,7 @@ namespace gtl::dxf::entities {
 			std::vector<edge_t> edges;
 			gcv< 97> nSourceBoundaryObject;
 			lgcv<330, &this_t::nSourceBoundaryObject> pSourceBoundaryObject;    // Reference to source boundary objects (multiple entries)
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 			bool PreRead(group_iter_t& iter) {
 				if ((fFlags() & fBOUNDARY_PATH__POLYLINE) and !polylineBoundary) {
@@ -1043,7 +1043,7 @@ namespace gtl::dxf::entities {
 			mgcv<point_t, 45, 46> vc;
 			gcv< 79> nLength;
 			lgcv< 49, &this_t::nLength> patternLineLengths;	// Lengths of pattern lines
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		};
 
 
@@ -1090,7 +1090,7 @@ namespace gtl::dxf::entities {
 
 		//std::vector<sGroup> unknowns_;		// 92, 93
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 	};
 
@@ -1110,7 +1110,7 @@ namespace gtl::dxf::entities {
 		gcv<290, eHANDEDNESS> eHandedness;	// 0: right handed, 1: left handed
 		gcv<280, eHELIX_CONSTRAIN> eConstrainType;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1138,7 +1138,7 @@ namespace gtl::dxf::entities {
 		gcv< 24> imageHeightClippingBoundary; // vcV
 		gcv<290> bClipInside; // 0: clip outside, 1: clip inside
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1156,7 +1156,7 @@ namespace gtl::dxf::entities {
 		gcv< 45> rowSpacing{0.};
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1182,7 +1182,7 @@ namespace gtl::dxf::entities {
 		mgcv<point_t, 212, 222, 232> ptOffsetFromInsertionPoint;
 		mgcv<point_t, 213, 223, 233> ptOffsetFromAnnotationPlacement;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1208,7 +1208,7 @@ namespace gtl::dxf::entities {
 		gcv< 91> shadowMapSize;
 		gcv<280> shadowMapSoftness;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1221,7 +1221,7 @@ namespace gtl::dxf::entities {
 			gcv< 40> widthStarting;
 			gcv< 41> widthEnding;
 			gcv< 42> bulge;
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		};
 		constexpr static inline xStringLiteral marker{"AcDbPolyline"};
 		gcv< 90> nVertex;
@@ -1232,7 +1232,7 @@ namespace gtl::dxf::entities {
 		TListVariable<sVertex, &this_t::nVertex> vertices;
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1255,7 +1255,7 @@ namespace gtl::dxf::entities {
 		gcv< 92> nCountOfPropertyWasOverridden;
 		TListVariable<gcv< 90, eMESH_PROPERTY_TYPE>, &this_t::nCountOfPropertyWasOverridden> eMeshPropertyType;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1289,13 +1289,13 @@ namespace gtl::dxf::entities {
 			constexpr static inline auto eCode_Parameter = eCode_Parameter_;
 			gcv<eCode_Count> nCount;
 			std::vector<gcv_t<eCode_Parameter>> params;
-			DEFINE_SPACESHIP_OPERATOR(this_t);
+			GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 		};
 
 		TElements< 74, 41> param;
 		TElements< 75, 42> areaFill;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1309,7 +1309,7 @@ namespace gtl::dxf::entities {
 		gcv<310> data;
 		gcv<  1> strEnd{"OLE"};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1328,7 +1328,7 @@ namespace gtl::dxf::entities {
 		lgcv<310, 0> data;	// binary data, multiple lines
 		gcv<  1> strEnd{"OLE"};	// end of OLE data
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1350,7 +1350,7 @@ namespace gtl::dxf::entities {
 		gcv< 75, ePOLYLINE_TYPE> eType;
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool PreRead(group_iter_t& iter) {
 			if (iter->eCode != eGROUP_CODE::subclass) {
@@ -1387,7 +1387,7 @@ namespace gtl::dxf::entities {
 		mgcv<point_t, 10, 20, 30> pt0;
 		mgcv<point_t, 11, 21, 31> pt1;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	////-----------------------------------------------------------------------------------------------------------------------------
@@ -1399,7 +1399,7 @@ namespace gtl::dxf::entities {
 	//	gcv< 70> version;
 	//	sgcv< 1, 3> proprietaryData;
 
-	//	DEFINE_SPACESHIP_OPERATOR(this_t);
+	//	GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	//};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1425,7 +1425,7 @@ namespace gtl::dxf::entities {
 		lgcv<32, &this_t::nVertexBackLine> verticesBackLineZ;
 		gcv<360> hGeometrySettingsObject;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1441,7 +1441,7 @@ namespace gtl::dxf::entities {
 		gcv< 51> scaleY;
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1471,7 +1471,7 @@ namespace gtl::dxf::entities {
 			return false;
 		}
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1490,7 +1490,7 @@ namespace gtl::dxf::entities {
 		gcv< 71> shadowMapSize;
 		gcv<280> shadowSoftness;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1520,7 +1520,7 @@ namespace gtl::dxf::entities {
 		gcv<296> fPathEntityTransformComputed;
 		mgcv<point_t, 11, 21, 31> vcControllingTwist;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	struct sAcDbLoftedSurface {
@@ -1544,7 +1544,7 @@ namespace gtl::dxf::entities {
 		gcv<296> fCreateRuledSurface;
 		gcv<297> fVirtualGuide;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	struct sAcDbRevolvedSurface {
@@ -1565,7 +1565,7 @@ namespace gtl::dxf::entities {
 		gcv<290> fSolid;
 		gcv<291> fCloseToAxis;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	struct sAcDbSweptSurface {
@@ -1596,7 +1596,7 @@ namespace gtl::dxf::entities {
 		gcv<296> fPathEntityTransformComputed;
 		mgcv<point_t, 11, 21, 31> vcControllingTwist;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	struct sAcDbSurface {
@@ -1605,7 +1605,7 @@ namespace gtl::dxf::entities {
 		gcv< 71> nU_isolines;
 		gcv< 72> nV_isolines;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1618,7 +1618,7 @@ namespace gtl::dxf::entities {
 		gcv_extrusion extrusion{{0., 0., 1.}};
 		mgcv<point_t, 11, 21, 31> vcXAxis; // WCS
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1632,7 +1632,7 @@ namespace gtl::dxf::entities {
 		gcv< 39> thickness;
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1653,7 +1653,7 @@ namespace gtl::dxf::entities {
 		lgcv<21, 0> insertionPointY;	// OCS/ECS,	If only two, then they are the lower left and upper right corner points of a clip rectangle.
 										//			If more than two, then they are the vertices of a clipping polygon
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1673,7 +1673,7 @@ namespace gtl::dxf::entities {
 		gcv< 74> polyfaceMeshVertexIndex4;
 		gcv< 91> vertexIdentifier;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1735,7 +1735,7 @@ namespace gtl::dxf::entities {
 
 		gcv_extrusion extrusion{{0., 0., 1.}};
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 	//-----------------------------------------------------------------------------------------------------------------------------
@@ -1760,7 +1760,7 @@ namespace gtl::dxf::entities {
 		lgcv<14, &this_t::nClipBoundaryVertex> verticesClipBoundaryX;
 		lgcv<24, &this_t::nClipBoundaryVertex> verticesClipBoundaryY;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 
 		bool PreRead(group_iter_t& iter) {
 			if (iter->eCode != eGROUP_CODE::subclass) {
@@ -1787,7 +1787,7 @@ namespace gtl::dxf::entities {
 		mgcv<point_t, 10, 20, 30> pt0;
 		mgcv<point_t, 11, 21, 31> pt1;
 
-		DEFINE_SPACESHIP_OPERATOR(this_t);
+		GTL__DXF_DEFINE_SPACESHIP_OPERATOR(this_t);
 	};
 
 };
