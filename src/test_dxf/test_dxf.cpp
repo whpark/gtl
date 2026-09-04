@@ -257,32 +257,6 @@ namespace test {
 
 }
 
-TEST_CASE("benchmark") {
-	std::vector<int> values(10'000uz, 0);
-	constexpr auto map_size = 2000uz;
-	for (auto& v : values)
-		v = rand() % map_size;
-	std::vector<int> map;
-	map.assign(map_size, 0);
-	for (auto v : std::ranges::views::iota(0uz, map_size))
-		map[v] = (int)v/10;
-
-	BENCHMARK("dividing") {
-		int64_t r {};
-		for (auto v : values)
-			r += v / 10;
-		return r;
-	};
-
-	BENCHMARK("map") {
-		int64_t r {};
-		for (auto v : values)
-			r += map[v];
-		return r;
-	};
-
-}
-
 TEST_CASE("ReadShape converts DXF entities to gtl.shape") {
 	auto const path = std::filesystem::temp_directory_path() / "gtl.dxf.read_shape.test.dxf";
 	struct remove_file {
