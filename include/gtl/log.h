@@ -23,6 +23,10 @@
 #include "gtl/time.h"
 #include "gtl/archive.h"
 
+#if defined(_DEBUG) && defined(_WINDOWS)
+#include <windows.h>
+#endif
+
 
 namespace gtl {
 #pragma pack(push, 8)

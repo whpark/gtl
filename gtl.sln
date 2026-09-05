@@ -78,12 +78,24 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_dxf", "src\test_dxf\te
 		{E18BEB19-2D8A-4D46-80A4-CD16276A67C0} = {E18BEB19-2D8A-4D46-80A4-CD16276A67C0}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtl.dwg", "src\dwg\dwg.vcxproj", "{BC5B9186-48A7-47CD-852C-098B01F32E71}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_dwg", "src\test_dwg\test_dwg.vcxproj", "{52B1E06F-6AB4-45D8-A557-4182021BF15D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BC5B9186-48A7-47CD-852C-098B01F32E71}.Debug|x64.ActiveCfg = Debug|x64
+		{BC5B9186-48A7-47CD-852C-098B01F32E71}.Debug|x64.Build.0 = Debug|x64
+		{BC5B9186-48A7-47CD-852C-098B01F32E71}.Release|x64.ActiveCfg = Release|x64
+		{BC5B9186-48A7-47CD-852C-098B01F32E71}.Release|x64.Build.0 = Release|x64
+		{52B1E06F-6AB4-45D8-A557-4182021BF15D}.Debug|x64.ActiveCfg = Debug|x64
+		{52B1E06F-6AB4-45D8-A557-4182021BF15D}.Debug|x64.Build.0 = Debug|x64
+		{52B1E06F-6AB4-45D8-A557-4182021BF15D}.Release|x64.ActiveCfg = Release|x64
+		{52B1E06F-6AB4-45D8-A557-4182021BF15D}.Release|x64.Build.0 = Release|x64
 		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}.Debug|x64.ActiveCfg = Debug|x64
 		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}.Debug|x64.Build.0 = Debug|x64
 		{0B710E2D-2BBC-4D9C-BF95-7CD33604A1D0}.Release|x64.ActiveCfg = Release|x64
@@ -141,6 +153,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{52B1E06F-6AB4-45D8-A557-4182021BF15D} = {5157E3DA-9437-4F16-955C-AB6DAE28555C}
 		{14CA3D40-1D88-4BF7-A9E0-505198D5B747} = {5157E3DA-9437-4F16-955C-AB6DAE28555C}
 		{446FCEAB-4FBE-4BE2-9B32-84B7B99F61FE} = {5157E3DA-9437-4F16-955C-AB6DAE28555C}
 		{0F115BD6-A104-41EB-8F5D-194C4E66DD0C} = {5157E3DA-9437-4F16-955C-AB6DAE28555C}

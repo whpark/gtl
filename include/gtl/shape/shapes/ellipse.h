@@ -14,6 +14,7 @@
 
 #include "../shape_primitives.h"
 #include "../canvas.h"
+#include <numbers>
 
 //export module shape;
 
@@ -61,10 +62,24 @@ namespace gtl::shape {
 				m_angle_first_axis = -m_angle_first_axis;
 		}
 		virtual bool UpdateBoundary(rect_t& rectBoundary) const override {
-			// todo : ... upgrade
 			bool bResult{};
-			bResult |= rectBoundary.UpdateBoundary(point_t(m_ptCenter.x-m_radius, m_ptCenter.y-m_radiusH, m_ptCenter.z));
-			bResult |= rectBoundary.UpdateBoundary(point_t(m_ptCenter.x+m_radius, m_ptCenter.y+m_radiusH, m_ptCenter.z));
+			auto c = gtl::cos(m_angle_first_axis), s = gtl::sin(m_angle_first_axis);
+			double start = (double)(rad_t)m_angle_start, sweep = (double)(rad_t)m_angle_length;
+			double const turn = 2.*std::numbers::pi;
+			auto append = [&](double t) {
+				bResult |= rectBoundary.UpdateBoundary(point_t{
+					m_ptCenter.x + m_radius*c*std::cos(t) - m_radiusH*s*std::sin(t),
+					m_ptCenter.y + m_radius*s*std::cos(t) + m_radiusH*c*std::sin(t), m_ptCenter.z});
+			};
+			append(start); append(start+sweep);
+			// Coordinate extrema of the rotated parametric ellipse, restricted to the arc.
+			for (double t : {std::atan2(-m_radiusH*s,m_radius*c), std::atan2(m_radiusH*c,m_radius*s)}) {
+				for (int i=0; i<2; ++i, t+=std::numbers::pi) {
+					double distance = std::fmod(sweep < 0. ? start-t : t-start, turn);
+					if (distance < 0.) distance += turn;
+					if (std::abs(sweep) >= turn || distance <= std::abs(sweep)) append(t);
+				}
+			}
 			return bResult;
 		}
 		virtual void Draw(ICanvas& canvas) const override {
