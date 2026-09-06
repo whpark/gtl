@@ -21,6 +21,10 @@ namespace gtl::dwg::entities {
 		std::vector<point_t> controlPoints, fitPoints; // WCS
 	};
 	struct sPoint { point_t position; };
+	struct sFace3D { std::array<point_t,4> corners; std::uint16_t invisibleEdges{}; }; // WCS; bits 0..3 hide edges.
+	struct sRay { point_t origin, direction; bool bothWays{}; }; // RAY or XLINE, unbounded WCS geometry.
+	struct sShape { point_t insertion; double scale{}, rotation{}, widthFactor{}, oblique{}; std::int16_t number{}; handle_t style{}; };
+	struct sFaceRecord { std::array<std::int16_t,4> indices{}; }; // Signed, one-based PFACE indices; negative hides the edge.
 	struct sSolid { std::array<point_t,4> corners; }; // SOLID/TRACE corners in OCS, perimeter order 0,1,3,2.
 	struct sMText {
 		point_t insertion, normal, xAxis;
@@ -50,6 +54,10 @@ namespace gtl::dwg::entities {
 		double constantWidth{};
 		std::vector<std::pair<double, double>> widths;
 		bool is3d{};
+		enum class eKind { polyline, polyface, mesh };
+		eKind kind{eKind::polyline};
+		std::uint16_t countM{}, countN{}, densityM{}, densityN{};
+		std::vector<sFaceRecord> faces;
 		std::uint16_t flags{}, curveType{};
 		double elevation{}, defaultStartWidth{}, defaultEndWidth{};
 		handle_t firstVertex{}, lastVertex{}, sequenceEnd{};
@@ -96,7 +104,7 @@ namespace gtl::dwg::entities {
 		std::vector<point_t> seeds;
 	};
 	// monostate retains common metadata for structural and unsupported entities.
-	using geometry_t = std::variant<std::monostate, sLine, sCircle, sArc, sPoint, sPolyline, sVertex, sInsert, sEllipse, sSpline, sText, sMText, sDimension, sHatch, sSolid>;
+	using geometry_t = std::variant<std::monostate, sLine, sCircle, sArc, sPoint, sPolyline, sVertex, sInsert, sEllipse, sSpline, sText, sMText, sDimension, sHatch, sSolid, sFace3D, sRay, sShape, sFaceRecord>;
 	struct sEntity {
 		handle_t handle{}, owner{}, layer{}, previous{}, next{};
 		std::uint16_t type{};

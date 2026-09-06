@@ -307,7 +307,8 @@ namespace gtl::dwg {
 				return;
 			}
 			if (std::holds_alternative<std::monostate>(source.geometry) ||
-			    std::holds_alternative<entities::sVertex>(source.geometry))
+			    std::holds_alternative<entities::sVertex>(source.geometry) ||
+			    std::holds_alternative<entities::sFaceRecord>(source.geometry))
 				return;
 			handle_t layerHandle = source.layer;
 			if (depth && document.layers.at(source.layer).name == "0")
@@ -356,6 +357,26 @@ namespace gtl::dwg {
 					copy.geometry = insert;
 					emit(copy, parent, depth);
 					return;
+				}
+				if (auto face = std::get_if<entities::sFace3D>(&source.geometry)) {
+					warn("3DFACE converted to visible edges; surface fill is not reconstructed");
+					for (size_t i = 0; i < 4 && !exhausted; ++i) {
+						if (face->invisibleEdges & (1u << i)) continue;
+						auto a = face->corners[i], b = face->corners[(i+1)%4];
+						if (a.x == b.x && a.y == b.y && a.z == b.z) continue;
+						auto copy = source; copy.geometry = entities::sLine{a,b};
+						emit(copy, parent, depth);
+					}
+					return;
+				}
+				if (std::holds_alternative<entities::sRay>(source.geometry)) {
+					warn("unbounded RAY/XLINE retained; Shape output requires an explicit clipping region"); return;
+				}
+				if (std::holds_alternative<entities::sShape>(source.geometry)) {
+					warn("SHAPE definition retained; SHX glyph rendering is not implemented"); return;
+				}
+				if (auto poly = std::get_if<entities::sPolyline>(&source.geometry); poly && poly->kind != entities::sPolyline::eKind::polyline) {
+					warn("PFACE/MESH vertices and topology retained; surface conversion is not implemented"); return;
 				}
 				if (auto solid = std::get_if<entities::sSolid>(&source.geometry)) {
 					entities::sHatch hatch;

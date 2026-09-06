@@ -16,6 +16,14 @@ returns the existing `gtl::shape::xDrawing` type.
   separate data/string/handle streams, UTF-16 strings, version-specific object
   type/size prefixes, classes and explicit ownership lists. The drawing APIs
   support the same basic geometry subset for all seven recognized signatures.
+- Additional definitions: 3DFACE WCS corners and invisible-edge flags; RAY/XLINE
+  origins and directions; SHAPE placement, number and shapefile/style handle;
+  PFACE/MESH dimensions, vertices and signed face indices. Mesh ownership,
+  counts and face indices are validated. Negative indices retain hidden edges.
+  3DFACE converts to visible wireframe edges, without surface filling.
+  RAY/XLINE, SHAPE glyphs and PFACE/MESH surfaces remain document data with
+  explicit output-omission diagnostics; infinite geometry is not given an
+  arbitrary finite extent. Mesh smoothing is not evaluated.
 - Geometry: LINE, CIRCLE, ARC, POINT, LWPOLYLINE (including class-based type
   lookup), 2D/3D POLYLINE and VERTEX. Linked vertex ownership and SEQEND records
   are validated. File strings have trailing NUL terminators removed; the Shape adapter converts layer names

@@ -332,6 +332,7 @@ namespace gtl::dwg::detail {
 		void GeometryHandles(xBitStream& stream, entities::sEntity& entity, bool modern = false,
 		                     sRevision const& revision = {}) {
 			auto handle = [&] { return stream.Handle(entity.handle); };
+			if (auto* shape = std::get_if<entities::sShape>(&entity.geometry)) shape->style = handle();
 			if (auto* text = std::get_if<entities::sText>(&entity.geometry)) {
 				text->style = handle();
 				if (text->embeddedHandles > stream.Remaining() / 8)
@@ -356,7 +357,7 @@ namespace gtl::dwg::detail {
 					handle();
 			}
 			if (auto* poly = std::get_if<entities::sPolyline>(&entity.geometry);
-			    poly && (entity.type == 0x0f || entity.type == 0x10)) {
+			    poly && (entity.type == 0x0f || entity.type == 0x10 || entity.type == 0x1d || entity.type == 0x1e)) {
 				if (modern) {
 					if (poly->ownedCount > stream.Remaining() / 8)
 						throw xParseError("invalid vertex count");
@@ -759,7 +760,9 @@ namespace gtl::dwg::detail {
 				break;
 			}
 			case 0x0a:
-			case 0x0b: {
+			case 0x0b:
+			case 0x0c:
+			case 0x0d: {
 				entities::sVertex vertex;
 				vertex.flags = stream.RC();
 				vertex.position = Point(stream);
@@ -775,6 +778,57 @@ namespace gtl::dwg::detail {
 					vertex.tangent = stream.BD();
 				}
 				entity.geometry = vertex;
+				break;
+			}
+			case 0x0e: {
+				entities::sFaceRecord face;
+				for (auto& index : face.indices) index = stream.BS();
+				entity.geometry = face;
+				break;
+			}
+			case 0x1d:
+			case 0x1e: {
+				entities::sPolyline poly;
+				poly.is3d = true;
+				poly.kind = type == 0x1d ? entities::sPolyline::eKind::polyface : entities::sPolyline::eKind::mesh;
+				auto count = [&]() { auto n = stream.BS(); if (n < 0) throw xParseError("negative mesh count"); return static_cast<std::uint16_t>(n); };
+				if (type == 0x1e) { poly.flags = static_cast<std::uint16_t>(stream.BS()); poly.curveType = static_cast<std::uint16_t>(stream.BS()); }
+				poly.countM = count(); poly.countN = count();
+				if (type == 0x1e) { poly.densityM = count(); poly.densityN = count(); }
+				if (modern) poly.ownedCount = OwnedCount(stream);
+				entity.geometry = std::move(poly);
+				break;
+			}
+			case 0x1c: {
+				entities::sFace3D face;
+				if (!r2000) {
+					for (auto& p : face.corners) p = Point(stream);
+					face.invisibleEdges = static_cast<std::uint16_t>(stream.BS());
+				} else {
+					bool noFlags = stream.B(), zeroZ = stream.B();
+					face.corners[0] = {stream.RD(), stream.RD(), zeroZ ? 0. : stream.RD()};
+					for (size_t i = 1; i < 4; ++i) {
+						auto p = face.corners[i-1];
+						face.corners[i] = {stream.DD(p.x), stream.DD(p.y), stream.DD(p.z)};
+					}
+					if (!noFlags) face.invisibleEdges = static_cast<std::uint16_t>(stream.BS());
+				}
+				entity.geometry = face;
+				break;
+			}
+			case 0x28:
+			case 0x29: {
+				entities::sRay ray{Point(stream), Point(stream), type == 0x29};
+				if (ray.direction.x == 0 && ray.direction.y == 0 && ray.direction.z == 0) throw xParseError("zero ray direction");
+				entity.geometry = ray;
+				break;
+			}
+			case 0x21: {
+				entities::sShape shape;
+				shape.insertion = Point(stream); shape.scale = stream.BD(); shape.rotation = stream.BD();
+				shape.widthFactor = stream.BD(); shape.oblique = stream.BD(); entity.thickness = stream.BD();
+				shape.number = stream.BS(); entity.extrusion = Point(stream);
+				entity.geometry = shape;
 				break;
 			}
 			case 0x0f:
@@ -1084,11 +1138,22 @@ namespace gtl::dwg::detail {
 					if (!document.layers.contains(entity.layer))
 						throw xParseError("entity references a missing layer");
 					if (auto* poly = std::get_if<entities::sPolyline>(&entity.geometry);
-					    poly && (entity.type == 0x0f || entity.type == 0x10)) {
+					    poly && (entity.type == 0x0f || entity.type == 0x10 || entity.type == 0x1d || entity.type == 0x1e)) {
 						auto& seq = find(poly->sequenceEnd);
 						if (seq.type != 6 || seq.owner != entity.handle)
 							throw xParseError("invalid POLYLINE sequence end");
 						owned(poly->firstVertex, poly->lastVertex, poly->vertices, [&](entities::sEntity& child) {
+							if (poly->kind != entities::sPolyline::eKind::polyline) {
+								if (child.owner != entity.handle) throw xParseError("invalid mesh vertex owner");
+								if (poly->kind == entities::sPolyline::eKind::polyface && child.type == 0x0e) {
+									poly->faces.push_back(std::get<entities::sFaceRecord>(child.geometry));
+								} else {
+									auto expected = poly->kind == entities::sPolyline::eKind::polyface ? 0x0d : 0x0c;
+									if (child.type != expected) throw xParseError("invalid mesh vertex type");
+									poly->points.push_back(std::get<entities::sVertex>(child.geometry).position);
+								}
+								return;
+							}
 							auto vertex = std::get_if<entities::sVertex>(&child.geometry);
 							if (!vertex || child.owner != entity.handle || child.type != (poly->is3d ? 0x0b : 0x0a))
 								throw xParseError("invalid POLYLINE vertex ownership or type");
@@ -1099,6 +1164,15 @@ namespace gtl::dwg::detail {
 							poly->bulges.push_back(vertex->bulge);
 							poly->widths.emplace_back(vertex->startWidth, vertex->endWidth);
 						});
+						if (poly->kind == entities::sPolyline::eKind::polyface) {
+							if (poly->points.size() != poly->countM || poly->faces.size() != poly->countN) throw xParseError("polyface count mismatch");
+							for (auto const& face : poly->faces) for (size_t i = 0; i < 4; ++i) {
+								auto index = static_cast<int>(face.indices[i]);
+								if ((index == 0 && i < 3) || static_cast<size_t>(index < 0 ? -index : index) > poly->points.size()) throw xParseError("invalid polyface index");
+							}
+						} else if (poly->kind == entities::sPolyline::eKind::mesh && poly->points.size() != static_cast<size_t>(poly->countM) * poly->countN)
+							throw xParseError("mesh count mismatch");
+
 					}
 					if (auto* insert = std::get_if<entities::sInsert>(&entity.geometry)) {
 						if (!document.blocks.contains(insert->block))
@@ -1484,7 +1558,7 @@ namespace gtl::dwg::detail {
 						entity.handle = object.handle;
 						entity.type = object.type;
 						auto common = EntityHeader(stream, entity, r2000, modern, revision);
-						bool supported = (type >= 1 && type <= 8) || type == 0x0a || type == 0x0b || type == 0x0f ||
+						bool supported = (type >= 0x0c && type <= 0x0e) || (type >= 0x1c && type <= 0x1e) || type == 0x21 || type == 0x28 || type == 0x29 || (type >= 1 && type <= 8) || type == 0x0a || type == 0x0b || type == 0x0f ||
 						                 type == 0x10 || type == 0x11 || type == 0x12 || type == 0x13 || type == 0x1b ||
 						                 (type >= 0x14 && type <= 0x1a) || type == 0x1f || type == 0x20 ||
 						                 type == 0x23 || type == 0x24 || type == 0x2c || type == 0x4d || type == 0x4e;
