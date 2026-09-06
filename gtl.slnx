@@ -1,0 +1,55 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/TEST and BENCH/">
+    <Project Path="src/bench/bench.vcxproj" Id="446fceab-4fbe-4be2-9b32-84b7b99f61fe" />
+    <Project Path="src/CADViewer/CADViewer.vcxproj" Id="59af2688-c087-4f56-b258-e9f4d7f5a34e" />
+    <Project Path="src/test/test.vcxproj" Id="14ca3d40-1d88-4bf7-a9e0-505198d5b747" />
+    <Project Path="src/test_dwg/test_dwg.vcxproj" Id="52b1e06f-6ab4-45d8-a557-4182021bf15d" />
+    <Project Path="src/test_dxf/test_dxf.vcxproj" Id="dcea71a9-987a-48b7-bd0a-9ff6ef07d093">
+      <BuildDependency Project="src/dxf/dxf.vcxproj" />
+    </Project>
+    <Project Path="src/test_qt/test_qt.vcxproj" Id="3a2a0fe4-dbab-4a7c-bbbe-27f5f5b7671f">
+      <BuildDependency Project="src/qt/qt.vcxproj" />
+    </Project>
+    <Project Path="src/test_sequence/test_sequence.vcxproj" Id="9a04f548-2eab-4437-820a-26d600e077cc">
+      <BuildDependency Project="src/gtl/gtl.vcxproj" />
+    </Project>
+    <Project Path="src/test_win/test_win.vcxproj" Id="0f115bd6-a104-41eb-8f5d-194c4e66dd0c" />
+  </Folder>
+  <Folder Name="/[ Solution Items ]/">
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="build_all.bat" />
+    <File Path="CMakeLists.txt" />
+  </Folder>
+  <Folder Name="/[ Solution Items ]/etc/">
+    <File Path="etc/calc_time.py" />
+  </Folder>
+  <Folder Name="/[ Solution Items ]/etc/vcpkg/">
+    <File Path="etc/vcpkg/dependency.txt" />
+    <File Path="etc/vcpkg/install-vcpkg.bat" />
+  </Folder>
+  <Folder Name="/[ Solution Items ]/etc/vcpkg/triplets/">
+    <File Path="etc/vcpkg/triplets/x64-windows-v143.cmake" />
+    <File Path="etc/vcpkg/triplets/x64-windows-v145.cmake" />
+    <File Path="etc/vcpkg/triplets/x64-windows.cmake" />
+  </Folder>
+  <Project Path="src/dwg/dwg.vcxproj" Id="bc5b9186-48a7-47cd-852c-098b01f32e71" />
+  <Project Path="src/dxf/dxf.vcxproj" Id="e18beb19-2d8a-4d46-80a4-cd16276a67c0" />
+  <Project Path="src/gtl/gtl.vcxproj" Id="0b710e2d-2bbc-4d9c-bf95-7cd33604a1d0" />
+  <Project Path="src/mfc/mfc.vcxproj" Id="5f0d7bd9-e1ec-45d1-96b9-2ea611944d5e">
+    <BuildDependency Project="src/win/win.vcxproj" />
+  </Project>
+  <Project Path="src/qt/qt.vcxproj" Id="e963dd40-a001-4874-9def-3c7646abaecc">
+    <BuildDependency Project="src/gtl/gtl.vcxproj" />
+  </Project>
+  <Project Path="src/shape/shape.vcxproj" Id="fba95adb-13a2-4139-ba8e-789bfe9aa1ae" />
+  <Project Path="src/win/win.vcxproj" Id="a7a07211-7966-4626-9dc3-02f8cc2a9042">
+    <BuildDependency Project="src/gtl/gtl.vcxproj" />
+  </Project>
+  <Project Path="src/wx/wx.vcxproj" Id="75a8f096-3af5-4368-a4b3-7c7cc0eb7f44">
+    <BuildDependency Project="src/gtl/gtl.vcxproj" />
+  </Project>
+</Solution>
