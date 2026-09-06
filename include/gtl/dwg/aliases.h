@@ -6,7 +6,7 @@
 namespace gtl::dwg {
 
 	using handle_t = std::uint64_t;
-	using string_t = std::string; // File codepage; conversion to wide strings occurs in ToShape.
+	using string_t = std::string; // File codepage before R2007; UTF-8 from R2007. ToShape produces wide strings.
 	struct point_t {
 		double x{}, y{}, z{};
 		bool operator==(point_t const&) const = default;

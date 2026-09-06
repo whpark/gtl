@@ -14,19 +14,39 @@ namespace gtl::dwg {
 	};
 	struct sLayer {
 		handle_t handle{};
+		handle_t lineType{};
 		string_t name;
 		std::int16_t color{7};
+		std::optional<std::uint32_t> rgb;
 		std::uint16_t flags{};
 		std::uint8_t lineWeight{31};
 		bool frozen{}, off{}, locked{}, plot{true};
 	};
+	struct sTextStyle {
+		handle_t handle{}; string_t name, font, bigFont;
+		bool vertical{}, shapeFile{};
+		double fixedHeight{}, widthFactor{}, oblique{}, lastHeight{};
+		std::uint8_t generation{};
+	};
+	struct sLineType {
+		struct sDash { double length{}, x{}, y{}, scale{}, rotation{}; std::int16_t shapeCode{}, flags{}; handle_t style{}; };
+		handle_t handle{}; string_t name, description;
+		double length{}; std::uint8_t alignment{};
+		std::vector<sDash> dashes; std::vector<std::uint8_t> strings;
+	};
 	struct sDocument {
+		using header_value_t=std::variant<std::int64_t,std::uint64_t,double,point_t,string_t>;
+		std::map<string_t,header_value_t> headerVariables;
+		std::optional<std::uint16_t> insertionUnits, measurement;
 		eVERSION version{eVERSION::unknown};
 		std::uint16_t codepage{}; // DWG codepage identifier, not Windows codepage number.
+		bool unicodeStrings{}; // R2007+ TU strings are normalized to UTF-8.
 		std::vector<sSection> sections;
 		std::vector<sObject> objects;
 		std::map<std::uint16_t, sClass> classes;
 		std::map<handle_t, sLayer> layers;
+		std::map<handle_t, sTextStyle> textStyles;
+		std::map<handle_t, sLineType> lineTypes;
 		struct sBlock {
 			handle_t handle{}, begin{}, end{}, first{}, last{};
 			string_t name, xrefPath, description;

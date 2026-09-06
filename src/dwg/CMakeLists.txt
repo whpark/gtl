@@ -1,4 +1,5 @@
-add_library(gtl.dwg SHARED dwg.cpp detail/reader.cpp detail/container.cpp pch.cpp)
+add_library(gtl.dwg SHARED dwg.cpp detail/reader.cpp detail/container.cpp pch.cpp
+	detail/curves.h detail/hatch.h detail/header_fields.inc)
 
 target_include_directories(gtl.dwg
 	PUBLIC ${CMAKE_SOURCE_DIR}/include

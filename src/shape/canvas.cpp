@@ -63,8 +63,12 @@ namespace gtl::shape {
 			return;
 		}
 		bspline.setControlPoints(points);
-		//std::vector<double> knotsv{knots.begin(), knots.end()};
-		//bspline.setKnots(knotsv);
+		double domainStart = 0., domainEnd = 1.;
+		if (!knots.empty()) {
+			bspline.setKnots(std::vector<double>{knots.begin(), knots.end()});
+			domainStart = knots[static_cast<size_t>(degree)];
+			domainEnd = knots[pts.size()];
+		}
 
 		//auto cr = dynamic_cast<xCanvasMat&>(canvas).m_color;
 		//dynamic_cast<xCanvasMat&>(canvas).m_color = cv::Scalar(0, 0, 255);
@@ -74,13 +78,13 @@ namespace gtl::shape {
 		//}
 		//dynamic_cast<xCanvasMat&>(canvas).m_color = cr;
 
-		point_t pt{bspline.eval(0.0).result()};
+		point_t pt{bspline.eval(domainStart).result()};
 		canvas.MoveTo(pt);
 		for (double t{ step }; t < 1.0; t += step) {
-			auto pt = bspline.eval(t).result();
+			auto pt = bspline.eval(std::lerp(domainStart, domainEnd, t)).result();
 			canvas.LineTo(point_t(pt));
 		}
-		canvas.LineTo(point_t(bspline.eval(1.).result()));
+		canvas.LineTo(point_t(bspline.eval(domainEnd).result()));
 
 	}
 

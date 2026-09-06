@@ -40,7 +40,7 @@ namespace gtl::dwg::detail {
 			m_position += count * 8;
 		}
 		std::uint64_t Bits(unsigned count) {
-			if (count > 64 || count > Remaining()) throw xParseError("truncated bit sequence");
+			if (count > 64 || count > Remaining()) throw xParseError("truncated bit sequence at " + std::to_string(m_position) + ", need " + std::to_string(count) + ", remaining " + std::to_string(Remaining()));
 			std::uint64_t value{};
 			for (unsigned i{}; i < count; ++i, ++m_position)
 				value = (value << 1) | ((m_data[m_position / 8] >> (7 - m_position % 8)) & 1);
@@ -151,6 +151,25 @@ namespace gtl::dwg::detail {
 			// Some writers include a terminating NUL in the stored byte count.
 			while (!result.empty() && result.back() == '\0') result.pop_back();
 			return result;
+		}
+		std::string UnicodeText() {
+			auto length=BS();
+			if(length<0 || static_cast<size_t>(length)>Remaining()/16)throw xParseError("invalid UTF-16 text length");
+			std::string result;
+			for(int i=0;i<length;++i){
+				std::uint32_t code=RS();
+				if(code>=0xd800 && code<=0xdbff){
+					if(++i>=length)throw xParseError("truncated UTF-16 surrogate pair");
+					auto low=RS();if(low<0xdc00 || low>0xdfff)throw xParseError("invalid UTF-16 surrogate pair");
+					code=0x10000+((code-0xd800)<<10)+(low-0xdc00);
+				}else if(code>=0xdc00 && code<=0xdfff)throw xParseError("unpaired UTF-16 surrogate");
+				auto byte=[&](std::uint32_t value){result+=static_cast<char>(value);};
+				if(code<0x80)byte(code);
+				else if(code<0x800){byte(0xc0|(code>>6));byte(0x80|(code&63));}
+				else if(code<0x10000){byte(0xe0|(code>>12));byte(0x80|((code>>6)&63));byte(0x80|(code&63));}
+				else{byte(0xf0|(code>>18));byte(0x80|((code>>12)&63));byte(0x80|((code>>6)&63));byte(0x80|(code&63));}
+			}
+			while(!result.empty() && result.back()=='\0')result.pop_back();return result;
 		}
 		static double Finite(double value) {
 			if (!std::isfinite(value)) throw xParseError("non-finite coordinate");

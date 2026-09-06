@@ -10,6 +10,9 @@
     <ClInclude Include="detail\bit_stream.h" />
     <ClInclude Include="detail\reader.h" />
     <ClInclude Include="detail\transform.h" />
+	<ClInclude Include="detail\curves.h" />
+	<ClInclude Include="detail\hatch.h" />
+	<ClInclude Include="detail\header_fields.inc" />
     <ClInclude Include="detail\container.h" />
     <ClInclude Include="..\..\include\gtl\dwg\container.h" />
     <ClInclude Include="pch.h" />

@@ -9,4 +9,12 @@ target_link_libraries(test.dwg PRIVATE gtl gtl.shape gtl.dwg Catch2::Catch2)
 
 gtl_apply_common_options(test.dwg)
 gtl_set_exe_output_dir(test.dwg)
+# Keep both configurations identifiable in GTL's shared bin directory. Otherwise
+# an up-to-date Debug build can accidentally run the last Release executable.
+set_target_properties(test.dwg PROPERTIES
+	OUTPUT_NAME_DEBUG "test.dwg.x64D"
+	OUTPUT_NAME_RELEASE "test.dwg.x64R"
+	OUTPUT_NAME_RELWITHDEBINFO "test.dwg.x64R"
+	OUTPUT_NAME_MINSIZEREL "test.dwg.x64R"
+)
 add_test(NAME gtl.dwg COMMAND test.dwg)
