@@ -61,9 +61,6 @@
     <ClInclude Include="..\..\include\gtl\dxf\sections.h">
       <Filter>Header Files\dxf</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gtl\dxf\shape.h">
-      <Filter>Header Files\dxf</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gtl\dxf\dxf.h">
       <Filter>Header Files\dxf</Filter>
     </ClInclude>

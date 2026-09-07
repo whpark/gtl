@@ -150,7 +150,6 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClInclude Include="..\..\include\gtl\dxf\group.h" />
     <ClInclude Include="..\..\include\gtl\dxf\macro.h" />
     <ClInclude Include="..\..\include\gtl\dxf\sections.h" />
-    <ClInclude Include="..\..\include\gtl\dxf\shape.h" />
     <ClInclude Include="..\..\include\gtl\dxf\stream.h" />
     <ClInclude Include="..\..\include\gtl\reflection_struct.h" />
     <ClInclude Include="framework.h" />

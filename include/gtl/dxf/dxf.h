@@ -27,7 +27,7 @@
 #include "gtl/dxf/stream.h"
 #include "gtl/dxf/entities.h"
 #include "gtl/dxf/sections.h"
-#include "gtl/dxf/shape.h"
+#include "gtl/shape/shape.h"
 
 namespace gtl::dxf {
 

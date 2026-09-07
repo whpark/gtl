@@ -47,7 +47,7 @@ namespace gtl::dxf {
 	using binary_t = std::vector<std::uint8_t>;
 
 	// NOTE : gtl::shape::string_t is std::wstring, but DXF group values are kept as read from the file.
-	//        they are converted to gtl::shape::string_t only when a drawing is built. (see gtl/dxf/shape.h)
+	//        they are converted to gtl::shape::string_t only when a drawing is built. (see gtl/dxf/dxf.cpp)
 	using string_t = std::string;
 	using string_view_t = std::string_view;
 	using group_value_t = std::variant<bool, std::int16_t, std::int32_t, std::int64_t, double, string_t, binary_t>;
