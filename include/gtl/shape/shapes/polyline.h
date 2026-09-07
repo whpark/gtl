@@ -162,7 +162,8 @@ namespace gtl::shape {
 						continue;
 					}
 					pts.push_back(polypoint_t(line.m_pt1));
-				} else if (shape.GetShapeType() == eSHAPE::arc_xy) {
+				}
+				else if (shape.GetShapeType() == eSHAPE::arc_xy) {
 					auto const& arc = (xArc const&)shape;
 					auto ptC = arc.GetStartEndPoint();
 					if (!ptC)
@@ -174,6 +175,14 @@ namespace gtl::shape {
 					}
 					pts.back().Bulge() = gtl::rad_t(arc.m_angle_length)/4.;
 					pts.push_back(polypoint_t(pt1));
+				}
+				else if (shape.GetShapeType() == eSHAPE::polyline) {
+					auto const& poly = (xPolyline const&)shape;
+					if ( poly.m_pts.empty() or poly.m_bLoop or (ptBack.Distance(poly.m_pts.front()) > dThreshold) )
+						continue;
+					for (size_t i{1}; i < poly.m_pts.size(); i++) {
+						pts.push_back(poly.m_pts[i]);
+					}
 				}
 				else {
 					return {};	// if the source object includes not an line nor arc, cannot be reduced to polyline.
