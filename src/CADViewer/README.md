@@ -7,8 +7,19 @@ The application uses `gtl.dxf`, `gtl.dwg`, `gtl.shape` and `gtl.qt`.
 - **Entities** groups converted display geometry by layer. These rows are Shape
   objects, not a complete list of native DWG database objects; block expansion and
   curve/fill approximation can produce multiple rows for one source entity.
+- Layer checkboxes toggle all child entities; a partial check indicates mixed visibility.
+- Toggle an entity checkbox to show or hide it. Hidden entities remain inspectable
+  but do not receive a selection overlay. Visibility changes affect only the view.
+- Drag in the drawing with the left mouse button: left-to-right selects fully
+  contained entities; right-to-left selects intersecting entities. Middle drag pans.
+  Hidden entities are excluded. The tree supports multiple selection and Properties
+  groups the selected entities; all visible selected entities receive an overlay.
+  Curve hit testing uses sampled strokes (target chord deviation 0.25 screen pixel,
+  bounded subdivision); text uses the current renderer's text footprint.
 - Select a row to see common properties and the Shape geometry description in
   **Properties**, and a yellow geometry overlay and bounds in the view.
+- Double-click an entity to fit it at the view center; double-click a layer to fit
+  its visible entities. Hidden entities remain hidden. Points keep the current zoom.
 - **Escape** clears selection. **Home** fits the drawing. Both docks can be
   restored from the **View** menu.
 

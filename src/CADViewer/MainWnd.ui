@@ -2,53 +2,77 @@
 <ui version="4.0">
  <class>MainWndClass</class>
  <widget class="QMainWindow" name="MainWndClass">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>600</width>
-    <height>400</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>CADViewer</string>
-  </property>
-  <widget class="QWidget" name="centralWidget"/>
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1280</width><height>800</height></rect></property>
+  <property name="windowTitle"><string>CADViewer</string></property>
+  <property name="windowIcon"><iconset resource="resource.qrc"><normaloff>:/image/icon.ico</normaloff>:/image/icon.ico</iconset></property>
+  <widget class="gtl::qt::xLayeredMatView" name="drawingView"/>
   <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>600</width>
-     <height>22</height>
-    </rect>
-   </property>
    <widget class="QMenu" name="menuFiles">
-    <property name="title">
-     <string>Files</string>
-    </property>
-    <addaction name="actionAbout"/>
+    <property name="title"><string>Files</string></property>
+    <addaction name="actionOpen"/><addaction name="separator"/><addaction name="actionAbout"/>
    </widget>
-   <addaction name="menuFiles"/>
+   <widget class="QMenu" name="menuView">
+    <property name="title"><string>View</string></property>
+    <addaction name="actionEntities"/><addaction name="actionProperties"/>
+   </widget>
+   <addaction name="menuFiles"/><addaction name="menuView"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
+   <property name="windowTitle"><string>Drawing tools</string></property>
+   <attribute name="toolBarArea"><enum>TopToolBarArea</enum></attribute>
+   <attribute name="toolBarBreak"><bool>false</bool></attribute>
+   <addaction name="actionOpen"/><addaction name="actionFit"/><addaction name="actionClearSelection"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
+  <widget class="QDockWidget" name="entityDock">
+   <property name="windowTitle"><string>Entities (display geometry)</string></property>
+   <attribute name="dockWidgetArea"><number>1</number></attribute>
+   <widget class="QWidget" name="entityDockContents">
+    <layout class="QVBoxLayout" name="entityLayout">
+     <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+     <item><widget class="QTreeWidget" name="entityTree">
+      <property name="selectionMode"><enum>QAbstractItemView::ExtendedSelection</enum></property>
+      <property name="uniformRowHeights"><bool>true</bool></property>
+      <column><property name="text"><string>Layer / Entity</string></property></column>
+      <column><property name="text"><string>Type</string></property></column>
+     </widget></item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="propertyDock">
+   <property name="windowTitle"><string>Properties</string></property>
+   <attribute name="dockWidgetArea"><number>2</number></attribute>
+   <widget class="QWidget" name="propertyDockContents">
+    <layout class="QVBoxLayout" name="propertyLayout">
+     <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+     <item><widget class="QSplitter" name="propertySplitter">
+      <property name="orientation"><enum>Qt::Vertical</enum></property>
+      <widget class="QTreeWidget" name="propertyTree">
+       <column><property name="text"><string>Property</string></property></column>
+       <column><property name="text"><string>Value</string></property></column>
+      </widget>
+      <widget class="QPlainTextEdit" name="entityDetails">
+       <property name="readOnly"><bool>true</bool></property>
+       <property name="placeholderText"><string>Select an entity to inspect its geometry.</string></property>
+      </widget>
+     </widget></item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionOpen"><property name="text"><string>Open…</string></property><property name="shortcut"><string>Ctrl+O</string></property></action>
+  <action name="actionFit"><property name="text"><string>Fit drawing</string></property><property name="shortcut"><string>Home</string></property></action>
+  <action name="actionClearSelection"><property name="text"><string>Clear selection</string></property><property name="shortcut"><string>Esc</string></property></action>
+  <action name="actionEntities"><property name="checkable"><bool>true</bool></property><property name="checked"><bool>true</bool></property><property name="text"><string>Entities (display geometry)</string></property></action>
+  <action name="actionProperties"><property name="checkable"><bool>true</bool></property><property name="checked"><bool>true</bool></property><property name="text"><string>Properties</string></property></action>
+  <action name="actionAbout"><property name="text"><string>About</string></property></action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="resource.qrc"/>
- </resources>
- <connections/>
+ <customwidgets><customwidget><class>gtl::qt::xLayeredMatView</class><extends>QWidget</extends><header>gtl/qt/MatView/LayeredMatView.h</header><container>1</container></customwidget></customwidgets>
+ <resources><include location="resource.qrc"/></resources>
+ <connections>
+  <connection><sender>actionEntities</sender><signal>toggled(bool)</signal><receiver>entityDock</receiver><slot>setVisible(bool)</slot></connection>
+  <connection><sender>entityDock</sender><signal>visibilityChanged(bool)</signal><receiver>actionEntities</receiver><slot>setChecked(bool)</slot></connection>
+  <connection><sender>actionProperties</sender><signal>toggled(bool)</signal><receiver>propertyDock</receiver><slot>setVisible(bool)</slot></connection>
+  <connection><sender>propertyDock</sender><signal>visibilityChanged(bool)</signal><receiver>actionProperties</receiver><slot>setChecked(bool)</slot></connection>
+ </connections>
 </ui>
