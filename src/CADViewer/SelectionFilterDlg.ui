@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ui version="4.0">
+ <class>SelectionFilterDlg</class>
+ <widget class="QDialog" name="SelectionFilterDlg">
+  <property name="windowTitle">
+   <string>Selection Filter</string>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>340</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="filterDockLayout">
+   <item>
+    <widget class="QComboBox" name="filterType">
+     <item>
+      <property name="text">
+       <string>All types</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="filterLayer">
+     <item>
+      <property name="text">
+       <string>All layers</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="sizeHint">
+     <property name="text">
+      <string>Size = max(width, height); maximum 0 = unlimited</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDoubleSpinBox" name="filterMin">
+     <property name="minimum">
+      <double>0</double>
+     </property>
+     <property name="maximum">
+      <double>1000000000.0</double>
+     </property>
+     <property name="value">
+      <double>0</double>
+     </property>
+     <property name="decimals">
+      <number>6</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDoubleSpinBox" name="filterMax">
+     <property name="minimum">
+      <double>0</double>
+     </property>
+     <property name="maximum">
+      <double>1000000000.0</double>
+     </property>
+     <property name="value">
+      <double>0</double>
+     </property>
+     <property name="decimals">
+      <number>6</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="mouseFilter">
+     <property name="text">
+      <string>Apply filter to mouse selection</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="selectMatches">
+     <property name="text">
+      <string>Select matching entities</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="selectAll">
+     <property name="text">
+      <string>Select all visible</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="invertSelection">
+     <property name="text">
+      <string>Invert selection</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources />
+ <connections />
+</ui>

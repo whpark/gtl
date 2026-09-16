@@ -1,78 +1,536 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <ui version="4.0">
  <class>MainWndClass</class>
  <widget class="QMainWindow" name="MainWndClass">
-  <property name="geometry"><rect><x>0</x><y>0</y><width>1280</width><height>800</height></rect></property>
-  <property name="windowTitle"><string>CADViewer</string></property>
-  <property name="windowIcon"><iconset resource="resource.qrc"><normaloff>:/image/icon.ico</normaloff>:/image/icon.ico</iconset></property>
-  <widget class="gtl::qt::xLayeredMatView" name="drawingView"/>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1280</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>CADViewer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resource.qrc">
+    <normaloff>:/image/icon.ico</normaloff>:/image/icon.ico</iconset>
+  </property>
+  <widget class="gtl::qt::xLayeredMatView" name="drawingView" />
   <widget class="QMenuBar" name="menuBar">
    <widget class="QMenu" name="menuFiles">
-    <property name="title"><string>Files</string></property>
-    <addaction name="actionOpen"/><addaction name="separator"/><addaction name="actionAbout"/>
+    <property name="title">
+     <string>Files</string>
+    </property>
+    <addaction name="actionOpen" />
+    <addaction name="separator" />
+    <addaction name="actionAbout" />
+    <addaction name="actionSave" />
+    <addaction name="actionSaveAs" />
+    <addaction name="actionImportShape" />
+    <addaction name="actionExportSelection" />
+    <addaction name="actionSavePng" />
    </widget>
    <widget class="QMenu" name="menuView">
-    <property name="title"><string>View</string></property>
-    <addaction name="actionEntities"/><addaction name="actionProperties"/>
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionEntities" />
+    <addaction name="actionProperties" />
+    <addaction name="actionOperations" />
+    <addaction name="actionSelectionFilter" />
+    <addaction name="actionWorkingSet" />
+    <addaction name="actionHistory" />
+    <addaction name="actionLog" />
+    <addaction name="actionResetLayout" />
+    <addaction name="actionDark" />
+    <addaction name="actionShowText" />
+    <addaction name="actionDirections" />
    </widget>
-   <addaction name="menuFiles"/><addaction name="menuView"/>
+   <addaction name="menuFiles" />
+   <addaction name="menuView" />
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionUndo" />
+    <addaction name="actionRedo" />
+    <addaction name="actionCopy" />
+    <addaction name="actionPaste" />
+    <addaction name="actionDelete" />
+   </widget>
+   <addaction name="menuEdit" />
   </widget>
   <widget class="QToolBar" name="mainToolBar">
-   <property name="windowTitle"><string>Drawing tools</string></property>
-   <attribute name="toolBarArea"><enum>TopToolBarArea</enum></attribute>
-   <attribute name="toolBarBreak"><bool>false</bool></attribute>
-   <addaction name="actionOpen"/><addaction name="actionFit"/><addaction name="actionClearSelection"/>
+   <property name="windowTitle">
+    <string>Drawing tools</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen" />
+   <addaction name="actionFit" />
+   <addaction name="actionClearSelection" />
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QStatusBar" name="statusBar" />
   <widget class="QDockWidget" name="entityDock">
-   <property name="windowTitle"><string>Entities (display geometry)</string></property>
-   <attribute name="dockWidgetArea"><number>1</number></attribute>
+   <property name="windowTitle">
+    <string>Entities (display geometry)</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
    <widget class="QWidget" name="entityDockContents">
     <layout class="QVBoxLayout" name="entityLayout">
-     <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
-     <item><widget class="QTreeWidget" name="entityTree">
-      <property name="selectionMode"><enum>QAbstractItemView::ExtendedSelection</enum></property>
-      <property name="uniformRowHeights"><bool>true</bool></property>
-      <column><property name="text"><string>Layer / Entity</string></property></column>
-      <column><property name="text"><string>Type</string></property></column>
-     </widget></item>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTreeWidget" name="entityTree">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
+       <column>
+        <property name="text">
+         <string>Layer / Entity</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Type</string>
+        </property>
+       </column>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
   <widget class="QDockWidget" name="propertyDock">
-   <property name="windowTitle"><string>Properties</string></property>
-   <attribute name="dockWidgetArea"><number>2</number></attribute>
+   <property name="windowTitle">
+    <string>Properties</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
    <widget class="QWidget" name="propertyDockContents">
     <layout class="QVBoxLayout" name="propertyLayout">
-     <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
-     <item><widget class="QSplitter" name="propertySplitter">
-      <property name="orientation"><enum>Qt::Vertical</enum></property>
-      <widget class="QTreeWidget" name="propertyTree">
-       <column><property name="text"><string>Property</string></property></column>
-       <column><property name="text"><string>Value</string></property></column>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QSplitter" name="propertySplitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QTreeWidget" name="propertyTree">
+        <column>
+         <property name="text">
+          <string>Property</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Value</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QPlainTextEdit" name="entityDetails">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Select an entity to inspect its geometry.</string>
+        </property>
+       </widget>
       </widget>
-      <widget class="QPlainTextEdit" name="entityDetails">
-       <property name="readOnly"><bool>true</bool></property>
-       <property name="placeholderText"><string>Select an entity to inspect its geometry.</string></property>
-      </widget>
-     </widget></item>
+     </item>
     </layout>
    </widget>
   </widget>
-  <action name="actionOpen"><property name="text"><string>Open…</string></property><property name="shortcut"><string>Ctrl+O</string></property></action>
-  <action name="actionFit"><property name="text"><string>Fit drawing</string></property><property name="shortcut"><string>Home</string></property></action>
-  <action name="actionClearSelection"><property name="text"><string>Clear selection</string></property><property name="shortcut"><string>Esc</string></property></action>
-  <action name="actionEntities"><property name="checkable"><bool>true</bool></property><property name="checked"><bool>true</bool></property><property name="text"><string>Entities (display geometry)</string></property></action>
-  <action name="actionProperties"><property name="checkable"><bool>true</bool></property><property name="checked"><bool>true</bool></property><property name="text"><string>Properties</string></property></action>
-  <action name="actionAbout"><property name="text"><string>About</string></property></action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionFit">
+   <property name="text">
+    <string>Fit drawing</string>
+   </property>
+   <property name="shortcut">
+    <string>Home</string>
+   </property>
+  </action>
+  <action name="actionClearSelection">
+   <property name="text">
+    <string>Clear selection</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionEntities">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Entities (display geometry)</string>
+   </property>
+  </action>
+  <action name="actionProperties">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Properties</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionOperations">
+   <property name="text">
+    <string>Operations</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionSelectionFilter">
+   <property name="text">
+    <string>Selection filter</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </action>
+  <widget class="QDockWidget" name="workingDock">
+   <property name="windowTitle">
+    <string>Working Set</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="workingDockContents">
+    <layout class="QVBoxLayout" name="workingDockLayout">
+     <item>
+      <widget class="QListWidget" name="workingList">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="workingAdd">
+       <property name="text">
+        <string>Add selection</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="workingRemove">
+       <property name="text">
+        <string>Remove highlighted entries</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="workingSelect">
+       <property name="text">
+        <string>Select Working Set</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="workingClear">
+       <property name="text">
+        <string>Clear Working Set</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="workingExport">
+       <property name="text">
+        <string>Export Working Set…</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionWorkingSet">
+   <property name="text">
+    <string>Working Set</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </action>
+  <widget class="QDockWidget" name="historyDock">
+   <property name="windowTitle">
+    <string>History</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="historyDockContents">
+    <layout class="QVBoxLayout" name="historyDockLayout">
+     <item>
+      <widget class="QListWidget" name="historyList" />
+     </item>
+     <item>
+      <widget class="QPushButton" name="historyClear">
+       <property name="text">
+        <string>Clear history</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionHistory">
+   <property name="text">
+    <string>History</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </action>
+  <widget class="QDockWidget" name="logDock">
+   <property name="windowTitle">
+    <string>Log</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="logDockContents">
+    <layout class="QVBoxLayout" name="logDockLayout">
+     <item>
+      <widget class="QPlainTextEdit" name="logText">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionLog">
+   <property name="text">
+    <string>Log</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save .shape</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save .shape As…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionImportShape">
+   <property name="text">
+    <string>Import .shape…</string>
+   </property>
+  </action>
+  <action name="actionExportSelection">
+   <property name="text">
+    <string>Export selection .shape…</string>
+   </property>
+  </action>
+  <action name="actionSavePng">
+   <property name="text">
+    <string>Save view as PNG…</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Paste…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="actionResetLayout">
+   <property name="text">
+    <string>Reset layout</string>
+   </property>
+  </action>
+  <action name="actionDark">
+   <property name="text">
+    <string>Dark background</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionShowText">
+   <property name="text">
+    <string>Show text</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionDirections">
+   <property name="text">
+    <string>방향표시</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="toolTip">
+    <string>선택된 엔티티의 시작점: 초록 화살촉 / 끝점: 빨강 화살촉</string>
+   </property>
+  </action>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
- <customwidgets><customwidget><class>gtl::qt::xLayeredMatView</class><extends>QWidget</extends><header>gtl/qt/MatView/LayeredMatView.h</header><container>1</container></customwidget></customwidgets>
- <resources><include location="resource.qrc"/></resources>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>gtl::qt::xLayeredMatView</class>
+   <extends>QWidget</extends>
+   <header>gtl/qt/MatView/LayeredMatView.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="resource.qrc" />
+ </resources>
  <connections>
-  <connection><sender>actionEntities</sender><signal>toggled(bool)</signal><receiver>entityDock</receiver><slot>setVisible(bool)</slot></connection>
-  <connection><sender>entityDock</sender><signal>visibilityChanged(bool)</signal><receiver>actionEntities</receiver><slot>setChecked(bool)</slot></connection>
-  <connection><sender>actionProperties</sender><signal>toggled(bool)</signal><receiver>propertyDock</receiver><slot>setVisible(bool)</slot></connection>
-  <connection><sender>propertyDock</sender><signal>visibilityChanged(bool)</signal><receiver>actionProperties</receiver><slot>setChecked(bool)</slot></connection>
+  <connection>
+   <sender>actionEntities</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>entityDock</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>actionProperties</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>propertyDock</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>actionWorkingSet</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>workingDock</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>actionHistory</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>historyDock</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
+  <connection>
+   <sender>actionLog</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>logDock</receiver>
+   <slot>setVisible(bool)</slot>
+  </connection>
  </connections>
 </ui>

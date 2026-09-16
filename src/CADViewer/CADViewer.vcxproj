@@ -135,9 +135,14 @@
   <ItemGroup>
     <QtMoc Include="App.h" />
     <QtMoc Include="AboutDlg.h" />
+    <ClInclude Include="Editor.inc" />
+    <ClInclude Include="EditorGeometry.inc" />
+    <ClInclude Include="ShapeFile.inc" />
     <ClInclude Include="resource.h" />
     <QtRcc Include="resource.qrc" />
     <QtUic Include="AboutDlg.ui" />
+    <QtUic Include="OperationsDlg.ui" />
+    <QtUic Include="SelectionFilterDlg.ui" />
     <QtUic Include="MainWnd.ui" />
     <QtMoc Include="MainWnd.h" />
     <ClCompile Include="AboutDlg.cpp" />

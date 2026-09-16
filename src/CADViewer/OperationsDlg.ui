@@ -1,0 +1,481 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ui version="4.0">
+ <class>OperationsDlg</class>
+ <widget class="QDialog" name="OperationsDlg">
+  <property name="windowTitle">
+   <string>Operations</string>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>460</width>
+    <height>460</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="operationsWrapperLayout">
+   <item>
+    <widget class="QScrollArea" name="operationsScroll">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="operationsDockContents">
+      <layout class="QVBoxLayout" name="operationsDockLayout">
+       <item>
+        <widget class="QComboBox" name="opTarget">
+         <item>
+          <property name="text">
+           <string>Selection</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Working Set</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Whole drawing</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="operation">
+         <item>
+          <property name="text">
+           <string>Translate</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Rotate</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Scale</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mirror X</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mirror Y</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Reverse</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Set Layer</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Set Color</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Set Line Weight</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Join</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Explode</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Set Start</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Split At</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Delete</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Paste</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Mirror Z</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Break At Vertex</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="operationParameters">
+         <item row="0" column="0">
+          <widget class="QLabel" name="opXLabel">
+           <property name="text">
+            <string>X / offset X</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QDoubleSpinBox" name="opX">
+           <property name="minimum">
+            <double>-1000000000.0</double>
+           </property>
+           <property name="maximum">
+            <double>1000000000.0</double>
+           </property>
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="value">
+            <double>0</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="opYLabel">
+           <property name="text">
+            <string>Y / offset Y</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="opY">
+           <property name="minimum">
+            <double>-1000000000.0</double>
+           </property>
+           <property name="maximum">
+            <double>1000000000.0</double>
+           </property>
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="value">
+            <double>0</double>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="opZLabel">
+           <property name="text">
+            <string>Z / offset Z</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="opZ">
+           <property name="minimum">
+            <double>-1000000000.0</double>
+           </property>
+           <property name="maximum">
+            <double>1000000000.0</double>
+           </property>
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="value">
+            <double>0</double>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="opAngleLabel">
+           <property name="text">
+            <string>Angle (degrees)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QDoubleSpinBox" name="opAngle">
+           <property name="minimum">
+            <double>-1000000000.0</double>
+           </property>
+           <property name="maximum">
+            <double>1000000000.0</double>
+           </property>
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="value">
+            <double>0</double>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="opScaleLabel">
+           <property name="text">
+            <string>Uniform scale</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="opScale">
+           <property name="minimum">
+            <double>-1000000000.0</double>
+           </property>
+           <property name="maximum">
+            <double>1000000000.0</double>
+           </property>
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="value">
+            <double>1</double>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="opToleranceLabel">
+           <property name="text">
+            <string>Join tolerance</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QDoubleSpinBox" name="opTolerance">
+           <property name="minimum">
+            <double>-1000000000.0</double>
+           </property>
+           <property name="maximum">
+            <double>1000000000.0</double>
+           </property>
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="value">
+            <double>0.001</double>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="opIndexLabel">
+           <property name="text">
+            <string>Vertex index (0-based)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QSpinBox" name="opIndex">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>1000000</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="opWeightLabel">
+           <property name="text">
+            <string>Line weight code</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QSpinBox" name="opWeight">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>31</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="pasteColumnsLabel">
+           <property name="text">
+            <string>Paste columns</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QSpinBox" name="pasteColumns">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="pasteRowsLabel">
+           <property name="text">
+            <string>Paste rows</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QSpinBox" name="pasteRows">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="opTextLabel">
+           <property name="text">
+            <string>Layer name / #RRGGBB</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QLineEdit" name="opText" />
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="pasteDXLabel">
+           <property name="text">
+            <string>Array column spacing</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <widget class="QDoubleSpinBox" name="pasteDX">
+           <property name="minimum">
+            <double>-1000000000.0</double>
+           </property>
+           <property name="maximum">
+            <double>1000000000.0</double>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="pasteDYLabel">
+           <property name="text">
+            <string>Array row spacing</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <widget class="QDoubleSpinBox" name="pasteDY">
+           <property name="minimum">
+            <double>-1000000000.0</double>
+           </property>
+           <property name="maximum">
+            <double>1000000000.0</double>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="0">
+          <widget class="QLabel" name="centerModeLabel">
+           <property name="text">
+            <string>Transform center</string>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="1">
+          <widget class="QComboBox" name="centerMode">
+           <item>
+            <property name="text">
+             <string>Specified X/Y/Z</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Origin</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Target bounds center</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="15" column="0">
+          <widget class="QLabel" name="startModeLabel">
+           <property name="text">
+            <string>Start mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="1">
+          <widget class="QComboBox" name="startMode">
+           <item>
+            <property name="text">
+             <string>Vertex index</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Nearest vertex / endpoint</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Nearest point on outline</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pickPoint">
+         <property name="text">
+          <string>Pick X/Y in drawing</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="applyOperation">
+         <property name="text">
+          <string>Apply</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources />
+ <connections />
+</ui>
