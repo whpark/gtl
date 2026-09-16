@@ -306,9 +306,9 @@ namespace gtl::dwg {
 				exhausted = true;
 				return;
 			}
-			if (std::holds_alternative<std::monostate>(source.geometry) ||
-			    std::holds_alternative<entities::sVertex>(source.geometry) ||
-			    std::holds_alternative<entities::sFaceRecord>(source.geometry))
+			if ((std::holds_alternative<std::monostate>(source.geometry) && source.type >= 4 && source.type <= 6) ||
+				std::holds_alternative<entities::sVertex>(source.geometry) ||
+				std::holds_alternative<entities::sFaceRecord>(source.geometry))
 				return;
 			handle_t layerHandle = source.layer;
 			if (depth && document.layers.at(source.layer).name == "0")
@@ -331,7 +331,210 @@ namespace gtl::dwg {
 			                   : source.lineTypeMode == 1 ? parent.lineType
 			                   : source.lineTypeMode == 3 ? source.lineType
 			                                              : 0;
+			auto preserve = [&]() {
+				std::string name = source.className;
+				if (name.empty())
+					switch (source.type) {
+					case 2:
+						name = "ATTRIB";
+						break;
+					case 3:
+						name = "ATTDEF";
+						break;
+					case 0x14:
+						name = "DIMORDINATE";
+						break;
+					case 0x15:
+						name = "DIMLINEAR";
+						break;
+					case 0x16:
+						name = "DIMALIGNED";
+						break;
+					case 0x17:
+						name = "DIMANGULAR3P";
+						break;
+					case 0x18:
+						name = "DIMANGULAR";
+						break;
+					case 0x19:
+						name = "DIMRADIAL";
+						break;
+					case 0x1a:
+						name = "DIMDIAMETRIC";
+						break;
+					case 0x1d:
+					case 0x1e:
+						name = "MESH";
+						break;
+					case 0x21:
+						name = "SHAPE";
+						break;
+					case 0x22:
+						name = "VIEWPORT";
+						break;
+					case 0x25:
+						name = "REGION";
+						break;
+					case 0x26:
+						name = "3DSOLID";
+						break;
+					case 0x27:
+						name = "BODY";
+						break;
+					case 0x2b:
+						name = "OLEFRAME";
+						break;
+					case 0x2d:
+						name = "LEADER";
+						break;
+					case 0x2e:
+						name = "TOLERANCE";
+						break;
+					case 0x2f:
+						name = "MLINE";
+						break;
+					case 0x4a:
+						name = "OLE2FRAME";
+						break;
+					case 0x1f2:
+						name = "ACAD_PROXY_ENTITY";
+						break;
+					default:
+						return;
+					}
+				auto item = gtl::shape::xShape::CreateShapeFromEntityName(name);
+				if (!dynamic_cast<gtl::shape::xCadEntity *>(item.get()))
+					item = std::make_unique<gtl::shape::xProxyEntity>();
+				auto &cad = static_cast<gtl::shape::xCadEntity &>(*item);
+				cad.m_entityName = wide(name);
+				cad.m_binary = gtl::shape::sCadBinary{L"DWG",
+													  static_cast<uint32_t>(document.version),
+													  document.codepage,
+													  source.type,
+													  source.handle,
+													  source.dataBitOffset,
+													  source.handleBitOffset,
+													  source.bitLength,
+													  source.binary};
+				cad.m_origin = Point(parent.transform.offset);
+				for (size_t i = 0; i < 3; ++i)
+					cad.m_axes[i] = Point(parent.transform.axes[i]);
+				if (auto text = std::get_if<entities::sText>(&source.geometry))
+					cad.m_groups = {{1, wide(text->text)},	 {2, wide(text->tag)},
+									{3, wide(text->prompt)}, {70, int16_t(text->flags)},
+									{73, text->fieldLength}, {280, int16_t(text->lockPosition)}};
+				if (auto data = std::get_if<entities::sCadRenderData>(&source.geometry)) {
+					for (auto const &group : data->groups) {
+						gtl::shape::sCadGroup tag;
+						tag.code = group.code;
+						std::visit(
+							[&](auto const &value) {
+								if constexpr (std::is_same_v<std::decay_t<decltype(value)>, string_t>)
+									tag.value = wide(value);
+								else
+									tag.value = value;
+							},
+							group.value);
+						cad.m_groups.push_back(std::move(tag));
+					}
+				}
+				if (auto dimension = std::get_if<entities::sDimension>(&source.geometry)) {
+					auto point = [&](int code, point_t p) {
+						cad.m_groups.push_back({int16_t(code), p.x});
+						cad.m_groups.push_back({int16_t(code + 10), p.y});
+						cad.m_groups.push_back({int16_t(code + 20), p.z});
+					};
+					cad.m_groups = {{1, wide(dimension->text)},
+									{42, dimension->measurement},
+									{50, dimension->dimensionRotation * 180 / std::numbers::pi},
+									{70, int16_t((dimension->ordinateFlags & 1) ? 64 : 0)}};
+					point(11, dimension->textMidpoint);
+					point(210, source.extrusion);
+					auto const &points = dimension->definitionPoints;
+					std::vector<int> codes;
+					switch (source.type) {
+					case 0x14:
+						codes = {10, 13, 14};
+						break;
+					case 0x15:
+					case 0x16:
+						codes = {13, 14, 10};
+						break;
+					case 0x17:
+						codes = {10, 13, 14, 15};
+						break;
+					case 0x18:
+						codes = {16, 13, 14, 15, 10};
+						break;
+					case 0x19:
+						codes = {10, 15};
+						break;
+					case 0x1a:
+						codes = {15, 10};
+						break;
+					}
+					for (size_t i = 0; i < std::min(codes.size(), points.size()); ++i)
+						point(codes[i], points[i]);
+					cad.m_bExternalGraphics = document.blocks.contains(dimension->block) &&
+											  !document.blocks.at(dimension->block).entities.empty();
+				}
+				if (auto poly = std::get_if<entities::sPolyline>(&source.geometry)) {
+					// Preserve owned mesh vertices/faces as an ordered POLYLINE sequence as well as its header payload.
+					cad.m_groups = {
+						{0, gtl::shape::string_t{L"POLYLINE"}},
+						{70, int16_t(poly->flags | (poly->kind == entities::sPolyline::eKind::polyface ? 64 : 16))},
+						{71, int16_t(poly->countM)},
+						{72, int16_t(poly->countN)},
+						{73, int16_t(poly->densityM)},
+						{74, int16_t(poly->densityN)},
+						{75, int16_t(poly->curveType)}};
+					for (auto const &point : poly->points) {
+						cad.m_groups.push_back({0, gtl::shape::string_t{L"VERTEX"}});
+						cad.m_groups.push_back({10, point.x});
+						cad.m_groups.push_back({20, point.y});
+						cad.m_groups.push_back({30, point.z});
+					}
+					for (auto const &face : poly->faces) {
+						cad.m_groups.push_back({0, gtl::shape::string_t{L"VERTEX"}});
+						cad.m_groups.push_back({70, int16_t{128}});
+						for (size_t i = 0; i < 4; ++i)
+							cad.m_groups.push_back({int16_t(71 + i), int16_t(face.indices[i])});
+					}
+					cad.m_groups.push_back({0, gtl::shape::string_t{L"SEQEND"}});
+				}
+				cad.m_strLayer = layer.m_name;
+				cad.m_bVisible = current.visible;
+				cad.m_color = current.color;
+				cad.m_lineWeight = current.lineWeight;
+				if (auto lt = document.lineTypes.find(current.lineType); lt != document.lineTypes.end())
+					cad.m_strLineType = wide(lt->second.name);
+				if (resultReport.convertedEntities >= options.maxEntities) {
+					exhausted = true;
+					warn("converted entity limit reached");
+					return;
+				}
+				layer.m_shapes.push_back(std::move(item));
+				++resultReport.convertedEntities;
+				++resultReport.preservedEntities;
+			};
 			try {
+				bool dataOnly = std::holds_alternative<std::monostate>(source.geometry) ||
+								std::holds_alternative<entities::sShape>(source.geometry) ||
+								std::holds_alternative<entities::sCadRenderData>(source.geometry);
+				if (auto poly = std::get_if<entities::sPolyline>(&source.geometry);
+					poly && poly->kind != entities::sPolyline::eKind::polyline)
+					dataOnly = true;
+				if (dataOnly) {
+					preserve();
+					return;
+				}
+				if (std::holds_alternative<entities::sDimension>(source.geometry) ||
+					((source.type == 2 || source.type == 3) &&
+					 std::holds_alternative<entities::sText>(source.geometry)))
+					preserve();
+				if (exhausted)
+					return;
+
 				if (auto text = std::get_if<entities::sText>(&source.geometry); text && text->multiline) {
 					if (source.type == 3 && !(text->flags & 2))
 						return;
@@ -358,27 +561,33 @@ namespace gtl::dwg {
 					emit(copy, parent, depth);
 					return;
 				}
-				if (auto face = std::get_if<entities::sFace3D>(&source.geometry)) {
-					warn("3DFACE converted to visible edges; surface fill is not reconstructed");
-					for (size_t i = 0; i < 4 && !exhausted; ++i) {
-						if (face->invisibleEdges & (1u << i)) continue;
-						auto a = face->corners[i], b = face->corners[(i+1)%4];
-						if (a.x == b.x && a.y == b.y && a.z == b.z) continue;
-						auto copy = source; copy.geometry = entities::sLine{a,b};
-						emit(copy, parent, depth);
-					}
-					return;
-				}
-				if (std::holds_alternative<entities::sRay>(source.geometry)) {
-					warn("unbounded RAY/XLINE retained; Shape output requires an explicit clipping region"); return;
-				}
-				if (std::holds_alternative<entities::sShape>(source.geometry)) {
-					warn("SHAPE definition retained; SHX glyph rendering is not implemented"); return;
-				}
-				if (auto poly = std::get_if<entities::sPolyline>(&source.geometry); poly && poly->kind != entities::sPolyline::eKind::polyline) {
-					warn("PFACE/MESH vertices and topology retained; surface conversion is not implemented"); return;
-				}
 				if (auto solid = std::get_if<entities::sSolid>(&source.geometry)) {
+					std::unique_ptr<gtl::shape::xSolid> native;
+					if (source.type == 0x20)
+						native = std::make_unique<gtl::shape::xTrace>();
+					else
+						native = std::make_unique<gtl::shape::xSolid>();
+					auto placement = detail::Compose(parent.transform, detail::OCS(source.extrusion));
+					size_t corner = 0;
+					for (unsigned i : {0u, 1u, 3u, 2u})
+						native->m_pts[corner++] = Point(placement.Point(solid->corners[i]));
+					native->m_thickness = Point(placement.Vector({0, 0, source.thickness}));
+					native->m_color = current.color;
+					native->m_lineWeight = current.lineWeight;
+					native->m_bVisible = current.visible;
+					native->m_strLayer = layer.m_name;
+					if (auto lt = document.lineTypes.find(current.lineType); lt != document.lineTypes.end())
+						native->m_strLineType = wide(lt->second.name);
+					if (resultReport.convertedEntities >= options.maxEntities) {
+						exhausted = true;
+						warn("converted entity limit reached");
+						return;
+					}
+					layer.m_shapes.push_back(std::move(native));
+					++resultReport.convertedEntities;
+					if (options.hatchBoundaryOnly)
+						return;
+
 					entities::sHatch hatch;
 					hatch.solid = true;
 					hatch.elevation = solid->corners[0].z;
@@ -531,10 +740,12 @@ namespace gtl::dwg {
 				}
 				auto transform = parent.transform;
 				bool world = std::holds_alternative<entities::sLine>(source.geometry) ||
-				             std::holds_alternative<entities::sPoint>(source.geometry) ||
-				             std::holds_alternative<entities::sEllipse>(source.geometry) ||
-				             std::holds_alternative<entities::sSpline>(source.geometry) ||
-				             std::holds_alternative<entities::sMText>(source.geometry);
+							 std::holds_alternative<entities::sPoint>(source.geometry) ||
+							 std::holds_alternative<entities::sEllipse>(source.geometry) ||
+							 std::holds_alternative<entities::sSpline>(source.geometry) ||
+							 std::holds_alternative<entities::sMText>(source.geometry) ||
+							 std::holds_alternative<entities::sFace3D>(source.geometry) ||
+							 std::holds_alternative<entities::sRay>(source.geometry);
 				if (auto poly = std::get_if<entities::sPolyline>(&source.geometry); poly && poly->is3d)
 					world = true;
 				if (!world)
@@ -542,22 +753,37 @@ namespace gtl::dwg {
 				std::unique_ptr<gtl::shape::xShape> target = std::visit(
 				    [&](auto const& geometry) -> std::unique_ptr<gtl::shape::xShape> {
 					    using T = std::decay_t<decltype(geometry)>;
-					    if constexpr (std::is_same_v<T, entities::sLine>) {
-						    auto item = std::make_unique<gtl::shape::xLine>();
-						    item->m_pt0 = Point(transform.Point(geometry.start));
+						if constexpr (std::is_same_v<T, entities::sFace3D>) {
+							auto item = std::make_unique<gtl::shape::x3DFace>();
+							for (size_t i = 0; i < 4; ++i)
+								item->m_pts[i] = Point(transform.Point(geometry.corners[i]));
+							item->m_invisibleEdges = geometry.invisibleEdges;
+							return item;
+						} else if constexpr (std::is_same_v<T, entities::sRay>) {
+							std::unique_ptr<gtl::shape::xRay> item;
+							if (geometry.bothWays)
+								item = std::make_unique<gtl::shape::xXLine>();
+							else
+								item = std::make_unique<gtl::shape::xRay>();
+							item->m_origin = Point(transform.Point(geometry.origin));
+							item->m_direction = Point(transform.Vector(geometry.direction));
+							return item;
+						} else if constexpr (std::is_same_v<T, entities::sLine>) {
+							auto item = std::make_unique<gtl::shape::xLine>();
+							item->m_pt0 = Point(transform.Point(geometry.start));
 						    item->m_pt1 = Point(transform.Point(geometry.end));
 						    return item;
-					    } else if constexpr (std::is_same_v<T, entities::sCircle>) {
-						    return Curve(geometry.center, geometry.radius, 0., 2 * std::numbers::pi, true, transform);
-					    } else if constexpr (std::is_same_v<T, entities::sArc>) {
-						    double sweep = std::fmod(geometry.endAngle - geometry.startAngle, 2 * std::numbers::pi);
-						    if (sweep < 0)
+						} else if constexpr (std::is_same_v<T, entities::sCircle>) {
+							return Curve(geometry.center, geometry.radius, 0., 2 * std::numbers::pi, true, transform);
+						} else if constexpr (std::is_same_v<T, entities::sArc>) {
+							double sweep = std::fmod(geometry.endAngle - geometry.startAngle, 2 * std::numbers::pi);
+							if (sweep < 0)
 							    sweep += 2 * std::numbers::pi;
 						    return Curve(geometry.center, geometry.radius, geometry.startAngle, sweep, false,
 							             transform);
-					    } else if constexpr (std::is_same_v<T, entities::sMText>) {
-						    double axisLength = detail::Length(geometry.xAxis);
-						    if (!(axisLength > 0) || !std::isfinite(axisLength))
+						} else if constexpr (std::is_same_v<T, entities::sMText>) {
+							double axisLength = detail::Length(geometry.xAxis);
+							if (!(axisLength > 0) || !std::isfinite(axisLength))
 							    throw std::runtime_error("invalid MTEXT axis");
 						    auto axis = detail::Scale(geometry.xAxis, 1. / axisLength);
 						    auto x = transform.Vector(axis);
@@ -585,9 +811,9 @@ namespace gtl::dwg {
 							    item->m_textStyle = wide(style->second.name);
 						    warn("MTEXT formatting, wrapping and background require a compatible text renderer");
 						    return item;
-					    } else if constexpr (std::is_same_v<T, entities::sText>) {
-						    if (source.type == 3 && !(geometry.flags & 2))
-							    return {}; // Nonconstant ATTDEF is replaced by INSERT attributes.
+						} else if constexpr (std::is_same_v<T, entities::sText>) {
+							if (source.type == 3 && !(geometry.flags & 2))
+								return {}; // Nonconstant ATTDEF is replaced by INSERT attributes.
 						    if (!detail::Planar(transform))
 							    throw std::runtime_error("tilted text cannot be represented by gtl.shape");
 						    auto x = transform.Vector({std::cos(geometry.rotation), std::sin(geometry.rotation), 0});
@@ -617,9 +843,9 @@ namespace gtl::dwg {
 							    warn("text style font not resolved");
 						    }
 						    return item;
-					    } else if constexpr (std::is_same_v<T, entities::sSpline>) {
-						    if (geometry.scenario == 2) {
-							    auto spline = detail::Interpolate(geometry);
+						} else if constexpr (std::is_same_v<T, entities::sSpline>) {
+							if (geometry.scenario == 2) {
+								auto spline = detail::Interpolate(geometry);
 							    auto item = std::make_unique<gtl::shape::xSpline>();
 							    item->m_degree = static_cast<int>(spline.degree);
 							    item->m_knots = spline.knots;
@@ -628,8 +854,8 @@ namespace gtl::dwg {
 							    warn("fit-point spline reconstructed by parameterized interpolation; original fit "
 								     "solver is not retained in DWG");
 							    return item;
-						    }
-						    if (!geometry.weights.empty() && (!std::ranges::all_of(geometry.weights, [&](double w) {
+							}
+							if (!geometry.weights.empty() && (!std::ranges::all_of(geometry.weights, [&](double w) {
 							        return w == geometry.weights.front();
 						        }) || geometry.weights.front() <= 0.)) {
 							    auto item = std::make_unique<gtl::shape::xPolyline>();
@@ -649,9 +875,9 @@ namespace gtl::dwg {
 						    for (auto p : geometry.controlPoints)
 							    item->m_ptsControl.push_back(Point(transform.Point(p)));
 						    return item;
-					    } else if constexpr (std::is_same_v<T, entities::sEllipse>) {
-						    using namespace detail;
-						    auto major = geometry.majorAxis;
+						} else if constexpr (std::is_same_v<T, entities::sEllipse>) {
+							using namespace detail;
+							auto major = geometry.majorAxis;
 						    double length = Length(major), normalLength = Length(source.extrusion);
 						    if (!(length > 0.) || !std::isfinite(length) || !(normalLength > 0.) ||
 							    !std::isfinite(normalLength))
@@ -667,13 +893,13 @@ namespace gtl::dwg {
 						    else if (sweep < 0.)
 							    sweep += 2 * std::numbers::pi;
 						    return Curve({}, 1., geometry.startAngle, sweep, false, Compose(transform, axes), true);
-					    } else if constexpr (std::is_same_v<T, entities::sPoint>) {
-						    auto item = std::make_unique<gtl::shape::xDot>();
-						    item->m_pt = Point(transform.Point(geometry.position));
+						} else if constexpr (std::is_same_v<T, entities::sPoint>) {
+							auto item = std::make_unique<gtl::shape::xDot>();
+							item->m_pt = Point(transform.Point(geometry.position));
 						    return item;
-					    } else if constexpr (std::is_same_v<T, entities::sPolyline>) {
-						    if (geometry.curveType || (geometry.flags & 6))
-							    throw std::runtime_error("fitted POLYLINE omitted; fit evaluation is not implemented");
+						} else if constexpr (std::is_same_v<T, entities::sPolyline>) {
+							if (geometry.curveType || (geometry.flags & 6))
+								throw std::runtime_error("fitted POLYLINE omitted; fit evaluation is not implemented");
 						    bool curved =
 						        std::ranges::any_of(geometry.bulges, [](double value) { return value != 0.; });
 						    if (curved && (!detail::Planar(transform) || !detail::Similarity(transform)))
@@ -696,8 +922,8 @@ namespace gtl::dwg {
 						        }))
 							    warn("polyline widths omitted from centerline conversion");
 						    return item;
-					    } else
-						    return {};
+						} else
+							return {};
 				    },
 				    source.geometry);
 				if (!target)
@@ -708,8 +934,10 @@ namespace gtl::dwg {
 				target->m_color = current.color;
 				if (auto lineType = document.lineTypes.find(current.lineType); lineType != document.lineTypes.end()) {
 					target->m_strLineType = wide(lineType->second.name);
-					if (!lineType->second.dashes.empty() && !std::holds_alternative<entities::sText>(source.geometry) &&
-					    !std::holds_alternative<entities::sMText>(source.geometry)) {
+					if (!lineType->second.dashes.empty() && !dynamic_cast<gtl::shape::xRay *>(target.get()) &&
+						!dynamic_cast<gtl::shape::x3DFace *>(target.get()) &&
+						!std::holds_alternative<entities::sText>(source.geometry) &&
+						!std::holds_alternative<entities::sMText>(source.geometry)) {
 						if (std::ranges::any_of(lineType->second.dashes,
 						                        [](auto const& dash) { return (dash.flags & 6) != 0; }))
 							warn("complex linetype glyphs retained in document; dash strokes rendered");

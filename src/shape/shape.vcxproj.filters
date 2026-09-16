@@ -20,6 +20,7 @@
     <ClInclude Include="framework.h">
       <Filter>framework</Filter>
     </ClInclude>
+    <ClInclude Include="cad_render.inc" />
     <ClInclude Include="pch.h">
       <Filter>framework</Filter>
     </ClInclude>
@@ -37,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\shape_primitives.h">
       <Filter>shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gtl\shape\shapes\cad.h">
+      <Filter>shape\shapes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\gtl\shape\shapes\arc.h">
       <Filter>shape\shapes</Filter>

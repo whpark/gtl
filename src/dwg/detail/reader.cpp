@@ -332,6 +332,11 @@ namespace gtl::dwg::detail {
 		void GeometryHandles(xBitStream& stream, entities::sEntity& entity, bool modern = false,
 		                     sRevision const& revision = {}) {
 			auto handle = [&] { return stream.Handle(entity.handle); };
+			if (auto *cad = std::get_if<entities::sCadRenderData>(&entity.geometry)) {
+				for (int i = 0; i < (entity.type == 0x2d ? 2 : 1); ++i)
+					cad->references.push_back(handle());
+			}
+
 			if (auto* shape = std::get_if<entities::sShape>(&entity.geometry)) shape->style = handle();
 			if (auto* text = std::get_if<entities::sText>(&entity.geometry)) {
 				text->style = handle();
@@ -453,9 +458,97 @@ namespace gtl::dwg::detail {
 			return text;
 		}
 
+		entities::sCadRenderData ReadCadRenderData(xBitStream &stream, std::uint16_t type, bool r2000,
+												   sRevision const &revision) {
+			entities::sCadRenderData result;
+			auto &groups = result.groups;
+			auto number = [&](int code, double value) { groups.push_back({static_cast<int16_t>(code), value}); };
+			auto point = [&](int code) {
+				auto p = Point(stream);
+				number(code, p.x);
+				number(code + 10, p.y);
+				number(code + 20, p.z);
+			};
+			if (type == 0x2e) {
+				if (!r2000) {
+					stream.BS();
+					stream.BD();
+					stream.BD();
+				}
+				point(10);
+				point(11);
+				point(210);
+				groups.push_back({1, Text(stream, revision)});
+			} else if (type == 0x2d) {
+				stream.B();
+				number(73, stream.BS());
+				number(72, stream.BS());
+				auto count = stream.BL();
+				if (count < 0 || count > 16384)
+					throw xParseError("LEADER: invalid vertex count");
+				for (int i = 0; i < count; ++i)
+					point(10);
+				Point(stream);
+				point(210);
+				point(211);
+				point(212);
+				point(213);
+				if (!r2000)
+					stream.BD();
+				if (revision.version < eVERSION::r2010) {
+					number(40, stream.BD());
+					number(41, stream.BD());
+				}
+				number(74, stream.B());
+				number(71, stream.B());
+				stream.BS();
+				if (!r2000) {
+					stream.BD();
+					stream.B();
+					stream.B();
+					stream.BS();
+					stream.BS();
+				}
+				stream.B();
+				stream.B();
+			} else {
+				number(40, stream.BD());
+				number(70, stream.RC());
+				point(10);
+				point(210);
+				number(71, stream.BS());
+				auto elements = stream.RC();
+				auto vertices = stream.BS();
+				if (vertices < 0 || vertices > 4096 || size_t(vertices) * elements > 16384)
+					throw xParseError("MLINE: excessive vertices/elements");
+				number(73, elements);
+				number(72, vertices);
+				for (int i = 0; i < vertices; ++i) {
+					point(11);
+					point(12);
+					point(13);
+					for (int j = 0; j < elements; ++j)
+						for (auto code : {74, 75}) {
+							auto count = stream.BS();
+							if (count < 0 || count > 4096 || groups.size() + count > 262144)
+								throw xParseError("MLINE: excessive parameters");
+							number(code, count);
+							for (int k = 0; k < count; ++k)
+								number(code == 74 ? 41 : 42, stream.BD());
+						}
+				}
+			}
+			return result;
+		}
 		void Geometry(xBitStream& stream, entities::sEntity& entity, bool r2000, std::uint16_t type,
 		              bool modern = false, sRevision const& revision = {}) {
 			switch (type) {
+			case 0x2d:
+			case 0x2e:
+			case 0x2f:
+				entity.geometry = ReadCadRenderData(stream, type, r2000, revision);
+				break;
+
 			case 0x1f:
 			case 0x20: {
 				entities::sSolid solid;
@@ -1558,10 +1651,20 @@ namespace gtl::dwg::detail {
 						entity.handle = object.handle;
 						entity.type = object.type;
 						auto common = EntityHeader(stream, entity, r2000, modern, revision);
-						bool supported = (type >= 0x0c && type <= 0x0e) || (type >= 0x1c && type <= 0x1e) || type == 0x21 || type == 0x28 || type == 0x29 || (type >= 1 && type <= 8) || type == 0x0a || type == 0x0b || type == 0x0f ||
-						                 type == 0x10 || type == 0x11 || type == 0x12 || type == 0x13 || type == 0x1b ||
-						                 (type >= 0x14 && type <= 0x1a) || type == 0x1f || type == 0x20 ||
-						                 type == 0x23 || type == 0x24 || type == 0x2c || type == 0x4d || type == 0x4e;
+						entity.binary.assign(payload.begin(), payload.end());
+						entity.dataBitOffset = stream.Position();
+						entity.handleBitOffset = common.handles;
+						entity.bitLength = payload.size() * 8;
+						if (auto cls = document.classes.find(object.type);
+							cls != document.classes.end() && cls->second.itemClass == 0x1f2)
+							entity.className = cls->second.dxfName;
+						bool supported = (type >= 0x0c && type <= 0x0e) || (type >= 0x1c && type <= 0x1e) ||
+										 type == 0x21 || type == 0x28 || type == 0x29 || (type >= 1 && type <= 8) ||
+										 type == 0x0a || type == 0x0b || type == 0x0f || type == 0x10 || type == 0x11 ||
+										 type == 0x12 || type == 0x13 || type == 0x1b ||
+										 (type >= 0x14 && type <= 0x1a) || type == 0x1f || type == 0x20 ||
+										 type == 0x23 || type == 0x24 || type == 0x2c || type == 0x2d || type == 0x2e ||
+										 type == 0x2f || type == 0x4d || type == 0x4e;
 						if (supported)
 							Geometry(stream, entity, r2000, type, modern, revision);
 						EntityHandles(handles, entity, common, r2000, modern, revision);

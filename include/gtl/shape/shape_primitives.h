@@ -141,6 +141,28 @@ namespace gtl::shape {
 		viewport,
 		xline,
 
+		// Appended without changing existing enum values.
+		attdef,
+		attrib,
+		mleader,
+		tolerance,
+		wipeout,
+		oleframe,
+		ole2frame,
+		mline,
+		helix,
+		solid3d,
+		body,
+		region,
+		surface,
+		mesh,
+		table,
+		shape,
+		section,
+		light,
+		sun,
+		proxy_entity,
+
 		layer = 127,
 		drawing = 128,
 

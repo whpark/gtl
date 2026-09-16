@@ -103,9 +103,24 @@ namespace gtl::dwg::entities {
 		std::vector<sPatternLine> patternLines;
 		std::vector<point_t> seeds;
 	};
+	struct sCadRenderData {
+		struct sGroup {
+			std::int16_t code;
+			std::variant<double, string_t> value;
+		};
+		std::vector<sGroup> groups;
+		std::vector<handle_t> references;
+	};
 	// monostate retains common metadata for structural and unsupported entities.
-	using geometry_t = std::variant<std::monostate, sLine, sCircle, sArc, sPoint, sPolyline, sVertex, sInsert, sEllipse, sSpline, sText, sMText, sDimension, sHatch, sSolid, sFace3D, sRay, sShape, sFaceRecord>;
+	using geometry_t =
+		std::variant<std::monostate, sLine, sCircle, sArc, sPoint, sPolyline, sVertex, sInsert, sEllipse, sSpline,
+					 sText, sMText, sDimension, sHatch, sSolid, sFace3D, sRay, sShape, sFaceRecord, sCadRenderData>;
 	struct sEntity {
+		// Original object payload, starting at the type field (size prefix/CRC excluded).
+		// Offsets are relative to binary[0]. Coordinates remain in source space.
+		std::vector<std::uint8_t> binary;
+		std::uint64_t dataBitOffset{}, handleBitOffset{}, bitLength{};
+		string_t className;
 		handle_t handle{}, owner{}, layer{}, previous{}, next{};
 		std::uint16_t type{};
 		std::uint8_t mode{}; // 0: owner reference, 1: paper space, 2: model space
@@ -120,5 +135,4 @@ namespace gtl::dwg::entities {
 		point_t extrusion{0., 0., 1.};
 		geometry_t geometry;
 	};
-
 }

@@ -163,17 +163,99 @@ std::unique_ptr<TShape> Finish(std::unique_ptr<TShape> target, entities::xEntity
 	return target;
 }
 
+gtl::xCoordTrans3d CadOCS(point_t normal) {
+	auto length = std::hypot(normal.x, normal.y, normal.z);
+	if (!(length > 0) || !std::isfinite(length))
+		throw std::runtime_error("invalid CAD extrusion");
+	normal /= length;
+	auto cross = [](point_t a, point_t b) {
+		return point_t{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+	};
+	auto x = cross(std::abs(normal.x) < 1. / 64 && std::abs(normal.y) < 1. / 64 ? point_t{0, 1, 0} : point_t{0, 0, 1},
+				   normal);
+	x /= std::hypot(x.x, x.y, x.z);
+	auto y = cross(normal, x);
+	gtl::xCoordTrans3d ct;
+	ct.Init(1., cv::Matx33d{x.x, y.x, normal.x, x.y, y.y, normal.y, x.z, y.z, normal.z}, {}, {});
+	return ct;
+}
+std::unique_ptr<gtl::shape::xShape> PreserveCadEntity(entities::xEntity const &entity,
+													  sShapeConvertContext const &ctx) {
+	auto name = entity.m_sourceName;
+	if (name == "DIMENSION")
+		for (auto const &group : entity.m_sourceGroups)
+			if (group.eCode == 70) {
+				int flags = 0;
+				std::visit(
+					[&](auto const &value) {
+						if constexpr (std::is_integral_v<std::decay_t<decltype(value)>>)
+							flags = int(value);
+					},
+					group.value);
+				static std::array names{"DIMLINEAR", "DIMALIGNED",	 "DIMANGULAR", "DIMDIAMETRIC",
+										"DIMRADIAL", "DIMANGULAR3P", "DIMORDINATE"};
+				if ((flags & 7) < names.size())
+					name = names[flags & 7];
+				break;
+			}
+	auto result = gtl::shape::xShape::CreateShapeFromEntityName(name);
+	auto *cad = dynamic_cast<gtl::shape::xCadEntity *>(result.get());
+	if (!cad)
+		return {};
+	cad->m_entityName = ctx.Str(entity.m_sourceName);
+	for (auto const &group : entity.m_sourceGroups) {
+		gtl::shape::sCadGroup item;
+		item.code = static_cast<int16_t>(group.eCode);
+		std::visit(
+			[&](auto const &value) {
+				if constexpr (std::is_same_v<std::decay_t<decltype(value)>, string_t>)
+					item.value = ctx.Str(value);
+				else
+					item.value = value;
+			},
+			group.value);
+		cad->m_groups.push_back(std::move(item));
+	}
+	ApplyCommon(*cad, entity, ctx);
+	// Preserve placement/common fields even if an unfamiliar subclass layout stopped typed decoding.
+	for (auto const &group : entity.m_sourceGroups) {
+		if (group.eCode == 8)
+			if (auto value = std::get_if<string_t>(&group.value))
+				cad->m_strLayer = ctx.Str(*value);
+	}
+	return result;
+}
 std::unique_ptr<gtl::shape::xShape> ConvertSimpleEntity(entities::xEntity const& entity, sShapeConvertContext const& ctx) {
+	if (entities::xEntity::IsDataBackedName(entity.m_sourceName))
+		return PreserveCadEntity(entity, ctx);
 	switch (entity.GetEntityType()) {
 		case entities::eENTITY::_3dface: {
 			auto const* source = dynamic_cast<entities::x3DFace const*>(&entity);
 			if (!source) return {};
 			auto const& field = source->Subclasses().m_field;
-			auto target = std::make_unique<gtl::shape::xPolyline>();
-			target->m_bLoop = true;
-			target->m_pts = {PolyPoint(field.pt1()), PolyPoint(field.pt2()), PolyPoint(field.pt3()), PolyPoint(field.pt4())};
+			auto target = std::make_unique<gtl::shape::x3DFace>();
+			target->m_pts = {ShapePoint(field.pt1()), ShapePoint(field.pt2()), ShapePoint(field.pt3()),
+							 ShapePoint(field.pt4())};
+			target->m_invisibleEdges = static_cast<uint16_t>(field.flags());
 			return Finish(std::move(target), entity, ctx);
 		}
+		case entities::eENTITY::ray:
+		case entities::eENTITY::xline: {
+			std::unique_ptr<gtl::shape::xRay> target;
+			if (auto source = dynamic_cast<entities::xRay const *>(&entity)) {
+				target = std::make_unique<gtl::shape::xRay>();
+				target->m_origin = ShapePoint(source->Subclasses().m_field.pt0());
+				target->m_direction = ShapePoint(source->Subclasses().m_field.pt1());
+			} else if (auto source = dynamic_cast<entities::xXLine const *>(&entity)) {
+				target = std::make_unique<gtl::shape::xXLine>();
+				target->m_origin = ShapePoint(source->Subclasses().m_field.pt0());
+				target->m_direction = ShapePoint(source->Subclasses().m_field.pt1());
+			}
+			if (!target)
+				return {};
+			return Finish(std::move(target), entity, ctx);
+		}
+
 		case entities::eENTITY::line: {
 			auto const* source = dynamic_cast<entities::xLine const*>(&entity);
 			if (!source) return {};
@@ -305,9 +387,15 @@ std::unique_ptr<gtl::shape::xShape> ConvertSimpleEntity(entities::xEntity const&
 			auto const* trace = dynamic_cast<entities::xTrace const*>(&entity);
 			auto const* field = source ? &source->Subclasses().m_field : trace ? &trace->Subclasses().m_field : nullptr;
 			if (!field) return {};
-			auto target = std::make_unique<gtl::shape::xPolyline>();
-			target->m_bLoop = true;
-			target->m_pts = {PolyPoint(field->pt1()), PolyPoint(field->pt2()), PolyPoint(field->pt3()), PolyPoint(field->pt4())};
+			std::unique_ptr<gtl::shape::xSolid> target;
+			if (source)
+				target = std::make_unique<gtl::shape::xSolid>();
+			else
+				target = std::make_unique<gtl::shape::xTrace>();
+			auto ct = CadOCS(field->extrusion());
+			target->m_pts = {ct(ShapePoint(field->pt1())), ct(ShapePoint(field->pt2())), ct(ShapePoint(field->pt4())),
+							 ct(ShapePoint(field->pt3()))};
+			target->m_thickness = ct(gtl::shape::point_t{0, 0, field->thickness()});
 			return Finish(std::move(target), entity, ctx);
 		}
 		default:
@@ -421,6 +509,51 @@ void ConvertEntities(entities::entities_t const& entities, sShapeConvertContext 
 			converted = ConvertPolyline(*polyline, entities, i, ctx);
 		else
 			converted = ConvertSimpleEntity(entity, ctx);
+		if (auto cad = dynamic_cast<gtl::shape::xCadEntity *>(converted.get());
+			cad && (entity.m_sourceName == "DIMENSION" || entity.m_sourceName == "ACAD_TABLE" ||
+					entity.m_sourceName == "TABLE")) {
+			auto number = [&](int code, double fallback = 0.) {
+				for (auto const &tag : cad->m_groups)
+					if (tag.code == code)
+						return boost::apply_visitor(
+							[&](auto const &v) -> double {
+								if constexpr (std::is_arithmetic_v<std::decay_t<decltype(v)>>)
+									return (double)v;
+								else
+									return fallback;
+							},
+							tag.value);
+				return fallback;
+			};
+			gtl::shape::string_t name;
+			for (auto const &tag : cad->m_groups)
+				if (tag.code == 2)
+					if (auto s = boost::get<gtl::shape::string_t>(&tag.value)) {
+						name = *s;
+						break;
+					}
+			if (!name.empty())
+				if (auto block = findBlock(name); block && !block->m_shapes.empty()) {
+					gtl::xCoordTrans3d ct;
+					ct.m_origin = block->m_pt;
+					if (entity.m_sourceName == "DIMENSION")
+						ct.m_offset = gtl::shape::point_t{number(12), number(22), number(32)} + block->m_pt;
+					else {
+						ct.m_offset = {number(10), number(20), number(30)};
+						double angle = std::atan2(number(21), number(11, 1.));
+						ct.m_mat = ct.GetRotatingMatrixXY(deg_t{angle * 180 / std::numbers::pi});
+					}
+					for (auto const &original : block->m_shapes) {
+						auto item = original.NewClone();
+						if (!item)
+							continue;
+						item->Transform(ct, ct.IsRightHanded());
+						item->m_bVisible = item->m_bVisible && cad->m_bVisible;
+						add(std::move(item));
+					}
+					cad->m_bExternalGraphics = true;
+				}
+		}
 		if (converted)
 			add(std::move(converted));
 	}

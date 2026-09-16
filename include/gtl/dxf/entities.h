@@ -151,23 +151,51 @@ namespace gtl::dxf::entities {
 
 		virtual bool ReadSubclasses(group_iter_t& iter) = 0;
 
-		bool Read(group_iter_t& iter) {
-			auto const iter0 = iter;
-			for (; iter; ) {
-				if (iter->eCode == eGROUP_CODE::entity)
-					return true;
+		string_t m_sourceName;
+		std::vector<sGroup> m_sourceGroups;
+		bool m_bRawOnly{};
+		static bool IsDataBackedName(string_t const &name) {
+			static std::array names{
+				"DIMENSION",	"ATTDEF",		"ATTRIB",		   "LEADER",		"MULTILEADER",
+				"MLEADER",		"TOLERANCE",	"IMAGE",		   "UNDERLAY",		"PDFUNDERLAY",
+				"DWFUNDERLAY",	"DGNUNDERLAY",	"WIPEOUT",		   "OLEFRAME",		"OLE2FRAME",
+				"MLINE",		"HELIX",		"3DSOLID",		   "BODY",			"REGION",
+				"SURFACE",		"PLANESURFACE", "EXTRUDEDSURFACE", "LOFTEDSURFACE", "REVOLVEDSURFACE",
+				"SWEPTSURFACE", "MESH",			"ACAD_TABLE",	   "TABLE",			"SHAPE",
+				"SECTION",		"VIEWPORT",		"LIGHT",		   "SUN",			"ACAD_PROXY_ENTITY"};
+			return std::ranges::find(names, name) != names.end();
+		}
 
-				if (!ReadFieldMembers((sEntity&)*this, iter))
-					return false;
+		bool Read(group_iter_t &iter) {
+			m_bRawOnly = false;
+			m_sourceGroups.clear();
+			auto sourceEnd = iter;
+			for (; sourceEnd && sourceEnd->eCode != eGROUP_CODE::entity; ++sourceEnd)
+				m_sourceGroups.push_back(*sourceEnd);
+			auto readTyped = [&]() {
+				auto const iter0 = iter;
+				for (; iter;) {
+					if (iter->eCode == eGROUP_CODE::entity)
+						return true;
 
-				if (/*iter->eCode == eGROUP_CODE::subclass
-					and */!ReadSubclasses(iter)
-					)
-				{
-					break;
+					if (!ReadFieldMembers((sEntity &)*this, iter))
+						return false;
+
+					if (/*iter->eCode == eGROUP_CODE::subclass
+						and */
+						!ReadSubclasses(iter)) {
+						break;
+					}
 				}
-			}
-			return iter0 != iter;
+				return iter0 != iter;
+			};
+			if (readTyped() && iter == sourceEnd)
+				return true;
+			if (!IsDataBackedName(m_sourceName) || m_sourceGroups.empty())
+				return false;
+			static_cast<group_iter_t::base_t &>(iter) = sourceEnd;
+			m_bRawOnly = true;
+			return true;
 		}
 
 	public:
@@ -280,10 +308,14 @@ namespace gtl::dxf::entities {
 	//=============================================================================================================================
 	inline std::unique_ptr<xEntity> xEntity::CreateEntity(string_t const& name) {
 		auto const& map = GetEntityFactory();
-		if (auto iter = map.find(name); iter != map.end() and iter->second)
-			return iter->second();
+		if (auto iter = map.find(name); iter != map.end() and iter->second) {
+			auto entity = iter->second();
+			entity->m_sourceName = name;
+			return entity;
+		}
 		auto entity = std::make_unique<xUnknown>();
 		entity->m_name = name;
+		entity->m_sourceName = name;
 		return entity;
 	}
 
@@ -370,7 +402,7 @@ namespace gtl::dxf::entities {
 	GTL__DXF_ENTITY_DERIVED(xOle2Frame,		eENTITY::ole2_frame,	"OLE2FRAME",	TSubclass<sAcDbOle2Frame>);
 	GTL__DXF_ENTITY_DERIVED(xPoint,			eENTITY::point,			"POINT",		TSubclass<sAcDbPoint>);
 	GTL__DXF_ENTITY_DERIVED(xPolyline,		eENTITY::polyline,		"POLYLINE",		TSubclass<sAcDbPolyline>);
-	GTL__DXF_ENTITY_DERIVED(xRay,			eENTITY::ray,			"XRAY",			TSubclass<sAcDbRay>);
+	GTL__DXF_ENTITY_DERIVED(xRay, eENTITY::ray, "RAY", TSubclass<sAcDbRay>);
 	GTL__DXF_ENTITY_DERIVED(xRegion,			eENTITY::region,		"REGION",		TSubclass<sAcDbModelerGeometry>);
 	GTL__DXF_ENTITY_DERIVED(xSection,		eENTITY::section,		"SECTION",		TSubclass<sAcDbSection>);
 	GTL__DXF_ENTITY_DERIVED(xShape,			eENTITY::shape,			"SHAPE",		TSubclass<sAcDbShape>);

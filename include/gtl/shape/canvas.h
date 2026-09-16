@@ -102,6 +102,7 @@ namespace gtl::shape {
 		virtual void LineTo_Target(point_t const& ptTargetSystem) = 0;
 
 		virtual void PreDraw(xShape const&) = 0;
+        virtual void DrawCadEntity(xShape const&) {}
 		//virtual void Draw(xShape const&);
 
 		void MoveTo(point_t pt) {
@@ -240,8 +241,9 @@ namespace gtl::shape {
 		std::optional<xRect2d> GetClippingRect() override {
 			xRect2d rc;
 			rc.pt0() = m_ctI(xPoint2d(0, 0));
-			rc.pt1() = m_ctI(xPoint2d(m_img.cols, m_img.rows));
-			rc.NormalizeRect();
+			rc.pt1() = rc.pt0();
+            for(auto corner:{xPoint2d(m_img.cols,0),xPoint2d(0,m_img.rows),xPoint2d(m_img.cols,m_img.rows)})
+                rc.UpdateBoundary(m_ctI(corner));
 			return rc;
 		}
 	};

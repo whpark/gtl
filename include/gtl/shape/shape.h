@@ -41,6 +41,7 @@
 #include "canvas.h"
 #include "shape_primitives.h"
 #include "shape_others.h"
+#include "shapes/cad.h"
 
 //export module shape;
 

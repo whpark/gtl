@@ -13,6 +13,7 @@ namespace gtl::dwg {
 		std::string message;
 		std::vector<sDiagnostic> diagnostics;
 		size_t convertedEntities{};
+        size_t preservedEntities{}; // Data-backed CAD shapes, not decoded/rendered geometry.
 	};
 
 	class GTL__DWG_CLASS xDWG {

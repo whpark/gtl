@@ -67,6 +67,7 @@ public:
         m_target_interpolation_inverval = tolerance;
     }
     void PreDraw(gtl::shape::xShape const&) override {}
+    std::optional<gtl::xRect2d> GetClippingRect() override {return gtl::xRect2d{region.left(),region.top(),region.right(),region.bottom()};}
     bool Contains(gtl::shape::point_t p) const {
         return p.x >= region.left() && p.x <= region.right() && p.y >= region.top() && p.y <= region.bottom();
     }
@@ -398,6 +399,8 @@ void xMainWnd::SelectRegion(QPointF start,QPointF end) {
             auto* item=*it;if(!item->data(0,Qt::UserRole).isValid())continue;
             auto index=item->data(0,Qt::UserRole).toULongLong();
             if(index>=m_displayShapes.size() || !m_displayShapes[index]->m_bVisible || (m_filterUi.mouseFilter->isChecked() && !MatchesFilter(index)))continue;
+            // An infinite entity can cross a selection window but cannot be fully contained.
+            if(window && dynamic_cast<gtl::shape::xRay const*>(m_displayShapes[index]))continue;
             try {
                 xSelectionCanvas hit(region,m_ui.drawingView->Zoom());m_displayShapes[index]->Draw(hit);
                 if(hit.any && (window?hit.inside:hit.crossing)){

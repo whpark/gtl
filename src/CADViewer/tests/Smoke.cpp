@@ -12,6 +12,11 @@ int main(int argc, char** argv) { try {
  theApp.emplace(argc,argv);theApp->Init();auto& wnd=theApp->GetMainWnd();
  auto* tree=wnd.findChild<QTreeWidget*>("entityTree");auto* props=wnd.findChild<QTreeWidget*>("propertyTree");auto* view=wnd.findChild<gtl::qt::xLayeredMatView*>("drawingView");
  auto check=[](bool ok,char const* message){if(!ok){std::ofstream("build-dwg/verification/viewer-smoke/failure.txt")<<message;std::exit(2);}};
+ {
+  gtl::shape::xRay ray;ray.m_origin={-20,5,0};ray.m_direction={1,0,0};
+  xSelectionCanvas hit(QRectF(0,0,10,10),1.);ray.Draw(hit);check(hit.any && hit.crossing,"ray crossing selection missing");
+  ray.m_origin.y=20;xSelectionCanvas miss(QRectF(0,0,10,10),1.);ray.Draw(miss);check(!miss.any,"ray outside region selected");
+ }
  check(wnd.findChild<QAction*>("actionDirections")->isChecked(),"endpoint marks not enabled by default");
  for(auto path:{"build-dwg/verification/viewer-smoke/sample.dxf","src/test_dwg/DWG/sample_AC1032.dwg"}) {
   check(wnd.OpenFile(path),"open failed");QApplication::processEvents();
@@ -89,6 +94,32 @@ int main(int argc, char** argv) { try {
  tree->clearSelection();QApplication::processEvents();check(view->Count()==1,"multi clear overlay");
  QTimer::singleShot(0,[]{for(auto* w:QApplication::topLevelWidgets())if(auto* box=qobject_cast<QMessageBox*>(w))box->accept();});
  check(!wnd.OpenFile("missing.dwg"),"missing file accepted");check(view->Count()==1,"failed open removed drawing");
+ {
+  using namespace gtl::shape;
+  xDrawing drawing;auto layer=std::make_unique<xLayer>(L"CAD");
+  auto line=std::make_unique<xLine>();line->m_pt0={0,0,0};line->m_pt1={10,0,0};layer->m_shapes.push_back(std::move(line));
+  auto ray=std::make_unique<xRay>();ray->m_origin={0,5,0};ray->m_direction={1,0,0};layer->m_shapes.push_back(std::move(ray));
+  auto cad=std::make_unique<x3DSolid>();cad->m_entityName=L"3DSOLID";cad->m_groups={{1,string_t{L"body"}}};cad->m_binary.emplace();cad->m_binary->bytes={0,128,255};cad->m_origin={2,3,4};layer->m_shapes.push_back(std::move(cad));drawing.m_layers.push_back(std::move(layer));
+  auto path=QString("build-dwg/verification/viewer-smoke/cad.shape");WriteShapeFile(path,drawing);check(wnd.OpenFile(path),"CAD shape open failed");QApplication::processEvents();
+  drag(2,4,8,6);check(tree->selectedItems().isEmpty(),"window selected unbounded ray");
+  drag(8,4,2,6);check(tree->selectedItems().size()==1,"crossing did not select ray");check(view->Count()==2,"selected ray highlight missing");
+  check(wnd.SaveShape(path),"CAD shape save failed");auto restored=ReadShapeFile(path);
+  auto data=dynamic_cast<x3DSolid const*>(&restored->m_layers.front().m_shapes[2]);check(data && data->m_binary && data->m_binary->bytes==std::vector<uint8_t>{0,128,255} && data->m_origin==point_t{2,3,4},"CAD payload or placement lost in .shape");
+ }
+ {
+  auto legacy=ReadShapeFile("src/CADViewer/tests/legacy-cad-v0.shape");
+  auto* cad=dynamic_cast<gtl::shape::xCadEntity const*>(&legacy->m_layers.front().m_shapes[2]);
+  check(cad && !cad->m_bExternalGraphics && cad->m_binary && cad->m_binary->bytes==std::vector<uint8_t>{0,128,255},"legacy CAD .shape archive failed");
+ }
+ {
+  using namespace gtl::shape;
+  xDrawing drawing;auto layer=std::make_unique<xLayer>(L"Annotations");auto leader=std::make_unique<xLeader>();
+  leader->m_groups={{10,0.},{20,0.},{10,10.},{20,10.},{10,20.},{20,10.},{71,int16_t{1}}};layer->m_shapes.push_back(std::move(leader));drawing.m_layers.push_back(std::move(layer));
+  auto path=QString("build-dwg/verification/viewer-smoke/leader.shape");WriteShapeFile(path,drawing);check(wnd.OpenFile(path),"leader open failed");QApplication::processEvents();
+  drag(-5,-5,25,15);check(tree->selectedItems().size()==1 && view->Count()==2,"CAD leader selection or highlight missing");
+  auto image=view->grab().toImage();tree->topLevelItem(0)->setCheckState(0,Qt::Unchecked);QApplication::processEvents();check(image!=view->grab().toImage(),"CAD leader was not rendered");
+  wnd.grab().save("build-dwg/verification/viewer-smoke/cad-leader.png");
+ }
  #include "EditorChecks.inc"
  qInfo()<<"CADViewer smoke passed: DXF, DWG, entity selection, properties, highlight, clear and failed load.";
  theApp.reset();return 0;

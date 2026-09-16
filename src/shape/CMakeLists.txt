@@ -16,6 +16,8 @@ include(SelectLibraryConfigurations)
 select_library_configurations(TINYSPLINECXX)
 
 add_library(gtl.shape SHARED
+	cad_render.inc
+	../../include/gtl/shape/shapes/cad.h
 	canvas.cpp
 	dllmain.cpp
 	pch.cpp

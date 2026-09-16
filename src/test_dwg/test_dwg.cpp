@@ -432,8 +432,8 @@ TEST_CASE("dwg text and attributes decode native strings across all revisions", 
 		auto strings=[&](fixture::Bits& b){auto text=[&](std::u16string_view value){b.Short(static_cast<int>(value.size()));for(auto c:value)b.Raw(c,2);};text(u"\uac00\U0001f642");if(type!=1)text(u"TAG");if(type==3)text(u"Prompt");};
 		gtl::dwg::sDocument doc;
 		if(year<=2004){fixture::Graph graph{year!=14};graph.modern=year==2004;graph.Layer(1,"0");graph.Entity(type,2,0,geometry,{0});xTemporaryFile file;file.Write(year==2004?fixture::PackSections(graph.Sections()):graph.Bytes());
-			gtl::dwg::xDWG dwg;REQUIRE(dwg.ReadDWG(file.path));doc=dwg.GetDocument();gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);REQUIRE(report.convertedEntities==1);
-			auto const* text=dynamic_cast<gtl::shape::xText const*>(&drawing.m_layers.front().m_shapes.front());REQUIRE(text);CHECK(text->m_text==L"Hello");CHECK(text->m_height==Catch::Approx(2.));
+			gtl::dwg::xDWG dwg;REQUIRE(dwg.ReadDWG(file.path));doc=dwg.GetDocument();gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);REQUIRE(report.convertedEntities==(type==1?1:2));CHECK(report.preservedEntities==(type==1?0:1));
+			auto const* text=dynamic_cast<gtl::shape::xText const*>(&drawing.m_layers.front().m_shapes.back());REQUIRE(text);CHECK(text->m_text==L"Hello");CHECK(text->m_height==Catch::Approx(2.));
 		}else{gtl::dwg::sContainer container;container.version=year==2007?gtl::dwg::eVERSION::r2007:year==2010?gtl::dwg::eVERSION::r2010:year==2013?gtl::dwg::eVERSION::r2013:gtl::dwg::eVERSION::r2018;
 			for(auto const& [name,bytes]:fixture::UnicodeSections(year,u"test",false,type,geometry,strings,{0}))container.sections[name].data=bytes;doc=gtl::dwg::detail::ReadContainerObjects(container);}
 		REQUIRE(doc.entities.size()==1);auto const* text=std::get_if<gtl::dwg::entities::sText>(&doc.entities.front().geometry);REQUIRE(text);
@@ -453,8 +453,8 @@ TEST_CASE("dwg paper space selection and dimension blocks convert independently"
 		fixture::Graph graph;graph.Layer(1,"0");graph.Block(10,20,20);graph.Circle(20,10);
 		graph.Entity(0x15,30,0,[](fixture::Bits& b){b.Point({0,0,1});b.Raw(0,8);b.Raw(0,8);b.Double(0);b.Raw(0,1);b.Text("42");b.Double(0);b.Double(0);b.Point({2,3,1});b.Double(0);
 			b.Short(1);b.Short(1);b.Double(1);b.Double(42);b.Raw(std::bit_cast<std::uint64_t>(100.),8);b.Raw(std::bit_cast<std::uint64_t>(200.),8);for(int i=0;i<3;++i)b.Point({0,0,0});b.Double(0);b.Double(0);},{0,10});
-		xTemporaryFile file;file.Write(graph.Bytes());gtl::dwg::xDWG dwg;REQUIRE(dwg.ReadDWG(file.path));gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);REQUIRE(report.convertedEntities==1);
-		auto const* ellipse=dynamic_cast<gtl::shape::xEllipse const*>(&drawing.m_layers.front().m_shapes.front());REQUIRE(ellipse);CHECK(ellipse->m_ptCenter.x==102.);CHECK(ellipse->m_ptCenter.y==206.);
+		xTemporaryFile file;file.Write(graph.Bytes());gtl::dwg::xDWG dwg;REQUIRE(dwg.ReadDWG(file.path));gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);REQUIRE(report.convertedEntities==2);CHECK(report.preservedEntities==1);
+		auto const* ellipse=dynamic_cast<gtl::shape::xEllipse const*>(&drawing.m_layers.front().m_shapes.back());REQUIRE(ellipse);CHECK(ellipse->m_ptCenter.x==102.);CHECK(ellipse->m_ptCenter.y==206.);
 	}
 }
 
@@ -548,8 +548,8 @@ TEST_CASE("dwg SOLID and TRACE retain corner order for dimension arrow fills", "
 			for(auto p:{std::pair{0.,0.},std::pair{2.,0.},std::pair{0.,2.},std::pair{2.,2.}}){b.Raw(std::bit_cast<std::uint64_t>(p.first),8);b.Raw(std::bit_cast<std::uint64_t>(p.second),8);}if(r2000)b.Put(1,1);else b.Point({0,0,1});});
 		xTemporaryFile file;file.Write(graph.Bytes());gtl::dwg::xDWG dwg;REQUIRE(dwg.ReadDWG(file.path));gtl::dwg::sReadReport report;
 		gtl::dwg::sShapeOptions options;options.hatchBoundaryOnly=true;auto drawing=gtl::dwg::ToShape(dwg,&report,options);REQUIRE(report.convertedEntities==1);
-		auto const* poly=dynamic_cast<gtl::shape::xPolyline const*>(&drawing.m_layers.front().m_shapes.front());REQUIRE(poly);REQUIRE(poly->m_pts.size()==4);CHECK(poly->m_pts[2].x==2.);CHECK(poly->m_pts[2].y==2.);CHECK(poly->m_pts[2].z==3.);
-		options.hatchBoundaryOnly=false;gtl::dwg::ToShape(dwg,&report,options);CHECK(report.convertedEntities==2);
+		auto const* poly=dynamic_cast<gtl::shape::xSolid const*>(&drawing.m_layers.front().m_shapes.front());REQUIRE(poly);REQUIRE(poly->m_pts.size()==4);CHECK(poly->m_pts[2].x==2.);CHECK(poly->m_pts[2].y==2.);CHECK(poly->m_pts[2].z==3.);
+		options.hatchBoundaryOnly=false;gtl::dwg::ToShape(dwg,&report,options);CHECK(report.convertedEntities==3);
 	}
 }
 
@@ -777,7 +777,7 @@ TEST_CASE("dwg AC1018 object streams resolve explicit ownership and colors", "[d
 		graph.Entity(2,31,30,attribute,{0});graph.Entity(2,32,30,attribute,{0});graph.Entity(6,33,30,[](fixture::Bits&){});
 		xTemporaryFile file;file.Write(fixture::PackSections(graph.Sections()));gtl::dwg::xDWG dwg;
 		auto ok=dwg.ReadDWG(file.path);INFO(dwg.GetReport().message);REQUIRE(ok);
-		gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);CHECK(report.convertedEntities==3);
+		gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);CHECK(report.convertedEntities==5);CHECK(report.preservedEntities==2);
 		CHECK(report.diagnostics.empty());
 	}
 	SECTION("vertex list order is independent of numeric handles") {
@@ -814,7 +814,14 @@ TEST_CASE("dwg face ray and shape definitions preserve geometry", "[dwg][unit]")
   auto const& face=std::get<gtl::dwg::entities::sFace3D>(entities[0].geometry);CHECK(face.corners[2].y==5);CHECK(face.invisibleEdges==2);
   auto const& shape=std::get<gtl::dwg::entities::sShape>(entities[1].geometry);CHECK(shape.number==42);CHECK(shape.style==9);
   CHECK_FALSE(std::get<gtl::dwg::entities::sRay>(entities[2].geometry).bothWays);CHECK(std::get<gtl::dwg::entities::sRay>(entities[3].geometry).bothWays);
-  gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);CHECK(report.convertedEntities==3);CHECK(report.diagnostics.size()==4);
+  gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);CHECK(report.convertedEntities==4);CHECK(report.preservedEntities==1);CHECK(report.diagnostics.empty());
+  auto const* preserved=dynamic_cast<gtl::shape::xShapeEntity const*>(&drawing.m_layers.front().m_shapes[1]);
+  REQUIRE(preserved);REQUIRE(preserved->m_binary);
+  CHECK(preserved->m_binary->bytes==entities[1].binary);
+  CHECK(preserved->m_binary->dataBitOffset< preserved->m_binary->bitLength);
+  CHECK(dynamic_cast<gtl::shape::x3DFace const*>(&drawing.m_layers.front().m_shapes[0]));
+  CHECK(dynamic_cast<gtl::shape::xRay const*>(&drawing.m_layers.front().m_shapes[2]));
+  CHECK(dynamic_cast<gtl::shape::xXLine const*>(&drawing.m_layers.front().m_shapes[3]));
  }
 }
 
@@ -833,7 +840,9 @@ TEST_CASE("dwg polyface and mesh validate ownership counts and signed indices", 
   if(!ok)continue;
   auto const& poly=std::get<gtl::dwg::entities::sPolyline>(dwg.GetDocument().entities.front().geometry);CHECK(poly.points.size()==4);
   if(!mesh){REQUIRE(poly.faces.size()==1);CHECK(poly.faces[0].indices[1]==-2);}
-  gtl::dwg::sReadReport report;gtl::dwg::ToShape(dwg,&report);CHECK(report.convertedEntities==0);CHECK_FALSE(report.diagnostics.empty());
+  gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);CHECK(report.convertedEntities==1);CHECK(report.preservedEntities==1);CHECK(report.diagnostics.empty());
+  auto cad=dynamic_cast<gtl::shape::xMesh const*>(&drawing.m_layers.front().m_shapes.front());REQUIRE(cad);REQUIRE(cad->m_binary);CHECK_FALSE(cad->m_binary->bytes.empty());
+  CHECK(std::ranges::count_if(cad->m_groups,[](auto const& group){return group.code==10;})==4);
  }
 }
 
@@ -854,4 +863,61 @@ TEST_CASE("dwg new primitive decoders consume modern split streams", "[dwg][unit
  }
  fixture::Graph graph;graph.Layer(1,"0");graph.Entity(0x28,2,0,[](fixture::Bits& b){b.Point({0,0,0});b.Point({0,0,0});});
  xTemporaryFile file;file.Write(graph.Bytes());gtl::dwg::xDWG dwg;CHECK_FALSE(dwg.ReadDWG(file.path));
+}
+
+TEST_CASE("dwg CLASSES distinguishes preserved CAD entities from non-entities", "[dwg][unit]") {
+    for(auto name:{"IMAGE","MULTILEADER","3DSOLID","ACAD_TABLE","PDFUNDERLAY","VENDOR_ENTITY"})for(unsigned kind:{0x1f2u,0x1f3u}) {
+        CAPTURE(name,kind);fixture::Graph graph;graph.modern=true;graph.Layer(1,"0");
+        graph.Entity(500,2,0,[](fixture::Bits& b){b.Raw(0xa5,1);b.Raw(0x5a,1);});
+        xTemporaryFile file;file.Write(fixture::PackSections(graph.Sections(true,name,kind)));
+        gtl::dwg::xDWG dwg;auto ok=dwg.ReadDWG(file.path);INFO(dwg.GetReport().message);REQUIRE(ok);
+        gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);
+        CHECK(report.preservedEntities==(kind==0x1f2?1:0));CHECK(report.convertedEntities==report.preservedEntities);
+        if(kind!=0x1f2)continue;
+        auto const* cad=dynamic_cast<gtl::shape::xCadEntity const*>(&drawing.m_layers.front().m_shapes.front());REQUIRE(cad);REQUIRE(cad->m_binary);
+        CHECK(cad->m_entityName==gtl::ToStringW(name));CHECK(cad->m_binary->objectType==500);CHECK(cad->m_binary->handle==2);CHECK(cad->m_binary->bytes==dwg.GetDocument().entities.front().binary);
+        if(std::string_view{name}=="VENDOR_ENTITY")CHECK(dynamic_cast<gtl::shape::xProxyEntity const*>(cad));
+        gtl::dwg::sShapeOptions options;options.maxEntities=0;gtl::dwg::ToShape(dwg,&report,options);CHECK(report.convertedEntities==0);
+    }
+}
+
+TEST_CASE("dwg leader tolerance and mline decode render fields across revisions", "[dwg][unit][cad]") {
+    using namespace gtl::dwg;
+    for(unsigned year:{14u,2000u,2004u,2007u,2010u,2013u,2018u})for(unsigned type:{0x2du,0x2eu,0x2fu}) {
+        CAPTURE(year,type);
+        auto geometry=[&](fixture::Bits& b){
+            if(type==0x2e){if(year==14){b.Short(0);b.Double(1);b.Double(1);}b.Point({1,2,3});b.Point({1,0,0});b.Point({0,0,1});if(year<2007)b.Text("0.1%%vA");}
+            if(type==0x2d){b.Put(0,1);b.Short(0);b.Short(0);b.Long(2);b.Point({0,0,0});b.Point({10,10,0});b.Point({0,0,0});b.Point({0,0,1});b.Point({1,0,0});b.Point({0,0,0});b.Point({0,0,0});if(year==14)b.Double(0);if(year<2010){b.Double(2);b.Double(4);}b.Put(0,1);b.Put(1,1);b.Short(0);if(year==14){b.Double(0);b.Put(0,1);b.Put(0,1);b.Short(0);b.Short(0);}b.Put(0,1);b.Put(0,1);}
+            if(type==0x2f){b.Double(1);b.Raw(0,1);b.Point({0,0,0});b.Point({0,0,1});b.Short(1);b.Raw(2,1);b.Short(2);
+                for(double x:{0.,10.}){b.Point({x,0,0});b.Point({1,0,0});b.Point({0,1,0});for(double offset:{1.,-1.}){b.Short(2);b.Double(offset);b.Double(0);b.Short(0);}}
+            }
+        };
+        auto strings=[&](fixture::Bits& b){if(type==0x2e){std::u16string text=u"0.1%%vA";b.Short(static_cast<int>(text.size()));for(auto c:text)b.Raw(c,2);}};
+        std::vector<unsigned> handles(type==0x2d?2:1,0);
+        xTemporaryFile file;sDocument document;
+        if(year<=2004){fixture::Graph graph{year!=14};graph.modern=year==2004;graph.Layer(1,"0");graph.Entity(type,2,0,geometry,handles);file.Write(year==2004?fixture::PackSections(graph.Sections()):graph.Bytes());}
+        else {
+            auto sections=fixture::UnicodeSections(year,u"test",false,type,geometry,strings,handles);
+            if(year==2007){sContainer container;container.version=eVERSION::r2007;for(auto const& [name,bytes]:sections)container.sections[name].data=bytes;document=detail::ReadContainerObjects(container);}
+            else file.Write(fixture::PackSections(sections,year==2010?"AC1024":year==2013?"AC1027":"AC1032"));
+        }
+        if(year!=2007){xDWG dwg;auto ok=dwg.ReadDWG(file.path);INFO(dwg.GetReport().message);REQUIRE(ok);document=dwg.GetDocument();sReadReport report;auto drawing=ToShape(dwg,&report);REQUIRE(report.preservedEntities==1);REQUIRE(report.convertedEntities==1);auto const* cad=dynamic_cast<gtl::shape::xCadEntity const*>(&drawing.m_layers.front().m_shapes.front());REQUIRE(cad);CHECK_FALSE(cad->GetRenderGeometry().Empty());CHECK(cad->m_binary.has_value());}
+        REQUIRE(document.entities.size()==1);auto data=std::get_if<entities::sCadRenderData>(&document.entities.front().geometry);REQUIRE(data);CHECK(data->references.size()==handles.size());CHECK_FALSE(data->groups.empty());
+    }
+}
+TEST_CASE("dwg rejects excessive CAD render counts", "[dwg][unit][cad]") {
+    for(unsigned type:{0x2du,0x2fu}){
+        fixture::Graph graph;graph.Layer(1,"0");graph.Entity(type,2,0,[&](fixture::Bits& b){if(type==0x2d){b.Put(0,1);b.Short(0);b.Short(0);b.Long(20000);}else{b.Double(1);b.Raw(0,1);b.Point({0,0,0});b.Point({0,0,1});b.Short(1);b.Raw(255,1);b.Short(4096);}});
+        xTemporaryFile file;file.Write(graph.Bytes());gtl::dwg::xDWG dwg;CHECK_FALSE(dwg.ReadDWG(file.path));CHECK(dwg.GetReport().error==gtl::dwg::eREAD_ERROR::invalid_data);
+    }
+}
+
+TEST_CASE("dwg dimensions render definitions only without a cached block", "[dwg][unit][cad]") {
+    for(bool cached:{false,true}){
+        fixture::Graph graph;graph.Layer(1,"0");if(cached){graph.Block(10,20,20);graph.Circle(20,10);}
+        graph.Entity(0x15,30,0,[](fixture::Bits& b){b.Point({0,0,1});b.Raw(0,8);b.Raw(0,8);b.Double(0);b.Raw(0,1);b.Text("<>");b.Double(0);b.Double(0);b.Point({1,1,1});b.Double(0);b.Short(1);b.Short(1);b.Double(1);b.Double(10);b.Raw(0,8);b.Raw(0,8);b.Point({0,0,0});b.Point({10,0,0});b.Point({0,5,0});b.Double(0);b.Double(0);},{0,cached?10u:0u});
+        xTemporaryFile file;file.Write(graph.Bytes());gtl::dwg::xDWG dwg;REQUIRE(dwg.ReadDWG(file.path));gtl::dwg::sReadReport report;auto drawing=gtl::dwg::ToShape(dwg,&report);
+        auto cad=dynamic_cast<gtl::shape::xDimLinear const*>(&drawing.m_layers.front().m_shapes.front());REQUIRE(cad);CHECK(cad->m_bExternalGraphics==cached);auto rendered=cad->GetRenderGeometry();CHECK(rendered.Empty()==cached);
+        if(!cached){REQUIRE(rendered.lines.size()==9);CHECK(rendered.lines[2].pt0.y==5);CHECK(rendered.lines[2].pt1.x==10);REQUIRE(rendered.texts.size()==1);CHECK(rendered.texts[0].text==L"10");}
+    }
 }

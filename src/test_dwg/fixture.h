@@ -312,7 +312,7 @@ namespace fixture {
 			Entity(6,8,2,[](Bits&){});
 		}
 		std::vector<std::uint8_t> Bytes() const {return Container(objects,r2000);}
-		std::map<std::string,std::vector<std::uint8_t>> Sections(bool customClass=false) const {
+		std::map<std::string,std::vector<std::uint8_t>> Sections(bool customClass=false, std::string_view className="TEST_CLASS", unsigned classKind=0x1f3) const {
 			std::map<std::string,std::vector<std::uint8_t>> sections;
 			auto& data=sections["AcDb:AcDbObjects"];data={0xca,0x0d,0,0};
 			std::vector<std::uint8_t> map(2);unsigned previousHandle{},previousOffset{};
@@ -324,7 +324,7 @@ namespace fixture {
 			std::vector<std::uint8_t> end{0,2};Word(end,Crc(end),true);map.insert(map.end(),end.begin(),end.end());sections["AcDb:Handles"]=map;
 			std::vector<std::uint8_t> classes{0x8d,0xa1,0xc4,0xb8,0xc4,0xa9,0xf8,0xc5,0xc0,0xdc,0xf4,0x5f,0xe7,0xcf,0xb6,0x8a};
 			Bits body;body.Short(customClass?500:499);body.Raw(0,2);body.Put(1,1);
-			if(customClass){body.Short(500);body.Short(0);body.Text("GTL");body.Text("TestClass");body.Text("TEST_CLASS");body.Put(0,1);body.Short(0x1f3);body.Long(0);body.Long(0x10000);body.Long(0x20000);body.Long(0);body.Long(0);}
+			if(customClass){body.Short(500);body.Short(0);body.Text("GTL");body.Text("TestClass");body.Text(className);body.Put(0,1);body.Short(classKind);body.Long(0);body.Long(0x10000);body.Long(0x20000);body.Long(0);body.Long(0);}
 			classes.resize(20);LongAt(classes,16,static_cast<unsigned>(body.data.size()));
 			classes.insert(classes.end(),body.data.begin(),body.data.end());Word(classes,Crc({classes.begin()+16,classes.end()}));
 			for(size_t i=0;i<16;++i)classes.push_back(static_cast<std::uint8_t>(~classes[i]));

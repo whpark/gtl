@@ -20,10 +20,11 @@ returns the existing `gtl::shape::xDrawing` type.
   origins and directions; SHAPE placement, number and shapefile/style handle;
   PFACE/MESH dimensions, vertices and signed face indices. Mesh ownership,
   counts and face indices are validated. Negative indices retain hidden edges.
-  3DFACE converts to visible wireframe edges, without surface filling.
-  RAY/XLINE, SHAPE glyphs and PFACE/MESH surfaces remain document data with
-  explicit output-omission diagnostics; infinite geometry is not given an
-  arbitrary finite extent. Mesh smoothing is not evaluated.
+  3DFACE converts to `x3DFace`, retaining hidden-edge flags. RAY/XLINE convert to
+  unbounded `xRay`/`xXLine` shapes clipped to the canvas viewport or explicit ROI;
+  they do not contribute finite auto-fit bounds. SHAPE and PFACE/MESH convert to
+  data-backed CAD shapes: object payloads and decoded mesh vertex/face groups
+  are retained, but glyph/surface rendering and mesh smoothing are not evaluated.
 - Geometry: LINE, CIRCLE, ARC, POINT, LWPOLYLINE (including class-based type
   lookup), 2D/3D POLYLINE and VERTEX. Linked vertex ownership and SEQEND records
   are validated. File strings have trailing NUL terminators removed; the Shape adapter converts layer names
@@ -63,9 +64,16 @@ returns the existing `gtl::shape::xDrawing` type.
 - DIMENSION: ordinate, linear, aligned, angular (three-point/two-line), radius and
   diameter definitions, text, measurement, styles and anonymous block references.
   Cached anonymous blocks convert with the dimension's placement and scale.
-  A missing cache is reported; regenerating a dimension from DIMSTYLE is not done.
+  A missing cache is reported; decoded defining points then provide basic dimension
+  lines, arrows and measurement text. Full DIMSTYLE-based regeneration is not done.
+- LEADER, TOLERANCE and MLINE: version-specific render fields and referenced handles
+  are decoded, while the complete entity payload remains available. Their CAD shapes
+  render basic paths/arrows, tolerance frames/text and multiline elements. DWG
+  MULTILEADER, HELIX and TABLE still preserve binary data without rendering.
 - 2D SOLID/TRACE records, including dimension arrowheads, retain all four OCS
-  corners and convert through the same boundary/scanline fill path as solid hatches.
+  corners in native `xSolid`/`xTrace` shapes (perimeter order 0,1,3,2), including
+  extrusion/thickness transforms. Unless `hatchBoundaryOnly` is set, the existing
+  scanline fill approximation is emitted in addition to the native wireframe.
 - HATCH: polyline/bulge, line, circular/elliptical arc and spline paths, boundary
   handles, pattern definitions, seed points and gradient metadata. Pattern lines
   are clipped against contours using the hatch island style. Solid and gradient
@@ -88,11 +96,19 @@ returns the existing `gtl::shape::xDrawing` type.
   AC1018 through AC1032, independently of drawing conversion.
 
 This is a partial drawing reader, not a complete CAD database implementation.
-3D solids and custom object payloads are not implemented. Materials and visual
+3D solid kernels and custom object renderers are not implemented. Materials and visual
 styles are not reconstructed. Text bounds currently use the Shape insertion-point
 bound rather than font-metric glyph extents.
 Unknown payloads have their boundaries and CRC checked and are recorded in the
-diagnostics with the source type and handle. Their raw bytes are not retained.
+diagnostics with the source type and handle. Recognized entity records now retain their original payload bytes and data/handle
+bit offsets, including entities identified through CLASSES; non-entity objects
+are not converted into shapes. `xCadEntity` stores this payload with the DWG
+version/codepage/type/handle and accumulated block placement. Known CAD names
+select concrete CAD shape classes; unknown entity class names use `xProxyEntity`.
+Attributes and dimensions retain their data alongside existing text/block output.
+`report.preservedEntities` counts these data-backed shapes and is included in
+`convertedEntities`; these counts do not imply visible or fully decoded geometry.
+Referenced resources and the complete CAD object graph are not embedded.
 No byte-preserving round trip or writing API is provided.
 
 `ToShape` omits external/unloaded blocks, fitted polylines, tilted circular curves,
