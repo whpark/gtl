@@ -1110,5 +1110,30 @@ namespace gtl {
 	GTL__API std::expected<bool, std::string> ZipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder, std::string const& svFormat = {});
 	GTL__API std::expected<bool, std::string> UnzipFolder(std::filesystem::path const& pathZip, std::filesystem::path const& folder, std::string const& strFormat = {} /*Not Used*/);
 
+	//-----------------------------------------------------------------------------
+	// Archive (zip, 7z, ...) reading. (libarchive)
+
+	struct sArchiveEntry {
+		std::filesystem::path path;		// relative path in archive. ('/' separated, no trailing '/')
+		uint64_t size{};
+		std::chrono::system_clock::time_point tLastWrite;
+		bool bDir{};
+	};
+
+	/// @brief checks extension only. (.zip, .7z)
+	GTL__API bool IsArchiveFile(std::filesystem::path const& path);
+
+	/// @brief splits "D:/a/b.zip/sub/img.png" into {"D:/a/b.zip", "sub/img.png"}.
+	/// @return nullopt if no archive file (existing regular file) found in path. inner path is empty if path is the archive itself.
+	GTL__API std::optional<std::pair<std::filesystem::path, std::filesystem::path>> SplitArchivePath(std::filesystem::path const& path);
+
+	/// @brief list all entries. (headers only. no decompression)
+	GTL__API std::expected<std::vector<sArchiveEntry>, std::string> ListArchive(std::filesystem::path const& pathArchive);
+
+	/// @brief extracts one entry into memory.
+	/// @param fnProgress (read, total) -> false to cancel
+	GTL__API std::expected<std::vector<uint8_t>, std::string> ReadArchiveEntry(std::filesystem::path const& pathArchive, std::filesystem::path const& pathEntry,
+		std::function<bool(uint64_t read, uint64_t total)> const& fnProgress = {});
+
 #pragma pack(pop)
 }	// namespace gtl;

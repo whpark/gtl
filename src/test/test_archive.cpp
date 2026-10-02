@@ -449,4 +449,58 @@ TEST(gtl_archive, ZipFolder) {
 		EXPECT_TRUE(result.value());
 	}
 
+	// list / read
+	for (auto const& name : {L"가나다.zip", L"가나다.7z"}) {
+		auto const pathArchive = root / name;
+		EXPECT_TRUE(gtl::IsArchiveFile(pathArchive));
+
+		auto entries = gtl::ListArchive(pathArchive);
+		REQUIRE(entries.has_value());
+		auto iter = std::ranges::find(*entries, fs::path(L"서브1/file_서브1_3.txt"), &gtl::sArchiveEntry::path);
+		REQUIRE(iter != entries->end());
+		EXPECT_FALSE(iter->bDir);
+		EXPECT_TRUE(std::ranges::find(*entries, fs::path(L"서브1"), &gtl::sArchiveEntry::path) != entries->end());
+
+		auto data = gtl::ReadArchiveEntry(pathArchive, L"서브1/file_서브1_3.txt");
+		REQUIRE(data.has_value());
+		EXPECT_EQ(*data, gtl::FileToContainer<std::vector<uint8_t>>(path / L"서브1/file_서브1_3.txt").value_or(std::vector<uint8_t>{}));
+		EXPECT_EQ(data->size(), iter->size);
+
+		EXPECT_FALSE(gtl::ReadArchiveEntry(pathArchive, L"not_exist.txt").has_value());
+
+		auto split = gtl::SplitArchivePath(pathArchive / L"서브1/file_서브1_3.txt");
+		REQUIRE(split.has_value());
+		EXPECT_EQ(split->first, pathArchive);
+		EXPECT_EQ(split->second, fs::path(L"서브1/file_서브1_3.txt"));
+	}
+	EXPECT_FALSE(gtl::SplitArchivePath(path / L"서브1/file_서브1_3.txt").has_value());
+
+	// legacy zip : names in CP949 without utf-8 flag
+	{
+		fs::path const folder = root / "legacy_src";
+		fs::create_directories(folder / "XXXX1");
+		{
+			std::ofstream os(folder / "XXXX1" / "a.txt");
+			os << "legacy\n";
+		}
+		fs::path const pathAscii = root / "legacy_ascii.zip";
+		REQUIRE(gtl::ZipFolder(pathAscii, folder, ".zip").has_value());
+		auto buf = gtl::FileToContainer<std::string>(pathAscii).value_or(std::string{});
+		std::string const cp949 = "\xBC\xAD\xBA\xEA";	// "서브"
+		for (auto pos = buf.find("XXXX"); pos != buf.npos; pos = buf.find("XXXX", pos))
+			buf.replace(pos, 4, cp949);
+		fs::path const pathLegacy = root / "legacy_cp949.zip";
+		REQUIRE(gtl::ContainerToFile(buf, pathLegacy));
+
+		auto entries = gtl::ListArchive(pathLegacy);
+		REQUIRE(entries.has_value());
+		wchar_t cp[16]{};
+		if (GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IDEFAULTCODEPAGE, cp, (int)std::size(cp)) > 0 and _wtoi(cp) == 949) {
+			EXPECT_TRUE(std::ranges::find(*entries, fs::path(L"서브1/a.txt"), &gtl::sArchiveEntry::path) != entries->end());
+			auto data = gtl::ReadArchiveEntry(pathLegacy, L"서브1/a.txt");
+			REQUIRE(data.has_value());
+			EXPECT_EQ(data->size(), fs::file_size(folder / "XXXX1" / "a.txt"));
+		}
+	}
+
 }

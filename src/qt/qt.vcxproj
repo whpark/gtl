@@ -182,6 +182,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <ClCompile Include="QCollapsibleGroupBox.cpp" />
     <ClCompile Include="QFileFolderBrowser.cpp" />
     <ClCompile Include="QGlazeModel.cpp" />
+    <ClCompile Include="QArchiveFileSystemModel.cpp" />
     <ClCompile Include="QPathCompleter.cpp" />
     <ClCompile Include="util.cpp" />
     <QtMoc Include="..\..\include\gtl\qt\QFileFolderBrowser.h" />
@@ -198,6 +199,7 @@ xcopy /y "$(OutDir)$(TargetName)$(TargetExt)" "$(SolutionDir)bin\"
     <QtMoc Include="..\..\include\gtl\qt\QRoundButton.h" />
     <ClInclude Include="..\..\include\gtl\qt\MatBitmapArchive.h" />
     <QtMoc Include="..\..\include\gtl\qt\ProgressDlg.h" />
+    <QtMoc Include="..\..\include\gtl\qt\QArchiveFileSystemModel.h" />
     <QtMoc Include="..\..\include\gtl\qt\QPathCompleter.h" />
     <QtMoc Include="..\..\include\gtl\qt\QGlazeModel.h" />
     <QtMoc Include="..\..\include\gtl\qt\QCollapsibleGroupBox.h" />

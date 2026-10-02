@@ -12,6 +12,7 @@ add_library(gtl.qt SHARED
 	MatBitmapArchive.cpp
 	pch.cpp
 	ProgressDlg.cpp
+	QArchiveFileSystemModel.cpp
 	QCollapsibleGroupBox.cpp
 	QColorButton.cpp
 	QFileFolderBrowser.cpp
@@ -41,6 +42,7 @@ add_library(gtl.qt SHARED
 	${CMAKE_SOURCE_DIR}/include/gtl/qt/QRoundButton.h
 	${CMAKE_SOURCE_DIR}/include/gtl/qt/ProgressDlg.h
 	${CMAKE_SOURCE_DIR}/include/gtl/qt/QPathCompleter.h
+	${CMAKE_SOURCE_DIR}/include/gtl/qt/QArchiveFileSystemModel.h
 	${CMAKE_SOURCE_DIR}/include/gtl/qt/QGlazeModel.h
 	${CMAKE_SOURCE_DIR}/include/gtl/qt/QCollapsibleGroupBox.h
 	${CMAKE_SOURCE_DIR}/include/gtl/qt/MatView/LayeredMatView.h

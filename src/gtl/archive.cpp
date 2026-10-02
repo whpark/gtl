@@ -209,4 +209,226 @@ namespace gtl {
 		return std::unexpected{std::format("ZipFolder exception: {}", e.what())};
 	}
 
+	//-----------------------------------------------------------------------------
+	// Archive reading
+
+	namespace {
+
+		/// @brief libarchive converts entry names into LC_CTYPE charset.
+		///  UTF-8 locale (per thread, not to touch global locale) : any name can be converted. (source charset : see OpenArchiveForRead())
+		class xUtf8CTypeScope {
+			int m_eThreadLocaleOld{};
+			std::string m_strLocaleOld;
+		public:
+			xUtf8CTypeScope() {
+				m_eThreadLocaleOld = _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
+				if (auto* p = std::setlocale(LC_CTYPE, nullptr))
+					m_strLocaleOld = p;
+				std::setlocale(LC_CTYPE, ".UTF-8");
+			}
+			~xUtf8CTypeScope() {
+				std::setlocale(LC_CTYPE, m_strLocaleOld.empty() ? "C" : m_strLocaleOld.c_str());
+				_configthreadlocale(m_eThreadLocaleOld);
+			}
+		};
+
+		struct sArchiveReadDeleter {
+			void operator () (struct archive* a) const { archive_read_free(a); }
+		};
+		using archive_read_ptr = std::unique_ptr<struct archive, sArchiveReadDeleter>;
+
+		std::string ArchiveError(struct archive* a, std::string_view msg) {
+			if (a) {
+				if (auto const* err = archive_error_string(a))
+					return std::format("{}: {}", msg, err);
+			}
+			return std::string(msg);
+		}
+
+		/// @brief OEM codepage of user locale. (ex, "CP949")
+		///  GetOEMCP() can be 65001 when "Beta: Use Unicode UTF-8 for worldwide language support" is on.
+		std::string GetLegacyCharset() {
+		#if (GTL__USE_WINDOWS_API)
+			wchar_t buf[16]{};
+			if (GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IDEFAULTCODEPAGE, buf, (int)std::size(buf)) > 0) {
+				if (int cp = _wtoi(buf); cp > 0 and cp != CP_UTF8)
+					return std::format("CP{}", cp);
+			}
+		#endif
+			return {};
+		}
+
+		/// @param bLegacyNames : zip names without utf-8 flag are in OEM codepage (ex, CP949). otherwise, UTF-8.
+		std::expected<archive_read_ptr, std::string> OpenArchiveForRead(fs::path const& pathArchive, bool bLegacyNames) {
+			archive_read_ptr a(archive_read_new());
+			if (!a)
+				return std::unexpected{std::string("archive_read_new failed")};
+			archive_read_support_format_all(a.get());
+			archive_read_support_filter_all(a.get());
+			if (!bLegacyNames)
+				archive_read_set_options(a.get(), "zip:hdrcharset=UTF-8");
+			else if (static auto const charset = GetLegacyCharset(); !charset.empty())
+				archive_read_set_options(a.get(), std::format("zip:hdrcharset={}", charset).c_str());
+			if (archive_read_open_filename_w(a.get(), pathArchive.c_str(), 64*1024) != ARCHIVE_OK)
+				return std::unexpected{ArchiveError(a.get(), "archive_read_open_filename failed")};
+			return a;
+		}
+
+		/// @brief iterates entries. tries UTF-8 names first, then legacy (OEM codepage) names if any name is not valid UTF-8.
+		/// @param fnReset : called on (re)start
+		/// @param fn (archive*, archive_entry*) -> true to stop
+		/// @return true if stopped by fn
+		template < typename TReset, typename TFunc >
+		std::expected<bool, std::string> ForEachEntry(fs::path const& pathArchive, TReset&& fnReset, TFunc&& fn) {
+			for (bool bLegacyNames : {false, true}) {
+				auto a = OpenArchiveForRead(pathArchive, bLegacyNames);
+				if (!a)
+					return std::unexpected{std::move(a.error())};
+				fnReset();
+				bool bRetry{};
+				struct archive_entry* entry{};
+				while (true) {
+					int r = archive_read_next_header(a->get(), &entry);
+					if (r == ARCHIVE_EOF)
+						break;
+					if (r == ARCHIVE_WARN and !bLegacyNames) {	// "Pathname cannot be converted from UTF-8 to current locale."
+						bRetry = true;
+						break;
+					}
+					if (r < ARCHIVE_WARN)
+						return std::unexpected{ArchiveError(a->get(), "archive_read_next_header failed")};
+					if (fn(a->get(), entry))
+						return true;
+				}
+				if (!bRetry)
+					break;
+			}
+			return false;
+		}
+
+		/// @brief entry name -> generic path without leading "./", "/" and trailing "/"
+		fs::path GetEntryPath(struct archive_entry* entry) {
+			std::wstring str;
+			if (auto const* w = archive_entry_pathname_w(entry))
+				str = w;
+			else if (auto const* u8 = archive_entry_pathname_utf8(entry))
+				str = fs::path((char8_t const*)u8).wstring();
+			else if (auto const* s = archive_entry_pathname(entry))
+				str = fs::path(s).wstring();
+			std::ranges::replace(str, L'\\', L'/');
+			std::wstring_view sv = str;
+			while (sv.starts_with(L"./"))
+				sv.remove_prefix(2);
+			while (sv.starts_with(L'/'))
+				sv.remove_prefix(1);
+			while (sv.ends_with(L'/'))
+				sv.remove_suffix(1);
+			return fs::path(sv);
+		}
+
+	}	// anonymous namespace
+
+	bool IsArchiveFile(std::filesystem::path const& path) {
+		auto ext = path.extension().wstring();
+		return (gtl::tszicmp<wchar_t>(ext, std::wstring_view(L".zip")) == 0) or (gtl::tszicmp<wchar_t>(ext, std::wstring_view(L".7z")) == 0);
+	}
+
+	std::optional<std::pair<std::filesystem::path, std::filesystem::path>> SplitArchivePath(std::filesystem::path const& path) {
+		std::error_code ec;
+		fs::path pathArchive;
+		auto iter = path.begin();
+		for (; iter != path.end(); iter++) {
+			pathArchive /= *iter;
+			if (!IsArchiveFile(*iter))
+				continue;
+			if (fs::is_regular_file(pathArchive, ec)) {
+				iter++;
+				break;
+			}
+		}
+		if (pathArchive.empty() or !IsArchiveFile(pathArchive) or !fs::is_regular_file(pathArchive, ec))
+			return std::nullopt;
+		fs::path inner;
+		for (; iter != path.end(); iter++) {
+			if (!iter->empty())
+				inner /= *iter;
+		}
+		return std::pair{std::move(pathArchive), fs::path(inner.generic_wstring())};
+	}
+
+	std::expected<std::vector<sArchiveEntry>, std::string> ListArchive(std::filesystem::path const& pathArchive) try {
+		xUtf8CTypeScope localeScope;
+
+		std::vector<sArchiveEntry> entries;
+		auto r = ForEachEntry(pathArchive, [&] { entries.clear(); }, [&](struct archive*, struct archive_entry* entry) {
+			sArchiveEntry e;
+			e.path = GetEntryPath(entry);
+			if (e.path.empty())
+				return false;
+			e.bDir = archive_entry_filetype(entry) == AE_IFDIR;
+			e.size = archive_entry_size_is_set(entry) ? (uint64_t)archive_entry_size(entry) : 0;
+			if (archive_entry_mtime_is_set(entry)) {
+				e.tLastWrite = std::chrono::system_clock::from_time_t(archive_entry_mtime(entry))
+					+ std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::nanoseconds(archive_entry_mtime_nsec(entry)));
+			}
+			entries.push_back(std::move(e));
+			return false;	// no archive_read_data_skip() needed. next_header skips (lazily for 7z)
+		});
+		if (!r)
+			return std::unexpected{std::move(r.error())};
+		return entries;
+	}
+	catch (std::exception& e) {
+		return std::unexpected{std::format("ListArchive exception: {}", e.what())};
+	}
+
+	std::expected<std::vector<uint8_t>, std::string> ReadArchiveEntry(std::filesystem::path const& pathArchive, std::filesystem::path const& pathEntry,
+		std::function<bool(uint64_t read, uint64_t total)> const& fnProgress) try
+	{
+		xUtf8CTypeScope localeScope;
+
+		auto const target = pathEntry.generic_wstring();
+		std::vector<uint8_t> buffer;
+		std::string error;
+		auto r = ForEachEntry(pathArchive, [] {}, [&](struct archive* a, struct archive_entry* entry) {
+			if (archive_entry_filetype(entry) != AE_IFREG)
+				return false;
+			if (GetEntryPath(entry).generic_wstring() != target)
+				return false;
+
+			if (archive_entry_is_encrypted(entry)) {
+				error = "encrypted entry is not supported";
+				return true;
+			}
+			uint64_t const total = archive_entry_size_is_set(entry) ? (uint64_t)archive_entry_size(entry) : 0;
+			buffer.reserve(total);
+			std::vector<uint8_t> block(1024*1024);
+			while (true) {
+				auto n = archive_read_data(a, block.data(), block.size());
+				if (n == 0)
+					break;
+				if (n < 0) {
+					error = ArchiveError(a, "archive_read_data failed");
+					break;
+				}
+				buffer.insert(buffer.end(), block.begin(), block.begin() + (size_t)n);
+				if (fnProgress and !fnProgress(buffer.size(), total)) {
+					error = "canceled";
+					break;
+				}
+			}
+			return true;
+		});
+		if (!r)
+			return std::unexpected{std::move(r.error())};
+		if (!*r)
+			return std::unexpected{std::format("entry not found: {}", gtl::WtoU8A(target))};
+		if (!error.empty())
+			return std::unexpected{std::move(error)};
+		return buffer;
+	}
+	catch (std::exception& e) {
+		return std::unexpected{std::format("ReadArchiveEntry exception: {}", e.what())};
+	}
+
 } // namespace gtl
