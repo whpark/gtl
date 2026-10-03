@@ -154,6 +154,11 @@ bool QArchiveFileSystemModel::LoadArchive(QModelIndex const& index0, bool bReloa
 
 	// moves tree (children of root) into archive
 	auto Adopt = [&]() {
+		if (!archive.root.children.empty()) {	// (re-entered load) never destroy nodes
+			auto husk = std::make_unique<sArchive>();
+			husk->root.children = std::move(archive.root.children);
+			Retire(std::move(husk));
+		}
 		archive.root.children = std::move(root->children);
 		archive.root.visible = std::move(root->visible);
 		for (auto& child : archive.root.children)
@@ -198,7 +203,7 @@ bool QArchiveFileSystemModel::LoadArchive(QModelIndex const& index0, bool bReloa
 		Adopt();
 		changePersistentIndexList(from, to);
 		emit layoutChanged();
-		Trash(std::move(husk));
+		Retire(std::move(husk));
 	}
 
 	emit dataChanged(index, index);	// updates expand arrow
@@ -283,11 +288,11 @@ void QArchiveFileSystemModel::BuildTree(sNode& root, std::vector<sArchiveEntry> 
 	Arrange(root);
 }
 
-void QArchiveFileSystemModel::Trash(std::unique_ptr<sArchive> archive) {
+void QArchiveFileSystemModel::Retire(std::unique_ptr<sArchive> archive) {
 	if (!archive)
 		return;
 
-	// safety net : no persistent index may point to a node to be freed.
+	// no persistent index may point to a retired node.
 	{
 		std::unordered_set<void const*> nodes;
 		auto Collect = [&](this auto&& self, sNode const& node) -> void {
@@ -308,21 +313,9 @@ void QArchiveFileSystemModel::Trash(std::unique_ptr<sArchive> archive) {
 			changePersistentIndexList(from, to);
 	}
 
-	bool const bFirst = m_trash.empty();
-	m_trash.push_back(std::move(archive));
-	if (!bFirst)
-		return;
-	QTimer::singleShot(0, this, [this]() {
-		auto Forget = [this](this auto&& self, sNode& node) -> void {
-			for (auto& child : node.children) {
-				m_nodes.erase(child.get());
-				self(*child);
-			}
-		};
-		for (auto& archive : m_trash)
-			Forget(archive->root);
-		m_trash.clear();
-	});
+	// kept until the model is destroyed. (stay in m_nodes)
+	//  any index still referring to them (plain index copies in views, ...) is recognized as virtual, never as QFileSystemNode.
+	m_retired.push_back(std::move(archive));
 }
 
 //-----------------------------------------------------------------------------
@@ -368,7 +361,7 @@ bool QArchiveFileSystemModel::hasChildren(QModelIndex const& parent) const {
 		return node->bDir and !node->visible.empty();
 	if (IsArchive(parent)) {
 		auto* archive = FindArchive(parent);
-		return !archive or !archive->bLoaded or !archive->root.visible.empty();	// not loaded yet : assume it has children
+		return archive and archive->bLoaded and !archive->root.visible.empty();	// not loaded yet : no children (until LoadArchive())
 	}
 	return base_t::hasChildren(parent);
 }
@@ -457,18 +450,6 @@ Qt::ItemFlags QArchiveFileSystemModel::flags(QModelIndex const& index) const {
 }
 
 void QArchiveFileSystemModel::sort(int column, Qt::SortOrder order) {
-	auto HasVirtual = [this]() {
-		for (auto const& idx : persistentIndexList()) {
-			if (GetNode(idx))
-				return true;
-		}
-		return false;
-	};
-	if (!HasVirtual()) {
-		base_t::sort(column, order);
-		return;
-	}
-
 	// QFileSystemModel::sort() casts every persistent index to its own node. park virtual ones on their archive index.
 	emit layoutAboutToBeChanged({}, QAbstractItemModel::VerticalSortHint);
 
@@ -556,7 +537,10 @@ QModelIndex QArchiveFileSystemModel::setRootPath(QString const& path) {
 	if (!split)
 		return base_t::setRootPath(path);
 	base_t::setRootPath(ToQString(split->first.parent_path()));
-	return index(path);
+	auto idx = index(path);	// loads archive if path is in archive
+	if (split->second.empty())
+		LoadArchive(idx);	// archive itself. (views don't fetch an item without children)
+	return idx;
 }
 
 QString QArchiveFileSystemModel::filePath(QModelIndex const& index) const {
@@ -629,7 +613,7 @@ void QArchiveFileSystemModel::OnRowsRemoved() {
 	// archive file removed (persistent indexes under it are already invalidated)
 	for (auto iter = m_archives.begin(); iter != m_archives.end(); ) {
 		if (!iter->second->index.isValid()) {
-			Trash(std::move(iter->second));
+			Retire(std::move(iter->second));
 			iter = m_archives.erase(iter);
 		}
 		else
@@ -639,7 +623,7 @@ void QArchiveFileSystemModel::OnRowsRemoved() {
 
 void QArchiveFileSystemModel::OnModelReset() {
 	for (auto& [key, archive] : m_archives)
-		Trash(std::move(archive));
+		Retire(std::move(archive));
 	m_archives.clear();
 }
 

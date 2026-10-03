@@ -7,8 +7,8 @@
 // PWH
 // 2026-10-03
 //
-//  - archive file (gtl::IsArchiveFile()) has an expand arrow (assumed to have children) until loaded.
-//  - archive is loaded (gtl::ListArchive()) on fetchMore() (expanding) or index(path).
+//  - archive file (gtl::IsArchiveFile()) has no children until loaded. (no expand arrow)
+//  - archive is loaded (gtl::ListArchive()) by LoadArchive(), setRootPath(archive or path in it), index(path in archive), fetchMore().
 //  - virtual nodes (entries in archive) follow filter() : QDir::Dirs/AllDirs -> folders, QDir::Files -> files (+nameFilters)
 //  - path of virtual node : "D:/folder/a.zip/sub/img.png"
 //  - DO NOT call QFileSystemModel's non-virtual functions (filePath, fileInfo, ...) with a virtual index.
@@ -63,8 +63,8 @@ protected:
 	};
 
 	std::map<QString, std::unique_ptr<sArchive>> m_archives;	// key : base_t::filePath()
-	std::unordered_set<void const*> m_nodes;	// all virtual nodes (except archive root)
-	std::vector<std::unique_ptr<sArchive>> m_trash;		// freed later (next event loop)
+	std::unordered_set<void const*> m_nodes;	// all virtual nodes (except archive root). never erased.
+	std::vector<std::unique_ptr<sArchive>> m_retired;	// detached trees (reload, removed archive, reset). freed with the model.
 
 public:
 	QArchiveFileSystemModel(QObject* parent = nullptr);
@@ -118,8 +118,8 @@ protected:
 	QModelIndex CreateIndex(sNode* node, int column) const;
 	/// @brief builds (sorted, filtered) tree under root. (root.archive must be set)
 	void BuildTree(sNode& root, std::vector<gtl::sArchiveEntry> const& entries);
-	/// @brief frees nodes later. invalidates persistent indexes still pointing to them.
-	void Trash(std::unique_ptr<sArchive> archive);
+	/// @brief keeps detached tree until the model is destroyed. invalidates persistent indexes pointing to it.
+	void Retire(std::unique_ptr<sArchive> archive);
 
 	void OnDataChanged(QModelIndex const& topLeft, QModelIndex const& bottomRight);
 	void OnRowsRemoved();
