@@ -24,6 +24,7 @@
 #include <unordered_set>
 #include <vector>
 #include "gtl/qt/_lib_gtl_qt.h"
+#include "gtl/archive.h"
 #include <QFileSystemModel>
 #include <QPersistentModelIndex>
 #include <QDateTime>
@@ -115,7 +116,9 @@ protected:
 	sNode* GetNode(QModelIndex const& index) const;
 	sArchive* FindArchive(QModelIndex const& index) const;	// index : archive file. (base index)
 	QModelIndex CreateIndex(sNode* node, int column) const;
-	void UnloadArchive(sArchive& archive);
+	/// @brief builds (sorted, filtered) tree under root. (root.archive must be set)
+	void BuildTree(sNode& root, std::vector<gtl::sArchiveEntry> const& entries);
+	/// @brief frees nodes later. invalidates persistent indexes still pointing to them.
 	void Trash(std::unique_ptr<sArchive> archive);
 
 	void OnDataChanged(QModelIndex const& topLeft, QModelIndex const& bottomRight);

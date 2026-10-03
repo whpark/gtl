@@ -119,11 +119,9 @@ bool QArchiveFileSystemModel::LoadArchive(QModelIndex const& index0, bool bReloa
 	QModelIndex const index = index0.siblingAtColumn(0);
 	auto const key = base_t::filePath(index);
 	auto& rArchive = m_archives[key];
-	if (rArchive and rArchive->bLoaded) {
-		if (!bReload)
-			return rArchive->error.isEmpty();
-		UnloadArchive(*rArchive);
-	}
+	bool const bLoaded = rArchive and rArchive->bLoaded;
+	if (bLoaded and !bReload)
+		return rArchive->error.isEmpty();
 	if (!rArchive) {
 		rArchive = std::make_unique<sArchive>();
 		rArchive->key = key;
@@ -133,22 +131,84 @@ bool QArchiveFileSystemModel::LoadArchive(QModelIndex const& index0, bool bReloa
 	}
 	auto& archive = *rArchive;
 	archive.index = index;
-	archive.sizeFile = base_t::size(index);
-	archive.tLastModified = base_t::lastModified(index);
-	archive.error.clear();
+	{
+		// not base_t::size(), lastModified() : file info may not be gathered yet. (-> false 'modified' later)
+		QFileInfo const fi(key);
+		archive.sizeFile = fi.size();
+		archive.tLastModified = fi.lastModified();
+	}
 
 	std::expected<std::vector<sArchiveEntry>, std::string> entries;
 	{
 		xWaitCursor wc;
 		entries = gtl::ListArchive(archive.path);
 	}
-	if (!entries) {
+	QString error;
+	auto root = std::make_unique<sNode>();
+	root->archive = &archive;
+	root->bDir = true;
+	if (entries)
+		BuildTree(*root, *entries);
+	else
+		error = ToQString(entries.error());
+
+	// moves tree (children of root) into archive
+	auto Adopt = [&]() {
+		archive.root.children = std::move(root->children);
+		archive.root.visible = std::move(root->visible);
+		for (auto& child : archive.root.children)
+			child->parent = &archive.root;
+		archive.error = error;
 		archive.bLoaded = true;
-		archive.error = ToQString(entries.error());
-		emit dataChanged(index, index);	// no more expand arrow
-		emit archiveLoadFailed(key, archive.error);
-		return false;
+	};
+
+	if (!bLoaded) {
+		if (auto n = (int)root->visible.size(); n > 0) {
+			beginInsertRows(index, 0, n-1);
+			Adopt();
+			endInsertRows();
+		}
+		else
+			Adopt();
 	}
+	else {
+		// reload : swap trees in a layout change.
+		//  (rows removal doesn't cover hidden nodes (ex, files view's root folder) -> dangling persistent indexes)
+		//  persistent indexes (view's root, selection, expanded) are moved to new nodes by path. archive index if not found.
+		emit layoutAboutToBeChanged();
+		QModelIndexList from, to;
+		for (auto const& idx : persistentIndexList()) {
+			auto* node = GetNode(idx);
+			if (!node or node->archive != &archive)
+				continue;
+			sNode* nodeNew = root.get();
+			for (auto const& name : node->path) {
+				auto iter = std::ranges::find_if(nodeNew->children, [&](auto const& child) { return child->path.filename() == name; });
+				if (iter == nodeNew->children.end()) {
+					nodeNew = nullptr;
+					break;
+				}
+				nodeNew = iter->get();
+			}
+			from.push_back(idx);
+			to.push_back(nodeNew ? createIndex(nodeNew->row, idx.column(), nodeNew) : index.siblingAtColumn(idx.column()));
+		}
+		auto husk = std::make_unique<sArchive>();
+		husk->root.children = std::move(archive.root.children);
+		Adopt();
+		changePersistentIndexList(from, to);
+		emit layoutChanged();
+		Trash(std::move(husk));
+	}
+
+	emit dataChanged(index, index);	// updates expand arrow
+	if (!error.isEmpty() and !bReload)
+		emit archiveLoadFailed(key, error);
+	return error.isEmpty();
+}
+
+void QArchiveFileSystemModel::BuildTree(sNode& root, std::vector<sArchiveEntry> const& entries) {
+	auto* archive = root.archive;
 
 	// filter
 	sFilter filter;
@@ -166,13 +226,13 @@ bool QArchiveFileSystemModel::LoadArchive(QModelIndex const& index0, bool bReloa
 	std::map<std::wstring, sNode*> dirs;
 	auto GetDir = [&](this auto&& self, fs::path const& path) -> sNode* {
 		if (path.empty())
-			return &archive.root;
+			return &root;
 		auto key = path.generic_wstring();
 		if (auto iter = dirs.find(key); iter != dirs.end())
 			return iter->second;
 		auto* parent = self(path.parent_path());
 		auto node = std::make_unique<sNode>();
-		node->archive = &archive;
+		node->archive = archive;
 		node->parent = parent;
 		node->bDir = true;
 		node->name = ToQString(path.filename().wstring());
@@ -181,7 +241,7 @@ bool QArchiveFileSystemModel::LoadArchive(QModelIndex const& index0, bool bReloa
 		dirs[key] = p;
 		return p;
 	};
-	for (auto const& entry : *entries) {
+	for (auto const& entry : entries) {
 		if (entry.bDir) {
 			auto* node = GetDir(entry.path);
 			node->tLastWrite = ToQDateTime(entry.tLastWrite);
@@ -189,7 +249,7 @@ bool QArchiveFileSystemModel::LoadArchive(QModelIndex const& index0, bool bReloa
 		}
 		auto* parent = GetDir(entry.path.parent_path());
 		auto node = std::make_unique<sNode>();
-		node->archive = &archive;
+		node->archive = archive;
 		node->parent = parent;
 		node->name = ToQString(entry.path.filename().wstring());
 		node->path = entry.path;
@@ -220,51 +280,34 @@ bool QArchiveFileSystemModel::LoadArchive(QModelIndex const& index0, bool bReloa
 				self(*child);
 		}
 	};
-	Arrange(archive.root);
-
-	// report
-	if (auto n = (int)archive.root.visible.size(); n > 0) {
-		beginInsertRows(index, 0, n-1);
-		archive.bLoaded = true;
-		endInsertRows();
-	}
-	else {
-		archive.bLoaded = true;
-	}
-	emit dataChanged(index, index);	// updates expand arrow
-	return true;
-}
-
-void QArchiveFileSystemModel::UnloadArchive(sArchive& archive) {
-	if (!archive.bLoaded)
-		return;
-
-	// nodes are freed later. (indexes may still be referenced in this event loop)
-	auto husk = std::make_unique<sArchive>();
-	QModelIndex const index = archive.index;
-	if (int n = (int)archive.root.visible.size(); n > 0 and index.isValid()) {
-		beginRemoveRows(index, 0, n-1);
-		husk->root.children = std::move(archive.root.children);
-		archive.root.children.clear();
-		archive.root.visible.clear();
-		archive.bLoaded = false;
-		endRemoveRows();
-	}
-	else {
-		husk->root.children = std::move(archive.root.children);
-		archive.root.children.clear();
-		archive.root.visible.clear();
-		archive.bLoaded = false;
-	}
-	archive.error.clear();
-	Trash(std::move(husk));
-	if (index.isValid())
-		emit dataChanged(index, index);
+	Arrange(root);
 }
 
 void QArchiveFileSystemModel::Trash(std::unique_ptr<sArchive> archive) {
 	if (!archive)
 		return;
+
+	// safety net : no persistent index may point to a node to be freed.
+	{
+		std::unordered_set<void const*> nodes;
+		auto Collect = [&](this auto&& self, sNode const& node) -> void {
+			for (auto const& child : node.children) {
+				nodes.insert(child.get());
+				self(*child);
+			}
+		};
+		Collect(archive->root);
+		QModelIndexList from, to;
+		for (auto const& idx : persistentIndexList()) {
+			if (nodes.contains(idx.internalPointer())) {
+				from.push_back(idx);
+				to.push_back(QModelIndex());
+			}
+		}
+		if (!from.isEmpty())
+			changePersistentIndexList(from, to);
+	}
+
 	bool const bFirst = m_trash.empty();
 	m_trash.push_back(std::move(archive));
 	if (!bFirst)
@@ -565,7 +608,7 @@ void QArchiveFileSystemModel::OnDataChanged(QModelIndex const& topLeft, QModelIn
 		QModelIndex const idx = archive->index;
 		if (!archive->bLoaded or !idx.isValid() or idx.parent() != parent or idx.row() < topLeft.row() or idx.row() > bottomRight.row())
 			continue;
-		if (base_t::size(idx) != archive->sizeFile or base_t::lastModified(idx) != archive->tLastModified)
+		if (QFileInfo const fi(key); fi.size() != archive->sizeFile or fi.lastModified() != archive->tLastModified)
 			keys.push_back(key);
 	}
 	if (keys.isEmpty())
